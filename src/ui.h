@@ -3,6 +3,7 @@
  
 enum kGameMode {
   kTitles, 
+  kGameWindow,
   kNGameModes
 };
 
@@ -24,3 +25,4 @@ void initiUI(void);
 
 void resetUI(void);
 
+LCDBitmap* getTitleNewGameBitmap(uint8_t _i);

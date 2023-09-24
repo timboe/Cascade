@@ -36,6 +36,9 @@ enum kGameMode getGameMode() {
   return m_mode;
 }
 
+LCDBitmap* getTitleNewGameBitmap(uint8_t _i) {
+  return m_UIBitmapTitleNew[_i];
+}
 
 // LCDSprite* getSaveSprite() { return m_UISpriteSave; } 
 
@@ -79,28 +82,6 @@ void updateUITitles(int _fc) {
 void updateUI(int _fc) {
 
 }
-
-
-// void addUIToSpriteList() {
-
-//   struct Player_t* p = getPlayer();
-
-//   if (m_mode == kTitles) {
-//     pd->sprite->addSprite(m_UISpriteSplash);
-//     pd->sprite->addSprite(m_UISpriteTitleVersion);
-//     pd->sprite->addSprite(m_UISpriteTitleSelected);
-//     for (int32_t i = 0; i < 3; ++i) {
-//       //#ifdef DEMO
-//       // XXX CAUTION
-//       if (i != 1) continue;
-//       //#endif
-//       pd->sprite->addSprite(m_UISpriteTitleNew[i]);
-//     }
-//     return;
-//   }
-
-//   TODO
-// }
 
 
 void setGameMode(enum kGameMode _mode) {
@@ -248,7 +229,7 @@ void initiUI() {
     // pd->sprite->moveTo(m_UISpriteTitleCont[i], i*TILE_PIX*7 + (7*TILE_PIX)/2 + (i+1)*TILE_PIX, DEVICE_PIX_Y - 2*TILE_PIX);
 
     pd->graphics->pushContext(m_UIBitmapTitleNew[i]);
-    pd->graphics->setDrawMode(kDrawModeFillWhite);
+    pd->graphics->setDrawMode(kDrawModeFillBlack);
     char text[32];
     snprintf(text, 32, "New Game");
     int16_t len = strlen(text);

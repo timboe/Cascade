@@ -1,7 +1,7 @@
-name=Playdate Survivors
+name=Cascade
 author=Tim Martin
 description=Proof of concept
-bundleID=uk.co.tim-martin.playdatesurvivors
+bundleID=uk.co.tim-martin.cascade
 version=0.1
 buildNumber=1
 imagePath=titles
