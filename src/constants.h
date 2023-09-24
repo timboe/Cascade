@@ -1,0 +1,48 @@
+
+#define DEV
+
+//#define DEMO
+
+//#define TITLE_LOGO_ONLY
+
+#define ALWAYS_FPS true
+
+/// ///
+
+#define TICK_FREQUENCY 30
+
+#define TILE_PIX 16
+
+#define DEVICE_PIX_X 400
+#define DEVICE_PIX_Y 240
+
+#define HALF_DEVICE_PIX_X (DEVICE_PIX_X/2)
+#define HALF_DEVICE_PIX_Y (DEVICE_PIX_Y/2)
+
+#define TRAUMA_DECAY 0.05f;
+#define TRAUMA_AMPLIFICATION 4
+
+#define SQRT_HALF 0.70710678118f
+
+#define Z_INDEX_UI_TTT 32767
+#define Z_INDEX_UI_TT 32766
+#define Z_INDEX_UI_T 32765
+#define Z_INDEX_UI_M 32764
+#define Z_INDEX_UI_B 32763
+#define Z_INDEX_UI_BB 32762
+#define Z_INDEX_UI_BBB 32761
+#define Z_INDEX_UI_BACK 32760
+
+#define Z_INDEX_BACKGROUND -1
+#define Z_INDEX_PLAYER 16000
+#define Z_INDEX_PROJECTILE 15000
+
+#define FLAG_BALL 0
+#define FLAG_TARGET 1
+#define FLAG_WALL 2
+
+#define BUTTON_PRESSED_FRAMES 8
+
+#define VERSION "v0.1"
+
+#define N_MUSIC_TRACKS 5

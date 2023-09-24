@@ -1,0 +1,8 @@
+name=Playdate Survivors
+author=Tim Martin
+description=Proof of concept
+bundleID=uk.co.tim-martin.playdatesurvivors
+version=0.1
+buildNumber=1
+imagePath=titles
+launchSoundPath=
