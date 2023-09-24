@@ -30,7 +30,7 @@ void render(int32_t _fc) {
   }
 
   const float offX = 0.0f;
-  const float offY = 0.0f;
+  const float offY = -getScrollOffset();
 
   pd->graphics->setDrawMode(kDrawModeCopy);
   pd->graphics->setDrawOffset(offX, offY);
@@ -66,6 +66,26 @@ void renderTitles(int32_t _fc) {
     kBitmapUnflipped);  
 }
 
+
+
 void renderGameWindow(int32_t _fc) {
+
+  const int32_t so = getScrollOffset();
+  const uint32_t start = so / WF_DIVISION_PIX_Y;
+
+  pd->system->logToConsole("so is %i, rendering from %i", so, start);
+
+  for (uint32_t i = start; i < start+5; ++i) {
+    if (i >= WFSHEET_SIZE_Y) break;
+    pd->graphics->drawBitmap(getBitmapWf(0,i),
+      0,
+      WF_DIVISION_PIX_Y * i,
+      kBitmapUnflipped);
+  }
+
+  pd->graphics->drawBitmap(getBitmapTurretBarrel(), DEVICE_PIX_X/2 - 32, -32, kBitmapUnflipped);
+  pd->graphics->drawBitmap(getBitmapTurretBody(), DEVICE_PIX_X/2 - 32, -32, kBitmapUnflipped);
+
+
 
 }

@@ -8,6 +8,8 @@
 
 enum kGameMode m_mode = 0;
 
+int32_t m_scrollOffset = 0;
+
 // LCDSprite* m_UISpriteSave = NULL;
 // LCDSprite* m_UISpriteSaveLoadProgress = NULL;
 // LCDSprite* m_UISpriteLoad = NULL;
@@ -252,4 +254,16 @@ void initiUI() {
     pd->graphics->popContext();
   }
 
+}
+
+int32_t getScrollOffset(void) {
+  return m_scrollOffset;
+}
+
+int32_t modScrollOffset(int32_t _mod) {
+  return (m_scrollOffset += _mod);
+}
+
+void setScrollOffset(int32_t _set) {
+  m_scrollOffset = _set;
 }

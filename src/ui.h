@@ -26,3 +26,9 @@ void initiUI(void);
 void resetUI(void);
 
 LCDBitmap* getTitleNewGameBitmap(uint8_t _i);
+
+int32_t getScrollOffset(void);
+
+int32_t modScrollOffset(int32_t _mod);
+
+void setScrollOffset(int32_t _set);

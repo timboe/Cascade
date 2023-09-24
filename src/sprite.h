@@ -11,16 +11,20 @@ LCDFont* getRoobert24(void);
 
 LCDFont* getRoobert10(void);
 
-// LCDBitmap* getSprite32(uint32_t _x, uint32_t _y);
+LCDBitmap* getBitmapWf(uint32_t _x, uint32_t _y);
 
-// LCDBitmap* getSprite32_byidx(uint32_t _idx);
+LCDBitmap* getBitmapWf_byidx(uint32_t _idx);
 
 LCDBitmap* getSpriteSplash(void);
 
 LCDBitmap* getTitleSelectedBitmap(void);
 
+LCDBitmap* getBitmapTurretBody(void);
 
-// Short-form versions too
-//#define SID(X, Y) ((SHEET32_SIZE_X * Y) + X)
-//#define SPRITE32_ID(X, Y) ((SHEET32_SIZE_X * Y) + X)
+LCDBitmap* getBitmapTurretBarrel(void);
+
+void setBarrelAngle(float _angle);
+
+
+#define WF_ID(X, Y) ((WFSHEET_SIZE_X * Y) + X)
 
