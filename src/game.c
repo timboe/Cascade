@@ -8,15 +8,9 @@
 #include "ui.h"
 #include "io.h"
 
-PlaydateAPI* pd = NULL;
-
 int32_t m_frameCount = 0;
 
 ////////////
-
-void setPDPtr(PlaydateAPI* _p) {
-  pd = _p;
-}
 
 int getFrameCount() { 
   return m_frameCount; 

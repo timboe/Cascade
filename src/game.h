@@ -4,11 +4,8 @@
 #include <stdbool.h> 
 
 #include "pd_api.h"
+#include "pdxalloc.h"
 #include "constants.h"
-
-extern PlaydateAPI* pd;
-
-void setPDPtr(PlaydateAPI* _p);
 
 int gameLoop(void* _data);
 
