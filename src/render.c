@@ -1,9 +1,10 @@
 #include <math.h>
 #include "render.h"
-#include "sprite.h"
+#include "bitmap.h"
 #include "io.h"
 #include "input.h"
 #include "ui.h"
+#include "physics.h"
 
 float m_trauma = 0.0f, m_decay = 0.0f;
 
@@ -67,24 +68,58 @@ void renderTitles(int32_t _fc) {
 }
 
 
+#define MAX(a,b) ((a) > (b) ? a : b)
+#define MIN(a,b) ((a) < (b) ? a : b)
+
 
 void renderGameWindow(int32_t _fc) {
 
   const int32_t so = getScrollOffset();
-  const uint32_t start = so / WF_DIVISION_PIX_Y;
+  const uint32_t start = MAX(0, so / WF_DIVISION_PIX_Y);
 
-  pd->system->logToConsole("so is %i, rendering from %i", so, start);
+  pd->system->logToConsole("so is %i, rendering from %i to %i", so, start, start+5);
 
   for (uint32_t i = start; i < start+5; ++i) {
     if (i >= WFSHEET_SIZE_Y) break;
-    pd->graphics->drawBitmap(getBitmapWf(0,i),
-      0,
-      WF_DIVISION_PIX_Y * i,
-      kBitmapUnflipped);
+    pd->graphics->drawBitmap(getBitmapWf(0,i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
   }
 
-  pd->graphics->drawBitmap(getBitmapTurretBarrel(), DEVICE_PIX_X/2 - 32, -32, kBitmapUnflipped);
   pd->graphics->drawBitmap(getBitmapTurretBody(), DEVICE_PIX_X/2 - 32, -32, kBitmapUnflipped);
+  pd->graphics->drawBitmap(getBitmapTurretBarrel(), DEVICE_PIX_X/2 - 32, -32, kBitmapUnflipped);
+
+  {
+    cpBody* ball = getBall();
+    const cpVect center = cpBodyGetPosition(ball);
+    const float angle = (cpBodyGetAngle(ball) / (M_PIf * 2.0f)) * 180.0f;
+    const float x = center.x - BALL_RADIUS;
+    const float y = center.y - BALL_RADIUS;
+    const float size = BALL_RADIUS * 2.0f;
+    pd->graphics->fillEllipse(x, y, size, size, 0.0f, 360.0f, kColorWhite);
+    pd->graphics->drawEllipse(x, y, size, size, 1, 0.0f,           360.0f,        kColorBlack);
+    pd->graphics->drawEllipse(x, y, size, size, 1, 0.0f,           360.0f,        kColorBlack);
+    pd->graphics->drawEllipse(x, y, size, size, 3, angle,          angle + 10.0f, kColorBlack);
+    pd->graphics->drawEllipse(x, y, size, size, 3, angle + 180.0f, angle + 190,   kColorBlack);
+
+    if (y < 400) setScrollOffset(y - HALF_DEVICE_PIX_Y);
+  }
+
+  for (int i = i; i < N_OBST; ++i) {
+    cpBody* obst = getObst(i);
+    const cpVect center = cpBodyGetPosition(obst);
+    const float y = center.y - BALL_RADIUS;
+
+    int off = y - getScrollOffset();
+    if (off < 0 || off > DEVICE_PIX_Y) continue;
+
+    const float angle = (cpBodyGetAngle(obst) / (M_PIf * 2.0f)) * 180.0f;
+    const float x = center.x - BALL_RADIUS;
+    const float size = BALL_RADIUS * 2.0f;
+    pd->graphics->fillEllipse(x, y, size, size, 0.0f, 360.0f, kColorBlack);
+    pd->graphics->drawEllipse(x, y, size, size, 1, 0.0f,           360.0f,        kColorWhite);
+    pd->graphics->drawEllipse(x, y, size, size, 1, 0.0f,           360.0f,        kColorWhite);
+    pd->graphics->drawEllipse(x, y, size, size, 3, angle,          angle + 10.0f, kColorWhite);
+    pd->graphics->drawEllipse(x, y, size, size, 3, angle + 180.0f, angle + 190,   kColorWhite);
+  }
 
 
 

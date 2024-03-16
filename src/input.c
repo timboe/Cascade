@@ -1,9 +1,10 @@
 #include "input.h"
-#include "sprite.h"
+#include "bitmap.h"
 #include "render.h"
 #include "sound.h"
 #include "ui.h"
 #include "io.h"
+#include "physics.h"
 
 uint8_t m_pressed[4] = {0};
 
@@ -61,11 +62,18 @@ void clickHandleTitles(uint32_t _buttonPressed) {
 
 void clickHandleGameWindow(uint32_t _buttonPressed) {
   if (kButtonA == _buttonPressed) {
-    //sfx(kSfxA);
-    //doIO(kDoNothing, /*and then*/ kDoNewWorld, /*and finally*/ kDoNothing);
-    setGameMode(kGameWindow);
+
+    cpBodySetPosition(getBall(), cpv(HALF_DEVICE_PIX_X, 0));
+    cpBodySetVelocity(getBall(), cpvzero);
+    cpBodySetAngle(getBall(), 0);
+    cpBodySetAngularVelocity(getBall(), 0);
+
   } else if (kButtonB == _buttonPressed) {
-    //sfx(kSfxNo);
+
+    for (int i = 0; i < N_OBST; ++i) {
+      cpBodySetPosition(getObst(i), cpv(rand() % DEVICE_PIX_X, rand() % DEVICE_PIX_Y*2));
+    }
+
   } else if (_buttonPressed == kButtonUp || _buttonPressed == kButtonDown) {
     modScrollOffset( _buttonPressed == kButtonDown ? 10 : -10 );
   }

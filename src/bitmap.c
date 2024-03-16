@@ -1,4 +1,4 @@
-#include "sprite.h"
+#include "bitmap.h"
 #include "input.h"
 
 

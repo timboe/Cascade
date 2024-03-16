@@ -26,5 +26,7 @@ void* pdxrealloc(void* ptr, size_t size) {
 }
 
 void pdxlog(char* msg) {
-	pd->system->logToConsole(msg);
+  #ifdef DEV
+  pd->system->logToConsole(msg);
+  #endif
 }
