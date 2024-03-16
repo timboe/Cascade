@@ -1,6 +1,6 @@
 #pragma once
 #include "game.h"
 
-void render(void);
+void render(int32_t _fc);
 
 void addTrauma(float _amount);

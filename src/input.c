@@ -11,7 +11,9 @@ void clickHandleWander(uint32_t _buttonPressed);
 
 void clickHandleTitles(uint32_t _buttonPressed);
 
-void rotateHandleWander(float _rotation);
+void clickHandleGameWindow(uint32_t _buttonPressed);
+
+void rotateHandleGameWindow(float _angle);
 
 void rotateHandleTitles(float _rotation);
 
@@ -41,6 +43,7 @@ bool aPressed() {
 void gameClickConfigHandler(uint32_t _buttonPressed) {
   switch (getGameMode()) {
     case kTitles: return clickHandleTitles(_buttonPressed);
+    case kGameWindow: return clickHandleGameWindow(_buttonPressed);
     case kNGameModes: break;
   }
 }
@@ -50,14 +53,30 @@ void clickHandleTitles(uint32_t _buttonPressed) {
   if (kButtonA == _buttonPressed) {
     //sfx(kSfxA);
     //doIO(kDoNothing, /*and then*/ kDoNewWorld, /*and finally*/ kDoNothing);
+    setGameMode(kGameWindow);
   } else if (kButtonB == _buttonPressed) {
     //sfx(kSfxNo);
   }
 }
 
+void clickHandleGameWindow(uint32_t _buttonPressed) {
+  if (kButtonA == _buttonPressed) {
+    //sfx(kSfxA);
+    //doIO(kDoNothing, /*and then*/ kDoNewWorld, /*and finally*/ kDoNothing);
+    setGameMode(kGameWindow);
+  } else if (kButtonB == _buttonPressed) {
+    //sfx(kSfxNo);
+  } else if (_buttonPressed == kButtonUp || _buttonPressed == kButtonDown) {
+    modScrollOffset( _buttonPressed == kButtonDown ? 10 : -10 );
+  }
+}
 
 void rotateHandleTitles(float _rotation) {
  
+}
+
+void rotateHandleGameWindow(float _angle) {
+  setBarrelAngle(_angle);
 }
 
 void clickHandlerReplacement() {
@@ -98,9 +117,13 @@ void clickHandlerReplacement() {
   if (released & kButtonUp) m_pressed[2] = 0;
   if (released & kButtonDown) m_pressed[3] = 0;
 
-  switch (gm) {
-    case kTitles: rotateHandleTitles(pd->system->getCrankChange()); break; 
-    default: break;
+  const float cc = pd->system->getCrankChange();
+  if (cc) {
+    switch (gm) {
+      case kTitles: rotateHandleTitles(pd->system->getCrankChange()); break; 
+      case kGameWindow: rotateHandleGameWindow(pd->system->getCrankAngle()); break;
+      default: break;
+    }
   }
 
 }

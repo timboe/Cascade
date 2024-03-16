@@ -8,17 +8,9 @@
 #include "ui.h"
 #include "io.h"
 
-PlaydateAPI* pd = NULL;
-
 int32_t m_frameCount = 0;
 
-uint8_t m_tickID;
-
 ////////////
-
-void setPDPtr(PlaydateAPI* _p) {
-  pd = _p;
-}
 
 int getFrameCount() { 
   return m_frameCount; 
@@ -66,7 +58,7 @@ int gameLoop(void* _data) {
   // }
 
 
-  render();
+  if (m_frameCount % 2) render(m_frameCount);
 
   return 1;
 }

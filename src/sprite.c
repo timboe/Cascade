@@ -6,6 +6,14 @@ LCDBitmap* m_titleSelected;
 
 LCDBitmap* m_splash;
 
+LCDBitmap* m_turretBody;
+
+LCDBitmap* m_turretBarrel;
+
+LCDBitmap* m_turretBarrelRotated;
+
+LCDBitmapTable* m_sheetWf;
+
 LCDFont* m_fontRoobert24;
 
 LCDFont* m_fontRoobert10;
@@ -48,16 +56,24 @@ LCDFont* loadFontAtPath(const char* _path) {
 LCDBitmap* getSpriteSplash() { return m_splash; }
 
 
-// LCDBitmap* getSprite32(uint32_t _x, uint32_t _y) {
-//   return getSprite32_byidx(SPRITE32_ID(_x, _y));
-// }
+LCDBitmap* getBitmapWf(uint32_t _x, uint32_t _y) {
+  return getBitmapWf_byidx(WF_ID(_x, _y));
+}
 
-// LCDBitmap* getSprite32_byidx(uint32_t _idx) {
-//   return pd->graphics->getTableBitmap(m_sheet32, _idx);
-// }
+LCDBitmap* getBitmapWf_byidx(uint32_t _idx) {
+  return pd->graphics->getTableBitmap(m_sheetWf, _idx);
+}
 
 LCDBitmap* getTitleSelectedBitmap() {
   return m_titleSelected;
+}
+
+LCDBitmap* getBitmapTurretBody(void) {
+  return m_turretBody;
+}
+
+LCDBitmap* getBitmapTurretBarrel(void) {
+  return m_turretBarrelRotated;
 }
 
 void setRoobert10() {
@@ -81,7 +97,22 @@ void initSprite() {
   m_titleSelected = loadImageAtPath("images/titleSelected");
   m_splash = loadImageAtPath("images/splash");
 
+  m_turretBody = loadImageAtPath("images/turretBody");
+  m_turretBarrel = loadImageAtPath("images/turretBarrel");
+  m_turretBarrelRotated = pd->graphics->newBitmap(64, 64, kColorClear);
+  setBarrelAngle(0.0f);
+
+  m_sheetWf = loadImageTableAtPath("images/falls");
+
   m_fontRoobert24 = loadFontAtPath("fonts/Roobert-24-Medium");
   m_fontRoobert10 = loadFontAtPath("fonts/Roobert-10-Bold");
   pd->graphics->setFont(m_fontRoobert24);
+}
+
+
+void setBarrelAngle(float _angle) {
+  pd->graphics->pushContext(m_turretBarrelRotated);
+  pd->graphics->clear(kColorClear);
+  pd->graphics->drawRotatedBitmap(m_turretBarrel, 32, 32, _angle, 0.5f, 0.5f, 1.0f, 1.0f);
+  pd->graphics->popContext();
 }
