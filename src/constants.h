@@ -9,7 +9,7 @@
 
 /// ///
 
-#define TICK_FREQUENCY 30
+#define TICK_FREQUENCY 50
 
 #define TILE_PIX 16
 
@@ -28,6 +28,8 @@
 #define TRAUMA_AMPLIFICATION 4
 
 #define SQRT_HALF 0.70710678118f
+
+#define N_OBST 50
 
 #define Z_INDEX_UI_TTT 32767
 #define Z_INDEX_UI_TT 32766

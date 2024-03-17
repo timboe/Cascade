@@ -3,7 +3,7 @@
 
 #include "pd_api.h"
 #include "game.h"
-#include "sprite.h"
+#include "bitmap.h"
 #include "sound.h"
 #include "ui.h"
 #include "io.h"

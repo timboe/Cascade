@@ -24,45 +24,45 @@ static PlaydateAPI* pd = NULL;
 static cpSpace *SPACE;
 static LCDBitmap* BG_BITMAP;
 void initSpace(void) {
-	SPACE = cpSpaceNew();
-	cpSpaceSetIterations(SPACE, 20);
-	cpSpaceSetGravity(SPACE, cpv(0.0, 400.0));
-	cpSpaceSetSleepTimeThreshold(SPACE, 0.5f);
-	cpSpaceSetCollisionSlop(SPACE, 0.5f);
+  SPACE = cpSpaceNew();
+  cpSpaceSetIterations(SPACE, 20);
+  cpSpaceSetGravity(SPACE, cpv(0.0, 400.0));
+  cpSpaceSetSleepTimeThreshold(SPACE, 0.5f);
+  cpSpaceSetCollisionSlop(SPACE, 0.5f);
 
-	BG_BITMAP = pd->graphics->loadBitmap("bg.png", NULL);
+  BG_BITMAP = pd->graphics->loadBitmap("bg.png", NULL);
 
-	// cpShape *shape;
-	// cpBody *staticBody = cpSpaceGetStaticBody(SPACE);
-	// shape = cpSpaceAddShape(SPACE,
-	// 	cpSegmentShapeNew(staticBody, cpv(0, 0), cpv(400, 0), 0.0f));
-	// cpShapeSetElasticity(shape, 1.0f);
-	// cpShapeSetFriction(shape, 1.0f);
+  // cpShape *shape;
+  // cpBody *staticBody = cpSpaceGetStaticBody(SPACE);
+  // shape = cpSpaceAddShape(SPACE,
+  //  cpSegmentShapeNew(staticBody, cpv(0, 0), cpv(400, 0), 0.0f));
+  // cpShapeSetElasticity(shape, 1.0f);
+  // cpShapeSetFriction(shape, 1.0f);
 
-	// shape = cpSpaceAddShape(SPACE,
-	// 	cpSegmentShapeNew(staticBody, cpv(400, 0), cpv(400, 240), 0.0f));
-	// cpShapeSetElasticity(shape, 1.0f);
-	// cpShapeSetFriction(shape, 1.0f);
+  // shape = cpSpaceAddShape(SPACE,
+  //  cpSegmentShapeNew(staticBody, cpv(400, 0), cpv(400, 240), 0.0f));
+  // cpShapeSetElasticity(shape, 1.0f);
+  // cpShapeSetFriction(shape, 1.0f);
 
-	// shape = cpSpaceAddShape(SPACE,
-	// 	cpSegmentShapeNew(staticBody, cpv(400, 240), cpv(0, 240), 0.0f));
-	// cpShapeSetElasticity(shape, 1.0f);
-	// cpShapeSetFriction(shape, 1.0f);
+  // shape = cpSpaceAddShape(SPACE,
+  //  cpSegmentShapeNew(staticBody, cpv(400, 240), cpv(0, 240), 0.0f));
+  // cpShapeSetElasticity(shape, 1.0f);
+  // cpShapeSetFriction(shape, 1.0f);
 
-	// shape = cpSpaceAddShape(SPACE,
-	// 	cpSegmentShapeNew(staticBody, cpv(0, 240), cpv(0, 0), 0.0f));
-	// cpShapeSetElasticity(shape, 1.0f);
-	// cpShapeSetFriction(shape, 1.0f);
+  // shape = cpSpaceAddShape(SPACE,
+  //  cpSegmentShapeNew(staticBody, cpv(0, 240), cpv(0, 0), 0.0f));
+  // cpShapeSetElasticity(shape, 1.0f);
+  // cpShapeSetFriction(shape, 1.0f);
 }
 
 void updateSpace(void) {
-	cpSpaceStep(SPACE, TIMESTEP);
+  cpSpaceStep(SPACE, TIMESTEP);
 }
 
 void drawSpace(void) {
-	// pd->graphics->drawBitmap(BG_BITMAP, NULL, NULL,
-		// 0, 0, kDrawModeCopy, 0, noClip);
-	pd->graphics->drawBitmap(BG_BITMAP, 0, 0, kDrawModeCopy);
+  // pd->graphics->drawBitmap(BG_BITMAP, NULL, NULL,
+    // 0, 0, kDrawModeCopy, 0, noClip);
+  pd->graphics->drawBitmap(BG_BITMAP, 0, 0, kDrawModeCopy);
 }
 
 // static int BODY_COUNT = 50;
@@ -82,99 +82,99 @@ static cpBody *DRUM_BODY;
 static cpConstraint *DRUM_PIfVOT;
 
 void initDrum(void) {
-	float moment = cpMomentForCircle(100.0f,
-			DRUM_RADIUS - DRUM_THICKNESS, DRUM_RADIUS, cpvzero);
-	DRUM_BODY = cpBodyNew(10.0, moment);
-	cpSpaceAddBody(SPACE, DRUM_BODY);
-	cpBodySetPosition(DRUM_BODY, cpv(DRUM_X, DRUM_Y));
+  float moment = cpMomentForCircle(100.0f,
+      DRUM_RADIUS - DRUM_THICKNESS, DRUM_RADIUS, cpvzero);
+  DRUM_BODY = cpBodyNew(10.0, moment);
+  cpSpaceAddBody(SPACE, DRUM_BODY);
+  cpBodySetPosition(DRUM_BODY, cpv(DRUM_X, DRUM_Y));
 
-	cpShape *shape;
-	for (int i = 0; i < DRUM_VERTS; i++) {
-		float starta = (M_PIf * 2.0f) / DRUM_VERTS * i;
-		float enda = (M_PIf * 2.0f) / DRUM_VERTS * (i + 1);
-		float startx = DRUM_RADIUS * cosf(starta);
-		float starty = DRUM_RADIUS * sinf(starta);
-		float endx = DRUM_RADIUS * cosf(enda);
-		float endy = DRUM_RADIUS * sinf(enda);
-	    shape = cpSegmentShapeNew(DRUM_BODY, cpv(startx, starty),
-					cpv(endx, endy), DRUM_THICKNESS / 2.0f);
-	    cpShapeSetFriction(shape, 0.5f);
-		cpSpaceAddShape(SPACE, shape);
-	}
+  cpShape *shape;
+  for (int i = 0; i < DRUM_VERTS; i++) {
+    float starta = (M_PIf * 2.0f) / DRUM_VERTS * i;
+    float enda = (M_PIf * 2.0f) / DRUM_VERTS * (i + 1);
+    float startx = DRUM_RADIUS * cosf(starta);
+    float starty = DRUM_RADIUS * sinf(starta);
+    float endx = DRUM_RADIUS * cosf(enda);
+    float endy = DRUM_RADIUS * sinf(enda);
+      shape = cpSegmentShapeNew(DRUM_BODY, cpv(startx, starty),
+          cpv(endx, endy), DRUM_THICKNESS / 2.0f);
+      cpShapeSetFriction(shape, 0.5f);
+    cpSpaceAddShape(SPACE, shape);
+  }
 
-	for (int i = 0; i < DRUMBUMP_COUNT; i++) {
-		float angle = (M_PIf * 2.0f) / DRUMBUMP_COUNT * i;
-		float posx = DRUMBUMP_ORIGIN_RADIUS * cosf(angle);
-		float posy = DRUMBUMP_ORIGIN_RADIUS * sinf(angle);
-	    shape = cpCircleShapeNew(DRUM_BODY, DRUMBUMP_RADIUS, cpv(posx, posy));
-	    cpShapeSetFriction(shape, 0.5f);
-		cpSpaceAddShape(SPACE, shape);
-	}
+  for (int i = 0; i < DRUMBUMP_COUNT; i++) {
+    float angle = (M_PIf * 2.0f) / DRUMBUMP_COUNT * i;
+    float posx = DRUMBUMP_ORIGIN_RADIUS * cosf(angle);
+    float posy = DRUMBUMP_ORIGIN_RADIUS * sinf(angle);
+      shape = cpCircleShapeNew(DRUM_BODY, DRUMBUMP_RADIUS, cpv(posx, posy));
+      cpShapeSetFriction(shape, 0.5f);
+    cpSpaceAddShape(SPACE, shape);
+  }
 
-	cpBody *staticBody = cpSpaceGetStaticBody(SPACE);
-	DRUM_PIfVOT = cpPivotJointNew(staticBody, DRUM_BODY, cpv(DRUM_X, DRUM_Y));
-	cpSpaceAddConstraint(SPACE, DRUM_PIfVOT);
+  cpBody *staticBody = cpSpaceGetStaticBody(SPACE);
+  DRUM_PIfVOT = cpPivotJointNew(staticBody, DRUM_BODY, cpv(DRUM_X, DRUM_Y));
+  cpSpaceAddConstraint(SPACE, DRUM_PIfVOT);
 }
 
 void drawDrum(void) {
-	cpVect drumPos = cpBodyGetPosition(DRUM_BODY);
-	float drumAngle = cpBodyGetAngle(DRUM_BODY);
-	// for (int i = 0; i < DRUM_VERTS; i++) {
-	// 	float starta = ((M_PIf * 2.0) / DRUM_VERTS) * i + drumAngle;
-	// 	float enda = ((M_PIf * 2.0) / DRUM_VERTS) * (i + 1) + drumAngle;
-	// 	float startx = DRUM_RADIUS * cosf(starta) + drumPos.x;
-	// 	float starty = DRUM_RADIUS * sinf(starta) + drumPos.y;
-	// 	float endx = DRUM_RADIUS * cosf(enda) + drumPos.x;
-	// 	float endy = DRUM_RADIUS * sinf(enda) + drumPos.y;
+  cpVect drumPos = cpBodyGetPosition(DRUM_BODY);
+  float drumAngle = cpBodyGetAngle(DRUM_BODY);
+  // for (int i = 0; i < DRUM_VERTS; i++) {
+  //  float starta = ((M_PIf * 2.0) / DRUM_VERTS) * i + drumAngle;
+  //  float enda = ((M_PIf * 2.0) / DRUM_VERTS) * (i + 1) + drumAngle;
+  //  float startx = DRUM_RADIUS * cosf(starta) + drumPos.x;
+  //  float starty = DRUM_RADIUS * sinf(starta) + drumPos.y;
+  //  float endx = DRUM_RADIUS * cosf(enda) + drumPos.x;
+  //  float endy = DRUM_RADIUS * sinf(enda) + drumPos.y;
 
-	// 	pd->graphics->drawLine(NULL, NULL, startx, starty, endx, endy,
-	// 		                   DRUM_THICKNESS, kColorBlack, kLineCapStyleRound,
-	// 		                   LCDMakeRect(0, 0, 0, 0));
-	// }
+  //  pd->graphics->drawLine(NULL, NULL, startx, starty, endx, endy,
+  //                       DRUM_THICKNESS, kColorBlack, kLineCapStyleRound,
+  //                       LCDMakeRect(0, 0, 0, 0));
+  // }
 
-	for (int i = 0; i < DRUMBUMP_COUNT; i++) {
-		float angle = (M_PIf * 2.0f) / DRUMBUMP_COUNT * i;
-		angle += drumAngle;
-		float cx = DRUMBUMP_ORIGIN_RADIUS * cosf(angle) + drumPos.x;
-		float cy = DRUMBUMP_ORIGIN_RADIUS * sinf(angle) + drumPos.y;
-		// float ca = cosf(angle);
-		// float sa = sinf(angle);
-		// float c1x = c1.x * ca - c1.y * sa + center.x;
-		// float c1y = c1.x * sa + c1.y * ca + center.y;
+  for (int i = 0; i < DRUMBUMP_COUNT; i++) {
+    float angle = (M_PIf * 2.0f) / DRUMBUMP_COUNT * i;
+    angle += drumAngle;
+    float cx = DRUMBUMP_ORIGIN_RADIUS * cosf(angle) + drumPos.x;
+    float cy = DRUMBUMP_ORIGIN_RADIUS * sinf(angle) + drumPos.y;
+    // float ca = cosf(angle);
+    // float sa = sinf(angle);
+    // float c1x = c1.x * ca - c1.y * sa + center.x;
+    // float c1y = c1.x * sa + c1.y * ca + center.y;
 
-		float left = cx - DRUMBUMP_RADIUS;
-		float top = cy - DRUMBUMP_RADIUS;
-		float size = DRUMBUMP_RADIUS * 2;
-		// pd->graphics->drawEllipse(NULL, NULL, left, top, size, size,
-		// 		1, 0.0, 360.0, kColorBlack, noClip);
+    float left = cx - DRUMBUMP_RADIUS;
+    float top = cy - DRUMBUMP_RADIUS;
+    float size = DRUMBUMP_RADIUS * 2;
+    // pd->graphics->drawEllipse(NULL, NULL, left, top, size, size,
+    //    1, 0.0, 360.0, kColorBlack, noClip);
 
-		pd->graphics->setLineCapStyle(kLineCapStyleRound);
-		pd->graphics->drawLine(cx, cy, cx, cy, size, kColorBlack);
+    pd->graphics->setLineCapStyle(kLineCapStyleRound);
+    pd->graphics->drawLine(cx, cy, cx, cy, size, kColorBlack);
 
-	}
+  }
 
 }
 
 
 cpBody *CRANKER_BODY;
 void initCranker(void) {
-	CRANKER_BODY = cpBodyNew(INFINITY, INFINITY);
-	cpSpaceAddBody(SPACE, CRANKER_BODY);
+  CRANKER_BODY = cpBodyNew(INFINITY, INFINITY);
+  cpSpaceAddBody(SPACE, CRANKER_BODY);
 }
 
 void updateCranker(float targetAngle) {
-	float currentAngle = cpBodyGetAngle(CRANKER_BODY);
-	cpBodySetAngle(CRANKER_BODY, currentAngle);
-	float diff = targetAngle - currentAngle;
-	while (diff > M_PIf) diff -= M_PIf * 2;
-	while (diff < -M_PIf) diff += M_PIf * 2;
-	cpBodySetAngularVelocity(CRANKER_BODY, diff / TIMESTEP / 2.0f);
+  float currentAngle = cpBodyGetAngle(CRANKER_BODY);
+  cpBodySetAngle(CRANKER_BODY, currentAngle);
+  float diff = targetAngle - currentAngle;
+  while (diff > M_PIf) diff -= M_PIf * 2;
+  while (diff < -M_PIf) diff += M_PIf * 2;
+  cpBodySetAngularVelocity(CRANKER_BODY, diff / TIMESTEP / 2.0f);
 }
 
 static cpConstraint *CRANKER_GEAR;
 void connectCranker(void) {
-	CRANKER_GEAR = cpGearJointNew(CRANKER_BODY, DRUM_BODY, 0.0f, 6.0f);
-	cpSpaceAddConstraint(SPACE, CRANKER_GEAR);
+  CRANKER_GEAR = cpGearJointNew(CRANKER_BODY, DRUM_BODY, 0.0f, 6.0f);
+  cpSpaceAddConstraint(SPACE, CRANKER_GEAR);
 }
 
 static float CRANKER_X = 365;
@@ -183,22 +183,22 @@ static float CRANKER_RADIUS = 20;
 static float CRANKER_MARK_COUNT = 5;
 static float CRANKER_MARK_RADIUS = 3;
 void drawCranker(void) {
-	float crankAngle = cpBodyGetAngle(CRANKER_BODY);
-	for (int i = 0; i < CRANKER_MARK_COUNT; i++) {
-		float angle = (M_PIf * 2.0f) / CRANKER_MARK_COUNT * i;
-		angle += crankAngle;
-		float cx = CRANKER_RADIUS * cosf(angle) + CRANKER_X;
-		float cy = CRANKER_RADIUS * sinf(angle) + CRANKER_Y;
+  float crankAngle = cpBodyGetAngle(CRANKER_BODY);
+  for (int i = 0; i < CRANKER_MARK_COUNT; i++) {
+    float angle = (M_PIf * 2.0f) / CRANKER_MARK_COUNT * i;
+    angle += crankAngle;
+    float cx = CRANKER_RADIUS * cosf(angle) + CRANKER_X;
+    float cy = CRANKER_RADIUS * sinf(angle) + CRANKER_Y;
 
-		float left = cx - CRANKER_MARK_RADIUS;
-		float top = cy - CRANKER_MARK_RADIUS;
-		float size = CRANKER_MARK_RADIUS * 2;
-		// pd->graphics->drawEllipse(NULL, NULL, left, top, size, size,
-		// 		1, 0.0, 360.0, kColorBlack, noClip);
-		pd->graphics->setLineCapStyle(kLineCapStyleRound);
-		pd->graphics->drawLine(cx, cy, cx, cy, size, kColorBlack);
+    float left = cx - CRANKER_MARK_RADIUS;
+    float top = cy - CRANKER_MARK_RADIUS;
+    float size = CRANKER_MARK_RADIUS * 2;
+    // pd->graphics->drawEllipse(NULL, NULL, left, top, size, size,
+    //    1, 0.0, 360.0, kColorBlack, noClip);
+    pd->graphics->setLineCapStyle(kLineCapStyleRound);
+    pd->graphics->drawLine(cx, cy, cx, cy, size, kColorBlack);
 
-	}
+  }
 }
 
 
@@ -214,86 +214,86 @@ static cpBody* CIRCLE_BODIES[CIRCLE_COUNT];
 static cpBody* BOX_BODIES[BOX_COUNT];
 
 void initDebris(void) {
-	cpBody *body;
-	cpShape *shape;
-	for (int i = 0; i < CIRCLE_COUNT; i++) {
-		float moment = cpMomentForCircle(CIRCLE_MASS, 0.0f, CIRCLE_RADIUS, cpvzero);
-		body = cpBodyNew(CIRCLE_MASS, moment);
-		float angle = (i * M_PIf * 2.0f) / CIRCLE_COUNT;
-		float x = DRUM_X + (DRUM_RADIUS * 0.6f) * cosf(angle);
-		float y = DRUM_Y + (DRUM_RADIUS * 0.6f) * sinf(angle);
-		cpBodySetPosition(body, cpv(x, y));
-		cpSpaceAddBody(SPACE, body);
-		shape = cpCircleShapeNew(body, CIRCLE_RADIUS, cpvzero);
-	    cpShapeSetFriction(shape, 0.5f);
-		cpSpaceAddShape(SPACE, shape);
-		CIRCLE_BODIES[i] = body;
-	}
+  cpBody *body;
+  cpShape *shape;
+  for (int i = 0; i < CIRCLE_COUNT; i++) {
+    float moment = cpMomentForCircle(CIRCLE_MASS, 0.0f, CIRCLE_RADIUS, cpvzero);
+    body = cpBodyNew(CIRCLE_MASS, moment);
+    float angle = (i * M_PIf * 2.0f) / CIRCLE_COUNT;
+    float x = DRUM_X + (DRUM_RADIUS * 0.6f) * cosf(angle);
+    float y = DRUM_Y + (DRUM_RADIUS * 0.6f) * sinf(angle);
+    cpBodySetPosition(body, cpv(x, y));
+    cpSpaceAddBody(SPACE, body);
+    shape = cpCircleShapeNew(body, CIRCLE_RADIUS, cpvzero);
+      cpShapeSetFriction(shape, 0.5f);
+    cpSpaceAddShape(SPACE, shape);
+    CIRCLE_BODIES[i] = body;
+  }
 
-	for (int i = 0; i < BOX_COUNT; i++) {
-		float moment = cpMomentForBox(BOX_MASS, BOX_WIDTH, BOX_HEIGHT);
-		body = cpBodyNew(BOX_MASS, moment);
-		float angle = (i * M_PIf * 2.0f) / BOX_COUNT;
-		float x = DRUM_X + (DRUM_RADIUS * 0.3f) * cosf(angle);
-		float y = DRUM_Y + (DRUM_RADIUS * 0.3f) * sinf(angle);
-		cpBodySetPosition(body, cpv(x, y));
-		cpSpaceAddBody(SPACE, body);
-		shape = cpBoxShapeNew(body, BOX_WIDTH, BOX_HEIGHT, 0.0f);
-	    cpShapeSetFriction(shape, 0.5f);
-		cpSpaceAddShape(SPACE, shape);
-		BOX_BODIES[i] = body;
-	}
+  for (int i = 0; i < BOX_COUNT; i++) {
+    float moment = cpMomentForBox(BOX_MASS, BOX_WIDTH, BOX_HEIGHT);
+    body = cpBodyNew(BOX_MASS, moment);
+    float angle = (i * M_PIf * 2.0f) / BOX_COUNT;
+    float x = DRUM_X + (DRUM_RADIUS * 0.3f) * cosf(angle);
+    float y = DRUM_Y + (DRUM_RADIUS * 0.3f) * sinf(angle);
+    cpBodySetPosition(body, cpv(x, y));
+    cpSpaceAddBody(SPACE, body);
+    shape = cpBoxShapeNew(body, BOX_WIDTH, BOX_HEIGHT, 0.0f);
+      cpShapeSetFriction(shape, 0.5f);
+    cpSpaceAddShape(SPACE, shape);
+    BOX_BODIES[i] = body;
+  }
 }
 
 void drawDebris(void) {
-	cpBody *body;
-	for (int i = 0; i < CIRCLE_COUNT; i++) {
-		body = CIRCLE_BODIES[i];
-		cpVect center = cpBodyGetPosition(body);
-		float angle = cpBodyGetAngle(body);
-		angle = (angle / (M_PIf * 2.0f)) * 180.0f;
-		float x = center.x - CIRCLE_RADIUS;
-		float y = center.y - CIRCLE_RADIUS;
-		float size = CIRCLE_RADIUS * 2.0f;
+  cpBody *body;
+  for (int i = 0; i < CIRCLE_COUNT; i++) {
+    body = CIRCLE_BODIES[i];
+    cpVect center = cpBodyGetPosition(body);
+    float angle = cpBodyGetAngle(body);
+    angle = (angle / (M_PIf * 2.0f)) * 180.0f;
+    float x = center.x - CIRCLE_RADIUS;
+    float y = center.y - CIRCLE_RADIUS;
+    float size = CIRCLE_RADIUS * 2.0f;
 
-		//playdate->graphics->drawEllipse(int x, int y, int width, int height, 
-		// int lineWidth, float startAngle, float endAngle, LCDColor color);
+    //playdate->graphics->drawEllipse(int x, int y, int width, int height, 
+    // int lineWidth, float startAngle, float endAngle, LCDColor color);
 
-		pd->graphics->drawEllipse(x, y, size, size,
-				1, 0.0f, 360.0f, kColorBlack);
-		pd->graphics->drawEllipse(x, y, size, size,
-				3, angle, angle + 10, kColorBlack);
-		pd->graphics->drawEllipse(x, y, size, size,
-				3, angle + 180, angle + 190, kColorBlack);
+    pd->graphics->drawEllipse(x, y, size, size,
+        1, 0.0f, 360.0f, kColorBlack);
+    pd->graphics->drawEllipse(x, y, size, size,
+        3, angle, angle + 10, kColorBlack);
+    pd->graphics->drawEllipse(x, y, size, size,
+        3, angle + 180, angle + 190, kColorBlack);
 
-	}
+  }
 
-	cpVect p1 = cpv(-BOX_WIDTH / 2.0f, -BOX_HEIGHT / 2.0f);
-	cpVect p2 = cpv(-BOX_WIDTH / 2.0f, BOX_HEIGHT / 2.0f);
-	cpVect p3 = cpv(BOX_WIDTH / 2.0f, BOX_HEIGHT / 2.0f);
-	cpVect p4 = cpv(BOX_WIDTH / 2.0f, -BOX_HEIGHT / 2.0f);
-	for (int i = 0; i < BOX_COUNT; i++) {
-		body = BOX_BODIES[i];
-		cpVect center = cpBodyGetPosition(body);
-		float angle = cpBodyGetAngle(body);
-		float sa = sinf(angle);
-		float ca = cosf(angle);
+  cpVect p1 = cpv(-BOX_WIDTH / 2.0f, -BOX_HEIGHT / 2.0f);
+  cpVect p2 = cpv(-BOX_WIDTH / 2.0f, BOX_HEIGHT / 2.0f);
+  cpVect p3 = cpv(BOX_WIDTH / 2.0f, BOX_HEIGHT / 2.0f);
+  cpVect p4 = cpv(BOX_WIDTH / 2.0f, -BOX_HEIGHT / 2.0f);
+  for (int i = 0; i < BOX_COUNT; i++) {
+    body = BOX_BODIES[i];
+    cpVect center = cpBodyGetPosition(body);
+    float angle = cpBodyGetAngle(body);
+    float sa = sinf(angle);
+    float ca = cosf(angle);
 
-		float p1x = p1.x * ca - p1.y * sa + center.x;
-		float p1y = p1.x * sa + p1.y * ca + center.y;
-		float p2x = p2.x * ca - p2.y * sa + center.x;
-		float p2y = p2.x * sa + p2.y * ca + center.y;
-		float p3x = p3.x * ca - p3.y * sa + center.x;
-		float p3y = p3.x * sa + p3.y * ca + center.y;
-		float p4x = p4.x * ca - p4.y * sa + center.x;
-		float p4y = p4.x * sa + p4.y * ca + center.y;
+    float p1x = p1.x * ca - p1.y * sa + center.x;
+    float p1y = p1.x * sa + p1.y * ca + center.y;
+    float p2x = p2.x * ca - p2.y * sa + center.x;
+    float p2y = p2.x * sa + p2.y * ca + center.y;
+    float p3x = p3.x * ca - p3.y * sa + center.x;
+    float p3y = p3.x * sa + p3.y * ca + center.y;
+    float p4x = p4.x * ca - p4.y * sa + center.x;
+    float p4y = p4.x * sa + p4.y * ca + center.y;
 
-		pd->graphics->setLineCapStyle(kLineCapStyleSquare);
-		pd->graphics->drawLine(p1x, p1y, p2x, p2y, 1, kColorBlack);
-		pd->graphics->drawLine(p2x, p2y, p3x, p3y, 1, kColorBlack);
-		pd->graphics->drawLine(p3x, p3y, p4x, p4y, 1, kColorBlack);
-		pd->graphics->drawLine(p4x, p4y, p1x, p1y, 1, kColorBlack);
-	}
+    pd->graphics->setLineCapStyle(kLineCapStyleSquare);
+    pd->graphics->drawLine(p1x, p1y, p2x, p2y, 1, kColorBlack);
+    pd->graphics->drawLine(p2x, p2y, p3x, p3y, 1, kColorBlack);
+    pd->graphics->drawLine(p3x, p3y, p4x, p4y, 1, kColorBlack);
+    pd->graphics->drawLine(p4x, p4y, p1x, p1y, 1, kColorBlack);
+  }
 
 }
 
@@ -301,42 +301,42 @@ void drawDebris(void) {
 static int
 update(__attribute__ ((unused)) void* ud)
 {
-	pd->graphics->clear(kColorWhite);        
+  pd->graphics->clear(kColorWhite);        
 
 
-	float crankAngle = pd->system->getCrankAngle();
-	updateCranker((crankAngle / 360.0f) * (float)M_PIf * 2.0f);
+  float crankAngle = pd->system->getCrankAngle();
+  updateCranker((crankAngle / 360.0f) * (float)M_PIf * 2.0f);
 
-	updateSpace();
+  updateSpace();
 
-	drawSpace();
-	drawDrum();
-	drawDebris();
-	drawCranker();
-	pd->system->drawFPS(0,0);
+  drawSpace();
+  drawDrum();
+  drawDebris();
+  drawCranker();
+  pd->system->drawFPS(0,0);
 
-	return 1;
+  return 1;
 }
 
 
 int
 eventHandler(PlaydateAPI* playdate, PDSystemEvent event, __attribute__ ((unused)) uint32_t arg)
 {
-	if ( event == kEventInit )
-	{
-		pd = playdate;
-		setPDPtr(pd);
-		pd->display->setRefreshRate(FPS);
-		pd->system->setUpdateCallback(update, NULL);
+  if ( event == kEventInit )
+  {
+    pd = playdate;
+    setPDPtr(pd);
+    pd->display->setRefreshRate(FPS);
+    pd->system->setUpdateCallback(update, NULL);
 
-		// font = pd->graphics->loadFont("/System/Fonts/Asheville-Sans-14-Bold.pft", NULL);
+    // font = pd->graphics->loadFont("/System/Fonts/Asheville-Sans-14-Bold.pft", NULL);
 
-		initSpace();
-		initCranker();
-		initDrum();
-		connectCranker();
-		initDebris();
-	}
-	
-	return 0;
+    initSpace();
+    initCranker();
+    initDrum();
+    connectCranker();
+    initDebris();
+  }
+  
+  return 0;
 }

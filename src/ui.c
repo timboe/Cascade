@@ -1,6 +1,6 @@
 #include <math.h>
 #include "ui.h"
-#include "sprite.h"
+#include "bitmap.h"
 #include "input.h"
 #include "render.h"
 #include "sound.h"

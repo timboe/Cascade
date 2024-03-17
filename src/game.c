@@ -1,12 +1,13 @@
 #include <math.h>
 
 #include "game.h"
-#include "sprite.h"
+#include "bitmap.h"
 #include "render.h"
 #include "sound.h"
 #include "input.h"
 #include "ui.h"
 #include "io.h"
+#include "physics.h"
 
 int32_t m_frameCount = 0;
 
@@ -57,17 +58,18 @@ int gameLoop(void* _data) {
   //   updateUI(m_frameCount);
   // }
 
+  if (gm == kGameWindow) updateSpace();
 
-  if (m_frameCount % 2) render(m_frameCount);
+
+  //if (m_frameCount % 2)
+  render(m_frameCount);
 
   return 1;
 }
 
 void menuOptionsCallbackMenu(void* blank) {
   if (IOOperationInProgress()) { return; }
-  #ifdef DEV
-  pd->system->logToConsole("menuOptionsCallbackMenu");
-  #endif
+  pdxlog("menuOptionsCallbackMenu");
 }
 
 // Call prior to loading anything
@@ -86,6 +88,7 @@ void populateMenuGame() {
 }
 
 void initGame() {
+  initSpace();
 }
 
 char* ftos(float _value, int16_t _size, char* _dest) {
