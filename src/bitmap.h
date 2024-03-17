@@ -1,6 +1,8 @@
 #pragma once
 #include "game.h"
 
+const static uint8_t WF_BG_OFFSET[] = {194};
+
 void initSprite(void);
 
 void setRoobert10(void);
@@ -11,9 +13,11 @@ LCDFont* getRoobert24(void);
 
 LCDFont* getRoobert10(void);
 
-LCDBitmap* getBitmapWf(uint32_t _x, uint32_t _y);
+LCDBitmap* getBitmapWfFg(uint8_t _wf, uint32_t _x, uint32_t _y);
+LCDBitmap* getBitmapWfFg_byidx(uint8_t _wf, uint32_t _idx);
 
-LCDBitmap* getBitmapWf_byidx(uint32_t _idx);
+LCDBitmap* getBitmapWfBg(uint8_t _wf, uint32_t _x, uint32_t _y);
+LCDBitmap* getBitmapWfBg_byidx(uint8_t _wf, uint32_t _idx);
 
 LCDBitmap* getSpriteSplash(void);
 
@@ -23,8 +27,7 @@ LCDBitmap* getBitmapTurretBody(void);
 
 LCDBitmap* getBitmapTurretBarrel(void);
 
-void setBarrelAngle(float _angle);
-
+LCDBitmap* getBitmapBall(float _angle);
 
 #define WF_ID(X, Y) ((WFSHEET_SIZE_X * Y) + X)
 

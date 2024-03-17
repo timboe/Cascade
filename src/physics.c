@@ -28,7 +28,7 @@ void initSpace(void) {
   // Ball
   float moment = cpMomentForCircle(BALL_MASS, 0.0f, BALL_RADIUS, cpvzero);
   m_ball = cpBodyNew(BALL_MASS, moment);
-  cpBodySetPosition(m_ball, cpv(HALF_DEVICE_PIX_X, 0));
+  cpBodySetPosition(m_ball, cpv(HALF_DEVICE_PIX_X, UI_OFFSET_TOP + BALL_RADIUS));
   cpSpaceAddBody(SPACE, m_ball);
   cpShape* shape = cpCircleShapeNew(m_ball, BALL_RADIUS, cpvzero);
   cpShapeSetFriction(shape, 0.0f);
@@ -37,7 +37,7 @@ void initSpace(void) {
 
   for (int i = 0; i < N_OBST; ++i) {
     m_obstacle[i] = cpBodyNewKinematic();
-    cpBodySetPosition(m_obstacle[i], cpv(rand() % DEVICE_PIX_X, rand() % DEVICE_PIX_Y*2));
+    cpBodySetPosition(m_obstacle[i], cpv(rand() % DEVICE_PIX_X, (rand() % DEVICE_PIX_Y) + UI_OFFSET_TOP));
     cpSpaceAddBody(SPACE, m_obstacle[i]);
     cpShape* shape = cpCircleShapeNew(m_obstacle[i], BALL_RADIUS, cpvzero);
     cpShapeSetFriction(shape, 0.0f);
@@ -47,9 +47,9 @@ void initSpace(void) {
 
 
   m_walls = cpBodyNewStatic();
-  cpShape* top   = cpSegmentShapeNew(m_walls, cpv(0, 0), cpv(DEVICE_PIX_X, 0), 1.0f);
-  cpShape* left  = cpSegmentShapeNew(m_walls, cpv(0, 0), cpv(0, 1024), 1.0f);
-  cpShape* right = cpSegmentShapeNew(m_walls, cpv(DEVICE_PIX_X, 0), cpv(DEVICE_PIX_X, 1024), 1.0f);
+  cpShape* top   = cpSegmentShapeNew(m_walls, cpv(0, UI_OFFSET_TOP), cpv(DEVICE_PIX_X, UI_OFFSET_TOP), 1.0f);
+  cpShape* left  = cpSegmentShapeNew(m_walls, cpv(0, UI_OFFSET_TOP), cpv(0, PHYSWALL_PIX_Y), 1.0f);
+  cpShape* right = cpSegmentShapeNew(m_walls, cpv(DEVICE_PIX_X, UI_OFFSET_TOP), cpv(DEVICE_PIX_X, PHYSWALL_PIX_Y), 1.0f);
   cpShapeSetFriction(top, 0.0f);
   cpShapeSetElasticity(top, ELASTICITY);
   cpShapeSetFriction(left, 0.0f);

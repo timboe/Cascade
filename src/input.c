@@ -8,6 +8,8 @@
 
 uint8_t m_pressed[4] = {0};
 
+float m_turretBarrelAngle = 0.0f;
+
 void clickHandleWander(uint32_t _buttonPressed);
 
 void clickHandleTitles(uint32_t _buttonPressed);
@@ -63,7 +65,7 @@ void clickHandleTitles(uint32_t _buttonPressed) {
 void clickHandleGameWindow(uint32_t _buttonPressed) {
   if (kButtonA == _buttonPressed) {
 
-    cpBodySetPosition(getBall(), cpv(HALF_DEVICE_PIX_X, 0));
+    cpBodySetPosition(getBall(), cpv(HALF_DEVICE_PIX_X, UI_OFFSET_TOP));
     cpBodySetVelocity(getBall(), cpvzero);
     cpBodySetAngle(getBall(), 0);
     cpBodySetAngularVelocity(getBall(), 0);
@@ -71,11 +73,9 @@ void clickHandleGameWindow(uint32_t _buttonPressed) {
   } else if (kButtonB == _buttonPressed) {
 
     for (int i = 0; i < N_OBST; ++i) {
-      cpBodySetPosition(getObst(i), cpv(rand() % DEVICE_PIX_X, rand() % DEVICE_PIX_Y*2));
+      cpBodySetPosition(getObst(i), cpv(rand() % WFALL_PIX_X, (rand() % WFALL_PIX_Y) + UI_OFFSET_TOP));
     }
 
-  } else if (_buttonPressed == kButtonUp || _buttonPressed == kButtonDown) {
-    modScrollOffset( _buttonPressed == kButtonDown ? 10 : -10 );
   }
 }
 
@@ -84,7 +84,11 @@ void rotateHandleTitles(float _rotation) {
 }
 
 void rotateHandleGameWindow(float _angle) {
-  setBarrelAngle(_angle);
+  m_turretBarrelAngle = _angle;
+}
+
+float getTurretBarrelAngle(void) {
+  return m_turretBarrelAngle;
 }
 
 void clickHandlerReplacement() {
@@ -92,6 +96,12 @@ void clickHandlerReplacement() {
   enum kGameMode gm = getGameMode();
   PDButtons current, pushed, released = 0;
   pd->system->getButtonState(&current, &pushed, &released);
+
+  if (pushed & kButtonLeft) m_pressed[0] = 1;
+  if (pushed & kButtonRight) m_pressed[1] = 1;
+  if (pushed & kButtonUp) m_pressed[2] = 1;
+  if (pushed & kButtonDown) m_pressed[3] = 1;
+
   if (pushed & kButtonUp) gameClickConfigHandler(kButtonUp);
   if (pushed & kButtonRight) gameClickConfigHandler(kButtonRight);
   if (pushed & kButtonDown) gameClickConfigHandler(kButtonDown);

@@ -8,7 +8,7 @@
 
 enum kGameMode m_mode = 0;
 
-int32_t m_scrollOffset = 0;
+float m_scrollOffset = 0;
 
 // LCDSprite* m_UISpriteSave = NULL;
 // LCDSprite* m_UISpriteSaveLoadProgress = NULL;
@@ -256,14 +256,14 @@ void initiUI() {
 
 }
 
-int32_t getScrollOffset(void) {
+float getScrollOffset(void) {
   return m_scrollOffset;
 }
 
-int32_t modScrollOffset(int32_t _mod) {
+float modScrollOffset(float _mod) {
   return (m_scrollOffset += _mod);
 }
 
-void setScrollOffset(int32_t _set) {
+void setScrollOffset(float _set) {
   m_scrollOffset = _set;
 }

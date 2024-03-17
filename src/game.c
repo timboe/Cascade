@@ -11,6 +11,8 @@
 
 int32_t m_frameCount = 0;
 
+float m_vY = 0;
+
 ////////////
 
 int getFrameCount() { 
@@ -58,7 +60,26 @@ int gameLoop(void* _data) {
   //   updateUI(m_frameCount);
   // }
 
-  if (gm == kGameWindow) updateSpace();
+  if (gm == kGameWindow) {
+
+    float diffY = 0;
+    if      (getPressed(2)) diffY = -SCREEN_ACC;
+    else if (getPressed(3)) diffY =  SCREEN_ACC;
+    m_vY += diffY;
+    m_vY *= SCREEN_FRIC;
+    pd->system->logToConsole("v %f", m_vY);
+    modScrollOffset(m_vY);
+
+    const float so = getScrollOffset();
+    const float soDiff = SCROLL_OFFSET_MAX - so;
+    if (soDiff < 0) {
+      modScrollOffset(soDiff * SCREEN_BBACK);
+    } else if (so < 0) {
+      modScrollOffset(so * -SCREEN_BBACK);
+    }
+
+    updateSpace();
+  }
 
 
   //if (m_frameCount % 2)

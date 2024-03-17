@@ -19,10 +19,14 @@
 #define HALF_DEVICE_PIX_X (DEVICE_PIX_X/2)
 #define HALF_DEVICE_PIX_Y (DEVICE_PIX_Y/2)
 
-#define WFSHEET_SIZE_X 1
-#define WFSHEET_SIZE_Y 8
+#define WFALL_PIX_X DEVICE_PIX_X
+#define WFALL_PIX_Y (DEVICE_PIX_Y*4)
 
-#define WF_DIVISION_PIX_Y (DEVICE_PIX_Y/4)
+#define WF_DIVISION_PIX_Y 60
+
+#define WFSHEET_SIZE_X 1
+#define WFSHEET_SIZE_Y (WFALL_PIX_Y/WF_DIVISION_PIX_Y)
+
 
 #define TRAUMA_DECAY 0.05f;
 #define TRAUMA_AMPLIFICATION 4
@@ -31,18 +35,14 @@
 
 #define N_OBST 50
 
-#define Z_INDEX_UI_TTT 32767
-#define Z_INDEX_UI_TT 32766
-#define Z_INDEX_UI_T 32765
-#define Z_INDEX_UI_M 32764
-#define Z_INDEX_UI_B 32763
-#define Z_INDEX_UI_BB 32762
-#define Z_INDEX_UI_BBB 32761
-#define Z_INDEX_UI_BACK 32760
+#define N_WATERFALLS 8
 
-#define Z_INDEX_BACKGROUND -1
-#define Z_INDEX_PLAYER 16000
-#define Z_INDEX_PROJECTILE 15000
+#define UI_OFFSET_TOP 32
+
+#define SCROLL_OFFSET_MAX (WFALL_PIX_Y + UI_OFFSET_TOP - DEVICE_PIX_Y)
+
+// How many pixels down the side do we have to prevent the ball from bouncing out off
+#define PHYSWALL_PIX_Y (WFALL_PIX_Y + UI_OFFSET_TOP)
 
 #define FLAG_BALL 0
 #define FLAG_TARGET 1
@@ -53,3 +53,17 @@
 #define VERSION "v0.1"
 
 #define N_MUSIC_TRACKS 5
+
+// Physics 
+
+#define BALL_RADIUS 8.0f
+#define BALL_MASS 1.0f
+
+#define M_PIf 3.14159265358979323846f
+
+// Larger value to make moving quicker
+#define SCREEN_ACC 0.9f
+// Smaller value to limit max velocity
+#define SCREEN_FRIC 0.9f
+// Larger number for stronger bounce-back
+#define SCREEN_BBACK 0.2f
