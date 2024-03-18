@@ -5,14 +5,13 @@
 #include "physics.h"
 
 #define TIMESTEP (1.0f / TICK_FREQUENCY)
-#define G 400.0f
-#define ELASTICITY 0.98f 
+#define G 256.0f
+#define ELASTICITY 0.8f 
 static cpSpace* SPACE;
 
 
 static cpBody* m_ball;
 static cpBody* m_obstacle[N_OBST];
-static cpBody* m_walls;
 
 cpBody* getBall(void) { return m_ball; }
 
@@ -20,15 +19,15 @@ cpBody* getObst(uint32_t i) { return m_obstacle[i]; }
 
 void initSpace(void) {
   SPACE = cpSpaceNew();
-  cpSpaceSetIterations(SPACE, 20);
+  cpSpaceSetIterations(SPACE, 10);
   cpSpaceSetGravity(SPACE, cpv(0.0f, G));
   cpSpaceSetSleepTimeThreshold(SPACE, 0.5f);
-  cpSpaceSetCollisionSlop(SPACE, 0.5f);
+  cpSpaceSetCollisionSlop(SPACE, 0.5f); 
 
   // Ball
   float moment = cpMomentForCircle(BALL_MASS, 0.0f, BALL_RADIUS, cpvzero);
   m_ball = cpBodyNew(BALL_MASS, moment);
-  cpBodySetPosition(m_ball, cpv(HALF_DEVICE_PIX_X, UI_OFFSET_TOP + BALL_RADIUS));
+  cpBodySetPosition(m_ball, cpv(0, WFALL_PIX_Y*2));
   cpSpaceAddBody(SPACE, m_ball);
   cpShape* shape = cpCircleShapeNew(m_ball, BALL_RADIUS, cpvzero);
   cpShapeSetFriction(shape, 0.0f);
@@ -46,10 +45,10 @@ void initSpace(void) {
   }
 
 
-  m_walls = cpBodyNewStatic();
-  cpShape* top   = cpSegmentShapeNew(m_walls, cpv(0, UI_OFFSET_TOP), cpv(DEVICE_PIX_X, UI_OFFSET_TOP), 1.0f);
-  cpShape* left  = cpSegmentShapeNew(m_walls, cpv(0, UI_OFFSET_TOP), cpv(0, PHYSWALL_PIX_Y), 1.0f);
-  cpShape* right = cpSegmentShapeNew(m_walls, cpv(DEVICE_PIX_X, UI_OFFSET_TOP), cpv(DEVICE_PIX_X, PHYSWALL_PIX_Y), 1.0f);
+  cpBody* walls = cpSpaceGetStaticBody(SPACE);
+  cpShape* top   = cpSegmentShapeNew(walls, cpv(0,            UI_OFFSET_TOP), cpv(DEVICE_PIX_X, UI_OFFSET_TOP),  3.0f);
+  cpShape* left  = cpSegmentShapeNew(walls, cpv(0,            UI_OFFSET_TOP), cpv(0,            PHYSWALL_PIX_Y), 3.0f);
+  cpShape* right = cpSegmentShapeNew(walls, cpv(DEVICE_PIX_X, UI_OFFSET_TOP), cpv(DEVICE_PIX_X, PHYSWALL_PIX_Y), 3.0f);
   cpShapeSetFriction(top, 0.0f);
   cpShapeSetElasticity(top, ELASTICITY);
   cpShapeSetFriction(left, 0.0f);
@@ -84,5 +83,13 @@ void initSpace(void) {
 }
 
 void updateSpace(void) {
+
+
+  for (int i = 0; i < N_OBST/2; ++i) {
+    float x = cpBodyGetPosition(m_obstacle[i]).x;
+    if      (x >= DEVICE_PIX_X) cpBodySetVelocity(m_obstacle[i], cpv(-32.0f, 0));
+    else if (x <= 0)            cpBodySetVelocity(m_obstacle[i], cpv(+32.0f, 0));
+  }
+
   cpSpaceStep(SPACE, TIMESTEP);
 }

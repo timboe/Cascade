@@ -70,9 +70,22 @@ void clickHandleGameWindow(uint32_t _buttonPressed) {
     cpBodySetAngle(getBall(), 0);
     cpBodySetAngularVelocity(getBall(), 0);
 
+    const float angleRad = m_turretBarrelAngle * (M_PIf / 180.0f);
+    #define POOT_STRENGTH -100.0f
+    cpBodyApplyImpulseAtLocalPoint(getBall(), cpv(POOT_STRENGTH * -sinf(angleRad), POOT_STRENGTH * cosf(angleRad)), cpvzero);
+
   } else if (kButtonB == _buttonPressed) {
 
     for (int i = 0; i < N_OBST; ++i) {
+      cpBodySetPosition(getObst(i), cpv(rand() % WFALL_PIX_X, (rand() % WFALL_PIX_Y) + UI_OFFSET_TOP));
+    }
+
+    for (int i = 0; i < N_OBST/2; ++i) {
+      cpBodySetPosition(getObst(i), cpv( ((i+1)*32) % WFALL_PIX_X, ((i+1)*32) + UI_OFFSET_TOP));
+      cpBodySetVelocity(getObst(i), cpv(32.0f, 0));
+    }
+
+    for (int i = N_OBST/2; i < N_OBST; ++i) {
       cpBodySetPosition(getObst(i), cpv(rand() % WFALL_PIX_X, (rand() % WFALL_PIX_Y) + UI_OFFSET_TOP));
     }
 
