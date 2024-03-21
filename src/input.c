@@ -76,17 +76,23 @@ void clickHandleGameWindow(uint32_t _buttonPressed) {
 
   } else if (kButtonB == _buttonPressed) {
 
-    for (int i = 0; i < N_OBST; ++i) {
-      cpBodySetPosition(getObst(i), cpv(rand() % WFALL_PIX_X, (rand() % WFALL_PIX_Y) + UI_OFFSET_TOP));
-    }
+    // for (int i = 0; i < N_OBST; ++i) {
+    //   cpBodySetPosition(getObst(i), cpv(rand() % WFALL_PIX_X, (rand() % WFALL_PIX_Y) + UI_OFFSET_TOP));
+    //   cpBodySetPosition(getBox(i), cpv(rand() % WFALL_PIX_X, (rand() % WFALL_PIX_Y) + UI_OFFSET_TOP));
+    // }
 
     for (int i = 0; i < N_OBST/2; ++i) {
       cpBodySetPosition(getObst(i), cpv( ((i+1)*32) % WFALL_PIX_X, ((i+1)*32) + UI_OFFSET_TOP));
       cpBodySetVelocity(getObst(i), cpv(32.0f, 0));
+
+      cpBodySetPosition(getBox(i), cpv( WFALL_PIX_X - (((i+1)*32) % WFALL_PIX_X), ((i+1)*32) + 16 + UI_OFFSET_TOP));
+      cpBodySetVelocity(getBox(i), cpv(-32.0f, 0));
+      cpBodySetAngle(getBox(i), ((2*M_PIf)/(N_OBST/2))*i);
     }
 
     for (int i = N_OBST/2; i < N_OBST; ++i) {
       cpBodySetPosition(getObst(i), cpv(rand() % WFALL_PIX_X, (rand() % WFALL_PIX_Y) + UI_OFFSET_TOP));
+      cpBodySetPosition(getBox(i), cpv(rand() % WFALL_PIX_X, (rand() % WFALL_PIX_Y) + UI_OFFSET_TOP));
     }
 
   }

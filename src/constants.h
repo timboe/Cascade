@@ -33,7 +33,7 @@
 
 #define SQRT_HALF 0.70710678118f
 
-#define N_OBST 50
+#define N_OBST 64
 
 #define N_WATERFALLS 8
 
@@ -58,6 +58,9 @@
 
 #define BALL_RADIUS 8.0f
 #define BALL_MASS 1.0f
+
+#define BOX_WIDTH 22.5f
+#define BOX_HEIGHT 12.5f
 
 #define M_PIf 3.14159265358979323846f
 

@@ -29,5 +29,8 @@ LCDBitmap* getBitmapTurretBarrel(void);
 
 LCDBitmap* getBitmapBall(float _angle);
 
+LCDBitmap* getBitmapBox(float _angle);
+
+
 #define WF_ID(X, Y) ((WFSHEET_SIZE_X * Y) + X)
 

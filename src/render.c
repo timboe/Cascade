@@ -81,7 +81,7 @@ void renderGameWindow(int32_t _fc) {
   uint8_t wf = 0;
   static uint8_t wfOffC = 0;
   int8_t wfOff = 15 - (wfOffC % 16);
-    pd->system->logToConsole("off %i", wfOff);
+  //pd->system->logToConsole("off %i", wfOff);
   ++wfOffC;
   // NOTE: Need to draw one extra background due to animation
   for (uint32_t i = start; i < start+6; ++i) {
@@ -119,6 +119,20 @@ void renderGameWindow(int32_t _fc) {
     const float x = center.x - BALL_RADIUS;
 
     pd->graphics->drawBitmap(getBitmapBall(angle), x, y, kBitmapUnflipped);
+  }
+
+  for (uint32_t i = 0; i < N_OBST; ++i) {
+    cpBody* obst = getBox(i);
+    const cpVect center = cpBodyGetPosition(obst);
+    const float y = center.y - (BOX_HEIGHT/2.0f);
+
+    int off = y - getScrollOffset();
+    if (off < 0 || off > DEVICE_PIX_Y) continue;
+
+    const float angle = (cpBodyGetAngle(obst) / (M_PIf * 2.0f)) * 180.0f;
+    const float x = center.x - (BOX_HEIGHT/2.0f);
+
+    pd->graphics->drawBitmap(getBitmapBox(angle), x, y, kBitmapUnflipped);
   }
 
 

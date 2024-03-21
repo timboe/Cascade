@@ -12,10 +12,13 @@ static cpSpace* SPACE;
 
 static cpBody* m_ball;
 static cpBody* m_obstacle[N_OBST];
+static cpBody* m_box[N_OBST];
 
 cpBody* getBall(void) { return m_ball; }
 
 cpBody* getObst(uint32_t i) { return m_obstacle[i]; }
+
+cpBody* getBox(uint32_t i) {return m_box[i];}
 
 void initSpace(void) {
   SPACE = cpSpaceNew();
@@ -39,6 +42,17 @@ void initSpace(void) {
     cpBodySetPosition(m_obstacle[i], cpv(rand() % DEVICE_PIX_X, (rand() % DEVICE_PIX_Y) + UI_OFFSET_TOP));
     cpSpaceAddBody(SPACE, m_obstacle[i]);
     cpShape* shape = cpCircleShapeNew(m_obstacle[i], BALL_RADIUS, cpvzero);
+    cpShapeSetFriction(shape, 0.0f);
+    cpShapeSetElasticity(shape, ELASTICITY);
+    cpSpaceAddShape(SPACE, shape);
+  }
+
+  for (int i = 0; i < N_OBST; i++) {
+    //float moment = cpMomentForBox(BOX_MASS, BOX_WIDTH, BOX_HEIGHT);
+    m_box[i] = cpBodyNewKinematic(/*BOX_MASS, moment*/);
+    cpBodySetPosition(m_box[i], cpvzero);
+    cpSpaceAddBody(SPACE, m_box[i]);
+    shape = cpBoxShapeNew(m_box[i], BOX_WIDTH, BOX_HEIGHT, 0.0f);
     cpShapeSetFriction(shape, 0.0f);
     cpShapeSetElasticity(shape, ELASTICITY);
     cpSpaceAddShape(SPACE, shape);
@@ -89,6 +103,10 @@ void updateSpace(void) {
     float x = cpBodyGetPosition(m_obstacle[i]).x;
     if      (x >= DEVICE_PIX_X) cpBodySetVelocity(m_obstacle[i], cpv(-32.0f, 0));
     else if (x <= 0)            cpBodySetVelocity(m_obstacle[i], cpv(+32.0f, 0));
+
+    x = cpBodyGetPosition(m_box[i]).x;
+    if      (x >= DEVICE_PIX_X) cpBodySetVelocity(m_box[i], cpv(-32.0f, 0));
+    else if (x <= 0)            cpBodySetVelocity(m_box[i], cpv(+32.0f, 0));
   }
 
   cpSpaceStep(SPACE, TIMESTEP);

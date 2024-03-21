@@ -11,3 +11,5 @@ void updateSpace(void);
 cpBody* getBall(void);
 
 cpBody* getObst(uint32_t i);
+
+cpBody* getBox(uint32_t i);
