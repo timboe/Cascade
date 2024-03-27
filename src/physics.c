@@ -4,62 +4,71 @@
 
 #include "physics.h"
 
-#define TIMESTEP (1.0f / TICK_FREQUENCY)
-#define G 256.0f
-#define ELASTICITY 0.8f 
-static cpSpace* SPACE;
 
+static cpSpace* m_space;
 
 static cpBody* m_ball;
+static cpShape* m_ballShape;
+
 static cpBody* m_obstacle[N_OBST];
 static cpBody* m_box[N_OBST];
 
+bool m_ballInPlay = false;
+
 cpBody* getBall(void) { return m_ball; }
+
+cpShape* getBallShape(void) { return m_ballShape; }
 
 cpBody* getObst(uint32_t i) { return m_obstacle[i]; }
 
 cpBody* getBox(uint32_t i) {return m_box[i];}
 
+bool ballInPlay(void) { return m_ballInPlay; }
+
+void setBallInPlay(bool bip) { m_ballInPlay = bip; }
+
+cpSpace* getSpace(void) { return m_space; }
+
 void initSpace(void) {
-  SPACE = cpSpaceNew();
-  cpSpaceSetIterations(SPACE, 10);
-  cpSpaceSetGravity(SPACE, cpv(0.0f, G));
-  cpSpaceSetSleepTimeThreshold(SPACE, 0.5f);
-  cpSpaceSetCollisionSlop(SPACE, 0.5f); 
+  m_space = cpSpaceNew();
+  cpSpaceSetIterations(m_space, 10);
+  cpSpaceSetGravity(m_space, G);
+  cpSpaceSetSleepTimeThreshold(m_space, 0.5f);
+  cpSpaceSetCollisionSlop(m_space, 0.5f); 
 
   // Ball
   float moment = cpMomentForCircle(BALL_MASS, 0.0f, BALL_RADIUS, cpvzero);
   m_ball = cpBodyNew(BALL_MASS, moment);
   cpBodySetPosition(m_ball, cpv(0, WFALL_PIX_Y*2));
-  cpSpaceAddBody(SPACE, m_ball);
-  cpShape* shape = cpCircleShapeNew(m_ball, BALL_RADIUS, cpvzero);
-  cpShapeSetFriction(shape, 0.0f);
-  cpShapeSetElasticity(shape, ELASTICITY);
-  cpSpaceAddShape(SPACE, shape);
+  cpSpaceAddBody(m_space, m_ball);
+  m_ballShape = cpCircleShapeNew(m_ball, BALL_RADIUS, cpvzero);
+  cpShapeSetFriction(m_ballShape, 0.0f);
+  cpShapeSetElasticity(m_ballShape, ELASTICITY);
+  cpSpaceAddShape(m_space, m_ballShape);
 
   for (int i = 0; i < N_OBST; ++i) {
     m_obstacle[i] = cpBodyNewKinematic();
     cpBodySetPosition(m_obstacle[i], cpv(rand() % DEVICE_PIX_X, (rand() % DEVICE_PIX_Y) + UI_OFFSET_TOP));
-    cpSpaceAddBody(SPACE, m_obstacle[i]);
+    cpSpaceAddBody(m_space, m_obstacle[i]);
     cpShape* shape = cpCircleShapeNew(m_obstacle[i], BALL_RADIUS, cpvzero);
     cpShapeSetFriction(shape, 0.0f);
     cpShapeSetElasticity(shape, ELASTICITY);
-    cpSpaceAddShape(SPACE, shape);
+    cpSpaceAddShape(m_space, shape);
   }
 
   for (int i = 0; i < N_OBST; i++) {
     //float moment = cpMomentForBox(BOX_MASS, BOX_WIDTH, BOX_HEIGHT);
     m_box[i] = cpBodyNewKinematic(/*BOX_MASS, moment*/);
     cpBodySetPosition(m_box[i], cpvzero);
-    cpSpaceAddBody(SPACE, m_box[i]);
-    shape = cpBoxShapeNew(m_box[i], BOX_WIDTH, BOX_HEIGHT, 0.0f);
+    cpSpaceAddBody(m_space, m_box[i]);
+    cpShape* shape = cpBoxShapeNew(m_box[i], BOX_WIDTH, BOX_HEIGHT, 0.0f);
     cpShapeSetFriction(shape, 0.0f);
     cpShapeSetElasticity(shape, ELASTICITY);
-    cpSpaceAddShape(SPACE, shape);
+    cpSpaceAddShape(m_space, shape);
   }
 
 
-  cpBody* walls = cpSpaceGetStaticBody(SPACE);
+  cpBody* walls = cpSpaceGetStaticBody(m_space);
   cpShape* top   = cpSegmentShapeNew(walls, cpv(0,            UI_OFFSET_TOP), cpv(DEVICE_PIX_X, UI_OFFSET_TOP),  3.0f);
   cpShape* left  = cpSegmentShapeNew(walls, cpv(0,            UI_OFFSET_TOP), cpv(0,            PHYSWALL_PIX_Y), 3.0f);
   cpShape* right = cpSegmentShapeNew(walls, cpv(DEVICE_PIX_X, UI_OFFSET_TOP), cpv(DEVICE_PIX_X, PHYSWALL_PIX_Y), 3.0f);
@@ -69,31 +78,10 @@ void initSpace(void) {
   cpShapeSetElasticity(left, ELASTICITY);
   cpShapeSetFriction(right, 0.0f);
   cpShapeSetElasticity(right, ELASTICITY);
-  cpSpaceAddShape(SPACE, top);
-  cpSpaceAddShape(SPACE, left);
-  cpSpaceAddShape(SPACE, right);
+  cpSpaceAddShape(m_space, top);
+  cpSpaceAddShape(m_space, left);
+  cpSpaceAddShape(m_space, right);
 
-  // cpShape *shape;
-  // cpBody *staticBody = cpSpaceGetStaticBody(SPACE);
-  // shape = cpSpaceAddShape(SPACE,
-  //  cpSegmentShapeNew(staticBody, cpv(0, 0), cpv(400, 0), 0.0f));
-  // cpShapeSetElasticity(shape, 1.0f);
-  // cpShapeSetFriction(shape, 1.0f);
-
-  // shape = cpSpaceAddShape(SPACE,
-  //  cpSegmentShapeNew(staticBody, cpv(400, 0), cpv(400, 240), 0.0f));
-  // cpShapeSetElasticity(shape, 1.0f);
-  // cpShapeSetFriction(shape, 1.0f);
-
-  // shape = cpSpaceAddShape(SPACE,
-  //  cpSegmentShapeNew(staticBody, cpv(400, 240), cpv(0, 240), 0.0f));
-  // cpShapeSetElasticity(shape, 1.0f);
-  // cpShapeSetFriction(shape, 1.0f);
-
-  // shape = cpSpaceAddShape(SPACE,
-  //  cpSegmentShapeNew(staticBody, cpv(0, 240), cpv(0, 0), 0.0f));
-  // cpShapeSetElasticity(shape, 1.0f);
-  // cpShapeSetFriction(shape, 1.0f);
 }
 
 void updateSpace(void) {
@@ -109,5 +97,12 @@ void updateSpace(void) {
     else if (x <= 0)            cpBodySetVelocity(m_box[i], cpv(+32.0f, 0));
   }
 
-  cpSpaceStep(SPACE, TIMESTEP);
+  if (!m_ballInPlay) {
+    cpBodySetPosition(getBall(), cpv(HALF_DEVICE_PIX_X, UI_OFFSET_TOP));
+    cpBodySetVelocity(getBall(), cpvzero);
+    cpBodySetAngle(getBall(), 0);
+    cpBodySetAngularVelocity(getBall(), 0);
+  }
+
+  cpSpaceStep(m_space, TIMESTEP);
 }

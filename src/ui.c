@@ -265,5 +265,6 @@ float modScrollOffset(float _mod) {
 }
 
 void setScrollOffset(float _set) {
+  if (_set < 0) _set = 0;
   m_scrollOffset = _set;
 }

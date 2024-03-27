@@ -67,7 +67,6 @@ int gameLoop(void* _data) {
     else if (getPressed(3)) diffY =  SCREEN_ACC;
     m_vY += diffY;
     m_vY *= SCREEN_FRIC;
-    pd->system->logToConsole("v %f", m_vY);
     modScrollOffset(m_vY);
 
     const float so = getScrollOffset();

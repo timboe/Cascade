@@ -33,9 +33,9 @@ uint8_t radToByte(float _rad);
 /// ///
 
 uint8_t radToByte(float _rad) {
-  // /pd->system->logToConsole("angle %f", _rad);
+  // pd->system->logToConsole("angle %f -> %i", _rad, (_rad / (M_PIf * 2.0f)) * 256.0f);
   //return 0;
-  return (_rad / (M_PIf * 2.0f)) * 128.0f;
+  return (_rad / (M_PIf * 2.0f)) * 256.0f;
 }
 
 uint8_t angToByte(float _ang) {
@@ -124,8 +124,7 @@ LCDFont* getRoobert10(void) {
   return m_fontRoobert10;
 }
 
-#define MAX(a,b) ((a) > (b) ? a : b)
-#define MIN(a,b) ((a) < (b) ? a : b)
+
 
 void initSprite() {
   pd->graphics->setDrawMode(kDrawModeCopy);
@@ -170,26 +169,8 @@ void initSprite() {
     pd->graphics->popContext();
   }
 
-  const float BOX_MAX = MAX(BOX_WIDTH, BOX_HEIGHT) * SQRT_HALF;
-  m_boxBitmap[0] = pd->graphics->newBitmap(BOX_MAX*2, BOX_MAX*2, kColorWhite);
+  m_boxBitmap[0] = pd->graphics->newBitmap(BOX_MAX*2, BOX_MAX*2, kColorClear);
   pd->graphics->pushContext(m_boxBitmap[0]);
-  // cpVect p1 = cpv(-BOX_WIDTH / 2.0f, -BOX_HEIGHT / 2.0f);
-  // cpVect p2 = cpv(-BOX_WIDTH / 2.0f, BOX_HEIGHT / 2.0f);
-  // cpVect p3 = cpv(BOX_WIDTH / 2.0f, BOX_HEIGHT / 2.0f);
-  // cpVect p4 = cpv(BOX_WIDTH / 2.0f, -BOX_HEIGHT / 2.0f);
-  // const float p1x = p1.x - p1.y;
-  // const float p1y = p1.x + p1.y;
-  // const float p2x = p2.x - p2.y;
-  // const float p2y = p2.x + p2.y;
-  // const float p3x = p3.x - p3.y;
-  // const float p3y = p3.x + p3.y;
-  // const float p4x = p4.x - p4.y;
-  // const float p4y = p4.x + p4.y;
-  // pd->graphics->setLineCapStyle(kLineCapStyleSquare);
-  // pd->graphics->drawLine(p1x, p1y, p2x, p2y, 1, kColorBlack);
-  // pd->graphics->drawLine(p2x, p2y, p3x, p3y, 1, kColorBlack);
-  // pd->graphics->drawLine(p3x, p3y, p4x, p4y, 1, kColorBlack);
-  // pd->graphics->drawLine(p4x, p4y, p1x, p1y, 1, kColorBlack);
   pd->graphics->fillRect(BOX_MAX - BOX_WIDTH/2, BOX_MAX - BOX_HEIGHT/2, BOX_WIDTH, BOX_HEIGHT, kColorWhite);
   pd->graphics->drawRect(BOX_MAX - BOX_WIDTH/2, BOX_MAX - BOX_HEIGHT/2, BOX_WIDTH, BOX_HEIGHT, kColorBlack);
   pd->graphics->popContext();

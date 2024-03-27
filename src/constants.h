@@ -7,6 +7,9 @@
 
 #define ALWAYS_FPS true
 
+#define MAX(a,b) ((a) > (b) ? a : b)
+#define MIN(a,b) ((a) < (b) ? a : b)
+
 /// ///
 
 #define TICK_FREQUENCY 50
@@ -33,7 +36,7 @@
 
 #define SQRT_HALF 0.70710678118f
 
-#define N_OBST 64
+#define N_OBST 32
 
 #define N_WATERFALLS 8
 
@@ -61,9 +64,17 @@
 
 #define BOX_WIDTH 22.5f
 #define BOX_HEIGHT 12.5f
+#define BOX_MAX (MAX(BOX_WIDTH, BOX_HEIGHT) * SQRT_HALF)
 
 #define M_PIf 3.14159265358979323846f
 
+#define TIMESTEP (1.0f / TICK_FREQUENCY)
+#define ELASTICITY 0.8f 
+#define G cpv(0.0f, 256.0f)
+
+#define POOT_STRENGTH 100.0f
+
+// SCREEN EASING
 // Larger value to make moving quicker
 #define SCREEN_ACC 0.9f
 // Smaller value to limit max velocity
