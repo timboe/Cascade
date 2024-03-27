@@ -85,7 +85,6 @@ void renderBall(void) {
   const float x = center.x - BALL_RADIUS;
   const float y = center.y - BALL_RADIUS;
   pd->graphics->drawBitmap(getBitmapBall(), x, y, kBitmapUnflipped);
-  if (y < PHYSWALL_PIX_Y) setScrollOffset(y - HALF_DEVICE_PIX_Y); // TODO - smooth this and move this call
 }
 
 void renderTurret(void) {
@@ -113,7 +112,7 @@ void renderBackground(void) {
   // pd->system->logToConsole("so is %i, rendering from %i to %i", so, start, start+5);
   uint8_t wf = 0;
   static uint8_t wfOffC = 0;
-  int8_t wfOff = 15 - (wfOffC % 16);
+  int8_t wfOff = 15 - (wfOffC % 16); 
   //pd->system->logToConsole("off %i", wfOff);
   ++wfOffC;
   // NOTE: Need to draw one extra background due to animation

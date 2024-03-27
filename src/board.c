@@ -107,13 +107,14 @@ void clearBoard(void) {
 void renderBoard(void) {
   for (int i = 0; i < m_nPegs; ++i) {
     pd->graphics->drawBitmap(m_pegs[i].m_bitmap, m_pegs[i].m_xBitmap, m_pegs[i].m_yBitmap, kBitmapUnflipped);
-    // DEBUG
-    if (m_pegs[i].m_motion == kPegMotionEllipse) {
-      pd->graphics->fillEllipse(m_pegs[i].m_pathX[0]-3, m_pegs[i].m_pathY[0]-3, 6, 6, 0.0f, 360.0f, kColorWhite);
-      pd->graphics->fillEllipse(m_pegs[i].m_pathX[0]-2, m_pegs[i].m_pathY[0]-2, 4, 4, 0.0f, 360.0f, kColorBlack);
-    } else if (m_pegs[i].m_motion == kPegMotionPath) {
-      for (int j = 1; j < m_pegs[i].m_pathSteps; ++j) {
-        pd->graphics->drawLine(m_pegs[i].m_pathX[j], m_pegs[i].m_pathY[j], m_pegs[i].m_pathX[j-1], m_pegs[i].m_pathY[j-1], 2, kColorWhite);
+    if (!ballInPlay()) {
+      if (m_pegs[i].m_motion == kPegMotionEllipse) {
+        pd->graphics->fillEllipse(m_pegs[i].m_pathX[0]-3, m_pegs[i].m_pathY[0]-3, 6, 6, 0.0f, 360.0f, kColorWhite);
+        pd->graphics->fillEllipse(m_pegs[i].m_pathX[0]-2, m_pegs[i].m_pathY[0]-2, 4, 4, 0.0f, 360.0f, kColorBlack);
+      } else if (m_pegs[i].m_motion == kPegMotionPath) {
+        for (int j = 1; j < m_pegs[i].m_pathSteps; ++j) {
+          pd->graphics->drawLine(m_pegs[i].m_pathX[j], m_pegs[i].m_pathY[j], m_pegs[i].m_pathX[j-1], m_pegs[i].m_pathY[j-1], 2, kColorWhite);
+        }
       }
     }
   }

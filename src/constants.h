@@ -17,6 +17,9 @@
 #define TILE_PIX 16
 
 #define TURRET_RADIUS 32
+#define TURRET_ANGLE_MAX 285.0f
+#define TURRET_ANGLE_MIN 75.0f
+
 
 #define DEVICE_PIX_X 400
 #define DEVICE_PIX_Y 240

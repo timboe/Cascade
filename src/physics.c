@@ -4,6 +4,7 @@
 #include "physics.h"
 #include "input.h"
 #include "render.h"
+#include "ui.h"
 
 cpSpace* m_space;
 
@@ -84,6 +85,16 @@ void resetBall(void) {
 
 void updateSpace(float timestep) {
   cpSpaceStep(m_space, timestep);
+  
+  const float y = cpBodyGetPosition(m_ball).y;
+  if (y > PHYSWALL_PIX_Y + BALL_RADIUS) {
+    setBallInPlay(false);
+  } 
+
+  if (m_ballInPlay) {
+    setScrollOffset(y - HALF_DEVICE_PIX_Y); // TODO - smooth this and move this call
+  }
+
   if (!m_ballInPlay && !m_doMotionPath) {
     resetBall();
   }

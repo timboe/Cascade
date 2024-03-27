@@ -86,8 +86,8 @@ void rotateHandleTitles(float _rotation) {
 }
 
 void rotateHandleGameWindow(float angle) {
-  if (angle > 269.0f) { angle = 269.0f; }
-  else if (angle < 90.0f) { angle = 90.0f; }
+  if (angle > TURRET_ANGLE_MAX) { angle = TURRET_ANGLE_MAX; }
+  else if (angle < TURRET_ANGLE_MIN) { angle = TURRET_ANGLE_MIN; }
   m_turretBarrelAngle = angle;
 }
 
