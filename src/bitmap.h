@@ -1,5 +1,6 @@
 #pragma once
 #include "game.h"
+#include "peg.h"
 
 const static uint8_t WF_BG_OFFSET[] = {194};
 
@@ -24,13 +25,12 @@ LCDBitmap* getSpriteSplash(void);
 LCDBitmap* getTitleSelectedBitmap(void);
 
 LCDBitmap* getBitmapTurretBody(void);
-
 LCDBitmap* getBitmapTurretBarrel(void);
+LCDBitmap* getBitmapHeader(void);
 
-LCDBitmap* getBitmapBall(uint8_t iAngle);
+LCDBitmap* getBitmapPeg(const struct Peg_t* p);
 
-LCDBitmap* getBitmapRect(uint8_t iAngle);
-
+LCDBitmap* getBitmapBall(void);
 
 #define WF_ID(X, Y) ((WFSHEET_SIZE_X * Y) + X)
 

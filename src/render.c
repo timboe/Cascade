@@ -13,15 +13,25 @@ void renderTitles(int32_t _fc);
 
 void renderGameWindow(int32_t _fc);
 
+uint16_t m_ballTraceX[MAX_PEG_PATHS];
+uint16_t m_ballTraceY[MAX_PEG_PATHS];
+uint8_t m_ballTraces = 0;
+
 /// ///
 
-void addTrauma(float _amount) {
-  m_trauma += _amount;
-  m_trauma *= -1;
-  m_decay = _amount;
+void setBallTrace(const uint16_t i, const uint16_t x, const uint16_t y) {
+  m_ballTraceX[i] = x;
+  m_ballTraceY[i] = y;
+  m_ballTraces = i;
 }
 
-void render(int32_t _fc) {
+void addTrauma(float amount) {
+  m_trauma += amount;
+  m_trauma *= -1;
+  m_decay = amount;
+}
+
+void render(int32_t fc) {
 
   if (true && m_decay > 0.0f) {
     m_decay -= TRAUMA_DECAY;
@@ -40,8 +50,8 @@ void render(int32_t _fc) {
   pd->graphics->clear(kColorWhite);
 
   switch (getGameMode()) {
-    case kTitles: renderTitles(_fc); break;
-    case kGameWindow: renderGameWindow(_fc); break;
+    case kTitles: renderTitles(fc); break;
+    case kGameWindow: renderGameWindow(fc); break;
     default: break;
   }
 
@@ -72,10 +82,9 @@ void renderTitles(int32_t _fc) {
 void renderBall(void) {
   cpBody* ball = getBall();
   const cpVect center = cpBodyGetPosition(ball);
-  const float angle = (cpBodyGetAngle(ball) / (M_PIf * 2.0f)) * 180.0f;
   const float x = center.x - BALL_RADIUS;
   const float y = center.y - BALL_RADIUS;
-  pd->graphics->drawBitmap(getBitmapBall(angle), x, y, kBitmapUnflipped);
+  pd->graphics->drawBitmap(getBitmapBall(), x, y, kBitmapUnflipped);
   if (y < PHYSWALL_PIX_Y) setScrollOffset(y - HALF_DEVICE_PIX_Y); // TODO - smooth this and move this call
 }
 
@@ -83,28 +92,19 @@ void renderTurret(void) {
   if (getScrollOffset() >= 32) {
     return;
   }
-  pd->graphics->drawBitmap(getBitmapTurretBody(), DEVICE_PIX_X/2 - 32, 0, kBitmapUnflipped);
-  pd->graphics->drawBitmap(getBitmapTurretBarrel(), DEVICE_PIX_X/2 - 32, 0, kBitmapUnflipped);
+  pd->graphics->drawBitmap(getBitmapHeader(), 0, 0, kBitmapUnflipped);
+  pd->graphics->drawBitmap(getBitmapTurretBody(), DEVICE_PIX_X/2 - TURRET_RADIUS, BALL_RADIUS, kBitmapUnflipped);
+  pd->graphics->drawBitmap(getBitmapTurretBarrel(), DEVICE_PIX_X/2 - TURRET_RADIUS, BALL_RADIUS, kBitmapUnflipped);
 }
 
 void renderPath(void) {
   if (ballInPlay()) {
     return;
   }
-
-  cpBody* ball = getBall();  
-  setDoMotionPath(true);
-  launchBall();  
-  for(int i=0; i<64; i++){
-    updateSpace();
-    if(i%8==0){
-      const cpVect center = cpBodyGetPosition(ball);
-      pd->graphics->fillEllipse(center.x-3, center.y-3, 6, 6, 0.0f, 360.0f, kColorWhite);
-      pd->graphics->fillEllipse(center.x-2, center.y-2, 4, 4, 0.0f, 360.0f, kColorBlack);
-    }
+  for (int i = 1; i < m_ballTraces; ++i) {
+    pd->graphics->drawLine(m_ballTraceX[i], m_ballTraceY[i], m_ballTraceX[i-1], m_ballTraceY[i-1], 4, kColorWhite);
+    pd->graphics->drawLine(m_ballTraceX[i], m_ballTraceY[i], m_ballTraceX[i-1], m_ballTraceY[i-1], 2, kColorBlack);
   }
-  resetBall();
-  setDoMotionPath(false);
 }
 
 void renderBackground(void) {

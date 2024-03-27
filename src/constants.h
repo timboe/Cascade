@@ -16,6 +16,8 @@
 
 #define TILE_PIX 16
 
+#define TURRET_RADIUS 32
+
 #define DEVICE_PIX_X 400
 #define DEVICE_PIX_Y 240
 
@@ -74,7 +76,8 @@
 #define BOX_HEIGHT 12.5f
 #define BOX_MAX (MAX(BOX_WIDTH, BOX_HEIGHT) * SQRT_HALF)
 
-#define M_PIf 3.14159265358979323846f
+#define M_PIf  3.14159265358f
+#define M_2PIf 6.28318530718f
 
 #define TIMESTEP (1.0f / TICK_FREQUENCY)
 #define ELASTICITY 0.8f 

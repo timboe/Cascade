@@ -79,7 +79,11 @@ int gameLoop(void* _data) {
     }
 
     updateBoard();
-    updateSpace();
+    updateSpace(TIMESTEP);
+
+    // if (m_frameCount % 8 == 0 && !ballInPlay()) {
+    //   updatePath();
+    // }
   }
 
 

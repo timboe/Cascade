@@ -3,23 +3,19 @@
 #include "physics.h"
 
 LCDBitmap* m_titleSelected;
-
 LCDBitmap* m_splash;
 
+LCDBitmap* m_header;
 LCDBitmap* m_turretBody;
-
 LCDBitmap* m_turretBarrel[256];
 
 LCDBitmap* m_ballBitmap[256];
-
 LCDBitmap* m_rectBitmap[256];
 
 LCDBitmapTable* m_sheetWfBg[N_WATERFALLS];
-
 LCDBitmapTable* m_sheetWfFg[N_WATERFALLS];
 
 LCDFont* m_fontRoobert24;
-
 LCDFont* m_fontRoobert10;
 
 LCDBitmap* loadImageAtPath(const char* _path);
@@ -28,11 +24,7 @@ LCDBitmapTable* loadImageTableAtPath(const char* _path);
 
 LCDFont* loadFontAtPath(const char* _path);
 
-uint8_t radToByte(float _rad);
-
 /// ///
-
-
 
 LCDBitmap* loadImageAtPath(const char* _path) {
   const char* _outErr = NULL;
@@ -80,17 +72,22 @@ LCDBitmap* getBitmapWfFg_byidx(uint8_t _wf, uint32_t _idx) {
   return pd->graphics->getTableBitmap(m_sheetWfFg[_wf], _idx);
 }
 
-LCDBitmap* getBitmapBall(uint8_t iAngle) { return m_ballBitmap[iAngle]; }
-
-LCDBitmap* getBitmapRect(uint8_t iAngle) { return m_rectBitmap[iAngle]; }
-
-LCDBitmap* getTitleSelectedBitmap() {
-  return m_titleSelected;
+LCDBitmap* getBitmapPeg(const struct Peg_t* p) {
+  switch (p->m_shape) {
+    case kPegShapeBall: return m_ballBitmap[p->m_iAngle];
+    case kPegShapeRect: return m_rectBitmap[p->m_iAngle];
+    default: return NULL;
+  }
+  return NULL;
 }
 
-LCDBitmap* getBitmapTurretBody(void) {
-  return m_turretBody;
-}
+LCDBitmap* getBitmapBall(void) { return m_ballBitmap[0]; }
+
+LCDBitmap* getTitleSelectedBitmap() { return m_titleSelected; }
+
+LCDBitmap* getBitmapTurretBody(void) { return m_turretBody; }
+
+LCDBitmap* getBitmapHeader(void) { return m_header; }
 
 LCDBitmap* getBitmapTurretBarrel(void) {
   return m_turretBarrel[ angToByte(getTurretBarrelAngle()) ];
@@ -104,21 +101,16 @@ void setRoobert24() {
   pd->graphics->setFont(m_fontRoobert24); 
 }
 
-LCDFont* getRoobert24() {
-  return m_fontRoobert24;
-}
+LCDFont* getRoobert24() { return m_fontRoobert24; }
 
-LCDFont* getRoobert10(void) {
-  return m_fontRoobert10;
-}
-
-
+LCDFont* getRoobert10(void) { return m_fontRoobert10; }
 
 void initBitmap() {
   pd->graphics->setDrawMode(kDrawModeCopy);
   m_titleSelected = loadImageAtPath("images/titleSelected");
   m_splash = loadImageAtPath("images/splash");
 
+  m_header = loadImageAtPath("images/header");
   m_turretBody = loadImageAtPath("images/turretBody");
   m_turretBarrel[0] = loadImageAtPath("images/turretBarrel");
   // m_turretBarrelRotated = pd->graphics->newBitmap(64, 64, kColorClear);

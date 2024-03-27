@@ -66,8 +66,12 @@ void clickHandleTitles(uint32_t _buttonPressed) {
 void clickHandleGameWindow(uint32_t _buttonPressed) {
   if (kButtonA == _buttonPressed) {
     
-    setBallInPlay(true);
-    launchBall();
+    if (ballInPlay()) {
+      setBallInPlay(false);
+    } else {
+      setBallInPlay(true);
+      launchBall();
+    }
 
   } else if (kButtonB == _buttonPressed) {
 

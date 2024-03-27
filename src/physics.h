@@ -4,13 +4,13 @@
 
 void initSpace(void);
 
-void updateSpace(void);
+void updateSpace(float timestep);
+
+void updatePath(void);
 
 bool ballInPlay(void);
 
 void setBallInPlay(bool bip);
-
-void setDoMotionPath(bool dmp);
 
 cpBody* getBall(void);
 
@@ -27,3 +27,7 @@ uint8_t radToByte(float rad);
 uint8_t angToByte(float ang);
 
 float angToRad(float ang);
+
+float len(const float x1, const float x2, const float y1, const float y2);
+
+float len2(const float x1, const float x2, const float y1, const float y2);
