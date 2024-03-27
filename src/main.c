@@ -4,6 +4,7 @@
 #include "pd_api.h"
 #include "game.h"
 #include "bitmap.h"
+#include "board.h"
 #include "sound.h"
 #include "ui.h"
 #include "io.h"
@@ -13,7 +14,8 @@ __declspec(dllexport)
 #endif
 
 static void init(void) {
-  initSprite();
+  initBoard();
+  initBitmap();
   initiUI();
   initSound();
   initGame();

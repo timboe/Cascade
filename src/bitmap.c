@@ -12,7 +12,7 @@ LCDBitmap* m_turretBarrel[256];
 
 LCDBitmap* m_ballBitmap[256];
 
-LCDBitmap* m_boxBitmap[256];
+LCDBitmap* m_rectBitmap[256];
 
 LCDBitmapTable* m_sheetWfBg[N_WATERFALLS];
 
@@ -32,15 +32,7 @@ uint8_t radToByte(float _rad);
 
 /// ///
 
-uint8_t radToByte(float _rad) {
-  // pd->system->logToConsole("angle %f -> %i", _rad, (_rad / (M_PIf * 2.0f)) * 256.0f);
-  //return 0;
-  return (_rad / (M_PIf * 2.0f)) * 256.0f;
-}
 
-uint8_t angToByte(float _ang) {
-  return (_ang / 360.0f) * 256.0f;
-}
 
 LCDBitmap* loadImageAtPath(const char* _path) {
   const char* _outErr = NULL;
@@ -88,13 +80,9 @@ LCDBitmap* getBitmapWfFg_byidx(uint8_t _wf, uint32_t _idx) {
   return pd->graphics->getTableBitmap(m_sheetWfFg[_wf], _idx);
 }
 
-LCDBitmap* getBitmapBall(float _angle) {
-  return m_ballBitmap[radToByte(_angle)];
-}
+LCDBitmap* getBitmapBall(uint8_t iAngle) { return m_ballBitmap[iAngle]; }
 
-LCDBitmap* getBitmapBox(float _angle) {
-  return m_boxBitmap[radToByte(_angle)];
-}
+LCDBitmap* getBitmapRect(uint8_t iAngle) { return m_rectBitmap[iAngle]; }
 
 LCDBitmap* getTitleSelectedBitmap() {
   return m_titleSelected;
@@ -126,7 +114,7 @@ LCDFont* getRoobert10(void) {
 
 
 
-void initSprite() {
+void initBitmap() {
   pd->graphics->setDrawMode(kDrawModeCopy);
   m_titleSelected = loadImageAtPath("images/titleSelected");
   m_splash = loadImageAtPath("images/splash");
@@ -169,16 +157,16 @@ void initSprite() {
     pd->graphics->popContext();
   }
 
-  m_boxBitmap[0] = pd->graphics->newBitmap(BOX_MAX*2, BOX_MAX*2, kColorClear);
-  pd->graphics->pushContext(m_boxBitmap[0]);
+  m_rectBitmap[0] = pd->graphics->newBitmap(BOX_MAX*2, BOX_MAX*2, kColorClear);
+  pd->graphics->pushContext(m_rectBitmap[0]);
   pd->graphics->fillRect(BOX_MAX - BOX_WIDTH/2, BOX_MAX - BOX_HEIGHT/2, BOX_WIDTH, BOX_HEIGHT, kColorWhite);
   pd->graphics->drawRect(BOX_MAX - BOX_WIDTH/2, BOX_MAX - BOX_HEIGHT/2, BOX_WIDTH, BOX_HEIGHT, kColorBlack);
   pd->graphics->popContext();
   for (int32_t i = 1; i < 256; ++i) {
     const float angle = (365.0f / 256.0f) * i;
-    m_boxBitmap[i] = pd->graphics->newBitmap(BOX_MAX*2, BOX_MAX*2, kColorClear);
-    pd->graphics->pushContext(m_boxBitmap[i]);
-    pd->graphics->drawRotatedBitmap(m_boxBitmap[0], BOX_MAX, BOX_MAX, angle, 0.5f, 0.5f, 1.0f, 1.0f);
+    m_rectBitmap[i] = pd->graphics->newBitmap(BOX_MAX*2, BOX_MAX*2, kColorClear);
+    pd->graphics->pushContext(m_rectBitmap[i]);
+    pd->graphics->drawRotatedBitmap(m_rectBitmap[0], BOX_MAX, BOX_MAX, angle, 0.5f, 0.5f, 1.0f, 1.0f);
     pd->graphics->popContext();
   }
   

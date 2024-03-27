@@ -1,6 +1,7 @@
 #include <math.h>
 
 #include "game.h"
+#include "board.h"
 #include "bitmap.h"
 #include "render.h"
 #include "sound.h"
@@ -77,6 +78,7 @@ int gameLoop(void* _data) {
       modScrollOffset(so * -SCREEN_BBACK);
     }
 
+    updateBoard();
     updateSpace();
   }
 

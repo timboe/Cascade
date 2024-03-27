@@ -3,7 +3,7 @@
 
 const static uint8_t WF_BG_OFFSET[] = {194};
 
-void initSprite(void);
+void initBitmap(void);
 
 void setRoobert10(void);
 
@@ -27,9 +27,9 @@ LCDBitmap* getBitmapTurretBody(void);
 
 LCDBitmap* getBitmapTurretBarrel(void);
 
-LCDBitmap* getBitmapBall(float _angle);
+LCDBitmap* getBitmapBall(uint8_t iAngle);
 
-LCDBitmap* getBitmapBox(float _angle);
+LCDBitmap* getBitmapRect(uint8_t iAngle);
 
 
 #define WF_ID(X, Y) ((WFSHEET_SIZE_X * Y) + X)

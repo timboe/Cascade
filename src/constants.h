@@ -36,7 +36,15 @@
 
 #define SQRT_HALF 0.70710678118f
 
-#define N_OBST 32
+/////////////
+
+#define N_OBST 64
+
+#define MAX_PEGS 256
+
+#define MAX_PEG_PATHS 32
+
+/////////////
 
 #define N_WATERFALLS 8
 
@@ -70,6 +78,7 @@
 
 #define TIMESTEP (1.0f / TICK_FREQUENCY)
 #define ELASTICITY 0.8f 
+#define FRICTION 0.0f 
 #define G cpv(0.0f, 256.0f)
 
 #define POOT_STRENGTH 100.0f

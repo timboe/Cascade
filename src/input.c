@@ -5,10 +5,11 @@
 #include "ui.h"
 #include "io.h"
 #include "physics.h"
+#include "board.h"
 
 uint8_t m_pressed[4] = {0};
 
-float m_turretBarrelAngle = 0.0f;
+float m_turretBarrelAngle = 180.0f;
 
 void clickHandleWander(uint32_t _buttonPressed);
 
@@ -16,7 +17,7 @@ void clickHandleTitles(uint32_t _buttonPressed);
 
 void clickHandleGameWindow(uint32_t _buttonPressed);
 
-void rotateHandleGameWindow(float _angle);
+void rotateHandleGameWindow(float angle);
 
 void rotateHandleTitles(float _rotation);
 
@@ -64,47 +65,14 @@ void clickHandleTitles(uint32_t _buttonPressed) {
 
 void clickHandleGameWindow(uint32_t _buttonPressed) {
   if (kButtonA == _buttonPressed) {
-
-    cpBodySetPosition(getBall(), cpv(HALF_DEVICE_PIX_X, UI_OFFSET_TOP));
-    cpBodySetVelocity(getBall(), cpvzero);
-    cpBodySetAngle(getBall(), 0);
-    cpBodySetAngularVelocity(getBall(), 0);
-
+    
     setBallInPlay(true);
-
-    const float angleRad = m_turretBarrelAngle * (M_PIf / 180.0f);
-    cpBodyApplyImpulseAtLocalPoint(getBall(), cpv(POOT_STRENGTH * sinf(angleRad), POOT_STRENGTH * -cosf(angleRad)), cpvzero);
+    launchBall();
 
   } else if (kButtonB == _buttonPressed) {
 
     setBallInPlay(false);
-
-    cpBodySetPosition(getBall(), cpv(WFALL_PIX_X/2, WFALL_PIX_Y*4));
-
-
-    for (int i = 0; i < N_OBST/2; ++i) {
-      cpBodySetPosition(getObst(i), cpv( ((i+1)*32) % WFALL_PIX_X, ((i+1)*32) + UI_OFFSET_TOP));
-      cpBodySetVelocity(getObst(i), cpv(32.0f, 0));
-
-      cpBodySetPosition(getBox(i), cpv( WFALL_PIX_X - (((i+1)*32) % WFALL_PIX_X), ((i+1)*32) + 16 + UI_OFFSET_TOP));
-      cpBodySetVelocity(getBox(i), cpv(-32.0f, 0));
-      cpBodySetAngle(getBox(i), ((2*M_PIf)/(N_OBST/2))*i);
-    }
-
-    for (int i = N_OBST/2; i < N_OBST; ++i) {
-      cpBodySetPosition(getObst(i), cpv(rand() % WFALL_PIX_X, (rand() % WFALL_PIX_Y) + UI_OFFSET_TOP));
-      cpBodySetPosition(getBox(i), cpv(rand() % WFALL_PIX_X, (rand() % WFALL_PIX_Y) + UI_OFFSET_TOP));
-      cpBodySetAngle(getBox(i), (M_PIf/180.0f) * (rand()%360));
-    }
-
-    // for (int i = 0; i < N_OBST; ++i) {
-    //   cpBodySetPosition(getObst(i), cpvzero);
-    //   cpBodySetPosition(getBox(i), cpvzero);
-    //   cpBodySetVelocity(getObst(i), cpvzero);
-    //   cpBodySetVelocity(getBox(i), cpvzero);
-    // }
-    // cpBodySetAngle(getBox(0), M_PIf/4.0f);
-    // cpBodySetPosition(getBox(0), cpv(WFALL_PIX_X/2, 128 + UI_OFFSET_TOP));
+    randomiseBoard();
 
   }
 }
@@ -113,8 +81,10 @@ void rotateHandleTitles(float _rotation) {
  
 }
 
-void rotateHandleGameWindow(float _angle) {
-  m_turretBarrelAngle = _angle;
+void rotateHandleGameWindow(float angle) {
+  if (angle > 269.0f) { angle = 269.0f; }
+  else if (angle < 90.0f) { angle = 90.0f; }
+  m_turretBarrelAngle = angle;
 }
 
 float getTurretBarrelAngle(void) {

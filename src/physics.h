@@ -10,12 +10,20 @@ bool ballInPlay(void);
 
 void setBallInPlay(bool bip);
 
+void setDoMotionPath(bool dmp);
+
 cpBody* getBall(void);
 
 cpShape* getBallShape(void);
 
-cpBody* getObst(uint32_t i);
+void launchBall(void);
 
-cpBody* getBox(uint32_t i);
+void resetBall(void);
 
 cpSpace* getSpace(void);
+
+uint8_t radToByte(float rad);
+
+uint8_t angToByte(float ang);
+
+float angToRad(float ang);
