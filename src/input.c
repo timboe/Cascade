@@ -17,7 +17,7 @@ void clickHandleTitles(uint32_t _buttonPressed);
 
 void clickHandleGameWindow(uint32_t _buttonPressed);
 
-void rotateHandleGameWindow(float angle);
+void rotateHandleGameWindow(float angle, float delta);
 
 void rotateHandleTitles(float _rotation);
 
@@ -85,10 +85,27 @@ void rotateHandleTitles(float _rotation) {
  
 }
 
-void rotateHandleGameWindow(float angle) {
-  if (angle > TURRET_ANGLE_MAX) { angle = TURRET_ANGLE_MAX; }
-  else if (angle < TURRET_ANGLE_MIN) { angle = TURRET_ANGLE_MIN; }
-  m_turretBarrelAngle = angle;
+void rotateHandleGameWindow(float angle, float delta) {
+  static bool topLock = true;
+  static float revDetection = 180.0f;
+
+  const bool newRev = fabsf(angle - revDetection) > 180.0f;
+  revDetection = angle;
+
+  if (newRev && angle < 180.0f) {
+    topLock = false;
+  } else if (getScrollOffset() <= 0.0f) {
+    topLock = true;
+  }
+
+  if (topLock) {
+    if (angle > TURRET_ANGLE_MAX) { angle = TURRET_ANGLE_MAX; }
+    else if (angle < TURRET_ANGLE_MIN) { angle = TURRET_ANGLE_MIN; }
+    m_turretBarrelAngle = angle;
+  } else {
+    modScrollVelocity(delta*CRANK_SCROLL_MODIFIER);
+  }
+
 }
 
 float getTurretBarrelAngle(void) {
@@ -143,7 +160,7 @@ void clickHandlerReplacement() {
   if (cc) {
     switch (gm) {
       case kTitles: rotateHandleTitles(pd->system->getCrankChange()); break; 
-      case kGameWindow: rotateHandleGameWindow(pd->system->getCrankAngle()); break;
+      case kGameWindow: rotateHandleGameWindow(pd->system->getCrankAngle(), pd->system->getCrankChange()); break;
       default: break;
     }
   }

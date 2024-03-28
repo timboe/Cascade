@@ -9,6 +9,7 @@
 enum kGameMode m_mode = 0;
 
 float m_scrollOffset = 0;
+float m_vY = 0;
 
 // LCDSprite* m_UISpriteSave = NULL;
 // LCDSprite* m_UISpriteSaveLoadProgress = NULL;
@@ -256,15 +257,23 @@ void initiUI() {
 
 }
 
-float getScrollOffset(void) {
-  return m_scrollOffset;
+void modScrollVelocity(float mod) { m_vY += mod; }
+
+void applyScrollEasing(void) {
+  m_vY *= SCREEN_FRIC;
+  m_scrollOffset += m_vY;
+
+  const float soDiff = SCROLL_OFFSET_MAX - m_scrollOffset;
+  if (soDiff < 0) {
+    m_scrollOffset += soDiff * SCREEN_BBACK;
+  } else if (m_scrollOffset < 0) {
+    m_scrollOffset += (m_scrollOffset * -SCREEN_BBACK);
+  }
 }
 
-float modScrollOffset(float _mod) {
-  return (m_scrollOffset += _mod);
-}
+float getScrollOffset(void) { return m_scrollOffset; }
 
-void setScrollOffset(float _set) {
-  if (_set < 0) _set = 0;
-  m_scrollOffset = _set;
+void setScrollOffset(float set) {
+  if (set < 0) set = 0;
+  m_scrollOffset = set;
 }
