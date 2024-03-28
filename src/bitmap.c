@@ -13,7 +13,7 @@ LCDBitmapTable* m_turretBarrelTabel;
 LCDBitmap* m_ballBitmap[MAX_PEG_SIZE];
 LCDBitmap* m_rectBitmap[MAX_PEG_SIZE][256];
 
-LCDBitmapTable* m_sheetWfBg[N_WATERFALLS];
+LCDBitmap* m_wfBg[N_WATERFALLS];
 LCDBitmapTable* m_sheetWfFg[N_WATERFALLS];
 
 LCDFont* m_fontRoobert24;
@@ -56,14 +56,7 @@ LCDFont* loadFontAtPath(const char* _path) {
 
 LCDBitmap* getSpriteSplash() { return m_splash; }
 
-
-LCDBitmap* getBitmapWfBg(uint8_t _wf, uint32_t _x, uint32_t _y) {
-  return getBitmapWfBg_byidx(_wf, WF_ID(_x, _y));
-}
-
-LCDBitmap* getBitmapWfBg_byidx(uint8_t _wf, uint32_t _idx) {
-  return pd->graphics->getTableBitmap(m_sheetWfBg[_wf], _idx);
-}
+LCDBitmap* getBitmapWfBg(uint8_t wf) { return m_wfBg[wf]; }
 
 LCDBitmap* getBitmapWfFg(uint8_t _wf, uint32_t _x, uint32_t _y) {
   return getBitmapWfFg_byidx(_wf, WF_ID(_x, _y));
@@ -140,7 +133,7 @@ void initBitmap() {
   for (int32_t i = 0; i < N_WATERFALLS; ++i) {
     char buf[128];
     snprintf(buf, 128, "images/falls%i_bg", (int)i);
-    m_sheetWfBg[i] = loadImageTableAtPath(buf);
+    m_wfBg[i] = loadImageAtPath(buf);
     snprintf(buf, 128, "images/falls%i_fg", (int)i);
     m_sheetWfFg[i] = loadImageTableAtPath(buf);
     // TODO - temp
