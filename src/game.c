@@ -12,7 +12,6 @@
 
 int32_t m_frameCount = 0;
 
-float m_vY = 0;
 
 ////////////
 
@@ -66,17 +65,8 @@ int gameLoop(void* _data) {
     float diffY = 0;
     if      (getPressed(2)) diffY = -SCREEN_ACC;
     else if (getPressed(3)) diffY =  SCREEN_ACC;
-    m_vY += diffY;
-    m_vY *= SCREEN_FRIC;
-    modScrollOffset(m_vY);
-
-    const float so = getScrollOffset();
-    const float soDiff = SCROLL_OFFSET_MAX - so;
-    if (soDiff < 0) {
-      modScrollOffset(soDiff * SCREEN_BBACK);
-    } else if (so < 0) {
-      modScrollOffset(so * -SCREEN_BBACK);
-    }
+    if (diffY) modScrollVelocity(diffY);
+    applyScrollEasing();
 
     updateBoard();
     updateSpace(TIMESTEP);

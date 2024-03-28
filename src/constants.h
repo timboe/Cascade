@@ -96,3 +96,5 @@
 #define SCREEN_FRIC 0.9f
 // Larger number for stronger bounce-back
 #define SCREEN_BBACK 0.2f
+
+#define CRANK_SCROLL_MODIFIER 0.1f

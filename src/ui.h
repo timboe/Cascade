@@ -29,6 +29,10 @@ LCDBitmap* getTitleNewGameBitmap(uint8_t _i);
 
 float getScrollOffset(void);
 
-float modScrollOffset(float _mod);
+void setScrollOffset(float set);
 
-void setScrollOffset(float _set);
+void modScrollVelocity(float mod);
+
+void applyScrollEasing(void);
+
+
