@@ -11,3 +11,5 @@ void updateBoard(void);
 void renderBoard(void);
 
 void clearBoard(void);
+
+void popBoard(float y);

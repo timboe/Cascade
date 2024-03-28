@@ -12,13 +12,13 @@
 
 /// ///
 
-#define TICK_FREQUENCY 50
+#define TICK_FREQUENCY 30
 
 #define TILE_PIX 16
 
 #define TURRET_RADIUS 32
-#define TURRET_ANGLE_MAX 285.0f
-#define TURRET_ANGLE_MIN 75.0f
+#define TURRET_ANGLE_MIN 15.0f
+#define TURRET_ANGLE_MAX (360.0f - TURRET_ANGLE_MIN)
 
 
 #define DEVICE_PIX_X 400
@@ -49,20 +49,23 @@
 
 #define MAX_PEG_PATHS 32
 
+#define MAX_PEG_SIZE 5
+
 /////////////
 
 #define N_WATERFALLS 8
 
-#define UI_OFFSET_TOP 32
+// Trying without this
+#define UI_OFFSET_TOP 0
 
 #define SCROLL_OFFSET_MAX (WFALL_PIX_Y + UI_OFFSET_TOP - DEVICE_PIX_Y)
 
 // How many pixels down the side do we have to prevent the ball from bouncing out off
 #define PHYSWALL_PIX_Y (WFALL_PIX_Y + UI_OFFSET_TOP)
 
-#define FLAG_BALL 0
-#define FLAG_TARGET 1
-#define FLAG_WALL 2
+#define FLAG_BALL 1
+#define FLAG_PEG 2
+#define FLAG_WALL 4
 
 #define BUTTON_PRESSED_FRAMES 8
 
@@ -87,7 +90,7 @@
 #define FRICTION 0.0f 
 #define G cpv(0.0f, 256.0f)
 
-#define POOT_STRENGTH 100.0f
+#define POOT_STRENGTH 300.0f
 
 // SCREEN EASING
 // Larger value to make moving quicker
@@ -98,3 +101,7 @@
 #define SCREEN_BBACK 0.2f
 
 #define CRANK_SCROLL_MODIFIER 0.1f
+
+#define SCREEN_EASING 0.25f
+
+#define END_SWEEP_SCALE 0.25f

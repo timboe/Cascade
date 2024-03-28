@@ -1,9 +1,19 @@
 #include "peg.h"
 #include "bitmap.h"
 
-void initPeg(struct Peg_t* p, const enum PegShape_t s, const float x, const float y, const float a) {
+void updateAngle(struct Peg_t* p, float angle);
+
+void setPegBitmapCoordinates(struct Peg_t* p);
+
+///
+
+void initPeg(struct Peg_t* p, const enum PegShape_t s, const float x, const float y, const float a, const uint8_t size) {
   if (p->m_cpBody) {
     pd->system->error("Error initPeg called on an already initalised peg");
+    return;
+  }
+  if (size >= MAX_PEG_SIZE) {
+    pd->system->error("Error initPeg called with too large size %i", size);
     return;
   }
 
@@ -11,11 +21,14 @@ void initPeg(struct Peg_t* p, const enum PegShape_t s, const float x, const floa
   p->m_motion = kPegMotionStatic;
   p->m_type = kPegTypeNormal;
   p->m_state = kPegStateActive;
+  p->m_x = x;
+  p->m_y = y;
   p->m_angle = a;
   p->m_iAngle = radToByte(a);
   p->m_speed = 1.0f;
-  p->m_bitmap = getBitmapPeg(p); // Call after setting m_shape and m_iAngle
-  
+  p->m_size = size;
+  const float scale = sizeToScale(size);
+
   p->m_cpBody = cpBodyNewKinematic();
   cpBodySetPosition(p->m_cpBody, cpv(x, y));
   cpBodySetAngle(p->m_cpBody, a);
@@ -23,18 +36,19 @@ void initPeg(struct Peg_t* p, const enum PegShape_t s, const float x, const floa
   cpSpaceAddBody(getSpace(), p->m_cpBody);
   
   if (s == kPegShapeBall) {
-    p->m_cpShape = cpCircleShapeNew(p->m_cpBody, BALL_RADIUS, cpvzero);
-    p->m_radius = BALL_RADIUS;
+    p->m_cpShape = cpCircleShapeNew(p->m_cpBody, BALL_RADIUS*scale, cpvzero);
+    p->m_radius = BALL_RADIUS*scale;
   } else if (s == kPegShapeRect) {
-    p->m_cpShape = cpBoxShapeNew(p->m_cpBody, BOX_WIDTH, BOX_HEIGHT, 0.0f);
-    p->m_radius = BOX_MAX;
+    p->m_cpShape = cpBoxShapeNew(p->m_cpBody, BOX_WIDTH*scale, BOX_HEIGHT*scale, 0.0f);
+    p->m_radius = BOX_MAX*scale;
   } else {    
     pd->system->error("Error initPeg called with unknown peg shape");
     clearPeg(p);
     return;
   }
-  p->m_xBitmap = x - p->m_radius;
-  p->m_yBitmap = y - p->m_radius;
+  p->m_bitmap = getBitmapPeg(p); // Call after setting m_shape, m_iAngle and m_size
+  setPegBitmapCoordinates(p);
+  cpShapeSetCollisionType(p->m_cpShape, FLAG_PEG);
   cpShapeSetFriction(p->m_cpShape, FRICTION);
   cpShapeSetElasticity(p->m_cpShape, ELASTICITY);
   cpSpaceAddShape(getSpace(), p->m_cpShape);
@@ -44,15 +58,26 @@ void initPeg(struct Peg_t* p, const enum PegShape_t s, const float x, const floa
 }
 
 void clearPeg(struct Peg_t* p) {
+  removePeg(p);
+  memset(p, 0, sizeof(struct Peg_t));
+}
+
+void removePeg(struct Peg_t* p) {
   if (p->m_cpBody) {
     cpSpaceRemoveBody(getSpace(), p->m_cpBody);
     cpBodyFree(p->m_cpBody);
+    p->m_cpBody = NULL;
   }
   if (p->m_cpShape) {
     cpSpaceRemoveShape(getSpace(), p->m_cpShape);
     cpShapeFree(p->m_cpShape);
+    p->m_cpShape = NULL;
   }
-  memset(p, 0, sizeof(struct Peg_t));
+}
+
+void setPegBitmapCoordinates(struct Peg_t* p) {
+  p->m_xBitmap = p->m_x - p->m_radius;
+  p->m_yBitmap = p->m_y - p->m_radius;
 }
 
 void updateAngle(struct Peg_t* p, float angle) {
@@ -66,7 +91,12 @@ void updateAngle(struct Peg_t* p, float angle) {
 }
 
 void updatePeg(struct Peg_t* p) {
+  if (p->m_state == kPegStateRemoved) {
+    return;
+  }
+
   p->m_time += (TIMESTEP * p->m_speed);
+  if (p->m_time >= M_2PIf) { p->m_time -= M_2PIf; } // Keep this one bounded
 
   if (p->m_motion == kPegMotionStatic) {
 
@@ -74,14 +104,13 @@ void updatePeg(struct Peg_t* p) {
 
   } else if (p->m_motion == kPegMotionEllipse) {
 
+    const float easing = getEasing(p->m_easing, p->m_time / M_2PIf);
     p->m_time += (TIMESTEP * p->m_speed);
-    p->m_x = p->m_pathX[0] + (p->m_a * cosf(p->m_time));
-    p->m_y = p->m_pathY[0] + (p->m_b * sinf(p->m_time));
-    updateAngle(p, p->m_time + M_PIf * 0.5f ); // Offset to point inwards
+    p->m_x = p->m_pathX[0] + (p->m_a * cosf(p->m_time * easing));
+    p->m_y = p->m_pathY[0] + (p->m_b * sinf(p->m_time * easing));
+    updateAngle(p, (p->m_time * easing) + (M_PIf * 0.5f) ); // Offset to point inwards
 
   } else if (p->m_motion == kPegMotionPath) {
-
-    if (p->m_time >= M_2PIf) { p->m_time -= M_2PIf; } // Keep this one bounded
 
     uint8_t pathStep = 0;
     float stepLenFrac = 0;
@@ -115,9 +144,7 @@ void updatePeg(struct Peg_t* p) {
   }
 
   cpBodySetPosition(p->m_cpBody, cpv(p->m_x, p->m_y));
-
-  p->m_xBitmap = p->m_x - p->m_radius;
-  p->m_yBitmap = p->m_y - p->m_radius;
+  setPegBitmapCoordinates(p);
 }
 
 void setPegMotionSpeed(struct Peg_t* p, const float s) { p->m_speed = s; }
@@ -132,7 +159,7 @@ void setPegMotionEllipse(struct Peg_t* p, const float a, const float b) {
   p->m_motion = kPegMotionEllipse;
 }
 
-void addPegMotionPath(struct Peg_t* p, const uint16_t x, const uint16_t y) {
+void addPegMotionPath(struct Peg_t* p, const int16_t x, const int16_t y) {
   if (p->m_pathSteps == MAX_PEG_PATHS) {
     pd->system->error("Error addPegMotionPath has reached the max of %i paths", MAX_PEG_PATHS);
     return;
@@ -152,4 +179,36 @@ void pegMotionPathFinalise(struct Peg_t* p) {
   // Close the loop
   addPegMotionPath(p, p->m_pathX[0], p->m_pathY[0]);
   p->m_motion = kPegMotionPath;
+}
+
+void renderPeg(const struct Peg_t* p) {
+  if (p->m_state == kPegStateRemoved) {
+    return;
+  } else if (p->m_state == kPegStateHit) {
+    pd->graphics->setDrawMode(kDrawModeInverted);
+  }
+  pd->graphics->drawBitmap(p->m_bitmap, p->m_xBitmap, p->m_yBitmap, kBitmapUnflipped);
+  pd->graphics->setDrawMode(kDrawModeCopy);
+  if (!ballInPlay()) {
+    if (p->m_motion == kPegMotionEllipse) {
+      pd->graphics->fillEllipse(p->m_pathX[0]-3, p->m_pathY[0]-3, 6, 6, 0.0f, 360.0f, kColorWhite);
+      pd->graphics->fillEllipse(p->m_pathX[0]-2, p->m_pathY[0]-2, 4, 4, 0.0f, 360.0f, kColorBlack);
+    } else if (p->m_motion == kPegMotionPath) {
+      for (int j = 1; j < p->m_pathSteps; ++j) {
+        pd->graphics->drawLine(p->m_pathX[j], p->m_pathY[j], p->m_pathX[j-1], p->m_pathY[j-1], 2, kColorWhite);
+      }
+    }
+  }
+}
+
+void hitPeg(struct Peg_t* p) {
+  p->m_state = kPegStateHit;
+  // pd->system->logToConsole("bam!");
+}
+
+void checkPopPeg(struct Peg_t* p, float y) {
+  if (p->m_state == kPegStateHit && p->m_y >= y) {
+    p->m_state = kPegStateRemoved;
+    removePeg(p);
+  }
 }

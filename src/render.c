@@ -88,12 +88,12 @@ void renderBall(void) {
 }
 
 void renderTurret(void) {
-  if (getScrollOffset() >= 32) {
+  if (getScrollOffset() >= 2*TURRET_RADIUS) {
     return;
   }
-  pd->graphics->drawBitmap(getBitmapHeader(), 0, 0, kBitmapUnflipped);
-  pd->graphics->drawBitmap(getBitmapTurretBody(), DEVICE_PIX_X/2 - TURRET_RADIUS, BALL_RADIUS, kBitmapUnflipped);
-  pd->graphics->drawBitmap(getBitmapTurretBarrel(), DEVICE_PIX_X/2 - TURRET_RADIUS, BALL_RADIUS, kBitmapUnflipped);
+  //pd->graphics->drawBitmap(getBitmapHeader(), 0, 0, kBitmapUnflipped);
+  pd->graphics->drawBitmap(getBitmapTurretBody(), DEVICE_PIX_X/2 - TURRET_RADIUS, 0,  kBitmapUnflipped);
+  pd->graphics->drawBitmap(getBitmapTurretBarrel(), DEVICE_PIX_X/2 - TURRET_RADIUS, 0, kBitmapUnflipped);
 }
 
 void renderPath(void) {
@@ -155,6 +155,8 @@ void renderGameWindow(int32_t _fc) {
 
   // DRAW PATH
   renderPath();
+
+  renderBallEndSweep();
 
 
 }

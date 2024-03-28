@@ -32,5 +32,7 @@ LCDBitmap* getBitmapPeg(const struct Peg_t* p);
 
 LCDBitmap* getBitmapBall(void);
 
+float sizeToScale(uint8_t size);
+
 #define WF_ID(X, Y) ((WFSHEET_SIZE_X * Y) + X)
 

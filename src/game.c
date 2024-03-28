@@ -65,8 +65,11 @@ int gameLoop(void* _data) {
     float diffY = 0;
     if      (getPressed(2)) diffY = -SCREEN_ACC;
     else if (getPressed(3)) diffY =  SCREEN_ACC;
-    if (diffY) modScrollVelocity(diffY);
+    modScrollVelocity(diffY);
+
     applyScrollEasing();
+
+
 
     updateBoard();
     updateSpace(TIMESTEP);
@@ -79,6 +82,8 @@ int gameLoop(void* _data) {
 
   //if (m_frameCount % 2)
   render(m_frameCount);
+
+      doBallEndSweep();
 
   return 1;
 }

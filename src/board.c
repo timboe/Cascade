@@ -20,9 +20,10 @@ struct Peg_t* pegFromPool(void) {
 
 void boardAddWheel(const uint8_t n, const float angleMax, const enum PegShape_t s, const uint16_t x, const uint16_t y, const uint16_t a, const uint16_t b, const float speed) {
   for (int i = 0; i < n; ++i) {
+    const uint8_t size = 0;
     const float angle = (angleMax / n) * i;
     struct Peg_t* p = pegFromPool();
-    initPeg(p, s, x, y, angle);
+    initPeg(p, s, x, y, angle, size);
     setPegMotionSpeed(p, speed);
     setPegMotionOffset(p, angle);
     setPegMotionEllipse(p, a, b);
@@ -31,9 +32,10 @@ void boardAddWheel(const uint8_t n, const float angleMax, const enum PegShape_t 
 
 void boardAddPath(const uint8_t n, const float angleMax, const enum PegShape_t s, const enum EasingFunction_t e, int16_t x[], int16_t y[], const float speed) {
   for (int i = 0; i < n; ++i) {
+    const uint8_t size = 0;
     const float angle = (angleMax / n) * i;
     struct Peg_t* p = pegFromPool();
-    initPeg(p, s, x[0], y[0], angle);
+    initPeg(p, s, x[0], y[0], angle, size);
     setPegMotionSpeed(p, speed);
     setPegMotionOffset(p, angle);
     setPegMotionEasing(p, e);
@@ -50,20 +52,25 @@ void boardAddPath(const uint8_t n, const float angleMax, const enum PegShape_t s
 void randomiseBoard(void) {
   clearBoard();
 
-  for (int i = 0; i < 16; ++i) {
-    const uint16_t x = rand() % WFALL_PIX_X;
-    const uint16_t y = (rand() % WFALL_PIX_Y) + (2*UI_OFFSET_TOP);
-    const float a = (M_2PIf / 256.0f) * (rand() % 256);
+  const int maxStatic = rand() % 2 ? 16 : 64;
+
+  for (int i = 0; i < maxStatic; ++i) {
+    const int16_t x = rand() % WFALL_PIX_X;
+    const int16_t y = (rand() % WFALL_PIX_Y) + TURRET_RADIUS;
+    const float angle = (M_2PIf / 256.0f) * (rand() % 256);
     const enum PegShape_t s = (rand() % 2 ? kPegShapeBall : kPegShapeRect);
+    const uint8_t size = rand() % MAX_PEG_SIZE;
     struct Peg_t* p = pegFromPool();
-    initPeg(p, s, x, y, a);
+    initPeg(p, s, x, y, angle, size);
   }
+
+  if (maxStatic == 64) return;
 
   #define PEGS_PER_WHEEL 8
   #define WHEELS 4
   for (int wheelStep = 0; wheelStep < WHEELS; ++wheelStep) {
-    const uint16_t x = rand() % WFALL_PIX_X;
-    const uint16_t y = (rand() % WFALL_PIX_Y) + (2*UI_OFFSET_TOP);
+    const int16_t x = rand() % WFALL_PIX_X;
+    const int16_t y = (rand() % WFALL_PIX_Y) + TURRET_RADIUS;
     const float a = 64 + rand() % 32;
     const float b = 64 + rand() % 32;
     const enum PegShape_t s = (rand() % 2 ? kPegShapeBall : kPegShapeRect);
@@ -77,7 +84,7 @@ void randomiseBoard(void) {
     int16_t x[MAX_PEG_PATHS] = {0};
     int16_t y[MAX_PEG_PATHS] = {0};
     x[0] = rand() % WFALL_PIX_X;
-    y[0] = (rand() % WFALL_PIX_Y) + (2*UI_OFFSET_TOP);
+    y[0] = (rand() % WFALL_PIX_Y) + TURRET_RADIUS;
     const uint8_t pathLegs = 1 + rand() % (MAX_PEG_PATHS-2);
     for (int leg = 1; leg <= pathLegs; ++leg) {
       x[leg] = x[leg-1] - 64 + rand() % 128;
@@ -106,16 +113,12 @@ void clearBoard(void) {
 
 void renderBoard(void) {
   for (int i = 0; i < m_nPegs; ++i) {
-    pd->graphics->drawBitmap(m_pegs[i].m_bitmap, m_pegs[i].m_xBitmap, m_pegs[i].m_yBitmap, kBitmapUnflipped);
-    if (!ballInPlay()) {
-      if (m_pegs[i].m_motion == kPegMotionEllipse) {
-        pd->graphics->fillEllipse(m_pegs[i].m_pathX[0]-3, m_pegs[i].m_pathY[0]-3, 6, 6, 0.0f, 360.0f, kColorWhite);
-        pd->graphics->fillEllipse(m_pegs[i].m_pathX[0]-2, m_pegs[i].m_pathY[0]-2, 4, 4, 0.0f, 360.0f, kColorBlack);
-      } else if (m_pegs[i].m_motion == kPegMotionPath) {
-        for (int j = 1; j < m_pegs[i].m_pathSteps; ++j) {
-          pd->graphics->drawLine(m_pegs[i].m_pathX[j], m_pegs[i].m_pathY[j], m_pegs[i].m_pathX[j-1], m_pegs[i].m_pathY[j-1], 2, kColorWhite);
-        }
-      }
-    }
+    renderPeg(&m_pegs[i]);
+  }
+}
+
+void popBoard(float y) {
+  for (int i = 0; i < m_nPegs; ++i) {
+    checkPopPeg(&m_pegs[i], y);
   }
 }

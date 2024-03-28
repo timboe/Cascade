@@ -68,8 +68,10 @@ void clickHandleGameWindow(uint32_t _buttonPressed) {
     
     if (ballInPlay()) {
       setBallInPlay(false);
+      setScrollToTop(true);
     } else {
       setBallInPlay(true);
+      setScrollToTop(false);
       launchBall();
     }
 
@@ -77,6 +79,7 @@ void clickHandleGameWindow(uint32_t _buttonPressed) {
 
     setBallInPlay(false);
     randomiseBoard();
+    setScrollToTop(true);
 
   }
 }
@@ -92,21 +95,20 @@ void rotateHandleGameWindow(float angle, float delta) {
   const bool newRev = fabsf(angle - revDetection) > 180.0f;
   revDetection = angle;
 
-  if (newRev && angle < 180.0f) {
+  const float so = getScrollOffset();
+  if ((newRev && angle < 180.0f) || so > 0) {
     topLock = false;
-  } else if (getScrollOffset() <= 0.0f) {
+  } else if (so <= 0.0f) {
     topLock = true;
   }
 
-  if (topLock) {
-    if (angle > TURRET_ANGLE_MAX) { angle = TURRET_ANGLE_MAX; }
-    else if (angle < TURRET_ANGLE_MIN) { angle = TURRET_ANGLE_MIN; }
-    m_turretBarrelAngle = angle;
-  } else {
-    modScrollVelocity(delta*CRANK_SCROLL_MODIFIER);
-  }
+  if (!topLock) modScrollVelocity(delta*CRANK_SCROLL_MODIFIER);
 
-}
+  if (angle > TURRET_ANGLE_MAX) { angle = TURRET_ANGLE_MAX; }
+  else if (angle < TURRET_ANGLE_MIN) { angle = TURRET_ANGLE_MIN; }
+  m_turretBarrelAngle = angle;
+
+} 
 
 float getTurretBarrelAngle(void) {
   return m_turretBarrelAngle;

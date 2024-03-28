@@ -5,11 +5,16 @@
 #include "render.h"
 #include "sound.h"
 #include "io.h"
+#include "board.h"
 
 enum kGameMode m_mode = 0;
 
 float m_scrollOffset = 0;
 float m_vY = 0;
+bool m_goToTop = false;
+bool m_ballEndSweep = false;
+float m_endSweepProgress = 0;
+float m_popLevel = 0;
 
 // LCDSprite* m_UISpriteSave = NULL;
 // LCDSprite* m_UISpriteSaveLoadProgress = NULL;
@@ -257,16 +262,30 @@ void initiUI() {
 
 }
 
-void modScrollVelocity(float mod) { m_vY += mod; }
+void modScrollVelocity(float mod) { 
+  if (!mod) { return; }
+  m_vY += mod;
+  m_goToTop = false;
+}
+
+void setScrollToTop(bool stt) { m_goToTop = stt; }
 
 void applyScrollEasing(void) {
   m_vY *= SCREEN_FRIC;
   m_scrollOffset += m_vY;
 
+  if (m_goToTop && !m_ballEndSweep) {
+    pd->system->logToConsole("go to top active %i", getFrameCount());
+    setScrollOffset(0.0f);
+    if (m_scrollOffset <= 1.0) {
+      m_goToTop = false;
+    }
+  }
+
   const float soDiff = SCROLL_OFFSET_MAX - m_scrollOffset;
   if (soDiff < 0) {
     m_scrollOffset += soDiff * SCREEN_BBACK;
-  } else if (m_scrollOffset < 0) {
+  } else if (m_scrollOffset < 0.0f) {
     m_scrollOffset += (m_scrollOffset * -SCREEN_BBACK);
   }
 }
@@ -275,5 +294,36 @@ float getScrollOffset(void) { return m_scrollOffset; }
 
 void setScrollOffset(float set) {
   if (set < 0) set = 0;
-  m_scrollOffset = set;
+  float diff = set - m_scrollOffset;
+  m_scrollOffset += diff * SCREEN_EASING;
+  // pd->system->logToConsole("req %f, set %f", set, m_scrollOffset);
+}
+
+void activateBallEndSweep(void) {
+  m_ballEndSweep = true;
+  m_endSweepProgress = 0.0f;
+}
+
+void doBallEndSweep(void) {
+  if (!m_ballEndSweep) return;
+  m_endSweepProgress += (TIMESTEP * END_SWEEP_SCALE);
+  float progress = getEasing(EaseInOutSine, m_endSweepProgress);
+  progress = (1.0f - progress);
+
+  const float target = SCROLL_OFFSET_MAX * progress;
+  setScrollOffset(target);
+
+  m_popLevel = target + (progress * DEVICE_PIX_Y);
+  popBoard(m_popLevel);
+  // pd->system->logToConsole("end sweep active target %f, pop %f",target, m_popLevel);
+
+  if (m_endSweepProgress >= 1) {
+    m_ballEndSweep = false;
+    m_scrollOffset = 0;
+  }
+}
+
+void renderBallEndSweep(void) {
+  if (!m_ballEndSweep) return;
+  pd->graphics->drawLine(0, m_popLevel, DEVICE_PIX_X, m_popLevel, 4, kColorWhite);
 }

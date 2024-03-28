@@ -5,14 +5,21 @@
 #include "input.h"
 #include "render.h"
 #include "ui.h"
+#include "peg.h"
 
 cpSpace* m_space;
 
 cpBody* m_ball;
 cpShape* m_ballShape;
 
+cpCollisionHandler* m_colliderHandle;
+
+uint8_t cpCollisionBeginFunc_ballPeg(cpArbiter* arb, struct cpSpace* space, cpDataPointer data);
+
 bool m_ballInPlay = false;
 bool m_doMotionPath = false;
+
+/// ///
 
 uint8_t radToByte(float rad) { return (rad / M_2PIf) * 256.0f; }
 
@@ -58,12 +65,17 @@ void initSpace(void) {
   m_ballShape = cpCircleShapeNew(m_ball, BALL_RADIUS, cpvzero);
   cpShapeSetFriction(m_ballShape, 0.0f);
   cpShapeSetElasticity(m_ballShape, ELASTICITY);
+  cpShapeSetCollisionType(m_ballShape, FLAG_BALL);
   cpSpaceAddShape(m_space, m_ballShape);
+  resetBall();
 
   cpBody* walls = cpSpaceGetStaticBody(m_space);
   cpShape* top   = cpSegmentShapeNew(walls, cpv(0,            UI_OFFSET_TOP), cpv(DEVICE_PIX_X, UI_OFFSET_TOP),  3.0f);
   cpShape* left  = cpSegmentShapeNew(walls, cpv(0,            UI_OFFSET_TOP), cpv(0,            PHYSWALL_PIX_Y), 3.0f);
   cpShape* right = cpSegmentShapeNew(walls, cpv(DEVICE_PIX_X, UI_OFFSET_TOP), cpv(DEVICE_PIX_X, PHYSWALL_PIX_Y), 3.0f);
+  cpShapeSetCollisionType(top, FLAG_WALL);
+  cpShapeSetCollisionType(left, FLAG_WALL);
+  cpShapeSetCollisionType(right, FLAG_WALL);
   cpShapeSetFriction(top, 0.0f);
   cpShapeSetElasticity(top, ELASTICITY);
   cpShapeSetFriction(left, 0.0f);
@@ -74,10 +86,21 @@ void initSpace(void) {
   cpSpaceAddShape(m_space, left);
   cpSpaceAddShape(m_space, right);
 
+  m_colliderHandle = cpSpaceAddCollisionHandler(m_space, FLAG_BALL, FLAG_PEG);
+  m_colliderHandle->beginFunc = cpCollisionBeginFunc_ballPeg;
+}
+
+uint8_t cpCollisionBeginFunc_ballPeg(cpArbiter* arb, struct cpSpace* space, cpDataPointer data) {
+  cpBody* cpBall;
+  cpBody* cpPeg;
+  cpArbiterGetBodies(arb, &cpBall, &cpPeg);
+  struct Peg_t* p = (struct Peg_t*) cpBodyGetUserData(cpPeg);
+  hitPeg(p);
+  return 1;
 }
 
 void resetBall(void) {
-  cpBodySetPosition(m_ball, cpv(HALF_DEVICE_PIX_X, UI_OFFSET_TOP + BALL_RADIUS));
+  cpBodySetPosition(m_ball, cpv(HALF_DEVICE_PIX_X, TURRET_RADIUS));
   cpBodySetVelocity(m_ball, cpvzero);
   cpBodySetAngle(m_ball, 0);
   cpBodySetAngularVelocity(m_ball, 0);
@@ -87,12 +110,14 @@ void updateSpace(float timestep) {
   cpSpaceStep(m_space, timestep);
   
   const float y = cpBodyGetPosition(m_ball).y;
+
   if (y > PHYSWALL_PIX_Y + BALL_RADIUS) {
     setBallInPlay(false);
+    activateBallEndSweep();
   } 
 
   if (m_ballInPlay) {
-    setScrollOffset(y - HALF_DEVICE_PIX_Y); // TODO - smooth this and move this call
+    setScrollOffset(y - HALF_DEVICE_PIX_Y); // TODO - move this call
   }
 
   if (!m_ballInPlay && !m_doMotionPath) {

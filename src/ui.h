@@ -31,8 +31,14 @@ float getScrollOffset(void);
 
 void setScrollOffset(float set);
 
+void setScrollToTop(bool stt);
+
 void modScrollVelocity(float mod);
 
 void applyScrollEasing(void);
 
+void activateBallEndSweep(void);
 
+void doBallEndSweep(void);
+
+void renderBallEndSweep(void);

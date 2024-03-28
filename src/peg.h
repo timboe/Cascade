@@ -36,6 +36,7 @@ struct Peg_t {
   float m_x;
   float m_y;
   float m_radius;
+  uint8_t m_size;
   int16_t m_xBitmap; // Top left corner for rendering
   int16_t m_yBitmap; // Top left corner for rendering
   enum PegShape_t m_shape;
@@ -61,9 +62,11 @@ struct Peg_t {
 
 };
 
-void initPeg(struct Peg_t* p, const enum PegShape_t s, const float x, const float y, const float a);
+void initPeg(struct Peg_t* p, const enum PegShape_t s, const float x, const float y, const float a, const uint8_t size);
 
 void clearPeg(struct Peg_t* p);
+
+void removePeg(struct Peg_t* p);
 
 void updatePeg(struct Peg_t* p);
 
@@ -75,6 +78,12 @@ void setPegMotionOffset(struct Peg_t* p, const float offset);
 
 void setPegMotionEllipse(struct Peg_t* p, const float a, const float b);
 
-void addPegMotionPath(struct Peg_t* p, const uint16_t x, const uint16_t y);
+void addPegMotionPath(struct Peg_t* p, const int16_t x, const int16_t y);
 
 void pegMotionPathFinalise(struct Peg_t* p);
+
+void renderPeg(const struct Peg_t* p);
+
+void hitPeg(struct Peg_t* p);
+
+void checkPopPeg(struct Peg_t* p, float y);
