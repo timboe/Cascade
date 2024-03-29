@@ -112,13 +112,13 @@ void renderBackground(void) {
   // pd->system->logToConsole("so is %i, rendering from %i to %i", so, start, start+5);
   uint8_t wf = 0;
   static uint8_t wfOffC = 0;
-  int8_t wfOff = 15 - (wfOffC % 16); 
+  int8_t wfOff = 59 - (wfOffC % 60); 
   //pd->system->logToConsole("off %i", wfOff);
   ++wfOffC;
   // NOTE: Need to draw one extra background due to animation
   for (uint32_t i = start; i < start+6; ++i) {
     if (i >= WFSHEET_SIZE_Y) break;
-    pd->graphics->drawBitmap(getBitmapWfBg(wf, 0,i), WF_BG_OFFSET[wf], UI_OFFSET_TOP + (WF_DIVISION_PIX_Y * i) - wfOff, kBitmapUnflipped);
+    pd->graphics->drawBitmap(getBitmapWfBg(wf), WF_BG_OFFSET[wf], UI_OFFSET_TOP + (WF_DIVISION_PIX_Y * i) - wfOff, kBitmapUnflipped);
   }
   for (uint32_t i = start; i < start+5; ++i) {
     if (i >= WFSHEET_SIZE_Y) break;

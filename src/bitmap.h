@@ -17,8 +17,7 @@ LCDFont* getRoobert10(void);
 LCDBitmap* getBitmapWfFg(uint8_t _wf, uint32_t _x, uint32_t _y);
 LCDBitmap* getBitmapWfFg_byidx(uint8_t _wf, uint32_t _idx);
 
-LCDBitmap* getBitmapWfBg(uint8_t _wf, uint32_t _x, uint32_t _y);
-LCDBitmap* getBitmapWfBg_byidx(uint8_t _wf, uint32_t _idx);
+LCDBitmap* getBitmapWfBg(uint8_t wf);
 
 LCDBitmap* getSpriteSplash(void);
 

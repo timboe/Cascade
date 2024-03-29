@@ -277,7 +277,7 @@ void applyScrollEasing(void) {
   if (m_goToTop && !m_ballEndSweep) {
     pd->system->logToConsole("go to top active %i", getFrameCount());
     setScrollOffset(0.0f);
-    if (m_scrollOffset <= 1.0) {
+    if (m_scrollOffset <= 1.0f) {
       m_goToTop = false;
     }
   }
