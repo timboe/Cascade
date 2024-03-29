@@ -1,0 +1,373 @@
+[gd_scene load_steps=10 format=3 uid="uid://cmuubbicvggs5"]
+
+[ext_resource type="Script" path="res://RenderScene.gd" id="1_1f7cp"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_mxqya"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_7eq4d"]
+width = 800
+height = 1920
+noise = SubResource("FastNoiseLite_mxqya")
+
+[sub_resource type="GDScript" id="GDScript_vi753"]
+script/source = "extends HSlider
+
+func _on_value_changed(value):
+	$\"../WorldLabel\".text = \"World: \" + str(value)
+"
+
+[sub_resource type="GDScript" id="GDScript_scs8v"]
+script/source = "extends HSlider
+
+func _on_value_changed(value):
+	$\"../LevelLabel\".text = \"Level: \" + str(value)
+"
+
+[sub_resource type="GDScript" id="GDScript_stxm2"]
+script/source = "extends HSlider
+
+func _on_value_changed(value):
+	$\"../HeightLabel\".text = \"Height: \" + str(value)
+	$%Render.queue_redraw()
+	get_tree().call_group(\"y_sensitive\", \"new_max_y\", value)
+"
+
+[sub_resource type="GDScript" id="GDScript_gn8tb"]
+script/source = "extends CheckButton
+
+func _ready():
+	var bg := ButtonGroup.new()
+	button_group = bg
+	$\"../CheckRect\".button_group = bg
+"
+
+[sub_resource type="GDScript" id="GDScript_vhp14"]
+script/source = "extends SpinBox
+
+func new_max_y(new_max : int):
+	max_value = new_max
+"
+
+[sub_resource type="GDScript" id="GDScript_rjxf4"]
+script/source = "extends MenuButton
+
+var shape_size : int = 0
+
+func _ready():
+	get_popup().id_pressed.connect(self.on_pressed)
+
+func on_pressed(id: int):
+	$\"../SizeLabel\".text = get_popup().get_item_text( id )
+	shape_size = id
+	$%Render.do_update()
+"
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 128.0
+offset_bottom = 72.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBox" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LeftScroll" type="ScrollContainer" parent="HBox"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+
+[node name="Control" type="Control" parent="HBox/LeftScroll"]
+custom_minimum_size = Vector2(800, 1920)
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="HBox/LeftScroll/Control"]
+layout_mode = 2
+offset_right = 800.0
+offset_bottom = 1920.0
+texture = SubResource("NoiseTexture2D_7eq4d")
+
+[node name="Render" type="Node2D" parent="HBox/LeftScroll/Control"]
+unique_name_in_owner = true
+script = ExtResource("1_1f7cp")
+
+[node name="RightScroll" type="ScrollContainer" parent="HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Margin" type="MarginContainer" parent="HBox/RightScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 156
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="HBox/RightScroll/Margin"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="LevelSettings" type="RichTextLabel" parent="HBox/RightScroll/Margin/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "LEVEL SETTINGS"
+fit_content = true
+
+[node name="Grid" type="GridContainer" parent="HBox/RightScroll/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+columns = 2
+
+[node name="WorldLabel" type="RichTextLabel" parent="HBox/RightScroll/Margin/VBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "World: 1
+"
+fit_content = true
+
+[node name="WorldSlider" type="HSlider" parent="HBox/RightScroll/Margin/VBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 16.0
+value = 1.0
+rounded = true
+tick_count = 16
+script = SubResource("GDScript_vi753")
+
+[node name="LevelLabel" type="RichTextLabel" parent="HBox/RightScroll/Margin/VBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Level: 1"
+fit_content = true
+
+[node name="LevelSlider" type="HSlider" parent="HBox/RightScroll/Margin/VBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 8.0
+value = 1.0
+rounded = true
+tick_count = 8
+script = SubResource("GDScript_scs8v")
+
+[node name="HeightLabel" type="RichTextLabel" parent="HBox/RightScroll/Margin/VBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Height: 960"
+fit_content = true
+
+[node name="HeightSlider" type="HSlider" parent="HBox/RightScroll/Margin/VBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 240.0
+max_value = 960.0
+step = 60.0
+value = 960.0
+rounded = true
+tick_count = 12
+script = SubResource("GDScript_stxm2")
+
+[node name="Background" type="MenuButton" parent="HBox/RightScroll/Margin/VBox/Grid"]
+layout_mode = 2
+text = "Background"
+flat = false
+item_count = 2
+popup/item_0/text = "Fall0"
+popup/item_0/id = 0
+popup/item_1/text = "Fall1"
+popup/item_1/id = 1
+
+[node name="Foreground" type="MenuButton" parent="HBox/RightScroll/Margin/VBox/Grid"]
+layout_mode = 2
+text = "Foreground"
+flat = false
+item_count = 2
+popup/item_0/text = "Fall0"
+popup/item_0/id = 0
+popup/item_1/text = "Fall1"
+popup/item_1/id = 1
+
+[node name="Save" type="Button" parent="HBox/RightScroll/Margin/VBox/Grid"]
+layout_mode = 2
+text = "Save"
+
+[node name="Load" type="Button" parent="HBox/RightScroll/Margin/VBox/Grid"]
+layout_mode = 2
+text = "Load"
+
+[node name="HSeparator" type="HSeparator" parent="HBox/RightScroll/Margin/VBox"]
+layout_mode = 2
+
+[node name="AddPeg" type="RichTextLabel" parent="HBox/RightScroll/Margin/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "ADD PEGS"
+fit_content = true
+
+[node name="AddStatic" type="Button" parent="HBox/RightScroll/Margin/VBox"]
+layout_mode = 2
+text = "New Static Peg"
+
+[node name="AddElliptic" type="Button" parent="HBox/RightScroll/Margin/VBox"]
+layout_mode = 2
+text = "New Elliptic Peg Path"
+
+[node name="AddPath" type="Button" parent="HBox/RightScroll/Margin/VBox"]
+layout_mode = 2
+text = "New Linear Peg Path"
+
+[node name="HSeparator2" type="HSeparator" parent="HBox/RightScroll/Margin/VBox"]
+layout_mode = 2
+
+[node name="Pegs" type="RichTextLabel" parent="HBox/RightScroll/Margin/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "PEGS"
+fit_content = true
+
+[node name="PegControl" type="Control" parent="HBox/RightScroll/Margin/VBox" groups=["static_pegs"]]
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="HBox/RightScroll/Margin/VBox/PegControl"]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 164.0
+grow_horizontal = 2
+size_flags_vertical = 3
+
+[node name="Margin" type="MarginContainer" parent="HBox/RightScroll/Margin/VBox/PegControl/Panel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 146.0
+grow_horizontal = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBox" type="VBoxContainer" parent="HBox/RightScroll/Margin/VBox/PegControl/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Grid1" type="GridContainer" parent="HBox/RightScroll/Margin/VBox/PegControl/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+columns = 2
+
+[node name="StaticPeg" type="Label" parent="HBox/RightScroll/Margin/VBox/PegControl/Panel/Margin/VBox/Grid1"]
+layout_mode = 2
+text = "StaticPeg0"
+
+[node name="Button" type="Button" parent="HBox/RightScroll/Margin/VBox/PegControl/Panel/Margin/VBox/Grid1"]
+layout_mode = 2
+text = "Remove"
+
+[node name="CheckCirc" type="CheckButton" parent="HBox/RightScroll/Margin/VBox/PegControl/Panel/Margin/VBox/Grid1"]
+layout_mode = 2
+size_flags_horizontal = 3
+button_pressed = true
+text = "Circle"
+alignment = 1
+script = SubResource("GDScript_gn8tb")
+
+[node name="CheckRect" type="CheckButton" parent="HBox/RightScroll/Margin/VBox/PegControl/Panel/Margin/VBox/Grid1"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Rectangle"
+alignment = 1
+
+[node name="Grid2" type="GridContainer" parent="HBox/RightScroll/Margin/VBox/PegControl/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+columns = 4
+
+[node name="XLabel" type="Label" parent="HBox/RightScroll/Margin/VBox/PegControl/Panel/Margin/VBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "X"
+horizontal_alignment = 2
+
+[node name="XText" type="SpinBox" parent="HBox/RightScroll/Margin/VBox/PegControl/Panel/Margin/VBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 960.0
+value = 100.0
+rounded = true
+
+[node name="YLabel" type="Label" parent="HBox/RightScroll/Margin/VBox/PegControl/Panel/Margin/VBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Y"
+horizontal_alignment = 2
+
+[node name="YText" type="SpinBox" parent="HBox/RightScroll/Margin/VBox/PegControl/Panel/Margin/VBox/Grid2" groups=["y_sensitive"]]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 960.0
+value = 100.0
+rounded = true
+script = SubResource("GDScript_vhp14")
+
+[node name="AngleLabel" type="Label" parent="HBox/RightScroll/Margin/VBox/PegControl/Panel/Margin/VBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Angle"
+horizontal_alignment = 2
+
+[node name="AngleText" type="SpinBox" parent="HBox/RightScroll/Margin/VBox/PegControl/Panel/Margin/VBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 360.0
+rounded = true
+
+[node name="SizeLabel" type="Label" parent="HBox/RightScroll/Margin/VBox/PegControl/Panel/Margin/VBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Small
+"
+horizontal_alignment = 2
+
+[node name="SizeText" type="MenuButton" parent="HBox/RightScroll/Margin/VBox/PegControl/Panel/Margin/VBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Set Size"
+flat = false
+item_count = 4
+popup/item_0/text = "Small"
+popup/item_0/id = 0
+popup/item_1/text = "Medium"
+popup/item_1/id = 1
+popup/item_2/text = "Large"
+popup/item_2/id = 2
+popup/item_3/text = "Max"
+popup/item_3/id = 3
+script = SubResource("GDScript_rjxf4")
+
+[connection signal="value_changed" from="HBox/RightScroll/Margin/VBox/Grid/WorldSlider" to="HBox/RightScroll/Margin/VBox/Grid/WorldSlider" method="_on_value_changed"]
+[connection signal="value_changed" from="HBox/RightScroll/Margin/VBox/Grid/LevelSlider" to="HBox/RightScroll/Margin/VBox/Grid/LevelSlider" method="_on_value_changed"]
+[connection signal="value_changed" from="HBox/RightScroll/Margin/VBox/Grid/HeightSlider" to="HBox/RightScroll/Margin/VBox/Grid/HeightSlider" method="_on_value_changed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/VBox/PegControl/Panel/Margin/VBox/Grid1/CheckCirc" to="HBox/LeftScroll/Control/Render" method="do_update"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/VBox/PegControl/Panel/Margin/VBox/Grid1/CheckRect" to="HBox/LeftScroll/Control/Render" method="do_update"]
+[connection signal="value_changed" from="HBox/RightScroll/Margin/VBox/PegControl/Panel/Margin/VBox/Grid2/XText" to="HBox/LeftScroll/Control/Render" method="do_update_value"]
+[connection signal="value_changed" from="HBox/RightScroll/Margin/VBox/PegControl/Panel/Margin/VBox/Grid2/YText" to="HBox/LeftScroll/Control/Render" method="do_update_value"]
+[connection signal="value_changed" from="HBox/RightScroll/Margin/VBox/PegControl/Panel/Margin/VBox/Grid2/AngleText" to="HBox/LeftScroll/Control/Render" method="do_update_value"]
