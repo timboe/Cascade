@@ -13,7 +13,9 @@ const PLAYDATE_WIDTH : int = 400 * EDITOR_SCALE
 
 var dragMode : int = 0
 var dragNode : Control = null
-var dragY : float
+var dragPos : Vector2
+
+var t : float = 0
 
 func sizeToScale(size : int) -> float:
 	match size:
@@ -38,13 +40,9 @@ func lineColor(type : int) -> Color:
 	return Color.BLACK
 	
 func renderPeg(circ : bool, x : int, y : int, a : float, size : int, type : int) -> void:
-	x *= EDITOR_SCALE
-	y *= EDITOR_SCALE
 	var s := sizeToScale(size)
-	a = (2*PI / 360.0) * a
 	if circ: renderCirc(x, y, s, type)
 	else: renderRect(x, y, a, s, type)
-	renderGrabCirc(x, y)
 	
 func renderCirc(x : int, y : int, s : float, type : int) -> void:
 	draw_circle(Vector2(x, y), BALL_RADIUS*s, fillColor(type))
@@ -77,21 +75,71 @@ func renderRect(x : int, y : int, a : float, s : float, type : int) -> void:
 	draw_polygon(points, [fillColor(type)])
 	draw_polyline(points, lineColor(type), 4)
 	
-func renderGrabCirc(x : int, y : int) -> void:
-	draw_circle(Vector2(x, y), GRAB_CIRCLE_RADIUS, Color.RED)
-	draw_arc(Vector2(x, y), GRAB_CIRCLE_RADIUS, 0, 2*PI, 128, Color.DARK_RED, LINE_WIDTH)
+func renderGrabCirc(x : int, y : int, sel : bool) -> void:
+	var c1 = Color.RED
+	var c2 = Color.DARK_RED
+	if sel:
+		c1 = Color.ORANGE
+		c2 = Color.ORANGE_RED
+	draw_circle(Vector2(x, y), GRAB_CIRCLE_RADIUS, c1)
+	draw_arc(Vector2(x, y), GRAB_CIRCLE_RADIUS, 0, 2*PI, 128, c2, LINE_WIDTH)
 	
 func render_static_peg(staticPeg : Control):
 	var circ : bool = staticPeg.find_child("CheckCirc").button_pressed
 	var x : int = staticPeg.find_child("XText").value
 	var y : int = staticPeg.find_child("YText").value
 	var angle : int = staticPeg.find_child("AngleText").value
-	var size : int = staticPeg.find_child("SizeText").shape_size
-	var type : int = staticPeg.find_child("TypeText").shape_type
-	renderPeg(circ, x, y, angle, size, type)
+	var angle_rad : float =  (2*PI / 360.0) * angle
+	var size : int = staticPeg.find_child("SizeText").selected_id
+	var type : int = staticPeg.find_child("TypeText").selected_id
+	x *= EDITOR_SCALE
+	y *= EDITOR_SCALE
+	renderPeg(circ, x, y, angle_rad, size, type)
+	renderGrabCirc(x, y, staticPeg == dragNode)
 
+func render_elliptic_path(ellipticPath : Control):
+	var n_pegs : int = ellipticPath.find_child("PathSlider").value
+	var circ : bool = ellipticPath.find_child("CheckCirc").button_pressed
+	var size : int = ellipticPath.find_child("SizeText").selected_id
+	var ease : int = ellipticPath.find_child("EaseText").selected_id
+	var x : int = ellipticPath.find_child("XText").value
+	var y : int = ellipticPath.find_child("YText").value
+	var angle : int = ellipticPath.find_child("AngleText").value
+	var angle_rad : float =  (2*PI / 360.0) * angle
+	var speed : float = ellipticPath.find_child("SpeedText").value
+	var a : int = ellipticPath.find_child("AText").value
+	var b : int = ellipticPath.find_child("BText").value
+	x *= EDITOR_SCALE
+	y *= EDITOR_SCALE
+	a *= EDITOR_SCALE
+	b *= EDITOR_SCALE
+	
+	for i in range(0, n_pegs):
+		var peg_container : Control = ellipticPath.find_child("PegContainer"+str(i+1), true, false)
+		var custom_shape = peg_container.find_child("ShapeButton").selected_id
+		var custom_size = peg_container.find_child("SizeButton").selected_id
+		var custom_type = peg_container.find_child("TypeButton").selected_id
+		var shape_peg = circ
+		var size_peg = size
+		if custom_shape:
+			shape_peg = 1 if custom_shape == 1 else 0
+		if custom_size:
+			size_peg = custom_size-1
+		var angle_peg : float = (angle_rad / n_pegs) * i
+		var x_peg : float = x + (a * cos((t * speed) + angle_peg))
+		var y_peg : float = y + (b * sin((t * speed) + angle_peg))
+		renderPeg(shape_peg, x_peg, y_peg, (t * speed) + angle_peg + (PI * 0.5), size_peg, custom_type)
+	renderGrabCirc(x, y, ellipticPath == dragNode)
+	
+#
+func _process(delta):
+	t += delta
+	#if t >= PI:
+		#t -= 2*PI
+	queue_redraw()
+	
 func do_update():
-	print("Ping for redraw")
+	#print("Ping for redraw")
 	queue_redraw()
 
 func do_update_value(_value):
@@ -99,21 +147,16 @@ func do_update_value(_value):
 
 func _draw():
 	var staticPegs = get_tree().get_nodes_in_group("static_pegs")
+	var ellipticPaths = get_tree().get_nodes_in_group("elliptic_pegs")
 	print("Redraw ", len(staticPegs) , " static")
 	for staticPeg in staticPegs:
 		render_static_peg(staticPeg)
+	for ellipticPath in ellipticPaths:
+		render_elliptic_path(ellipticPath)
 		
 	draw_line(
 		Vector2(0, $%HeightSlider.value*EDITOR_SCALE), Vector2(PLAYDATE_WIDTH, $%HeightSlider.value*EDITOR_SCALE),
 	 	Color.RED, LINE_WIDTH*2)
-	
-	#var points = PackedVector2Array()
-	#var colour = PackedColorArray()
-	#points = [Vector2(100,100), Vector2(200,100), Vector2(200,200),Vector2(100,200)]
-	#colour = [Color.GRAY]
-#
-	#draw_polygon(points, colour)
-	#draw_polyline(points, Color.BLACK, 4)
 
 func find_peg(v : Vector2, n : String) -> Control:
 	for peg in get_tree().get_nodes_in_group(n):
@@ -137,14 +180,18 @@ func _input(event):
 			var yOff = $%LeftScroll.get_v_scroll()
 			var v = Vector2(event.position.x / EDITOR_SCALE, (event.position.y + yOff)/EDITOR_SCALE)
 			print("Mouse " , event.button_index , " Click/Unclick at: ", v)
+			for peg_remove : Control in get_tree().get_nodes_in_group("pegs"):
+				peg_remove.remove_theme_stylebox_override("panel")
 			var peg : Control = find_peg(v, "static_pegs")
 			if not peg: peg = find_peg(v, "elliptic_pegs")
 			if not peg: peg = find_peg(v, "path_pegs")
 			if peg:
 				print("Found " , peg)
+				peg.add_theme_stylebox_override("panel", load("res://selected_style_box_flat.tres"))
+				$%RightScroll.set_v_scroll( peg.position.y )
 				dragMode = event.button_index
 				dragNode = peg
-				dragY = v.y
+				dragPos = v
 		elif (event.button_index == 1 || event.button_index == 2) and not event.pressed:
 			dragMode = 0
 			dragNode = null
@@ -156,6 +203,9 @@ func _input(event):
 		if dragMode == 1: 
 			move_peg(dragNode, v)
 		elif dragMode == 2:
-			rotate_peg(dragNode, v.y - dragY)
-			dragY = v.y
+			if abs(v.y - dragPos.y) > abs(v.x - dragPos.x):
+				rotate_peg(dragNode, v.y - dragPos.y)
+			else:
+				rotate_peg(dragNode, v.x - dragPos.x)
+			dragPos = v
 		

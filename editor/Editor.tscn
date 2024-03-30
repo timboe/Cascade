@@ -1,7 +1,9 @@
-[gd_scene load_steps=9 format=3 uid="uid://cmuubbicvggs5"]
+[gd_scene load_steps=12 format=3 uid="uid://cmuubbicvggs5"]
 
 [ext_resource type="Script" path="res://RenderScene.gd" id="1_1f7cp"]
+[ext_resource type="Theme" uid="uid://mvm1lqkscosr" path="res://editor/theme/aestro.tres" id="1_3tosr"]
 [ext_resource type="PackedScene" uid="uid://4jairl80n3qw" path="res://peg_control.tscn" id="2_c1rmk"]
+[ext_resource type="PackedScene" uid="uid://difhlqonltpcy" path="res://elliptic_control.tscn" id="3_r0vrj"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_mxqya"]
 
@@ -45,6 +47,22 @@ func _on_pressed():
 	instance.name = \"StaticPeg\" + str(staticCount)
 	instance.find_child(\"StaticPeg\").text = instance.name
 	$%RightVBox.add_child(instance)
+	$%Render.queue_redraw()
+"
+
+[sub_resource type="GDScript" id="GDScript_qd471"]
+script/source = "extends Button
+
+@onready var staticScene = load(\"res://elliptic_control.tscn\")
+var ellipticCount : int = 0
+
+func _on_pressed():
+	var instance = staticScene.instantiate()
+	ellipticCount += 1
+	instance.name = \"EllipticPath\" + str(ellipticCount)
+	instance.find_child(\"EllipticPathText\").text = instance.name
+	$%RightVBox.add_child(instance)
+	$%Render.queue_redraw()
 "
 
 [node name="RootControl" type="Control"]
@@ -56,6 +74,7 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme = ExtResource("1_3tosr")
 
 [node name="HBox" type="HBoxContainer" parent="."]
 layout_mode = 1
@@ -86,8 +105,11 @@ unique_name_in_owner = true
 script = ExtResource("1_1f7cp")
 
 [node name="RightScroll" type="ScrollContainer" parent="HBox"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
 
 [node name="Margin" type="MarginContainer" parent="HBox/RightScroll"]
 layout_mode = 2
@@ -116,12 +138,12 @@ theme_override_constants/h_separation = 6
 theme_override_constants/v_separation = 6
 columns = 2
 
-[node name="WorldLabel" type="RichTextLabel" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+[node name="WorldLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "World: 1
 "
-fit_content = true
+horizontal_alignment = 2
 
 [node name="WorldSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
@@ -133,11 +155,11 @@ rounded = true
 tick_count = 16
 script = SubResource("GDScript_vi753")
 
-[node name="LevelLabel" type="RichTextLabel" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+[node name="LevelLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Level: 1"
-fit_content = true
+horizontal_alignment = 2
 
 [node name="LevelSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
@@ -149,11 +171,11 @@ rounded = true
 tick_count = 8
 script = SubResource("GDScript_scs8v")
 
-[node name="HeightLabel" type="RichTextLabel" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+[node name="HeightLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Height: 960"
-fit_content = true
+horizontal_alignment = 2
 
 [node name="HeightSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 unique_name_in_owner = true
@@ -212,10 +234,14 @@ script = SubResource("GDScript_2mwtp")
 [node name="AddElliptic" type="Button" parent="HBox/RightScroll/Margin/RightVBox"]
 layout_mode = 2
 text = "New Elliptic Peg Path"
+script = SubResource("GDScript_qd471")
 
 [node name="AddPath" type="Button" parent="HBox/RightScroll/Margin/RightVBox"]
 layout_mode = 2
 text = "New Linear Peg Path"
+
+[node name="OptionButton" type="OptionButton" parent="HBox/RightScroll/Margin/RightVBox"]
+layout_mode = 2
 
 [node name="HSeparator2" type="HSeparator" parent="HBox/RightScroll/Margin/RightVBox"]
 layout_mode = 2
@@ -227,9 +253,15 @@ text = "PEGS"
 fit_content = true
 
 [node name="PegControl" parent="HBox/RightScroll/Margin/RightVBox" instance=ExtResource("2_c1rmk")]
+visible = false
+layout_mode = 2
+
+[node name="EllipticControl" parent="HBox/RightScroll/Margin/RightVBox" instance=ExtResource("3_r0vrj")]
+visible = false
 layout_mode = 2
 
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/WorldSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/WorldSlider" method="_on_value_changed"]
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/LevelSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/LevelSlider" method="_on_value_changed"]
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/HeightSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/HeightSlider" method="_on_value_changed"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddStatic" to="HBox/RightScroll/Margin/RightVBox/AddStatic" method="_on_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddElliptic" to="HBox/RightScroll/Margin/RightVBox/AddElliptic" method="_on_pressed"]
