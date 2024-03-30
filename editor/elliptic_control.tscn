@@ -50,7 +50,7 @@ theme_override_constants/separation = 6
 
 [node name="EllipticPathText" type="Label" parent="Margin/EllipticVBox"]
 layout_mode = 2
-text = "EllipticPathPeg0"
+text = "EllipticPegPath0"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="Margin/EllipticVBox"]
 layout_mode = 2
@@ -67,6 +67,7 @@ size_flags_horizontal = 3
 min_value = 1.0
 max_value = 16.0
 value = 1.0
+rounded = true
 tick_count = 16
 ticks_on_borders = true
 script = ExtResource("1_x3mqg")
@@ -266,7 +267,11 @@ size_flags_horizontal = 3
 text = "Type"
 horizontal_alignment = 1
 
-[node name="PegContainer1" parent="Margin/EllipticVBox" instance=ExtResource("3_rfi6a")]
+[node name="PegVBox" type="VBoxContainer" parent="Margin/EllipticVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PegContainer1" parent="Margin/EllipticVBox/PegVBox" instance=ExtResource("3_rfi6a")]
 layout_mode = 2
 
 [connection signal="tree_exited" from="." to="Margin/EllipticVBox/Grid1/CheckCirc" method="_on_pressed"]
