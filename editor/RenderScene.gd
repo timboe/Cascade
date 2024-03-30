@@ -1,15 +1,13 @@
 extends Node2D
 
-const EDITOR_SCALE : int = 2
-
-const BALL_RADIUS : float = 8.0 * EDITOR_SCALE
-const BOX_WIDTH : float = 22.5 * EDITOR_SCALE
-const BOX_HEIGHT : float = 12.5 * EDITOR_SCALE
-const LINE_WIDTH : float = 2.0 * EDITOR_SCALE
+const BALL_RADIUS : float = 8.0
+const BOX_WIDTH : float = 22.5
+const BOX_HEIGHT : float = 12.5
+const LINE_WIDTH : float = 2.0
 
 const GRAB_CIRCLE_RADIUS : float = BALL_RADIUS/2
 
-const PLAYDATE_WIDTH : int = 400 * EDITOR_SCALE
+const PLAYDATE_WIDTH : int = 400
 
 var dragMode : int = 0
 var dragNode : Control = null
@@ -79,8 +77,8 @@ func renderGrabCirc(x : int, y : int, sel : bool) -> void:
 	var c1 = Color.RED
 	var c2 = Color.DARK_RED
 	if sel:
-		c1 = Color.ORANGE
-		c2 = Color.ORANGE_RED
+		c1 = Color.CADET_BLUE
+		c2 = Color.DARK_SLATE_BLUE
 	draw_circle(Vector2(x, y), GRAB_CIRCLE_RADIUS, c1)
 	draw_arc(Vector2(x, y), GRAB_CIRCLE_RADIUS, 0, 2*PI, 128, c2, LINE_WIDTH)
 	
@@ -90,52 +88,52 @@ func render_static_peg(staticPeg : Control):
 	var y : int = staticPeg.find_child("YText").value
 	var angle : int = staticPeg.find_child("AngleText").value
 	var angle_rad : float =  (2*PI / 360.0) * angle
-	var size : int = staticPeg.find_child("SizeText").selected_id
-	var type : int = staticPeg.find_child("TypeText").selected_id
-	x *= EDITOR_SCALE
-	y *= EDITOR_SCALE
+	var size : int = staticPeg.find_child("SizeText").selected
+	var type : int = staticPeg.find_child("TypeText").selected
 	renderPeg(circ, x, y, angle_rad, size, type)
 	renderGrabCirc(x, y, staticPeg == dragNode)
 
 func render_elliptic_path(ellipticPath : Control):
 	var n_pegs : int = ellipticPath.find_child("PathSlider").value
 	var circ : bool = ellipticPath.find_child("CheckCirc").button_pressed
-	var size : int = ellipticPath.find_child("SizeText").selected_id
-	var ease : int = ellipticPath.find_child("EaseText").selected_id
+	var size : int = ellipticPath.find_child("SizeText").selected
+	var ease : int = ellipticPath.find_child("EaseText").selected
 	var x : int = ellipticPath.find_child("XText").value
 	var y : int = ellipticPath.find_child("YText").value
-	var angle : int = ellipticPath.find_child("AngleText").value
-	var angle_rad : float =  (2*PI / 360.0) * angle
+	var arc : int = ellipticPath.find_child("ArcText").value
+	var arc_rad : float =  (2*PI / 360.0) * arc
 	var speed : float = ellipticPath.find_child("SpeedText").value
 	var a : int = ellipticPath.find_child("AText").value
 	var b : int = ellipticPath.find_child("BText").value
-	x *= EDITOR_SCALE
-	y *= EDITOR_SCALE
-	a *= EDITOR_SCALE
-	b *= EDITOR_SCALE
+	var angle : int = ellipticPath.find_child("AngleText").value
+	var angle_rad : float =  (2*PI / 360.0) * angle
+	var use_arc : int = ellipticPath.find_child("ArcAngleCheckbox").button_pressed
 	
 	for i in range(0, n_pegs):
 		var peg_container : Control = ellipticPath.find_child("PegContainer"+str(i+1), true, false)
-		var custom_shape = peg_container.find_child("ShapeButton").selected_id
-		var custom_size = peg_container.find_child("SizeButton").selected_id
-		var custom_type = peg_container.find_child("TypeButton").selected_id
+		var custom_shape = peg_container.find_child("ShapeButton").selected
+		var custom_size = peg_container.find_child("SizeButton").selected
+		var custom_type = peg_container.find_child("TypeButton").selected
 		var shape_peg = circ
 		var size_peg = size
 		if custom_shape:
 			shape_peg = 1 if custom_shape == 1 else 0
 		if custom_size:
 			size_peg = custom_size-1
-		var angle_peg : float = (angle_rad / n_pegs) * i
+		var angle_peg : float = (arc_rad / n_pegs) * i
 		var x_peg : float = x + (a * cos((t * speed) + angle_peg))
 		var y_peg : float = y + (b * sin((t * speed) + angle_peg))
-		renderPeg(shape_peg, x_peg, y_peg, (t * speed) + angle_peg + (PI * 0.5), size_peg, custom_type)
+		var draw_angle : float
+		if use_arc:
+			draw_angle = (t * speed) + angle_peg + (PI * 0.5)
+		else:
+			draw_angle = angle_rad
+		renderPeg(shape_peg, x_peg, y_peg, draw_angle, size_peg, custom_type)
 	renderGrabCirc(x, y, ellipticPath == dragNode)
 	
 #
 func _process(delta):
 	t += delta
-	#if t >= PI:
-		#t -= 2*PI
 	queue_redraw()
 	
 func do_update():
@@ -148,14 +146,14 @@ func do_update_value(_value):
 func _draw():
 	var staticPegs = get_tree().get_nodes_in_group("static_pegs")
 	var ellipticPaths = get_tree().get_nodes_in_group("elliptic_pegs")
-	print("Redraw ", len(staticPegs) , " static")
+	#print("Redraw ", len(staticPegs) , " static")
 	for staticPeg in staticPegs:
 		render_static_peg(staticPeg)
 	for ellipticPath in ellipticPaths:
 		render_elliptic_path(ellipticPath)
 		
 	draw_line(
-		Vector2(0, $%HeightSlider.value*EDITOR_SCALE), Vector2(PLAYDATE_WIDTH, $%HeightSlider.value*EDITOR_SCALE),
+		Vector2(0, $%HeightSlider.value), Vector2(PLAYDATE_WIDTH, $%HeightSlider.value),
 	 	Color.RED, LINE_WIDTH*2)
 
 func find_peg(v : Vector2, n : String) -> Control:
@@ -178,7 +176,7 @@ func _input(event):
 	if event is InputEventMouseButton:
 		if (event.button_index == 1 || event.button_index == 2) and event.pressed:
 			var yOff = $%LeftScroll.get_v_scroll()
-			var v = Vector2(event.position.x / EDITOR_SCALE, (event.position.y + yOff)/EDITOR_SCALE)
+			var v = Vector2(event.position.x, event.position.y + yOff)
 			print("Mouse " , event.button_index , " Click/Unclick at: ", v)
 			for peg_remove : Control in get_tree().get_nodes_in_group("pegs"):
 				peg_remove.remove_theme_stylebox_override("panel")
@@ -198,7 +196,7 @@ func _input(event):
 
 	if event is InputEventMouseMotion and dragMode:
 		var yOff = $%LeftScroll.get_v_scroll()
-		var v = Vector2(event.position.x / EDITOR_SCALE, (event.position.y + yOff)/EDITOR_SCALE)
+		var v = Vector2(event.position.x, event.position.y + yOff)
 		print("Drag ", v)
 		if dragMode == 1: 
 			move_peg(dragNode, v)

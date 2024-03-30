@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://rt77ny52x7as"]
+[gd_scene load_steps=2 format=3 uid="uid://1c88u1703smi"]
 
 [ext_resource type="Script" path="res://MenuButtonScript.tres.gd" id="1_684m4"]
 
@@ -10,12 +10,11 @@ size_flags_horizontal = 3
 text = "1"
 horizontal_alignment = 1
 
-[node name="ShapeButton" type="MenuButton" parent="."]
+[node name="ShapeButton" type="OptionButton" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Inherit"
-flat = false
 item_count = 3
+selected = 0
 popup/item_0/text = "Inherit"
 popup/item_0/id = 0
 popup/item_1/text = "Circle"
@@ -24,12 +23,11 @@ popup/item_2/text = "Rectangle"
 popup/item_2/id = 2
 script = ExtResource("1_684m4")
 
-[node name="SizeButton" type="MenuButton" parent="."]
+[node name="SizeButton" type="OptionButton" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Inherit"
-flat = false
 item_count = 5
+selected = 0
 popup/item_0/text = "Inherit"
 popup/item_0/id = 0
 popup/item_1/text = "Small"
@@ -42,12 +40,11 @@ popup/item_4/text = "Max"
 popup/item_4/id = 4
 script = ExtResource("1_684m4")
 
-[node name="TypeButton" type="MenuButton" parent="."]
+[node name="TypeButton" type="OptionButton" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Normal"
-flat = false
 item_count = 3
+selected = 0
 popup/item_0/text = "Normal"
 popup/item_0/id = 0
 popup/item_1/text = "Required"
@@ -55,3 +52,7 @@ popup/item_1/id = 1
 popup/item_2/text = "Special"
 popup/item_2/id = 2
 script = ExtResource("1_684m4")
+
+[connection signal="pressed" from="ShapeButton" to="ShapeButton" method="_on_pressed"]
+[connection signal="pressed" from="SizeButton" to="SizeButton" method="_on_pressed"]
+[connection signal="pressed" from="TypeButton" to="TypeButton" method="_on_pressed"]

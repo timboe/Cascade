@@ -4,14 +4,11 @@ extends HSlider
 @onready var rend = $/root/RootControl.find_child("Render")
 @onready var ellipticControl : Control = get_parent().get_parent().get_parent().get_parent()
 
-func _on_ready():
-	ellipticControl.custom_minimum_size.y = 310 + (1 * (31+6))
-	
 func _on_value_changed(newValue):
 	$"../PathLabel".text = "Path Pegs: " + str(newValue)
 	rend.do_update()
 	var ellipticVbox : VBoxContainer = ellipticControl.find_child("EllipticVBox")
-	ellipticControl.custom_minimum_size.y = 310 + ((newValue+1) * (31+6))
+	ellipticControl.custom_minimum_size.y = 320 + ((newValue+1) * (27+6))
 	for i in range(1, newValue+1):
 		var pName = "PegContainer"+str(i)
 		var pegControl = ellipticVbox.find_child(pName,true,false)

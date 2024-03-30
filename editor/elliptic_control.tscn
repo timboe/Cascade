@@ -1,8 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://difhlqonltpcy"]
+[gd_scene load_steps=6 format=3 uid="uid://l2fsqq1mog6x"]
 
 [ext_resource type="Script" path="res://PathSlider.gd" id="1_x3mqg"]
 [ext_resource type="Script" path="res://MenuButtonScript.tres.gd" id="2_sdnji"]
-[ext_resource type="PackedScene" uid="uid://rt77ny52x7as" path="res://peg_container.tscn" id="3_rfi6a"]
+[ext_resource type="PackedScene" uid="uid://1c88u1703smi" path="res://peg_container.tscn" id="3_rfi6a"]
 
 [sub_resource type="GDScript" id="GDScript_gn8tb"]
 script/source = "extends CheckButton
@@ -31,7 +31,7 @@ func _on_value_changed(_value):
 "
 
 [node name="EllipticControl" type="Panel" groups=["elliptic_pegs", "pegs"]]
-custom_minimum_size = Vector2(100, 370)
+custom_minimum_size = Vector2(100, 385)
 
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -103,12 +103,11 @@ size_flags_horizontal = 3
 text = "Size"
 horizontal_alignment = 2
 
-[node name="SizeText" type="MenuButton" parent="Margin/EllipticVBox/Grid2"]
+[node name="SizeText" type="OptionButton" parent="Margin/EllipticVBox/Grid2"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Small"
-flat = false
 item_count = 4
+selected = 0
 popup/item_0/text = "Small"
 popup/item_0/id = 0
 popup/item_1/text = "Medium"
@@ -125,10 +124,8 @@ size_flags_horizontal = 3
 text = "Easing"
 horizontal_alignment = 2
 
-[node name="EaseText" type="MenuButton" parent="Margin/EllipticVBox/Grid2"]
+[node name="EaseText" type="OptionButton" parent="Margin/EllipticVBox/Grid2"]
 layout_mode = 2
-text = "Linear"
-flat = false
 script = ExtResource("2_sdnji")
 
 [node name="XLabel" type="Label" parent="Margin/EllipticVBox/Grid2"]
@@ -158,17 +155,18 @@ value = 100.0
 rounded = true
 script = SubResource("GDScript_vhp14")
 
-[node name="AngleLabel" type="Label" parent="Margin/EllipticVBox/Grid2"]
+[node name="ArcLabel" type="Label" parent="Margin/EllipticVBox/Grid2"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Arc Length"
 horizontal_alignment = 2
 
-[node name="AngleText" type="SpinBox" parent="Margin/EllipticVBox/Grid2"]
+[node name="ArcText" type="SpinBox" parent="Margin/EllipticVBox/Grid2"]
 layout_mode = 2
 size_flags_horizontal = 3
 max_value = 360.0
 value = 360.0
+rounded = true
 
 [node name="SpeedLabel" type="Label" parent="Margin/EllipticVBox/Grid2"]
 layout_mode = 2
@@ -208,6 +206,32 @@ size_flags_horizontal = 3
 max_value = 960.0
 value = 32.0
 rounded = true
+
+[node name="AngleLabel" type="Label" parent="Margin/EllipticVBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Angle"
+horizontal_alignment = 2
+
+[node name="AngleText" type="SpinBox" parent="Margin/EllipticVBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Set angle to use for each peg, only used if Arc Angle is false."
+max_value = 360.0
+rounded = true
+editable = false
+
+[node name="ArcAngleLabel" type="Label" parent="Margin/EllipticVBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Arc Angle"
+horizontal_alignment = 2
+
+[node name="ArcAngleCheckbox" type="CheckBox" parent="Margin/EllipticVBox/Grid2"]
+layout_mode = 2
+tooltip_text = "Pegs inherit their angle from their position around the ellipse."
+button_pressed = true
+script = ExtResource("2_sdnji")
 
 [node name="Remove" type="Button" parent="Margin/EllipticVBox"]
 layout_mode = 2
@@ -249,10 +273,15 @@ layout_mode = 2
 [connection signal="value_changed" from="Margin/EllipticVBox/HBoxContainer2/PathSlider" to="Margin/EllipticVBox/HBoxContainer2/PathSlider" method="_on_value_changed"]
 [connection signal="pressed" from="Margin/EllipticVBox/Grid1/CheckCirc" to="Margin/EllipticVBox/Grid1/CheckCirc" method="_on_pressed"]
 [connection signal="pressed" from="Margin/EllipticVBox/Grid1/CheckRect" to="Margin/EllipticVBox/Grid1/CheckCirc" method="_on_pressed"]
+[connection signal="pressed" from="Margin/EllipticVBox/Grid2/SizeText" to="Margin/EllipticVBox/Grid2/SizeText" method="_on_pressed"]
+[connection signal="pressed" from="Margin/EllipticVBox/Grid2/EaseText" to="Margin/EllipticVBox/Grid2/EaseText" method="_on_pressed"]
 [connection signal="value_changed" from="Margin/EllipticVBox/Grid2/XText" to="Margin/EllipticVBox/Grid2/YText" method="_on_value_changed"]
 [connection signal="value_changed" from="Margin/EllipticVBox/Grid2/YText" to="Margin/EllipticVBox/Grid2/YText" method="_on_value_changed"]
-[connection signal="value_changed" from="Margin/EllipticVBox/Grid2/AngleText" to="Margin/EllipticVBox/Grid2/YText" method="_on_value_changed"]
+[connection signal="value_changed" from="Margin/EllipticVBox/Grid2/ArcText" to="Margin/EllipticVBox/Grid2/YText" method="_on_value_changed"]
 [connection signal="value_changed" from="Margin/EllipticVBox/Grid2/SpeedText" to="Margin/EllipticVBox/Grid2/YText" method="_on_value_changed"]
 [connection signal="value_changed" from="Margin/EllipticVBox/Grid2/AText" to="Margin/EllipticVBox/Grid2/YText" method="_on_value_changed"]
 [connection signal="value_changed" from="Margin/EllipticVBox/Grid2/BText" to="Margin/EllipticVBox/Grid2/YText" method="_on_value_changed"]
+[connection signal="value_changed" from="Margin/EllipticVBox/Grid2/AngleText" to="Margin/EllipticVBox/Grid2/YText" method="_on_value_changed"]
+[connection signal="pressed" from="Margin/EllipticVBox/Grid2/ArcAngleCheckbox" to="Margin/EllipticVBox/Grid2/ArcAngleCheckbox" method="_on_pressed"]
+[connection signal="toggled" from="Margin/EllipticVBox/Grid2/ArcAngleCheckbox" to="Margin/EllipticVBox/Grid2/ArcAngleCheckbox" method="_on_toggled"]
 [connection signal="pressed" from="Margin/EllipticVBox/Remove" to="." method="queue_free"]
