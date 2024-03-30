@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://cmuubbicvggs5"]
+[gd_scene load_steps=16 format=3 uid="uid://cmuubbicvggs5"]
 
 [ext_resource type="Script" path="res://RenderScene.gd" id="1_1f7cp"]
 [ext_resource type="Theme" uid="uid://mvm1lqkscosr" path="res://editor/theme/aestro.tres" id="1_3tosr"]
@@ -6,10 +6,7 @@
 [ext_resource type="StyleBox" uid="uid://cgsvf1qt0q4uy" path="res://background_style_box_flat.tres" id="2_gthnx"]
 [ext_resource type="PackedScene" uid="uid://l2fsqq1mog6x" path="res://elliptic_control.tscn" id="3_r0vrj"]
 [ext_resource type="Texture2D" uid="uid://b645rphiris4n" path="res://turretBody.png" id="3_u03i0"]
-[ext_resource type="Script" path="res://PathSlider.gd" id="7_m6ffv"]
-[ext_resource type="Script" path="res://MenuButtonScript.tres.gd" id="8_jn30m"]
-[ext_resource type="PackedScene" uid="uid://bc0o4iaqfoya" path="res://line_container.tscn" id="9_k0ofp"]
-[ext_resource type="PackedScene" uid="uid://1c88u1703smi" path="res://peg_container.tscn" id="9_m8huu"]
+[ext_resource type="PackedScene" uid="uid://bkucdftd1j28k" path="res://line_control.tscn" id="7_1iclo"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_mxqya"]
 
@@ -87,30 +84,27 @@ func _on_pressed():
 	$%Render.queue_redraw()
 "
 
-[sub_resource type="GDScript" id="GDScript_gn8tb"]
-script/source = "extends CheckButton
+[sub_resource type="GDScript" id="GDScript_sm36e"]
+script/source = "extends Button
 
-@onready var rend = $/root/RootControl.find_child(\"Render\")
+@onready var staticScene = load(\"res://line_control.tscn\")
+var lineCount : int = 0
 
-func _ready():
-	var bg := ButtonGroup.new()
-	button_group = bg
-	$\"../CheckRect\".button_group = bg
+var newPos := Vector2(32,64+32)
 
 func _on_pressed():
-	rend.do_update()
-"
-
-[sub_resource type="GDScript" id="GDScript_vhp14"]
-script/source = "extends SpinBox
-
-@onready var rend = $/root/RootControl.find_child(\"Render\")
-
-func new_max_y(new_max : int):
-	max_value = new_max
-
-func _on_value_changed(_value):
-	rend.do_update()
+	var instance = staticScene.instantiate()
+	lineCount += 1
+	instance.name = \"LineControl\" + str(lineCount)
+	instance.find_child(\"LinePathText\").text = \"LinearPegPath\" + str(lineCount)
+	instance.find_child(\"XText\").value = newPos.x
+	instance.find_child(\"YText\").value = newPos.y
+	newPos.x += 16
+	if (newPos.x >= 400 - 16):
+		newPos.x = 16
+		newPos.y += 16
+	$%RightVBox.add_child(instance)
+	$%Render.queue_redraw()
 "
 
 [node name="RootControl" type="Control"]
@@ -305,6 +299,7 @@ script = SubResource("GDScript_qd471")
 [node name="AddPath" type="Button" parent="HBox/RightScroll/Margin/RightVBox"]
 layout_mode = 2
 text = "New Linear Peg Path"
+script = SubResource("GDScript_sm36e")
 
 [node name="HSeparator2" type="HSeparator" parent="HBox/RightScroll/Margin/RightVBox"]
 layout_mode = 2
@@ -322,273 +317,8 @@ layout_mode = 2
 visible = false
 layout_mode = 2
 
-[node name="LineControl" type="Panel" parent="HBox/RightScroll/Margin/RightVBox" groups=["line_pegs", "pegs"]]
-custom_minimum_size = Vector2(100, 385)
-layout_mode = 2
-
-[node name="Margin" type="MarginContainer" parent="HBox/RightScroll/Margin/RightVBox/LineControl"]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 146.0
-grow_horizontal = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
-
-[node name="LineControlVBox" type="VBoxContainer" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin"]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="LinePathText" type="Label" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox"]
-layout_mode = 2
-text = "LinearPegPath0"
-
-[node name="HBoxContainer3" type="HBoxContainer" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox"]
-layout_mode = 2
-
-[node name="LineLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/HBoxContainer3"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Path Segments: 1"
-horizontal_alignment = 2
-
-[node name="LineSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/HBoxContainer3"]
-layout_mode = 2
-size_flags_horizontal = 3
-min_value = 1.0
-max_value = 32.0
-value = 1.0
-rounded = true
-tick_count = 16
-ticks_on_borders = true
-script = ExtResource("7_m6ffv")
-
-[node name="HBoxContainer2" type="HBoxContainer" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox"]
-layout_mode = 2
-
-[node name="PathLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/HBoxContainer2"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Path Pegs: 1"
-horizontal_alignment = 2
-
-[node name="PathSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/HBoxContainer2"]
-layout_mode = 2
-size_flags_horizontal = 3
-min_value = 1.0
-max_value = 16.0
-value = 1.0
-rounded = true
-tick_count = 16
-ticks_on_borders = true
-script = ExtResource("7_m6ffv")
-
-[node name="Grid1" type="GridContainer" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox"]
-layout_mode = 2
-theme_override_constants/h_separation = 6
-theme_override_constants/v_separation = 6
-columns = 2
-
-[node name="CheckCirc" type="CheckButton" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid1"]
-layout_mode = 2
-size_flags_horizontal = 3
-button_pressed = true
-text = "Circle"
-alignment = 1
-script = SubResource("GDScript_gn8tb")
-
-[node name="CheckRect" type="CheckButton" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid1"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Rectangle"
-alignment = 1
-
-[node name="Grid2" type="GridContainer" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox"]
-layout_mode = 2
-theme_override_constants/h_separation = 6
-theme_override_constants/v_separation = 6
-columns = 4
-
-[node name="SizeLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Size"
-horizontal_alignment = 2
-
-[node name="SizeText" type="OptionButton" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2"]
-layout_mode = 2
-size_flags_horizontal = 3
-item_count = 4
-selected = 0
-popup/item_0/text = "Small"
-popup/item_0/id = 0
-popup/item_1/text = "Medium"
-popup/item_1/id = 1
-popup/item_2/text = "Large"
-popup/item_2/id = 2
-popup/item_3/text = "Max"
-popup/item_3/id = 3
-script = ExtResource("8_jn30m")
-
-[node name="EaseLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Easing"
-horizontal_alignment = 2
-
-[node name="EaseText" type="OptionButton" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2"]
-layout_mode = 2
-script = ExtResource("8_jn30m")
-
-[node name="XLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "X"
-horizontal_alignment = 2
-
-[node name="XText" type="SpinBox" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2"]
-layout_mode = 2
-size_flags_horizontal = 3
-max_value = 960.0
-value = 130.0
-rounded = true
-
-[node name="YLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Y"
-horizontal_alignment = 2
-
-[node name="YText" type="SpinBox" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2" groups=["y_sensitive"]]
-layout_mode = 2
-size_flags_horizontal = 3
-max_value = 960.0
-value = 130.0
-rounded = true
-script = SubResource("GDScript_vhp14")
-
-[node name="ArcLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Arc Length"
-horizontal_alignment = 2
-
-[node name="ArcText" type="SpinBox" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2"]
-layout_mode = 2
-size_flags_horizontal = 3
-tooltip_text = "Determins the arc along the complete path where the pegs are placed."
-max_value = 360.0
-value = 360.0
-rounded = true
-
-[node name="SpeedLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Speed"
-horizontal_alignment = 2
-
-[node name="SpeedText" type="SpinBox" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2"]
-layout_mode = 2
-size_flags_horizontal = 3
-min_value = 0.01
-step = 0.01
-value = 1.0
-
-[node name="AngleLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Angle"
-horizontal_alignment = 2
-
-[node name="AngleText" type="SpinBox" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2"]
-layout_mode = 2
-size_flags_horizontal = 3
-tooltip_text = "Set angle to use for each peg, only used if Arc Angle is false."
-max_value = 360.0
-rounded = true
-editable = false
-
-[node name="ArcAngleLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Arc Angle"
-horizontal_alignment = 2
-
-[node name="ArcAngleCheckbox" type="CheckBox" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2"]
-layout_mode = 2
-tooltip_text = "Pegs inherit their angle from their position around the ellipse."
-button_pressed = true
-script = ExtResource("8_jn30m")
-
-[node name="Remove" type="Button" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox"]
-layout_mode = 2
-size_flags_horizontal = 4
-text = "Remove"
-
-[node name="LineInfoHBox" type="HBoxContainer" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox"]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="PegLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/LineInfoHBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Line Segment"
-horizontal_alignment = 1
-
-[node name="PegLabel2" type="Label" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/LineInfoHBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Relative X"
-horizontal_alignment = 1
-
-[node name="PegLabel3" type="Label" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/LineInfoHBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Relative Y"
-horizontal_alignment = 1
-
-[node name="LineVBox" type="VBoxContainer" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox"]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="LineContainer1" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/LineVBox" instance=ExtResource("9_k0ofp")]
-layout_mode = 2
-
-[node name="PegInfoHBox" type="HBoxContainer" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox"]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="PegLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/PegInfoHBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Peg"
-horizontal_alignment = 1
-
-[node name="PegLabel2" type="Label" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/PegInfoHBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Shape"
-horizontal_alignment = 1
-
-[node name="PegLabel3" type="Label" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/PegInfoHBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Size"
-horizontal_alignment = 1
-
-[node name="PegLabel4" type="Label" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/PegInfoHBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Type"
-horizontal_alignment = 1
-
-[node name="PegVBox" type="VBoxContainer" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox"]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="PegContainer1" parent="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/PegVBox" instance=ExtResource("9_m8huu")]
+[node name="LineControl" parent="HBox/RightScroll/Margin/RightVBox" instance=ExtResource("7_1iclo")]
+visible = false
 layout_mode = 2
 
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/WorldSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/WorldSlider" method="_on_value_changed"]
@@ -596,18 +326,4 @@ layout_mode = 2
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/HeightSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/HeightSlider" method="_on_value_changed"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddStatic" to="HBox/RightScroll/Margin/RightVBox/AddStatic" method="_on_pressed"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddElliptic" to="HBox/RightScroll/Margin/RightVBox/AddElliptic" method="_on_pressed"]
-[connection signal="tree_exited" from="HBox/RightScroll/Margin/RightVBox/LineControl" to="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid1/CheckCirc" method="_on_pressed"]
-[connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/HBoxContainer3/LineSlider" to="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/HBoxContainer3/LineSlider" method="_on_line_slider_value_changed"]
-[connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/HBoxContainer2/PathSlider" to="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/HBoxContainer2/PathSlider" method="_on_value_changed"]
-[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid1/CheckCirc" to="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid1/CheckCirc" method="_on_pressed"]
-[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid1/CheckRect" to="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid1/CheckCirc" method="_on_pressed"]
-[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2/SizeText" to="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2/SizeText" method="_on_pressed"]
-[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2/EaseText" to="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2/EaseText" method="_on_pressed"]
-[connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2/XText" to="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2/YText" method="_on_value_changed"]
-[connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2/YText" to="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2/YText" method="_on_value_changed"]
-[connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2/ArcText" to="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2/YText" method="_on_value_changed"]
-[connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2/SpeedText" to="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2/YText" method="_on_value_changed"]
-[connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2/AngleText" to="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2/YText" method="_on_value_changed"]
-[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2/ArcAngleCheckbox" to="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2/ArcAngleCheckbox" method="_on_pressed"]
-[connection signal="toggled" from="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2/ArcAngleCheckbox" to="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Grid2/ArcAngleCheckbox" method="_on_toggled"]
-[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/LineControl/Margin/LineControlVBox/Remove" to="HBox/RightScroll/Margin/RightVBox/LineControl" method="queue_free"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddPath" to="HBox/RightScroll/Margin/RightVBox/AddPath" method="_on_pressed"]

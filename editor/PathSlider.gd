@@ -10,6 +10,7 @@ var total_line = 1
 
 func get_y_size() -> int:
 	if "LineControl" in parentControl.name:
+		print("resize for pegs ", total_peg," line segments ", total_line)
 		return 340 + ((total_peg+1) * (27+6)) + ((total_line+1) * (27+6))
 	return 320 + ((total_peg+1) * (27+6))
 

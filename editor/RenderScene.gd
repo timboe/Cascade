@@ -71,7 +71,7 @@ func renderRect(x : int, y : int, a : float, s : float, type : int) -> void:
 	]
 		
 	draw_polygon(points, [fillColor(type)])
-	draw_polyline(points, lineColor(type), 4)
+	draw_polyline(points, lineColor(type), LINE_WIDTH)
 
 func overlay_fill_color(sel : bool):
 	if sel: return Color.CADET_BLUE
@@ -111,13 +111,11 @@ func render_elliptic_path(ellipticPath : Control):
 	var ease : int = ellipticPath.find_child("EaseText").selected
 	var x : int = ellipticPath.find_child("XText").value
 	var y : int = ellipticPath.find_child("YText").value
-	var arc : int = ellipticPath.find_child("ArcText").value
-	var arc_rad : float =  (2*PI / 360.0) * arc
+	var arc_rad : float = ellipticPath.find_child("ArcText").value * (2*PI / 360.0)
 	var speed : float = ellipticPath.find_child("SpeedText").value
 	var a : int = ellipticPath.find_child("AText").value
 	var b : int = ellipticPath.find_child("BText").value
-	var angle : int = ellipticPath.find_child("AngleText").value
-	var angle_rad : float =  (2*PI / 360.0) * angle
+	var angle_rad : float = ellipticPath.find_child("AngleText").value * (2*PI / 360.0) 
 	var use_arc : int = ellipticPath.find_child("ArcAngleCheckbox").button_pressed
 	
 	for i in range(0, n_pegs):
@@ -131,12 +129,12 @@ func render_elliptic_path(ellipticPath : Control):
 			shape_peg = 1 if custom_shape == 1 else 0
 		if custom_size:
 			size_peg = custom_size-1
-		var angle_peg : float = (arc_rad / n_pegs) * i
-		var x_peg : float = x + (a * cos((t * speed) + angle_peg))
-		var y_peg : float = y + (b * sin((t * speed) + angle_peg))
+		var arc_peg : float = (arc_rad / n_pegs) * i
+		var x_peg : float = x + (a * cos((t * speed) + arc_peg))
+		var y_peg : float = y + (b * sin((t * speed) + arc_peg))
 		var draw_angle : float
 		if use_arc:
-			draw_angle = (t * speed) + angle_peg + (PI * 0.5)
+			draw_angle = (t * speed) + arc_peg + (PI * 0.5)
 		else:
 			draw_angle = angle_rad
 		renderPeg(shape_peg, x_peg, y_peg, draw_angle, size_peg, custom_type)
@@ -153,11 +151,9 @@ func render_line_path(linePath : Control):
 	var ease : int = linePath.find_child("EaseText").selected
 	var x : int = linePath.find_child("XText").value
 	var y : int = linePath.find_child("YText").value
-	var arc : int = linePath.find_child("ArcText").value
-	var arc_rad : float =  (2*PI / 360.0) * arc
+	var arc_rad : float = linePath.find_child("ArcText").value * (2*PI / 360.0) 
 	var speed : float = linePath.find_child("SpeedText").value
-	var angle : int = linePath.find_child("AngleText").value
-	var angle_rad : float =  (2*PI / 360.0) * angle
+	var angle_rad : float = linePath.find_child("AngleText").value * (2*PI / 360.0)
 	var use_arc : int = linePath.find_child("ArcAngleCheckbox").button_pressed
 	
 	var line_path_array : Array
@@ -170,34 +166,61 @@ func render_line_path(linePath : Control):
 		line_path_array.push_back(Vector2(x+x_off, y+y_off))
 	line_path_array.push_back(Vector2(x,y))
 	
-
-	
-	#for i in range(0, n_pegs):
-		#var peg_container : Control = ellipticPath.find_child("PegContainer"+str(i+1), true, false)
-		#var custom_shape = peg_container.find_child("ShapeButton").selected
-		#var custom_size = peg_container.find_child("SizeButton").selected
-		#var custom_type = peg_container.find_child("TypeButton").selected
-		#var shape_peg = circ
-		#var size_peg = size
-		#if custom_shape:
-			#shape_peg = 1 if custom_shape == 1 else 0
-		#if custom_size:
-			#size_peg = custom_size-1
-		#var angle_peg : float = (arc_rad / n_pegs) * i
-		#var x_peg : float = x + (a * cos((t * speed) + angle_peg))
-		#var y_peg : float = y + (b * sin((t * speed) + angle_peg))
-		#var draw_angle : float
-		#if use_arc:
-			#draw_angle = (t * speed) + angle_peg + (PI * 0.5)
-		#else:
-			#draw_angle = angle_rad
-		#renderPeg(shape_peg, x_peg, y_peg, draw_angle, size_peg, custom_type)
+	var line_path_lengths : Array
+	var tot_path_length : float = 0
+	for i in range(0, len(line_path_array)-1):
+		line_path_lengths.push_back( line_path_array[i].distance_to( line_path_array[i+1] ) )
+		tot_path_length += line_path_lengths.back()
+		
+	for i in range(0, n_pegs):
+		var peg_container : Control = linePath.find_child("PegContainer"+str(i+1), true, false)
+		var custom_shape = peg_container.find_child("ShapeButton").selected
+		var custom_size = peg_container.find_child("SizeButton").selected
+		var custom_type = peg_container.find_child("TypeButton").selected
+		var shape_peg = circ
+		var size_peg = size
+		if custom_shape:
+			shape_peg = 1 if custom_shape == 1 else 0
+		if custom_size:
+			size_peg = custom_size-1
+		var arc_peg : float = (arc_rad / n_pegs) * i
+		
+		var draw_angle : float
+		if use_arc:
+			draw_angle = (t * speed) + arc_peg + (PI * 0.5)
+		else:
+			draw_angle = angle_rad
+		
+		var path_step : int = 0
+		var step_len_frac : float = 0;
+		var tot_len_frac : float = ((t * speed) + arc_peg) / (2*PI);
+		tot_len_frac = tot_len_frac - floor(tot_len_frac)
+		
+		while true:
+			step_len_frac = line_path_lengths[path_step] / tot_path_length
+			if tot_len_frac < step_len_frac:
+				break
+			else:
+				tot_len_frac -= step_len_frac
+				path_step += 1
+		# totLenFrac is now 0-X, where X is this steps fraction of the total path length: stepLenFrac.
+		# we want to scale this back into the range 0-1 and apply easing
+		#const float lenFrac = getEasing(p->m_easing, totLenFrac / stepLenFrac);
+		var len_frac : float = tot_len_frac / step_len_frac
+		# and we scale the difference between the points by this value
+		var dx : float = (line_path_array[path_step+1].x - line_path_array[path_step].x) * len_frac
+		var dy : float = (line_path_array[path_step+1].y - line_path_array[path_step].y) * len_frac
+		var x_peg = line_path_array[path_step].x + dx
+		var y_peg = line_path_array[path_step].y + dy
+		renderPeg(shape_peg, x_peg, y_peg, draw_angle, size_peg, custom_type)
+		
 	render_line_path_grab_shapes(line_path_array, dragNode in my_nodes)
 	render_grab_shape(x, y, dragNode in my_nodes)
 	
 #
 func _process(delta):
 	t += delta
+	#if t >= 2*PI: t -= 2*PI
 	queue_redraw()
 	
 func do_update():
@@ -235,8 +258,8 @@ func find_peg(v : Vector2, n : String) -> Control:
 func find_line_segment(v : Vector2, n : String) -> Control:
 	for peg in get_tree().get_nodes_in_group(n):
 		var v1 := Vector2()
-		v1.x = peg.find_parent("LineControl").find_child("XText").value
-		v1.y = peg.find_parent("LineControl").find_child("YText").value
+		v1.x = peg.find_parent("LineControl*").find_child("XText").value
+		v1.y = peg.find_parent("LineControl*").find_child("YText").value
 		var v2 := Vector2()
 		v2.x = peg.find_child("XOffText").value
 		v2.y = peg.find_child("YOffText").value
@@ -254,8 +277,8 @@ func move_peg(peg : Control, v : Vector2) -> void:
 		x_text.value = v.x
 		y_text.value = v.y
 	elif x_off_text and y_off_text:
-		var parent_x = peg.find_parent("LineControl").find_child("XText").value
-		var parent_y = peg.find_parent("LineControl").find_child("YText").value
+		var parent_x = peg.find_parent("LineControl*").find_child("XText").value
+		var parent_y = peg.find_parent("LineControl*").find_child("YText").value
 		x_off_text.value = v.x - parent_x
 		y_off_text.value = v.y - parent_y
 	
@@ -285,7 +308,7 @@ func _input(event):
 				return
 			if not peg: peg = find_line_segment(v, "line_segments")
 			if peg:
-				var parentLineControl = peg.find_parent("LineControl")
+				var parentLineControl = peg.find_parent("LineControl*")
 				print("Found " , peg)
 				parentLineControl.add_theme_stylebox_override("panel", load("res://selected_style_box_flat.tres"))
 				$%RightScroll.set_v_scroll( parentLineControl.position.y )

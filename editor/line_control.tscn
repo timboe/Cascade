@@ -1,0 +1,316 @@
+[gd_scene load_steps=7 format=3 uid="uid://bkucdftd1j28k"]
+
+[ext_resource type="Script" path="res://PathSlider.gd" id="1_2av14"]
+[ext_resource type="Script" path="res://MenuButtonScript.tres.gd" id="2_3s2by"]
+[ext_resource type="PackedScene" uid="uid://bc0o4iaqfoya" path="res://line_container.tscn" id="3_jywnv"]
+[ext_resource type="PackedScene" uid="uid://1c88u1703smi" path="res://peg_container.tscn" id="4_aj4g3"]
+
+[sub_resource type="GDScript" id="GDScript_gn8tb"]
+script/source = "extends CheckButton
+
+@onready var rend = $/root/RootControl.find_child(\"Render\")
+
+func _ready():
+	var bg := ButtonGroup.new()
+	button_group = bg
+	$\"../CheckRect\".button_group = bg
+
+func _on_pressed():
+	rend.do_update()
+"
+
+[sub_resource type="GDScript" id="GDScript_vhp14"]
+script/source = "extends SpinBox
+
+@onready var rend = $/root/RootControl.find_child(\"Render\")
+
+func new_max_y(new_max : int):
+	max_value = new_max
+
+func _on_value_changed(_value):
+	rend.do_update()
+"
+
+[node name="LineControl" type="Panel" groups=["line_pegs", "pegs"]]
+custom_minimum_size = Vector2(100, 385)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 146.0
+grow_horizontal = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="LineControlVBox" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="LinePathText" type="Label" parent="Margin/LineControlVBox"]
+layout_mode = 2
+text = "LinearPegPath0"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="Margin/LineControlVBox"]
+layout_mode = 2
+
+[node name="LineLabel" type="Label" parent="Margin/LineControlVBox/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Path Segments: 1"
+horizontal_alignment = 2
+
+[node name="LineSlider" type="HSlider" parent="Margin/LineControlVBox/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 32.0
+value = 1.0
+rounded = true
+tick_count = 16
+ticks_on_borders = true
+script = ExtResource("1_2av14")
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Margin/LineControlVBox"]
+layout_mode = 2
+
+[node name="PathLabel" type="Label" parent="Margin/LineControlVBox/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Path Pegs: 1"
+horizontal_alignment = 2
+
+[node name="PathSlider" type="HSlider" parent="Margin/LineControlVBox/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 16.0
+value = 1.0
+rounded = true
+tick_count = 16
+ticks_on_borders = true
+script = ExtResource("1_2av14")
+
+[node name="Grid1" type="GridContainer" parent="Margin/LineControlVBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+columns = 2
+
+[node name="CheckCirc" type="CheckButton" parent="Margin/LineControlVBox/Grid1"]
+layout_mode = 2
+size_flags_horizontal = 3
+button_pressed = true
+text = "Circle"
+alignment = 1
+script = SubResource("GDScript_gn8tb")
+
+[node name="CheckRect" type="CheckButton" parent="Margin/LineControlVBox/Grid1"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Rectangle"
+alignment = 1
+
+[node name="Grid2" type="GridContainer" parent="Margin/LineControlVBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+columns = 4
+
+[node name="SizeLabel" type="Label" parent="Margin/LineControlVBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Size"
+horizontal_alignment = 2
+
+[node name="SizeText" type="OptionButton" parent="Margin/LineControlVBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+item_count = 4
+selected = 0
+popup/item_0/text = "Small"
+popup/item_0/id = 0
+popup/item_1/text = "Medium"
+popup/item_1/id = 1
+popup/item_2/text = "Large"
+popup/item_2/id = 2
+popup/item_3/text = "Max"
+popup/item_3/id = 3
+script = ExtResource("2_3s2by")
+
+[node name="EaseLabel" type="Label" parent="Margin/LineControlVBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Easing"
+horizontal_alignment = 2
+
+[node name="EaseText" type="OptionButton" parent="Margin/LineControlVBox/Grid2"]
+layout_mode = 2
+script = ExtResource("2_3s2by")
+
+[node name="XLabel" type="Label" parent="Margin/LineControlVBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "X"
+horizontal_alignment = 2
+
+[node name="XText" type="SpinBox" parent="Margin/LineControlVBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 960.0
+value = 130.0
+rounded = true
+
+[node name="YLabel" type="Label" parent="Margin/LineControlVBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Y"
+horizontal_alignment = 2
+
+[node name="YText" type="SpinBox" parent="Margin/LineControlVBox/Grid2" groups=["y_sensitive"]]
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 960.0
+value = 130.0
+rounded = true
+script = SubResource("GDScript_vhp14")
+
+[node name="ArcLabel" type="Label" parent="Margin/LineControlVBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Arc Length"
+horizontal_alignment = 2
+
+[node name="ArcText" type="SpinBox" parent="Margin/LineControlVBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Determins the arc along the complete path where the pegs are placed."
+max_value = 360.0
+value = 360.0
+rounded = true
+
+[node name="SpeedLabel" type="Label" parent="Margin/LineControlVBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Speed"
+horizontal_alignment = 2
+
+[node name="SpeedText" type="SpinBox" parent="Margin/LineControlVBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.01
+step = 0.01
+value = 1.0
+
+[node name="AngleLabel" type="Label" parent="Margin/LineControlVBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Angle"
+horizontal_alignment = 2
+
+[node name="AngleText" type="SpinBox" parent="Margin/LineControlVBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Set angle to use for each peg, only used if Arc Angle is false."
+max_value = 360.0
+rounded = true
+editable = false
+
+[node name="ArcAngleLabel" type="Label" parent="Margin/LineControlVBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Arc Angle"
+horizontal_alignment = 2
+
+[node name="ArcAngleCheckbox" type="CheckBox" parent="Margin/LineControlVBox/Grid2"]
+layout_mode = 2
+tooltip_text = "Pegs inherit their angle from their position around the ellipse."
+button_pressed = true
+script = ExtResource("2_3s2by")
+
+[node name="Remove" type="Button" parent="Margin/LineControlVBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Remove"
+
+[node name="LineInfoHBox" type="HBoxContainer" parent="Margin/LineControlVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PegLabel" type="Label" parent="Margin/LineControlVBox/LineInfoHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Line Segment"
+horizontal_alignment = 1
+
+[node name="PegLabel2" type="Label" parent="Margin/LineControlVBox/LineInfoHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Relative X"
+horizontal_alignment = 1
+
+[node name="PegLabel3" type="Label" parent="Margin/LineControlVBox/LineInfoHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Relative Y"
+horizontal_alignment = 1
+
+[node name="LineVBox" type="VBoxContainer" parent="Margin/LineControlVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="LineContainer1" parent="Margin/LineControlVBox/LineVBox" instance=ExtResource("3_jywnv")]
+layout_mode = 2
+
+[node name="PegInfoHBox" type="HBoxContainer" parent="Margin/LineControlVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PegLabel" type="Label" parent="Margin/LineControlVBox/PegInfoHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Peg"
+horizontal_alignment = 1
+
+[node name="PegLabel2" type="Label" parent="Margin/LineControlVBox/PegInfoHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Shape"
+horizontal_alignment = 1
+
+[node name="PegLabel3" type="Label" parent="Margin/LineControlVBox/PegInfoHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Size"
+horizontal_alignment = 1
+
+[node name="PegLabel4" type="Label" parent="Margin/LineControlVBox/PegInfoHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Type"
+horizontal_alignment = 1
+
+[node name="PegVBox" type="VBoxContainer" parent="Margin/LineControlVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PegContainer1" parent="Margin/LineControlVBox/PegVBox" instance=ExtResource("4_aj4g3")]
+layout_mode = 2
+
+[connection signal="tree_exited" from="." to="Margin/LineControlVBox/Grid1/CheckCirc" method="_on_pressed"]
+[connection signal="value_changed" from="Margin/LineControlVBox/HBoxContainer3/LineSlider" to="Margin/LineControlVBox/HBoxContainer3/LineSlider" method="_on_line_slider_value_changed"]
+[connection signal="value_changed" from="Margin/LineControlVBox/HBoxContainer2/PathSlider" to="Margin/LineControlVBox/HBoxContainer2/PathSlider" method="_on_value_changed"]
+[connection signal="pressed" from="Margin/LineControlVBox/Grid1/CheckCirc" to="Margin/LineControlVBox/Grid1/CheckCirc" method="_on_pressed"]
+[connection signal="pressed" from="Margin/LineControlVBox/Grid1/CheckRect" to="Margin/LineControlVBox/Grid1/CheckCirc" method="_on_pressed"]
+[connection signal="pressed" from="Margin/LineControlVBox/Grid2/SizeText" to="Margin/LineControlVBox/Grid2/SizeText" method="_on_pressed"]
+[connection signal="pressed" from="Margin/LineControlVBox/Grid2/EaseText" to="Margin/LineControlVBox/Grid2/EaseText" method="_on_pressed"]
+[connection signal="value_changed" from="Margin/LineControlVBox/Grid2/XText" to="Margin/LineControlVBox/Grid2/YText" method="_on_value_changed"]
+[connection signal="value_changed" from="Margin/LineControlVBox/Grid2/YText" to="Margin/LineControlVBox/Grid2/YText" method="_on_value_changed"]
+[connection signal="value_changed" from="Margin/LineControlVBox/Grid2/ArcText" to="Margin/LineControlVBox/Grid2/YText" method="_on_value_changed"]
+[connection signal="value_changed" from="Margin/LineControlVBox/Grid2/SpeedText" to="Margin/LineControlVBox/Grid2/YText" method="_on_value_changed"]
+[connection signal="value_changed" from="Margin/LineControlVBox/Grid2/AngleText" to="Margin/LineControlVBox/Grid2/YText" method="_on_value_changed"]
+[connection signal="pressed" from="Margin/LineControlVBox/Grid2/ArcAngleCheckbox" to="Margin/LineControlVBox/Grid2/ArcAngleCheckbox" method="_on_pressed"]
+[connection signal="toggled" from="Margin/LineControlVBox/Grid2/ArcAngleCheckbox" to="Margin/LineControlVBox/Grid2/ArcAngleCheckbox" method="_on_toggled"]
+[connection signal="pressed" from="Margin/LineControlVBox/Remove" to="." method="queue_free"]
