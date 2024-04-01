@@ -42,3 +42,7 @@ void activateBallEndSweep(void);
 void doBallEndSweep(void);
 
 void renderBallEndSweep(void);
+
+float getParalaxFactorFar(void);
+
+float getParalaxFactorNear(void);

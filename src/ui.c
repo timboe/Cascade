@@ -327,3 +327,7 @@ void renderBallEndSweep(void) {
   if (!m_ballEndSweep) return;
   pd->graphics->drawLine(0, m_popLevel, DEVICE_PIX_X, m_popLevel, 4, kColorWhite);
 }
+
+float getParalaxFactorNear() { return m_scrollOffset * PARALAX_NEAR; }
+
+float getParalaxFactorFar() { return m_scrollOffset * PARALAX_FAR; }

@@ -99,9 +99,13 @@
 #define SCREEN_FRIC 0.9f
 // Larger number for stronger bounce-back
 #define SCREEN_BBACK 0.2f
-
+// Reduction factor to make the crank scrolling not be too fast
 #define CRANK_SCROLL_MODIFIER 0.1f
-
+// Per frame updates towards set-position
 #define SCREEN_EASING 0.25f
-
+// Time multiplier for a slow, full all-screen wipe 
 #define END_SWEEP_SCALE 0.25f
+
+// PARALAX
+#define PARALAX_FAR 0.1f;
+#define PARALAX_NEAR -0.1f
