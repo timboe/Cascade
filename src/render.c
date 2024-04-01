@@ -61,9 +61,7 @@ void render(int32_t fc) {
     pd->system->drawFPS(0, 0);
   }
   #endif
-
 }
-
 
 void renderTitles(int32_t _fc) {
   pd->graphics->drawBitmap(getSpriteSplash(), 0, 0, kBitmapUnflipped);
@@ -77,7 +75,6 @@ void renderTitles(int32_t _fc) {
     DEVICE_PIX_Y - TILE_PIX*2,
     kBitmapUnflipped);  
 }
-
 
 void renderBall(int32_t fc) {
   cpBody* ball = getBall();
@@ -123,7 +120,7 @@ void renderBackground(void) {
   static uint8_t wfOffC = 0;
   int8_t wfOff = 59 - (wfOffC % 60); 
   //pd->system->logToConsole("off %i", wfOff);
-  ++wfOffC;
+  wfOffC += 2;
   // NOTE: Need to draw one extra background due to animation
   for (uint32_t i = start; i < start+6; ++i) {
     if (i >= WFSHEET_SIZE_Y) break;

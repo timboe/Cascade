@@ -20,6 +20,8 @@ LCDBitmapTable* m_sheetWfFg[N_WATERFALLS];
 
 LCDFont* m_fontRoobert24;
 LCDFont* m_fontRoobert10;
+LCDFont* m_fontGreatvibes24;
+LCDFont* m_fontGreatvibes109;
 
 LCDBitmap* loadImageAtPath(const char* _path);
 
@@ -60,11 +62,12 @@ void updateInfoTopperBitmap(void) {
   pd->graphics->clearBitmap(m_infoTopperBitmap, kColorBlack);
   pd->graphics->pushContext(m_infoTopperBitmap);
   char text[128];
-  snprintf(text, 128, "%i-%i", (int)getCurrentLevel(), (int)getCurrentHole());
-  setRoobert24();
+  snprintf(text, 128, "%i9~%i9", (int)getCurrentLevel(), (int)getCurrentHole());
+  setGreatVibes24();
   pd->graphics->pushContext(m_infoTopperBitmap);
   pd->graphics->setDrawMode(kDrawModeFillWhite);
-  pd->graphics->drawText(text, 128, kUTF8Encoding, 0, 2);
+  pd->graphics->drawText(text, 128, kUTF8Encoding, 0, 8);
+  setRoobert24();
   const int32_t width = pd->graphics->getTextWidth(getRoobert24(), "By Tim Martin", 128, kUTF8Encoding, 0);
   pd->graphics->drawText("By Tim Martin", 128, kUTF8Encoding, DEVICE_PIX_X - width, 2);
   pd->graphics->popContext();
@@ -105,17 +108,21 @@ LCDBitmap* getBitmapTurretBarrel(void) {
   return m_turretBarrel[(getFrameCount() % 32) / 4][ angToByte(getTurretBarrelAngle()) ];
 }
 
-void setRoobert10() {
-  pd->graphics->setFont(m_fontRoobert10);
-}
+void setRoobert10() { pd->graphics->setFont(m_fontRoobert10); }
 
-void setRoobert24() {
-  pd->graphics->setFont(m_fontRoobert24); 
-}
+void setRoobert24() { pd->graphics->setFont(m_fontRoobert24); }
+
+void setGreatVibes24() { pd->graphics->setFont(m_fontGreatvibes24); }
+
+void setGreatVibes109() { pd->graphics->setFont(m_fontGreatvibes109); }
+
+LCDFont* getRoobert10(void) { return m_fontRoobert10; }
 
 LCDFont* getRoobert24() { return m_fontRoobert24; }
 
-LCDFont* getRoobert10(void) { return m_fontRoobert10; }
+LCDFont* getGreatVibes24() { return m_fontGreatvibes24; }
+
+LCDFont* getGreatVibes109() { return m_fontGreatvibes109; }
 
 float sizeToScale(uint8_t size) {
   switch (size) {
@@ -198,7 +205,9 @@ void initBitmap() {
 
   m_fontRoobert24 = loadFontAtPath("fonts/Roobert-24-Medium");
   m_fontRoobert10 = loadFontAtPath("fonts/Roobert-10-Bold");
-  pd->graphics->setFont(m_fontRoobert24);
+  m_fontGreatvibes24 = loadFontAtPath("fonts/GreatVibes-Regular-24");
+  m_fontGreatvibes109 = loadFontAtPath("fonts/GreatVibes-Regular-109");
+  pd->graphics->setFont(m_fontGreatvibes24);
 
   updateInfoTopperBitmap();
 }

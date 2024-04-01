@@ -289,11 +289,15 @@ void applyScrollEasing(void) {
 
   const float soDiff = SCROLL_OFFSET_MAX - m_scrollOffset;
   if (soDiff < 0) {
-    m_scrollOffset += soDiff * SCREEN_BBACK;
-    pd->system->logToConsole("BBACK active (bottom");
+    const float toAdd = soDiff * SCREEN_BBACK;
+    if (toAdd > -0.1f) { m_scrollOffset = SCROLL_OFFSET_MAX; m_vY = 0; }
+    else               { m_scrollOffset += toAdd; }
+    pd->system->logToConsole("BBACK active (BOTTOM) %i from %f to %f by adding %f", getFrameCount(), m_scrollOffset, m_scrollOffset + (soDiff * SCREEN_BBACK), toAdd);
   } else if (m_scrollOffset < m_minimumY) {
-    m_scrollOffset += ((m_scrollOffset - m_minimumY) * -SCREEN_BBACK);
-    pd->system->logToConsole("BBACK active (top");
+    const float toAdd = ((m_scrollOffset - m_minimumY) * -SCREEN_BBACK);
+    pd->system->logToConsole("BBACK active (top) %i from %f to %f by adding %f", getFrameCount(), m_scrollOffset, m_scrollOffset + ((m_scrollOffset - m_minimumY) * -SCREEN_BBACK), toAdd);
+    if (toAdd < 0.1f) { m_scrollOffset = m_minimumY; m_vY = 0; }
+    else              { m_scrollOffset += toAdd; }
   }
 }
 
