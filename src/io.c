@@ -16,6 +16,10 @@ uint32_t m_actionProgress = 0;
 
 SDFile* m_file;
 
+uint16_t m_level = 0;
+
+uint16_t m_hole = 0;
+
 int doRead(void* _userdata, uint8_t* _buf, int _bufsize);
 
 void doWrite(void* _userdata, const char* _str, int _len);
@@ -53,6 +57,14 @@ json_decoder m_jd = {
 
 
 /// ///
+
+uint16_t getCurrentLevel(void) { return m_level; }
+
+uint16_t getCurrentHole(void) { return m_hole; }
+
+uint16_t getPar(uint16_t level, uint16_t hole) { return 3; }
+
+uint16_t getCurrentPar(void) { return getPar(m_level, m_hole); }
 
 void doIO(enum kSaveLoadRequest _first, enum kSaveLoadRequest _andThen, enum kSaveLoadRequest _andFinally) {
   if (IOOperationInProgress()) {

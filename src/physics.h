@@ -4,7 +4,7 @@
 
 void initSpace(void);
 
-void updateSpace(float timestep);
+void updateSpace(int32_t frameCount);
 
 void updatePath(void);
 
@@ -15,6 +15,10 @@ void setBallInPlay(bool bip);
 cpBody* getBall(void);
 
 cpShape* getBallShape(void);
+
+int16_t* motionTrailX(void);
+
+int16_t* motionTrailY(void);
 
 void launchBall(void);
 

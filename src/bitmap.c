@@ -1,6 +1,7 @@
 #include "bitmap.h"
 #include "input.h"
 #include "physics.h"
+#include "io.h"
 
 LCDBitmap* m_titleSelected;
 LCDBitmap* m_splash;
@@ -9,6 +10,7 @@ LCDBitmap* m_header;
 LCDBitmap* m_turretBody;
 LCDBitmap* m_turretBarrel[8][256];
 LCDBitmapTable* m_turretBarrelTabel;
+LCDBitmap* m_infoTopperBitmap;
 
 LCDBitmap* m_ballBitmap[MAX_PEG_SIZE];
 LCDBitmap* m_rectBitmap[MAX_PEG_SIZE][256];
@@ -54,6 +56,20 @@ LCDFont* loadFontAtPath(const char* _path) {
   return _f;
 }
 
+void updateInfoTopperBitmap(void) {
+  pd->graphics->clearBitmap(m_infoTopperBitmap, kColorBlack);
+  pd->graphics->pushContext(m_infoTopperBitmap);
+  char text[128];
+  snprintf(text, 128, "%i-%i", (int)getCurrentLevel(), (int)getCurrentHole());
+  setRoobert24();
+  pd->graphics->pushContext(m_infoTopperBitmap);
+  pd->graphics->setDrawMode(kDrawModeFillWhite);
+  pd->graphics->drawText(text, 128, kUTF8Encoding, 0, 2);
+  const int32_t width = pd->graphics->getTextWidth(getRoobert24(), "By Tim Martin", 128, kUTF8Encoding, 0);
+  pd->graphics->drawText("By Tim Martin", 128, kUTF8Encoding, DEVICE_PIX_X - width, 2);
+  pd->graphics->popContext();
+}
+
 LCDBitmap* getSpriteSplash() { return m_splash; }
 
 LCDBitmap* getBitmapWfBg(uint8_t wf) { return m_wfBg[wf]; }
@@ -82,6 +98,8 @@ LCDBitmap* getTitleSelectedBitmap() { return m_titleSelected; }
 LCDBitmap* getBitmapTurretBody(void) { return m_turretBody; }
 
 LCDBitmap* getBitmapHeader(void) { return m_header; }
+
+LCDBitmap* getInfoTopperBitmap(void) { return m_infoTopperBitmap; }
 
 LCDBitmap* getBitmapTurretBarrel(void) {
   return m_turretBarrel[(getFrameCount() % 32) / 4][ angToByte(getTurretBarrelAngle()) ];
@@ -175,7 +193,12 @@ void initBitmap() {
     }
   }
   
+  m_infoTopperBitmap = pd->graphics->newBitmap(DEVICE_PIX_X, 32, kColorClear);
+
+
   m_fontRoobert24 = loadFontAtPath("fonts/Roobert-24-Medium");
   m_fontRoobert10 = loadFontAtPath("fonts/Roobert-10-Bold");
   pd->graphics->setFont(m_fontRoobert24);
+
+  updateInfoTopperBitmap();
 }

@@ -79,12 +79,19 @@ void renderTitles(int32_t _fc) {
 }
 
 
-void renderBall(void) {
+void renderBall(int32_t fc) {
   cpBody* ball = getBall();
-  const cpVect center = cpBodyGetPosition(ball);
-  const float x = center.x - BALL_RADIUS;
-  const float y = center.y - BALL_RADIUS;
-  pd->graphics->drawBitmap(getBitmapBall(), x, y, kBitmapUnflipped);
+  int16_t* trailX = motionTrailX();
+  int16_t* trailY = motionTrailY();
+  uint8_t size = BALL_RADIUS;
+  for (int32_t i = fc; i > fc - MOTION_TRAIL_LEN; --i) {
+    pd->graphics->fillEllipse(trailX[i%MOTION_TRAIL_LEN] - size, trailY[i%MOTION_TRAIL_LEN] - size, 2*size, 2*size, 0.0f, 360.0f, kColorWhite);
+    size -= (BALL_RADIUS / MOTION_TRAIL_LEN);
+  }
+  const cpVect pos = cpBodyGetPosition(ball);
+  pd->graphics->setDrawMode(kDrawModeInverted);
+  pd->graphics->drawBitmap(getBitmapBall(), pos.x - BALL_RADIUS, pos.y - BALL_RADIUS, kBitmapUnflipped);
+  pd->graphics->setDrawMode(kDrawModeCopy);
 }
 
 void renderTurret(void) {
@@ -125,9 +132,12 @@ void renderBackground(void) {
     if (i >= WFSHEET_SIZE_Y) break;
     pd->graphics->drawBitmap(getBitmapWfFg(wf, 0,i), 0, UI_OFFSET_TOP + (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
   }
+  if (start == 0) {
+    pd->graphics->drawBitmap(getInfoTopperBitmap(), 0, -32 + parallax, kBitmapUnflipped);
+  }
 }
 
-void renderGameWindow(int32_t _fc) {
+void renderGameWindow(int32_t fc) {
 
   // DRAW BACKGROUND
   renderBackground();
@@ -136,7 +146,7 @@ void renderGameWindow(int32_t _fc) {
   renderTurret();
 
   // DRAW BALL
-  renderBall();
+  renderBall(fc);
 
   // DRAW OBS
   renderBoard();

@@ -12,7 +12,7 @@
 
 /// ///
 
-#define TICK_FREQUENCY 30
+#define TICK_FREQUENCY 50
 
 #define TILE_PIX 16
 
@@ -77,6 +77,7 @@
 
 #define BALL_RADIUS 8.0f
 #define BALL_MASS 1.0f
+#define MOTION_TRAIL_LEN 4
 
 #define BOX_WIDTH 22.5f
 #define BOX_HEIGHT 12.5f
