@@ -19,6 +19,10 @@ uint8_t cpCollisionBeginFunc_ballPeg(cpArbiter* arb, struct cpSpace* space, cpDa
 bool m_ballInPlay = false;
 bool m_doMotionPath = false;
 
+int16_t m_motionTrailX[MOTION_TRAIL_LEN];
+int16_t m_motionTrailY[MOTION_TRAIL_LEN];
+
+
 /// ///
 
 uint8_t radToByte(float rad) { return (rad / M_2PIf) * 256.0f; }
@@ -34,6 +38,10 @@ float len(const float x1, const float x2, const float y1, const float y2) {
 float len2(const float x1, const float x2, const float y1, const float y2) {
   return powf(x1 - x2, 2) + powf(y1 - y2, 2);
 }
+
+int16_t* motionTrailX(void) { return m_motionTrailX; }
+
+int16_t* motionTrailY(void) { return m_motionTrailY; }
 
 cpBody* getBall(void) { return m_ball; }
 
@@ -100,14 +108,14 @@ uint8_t cpCollisionBeginFunc_ballPeg(cpArbiter* arb, struct cpSpace* space, cpDa
 }
 
 void resetBall(void) {
-  cpBodySetPosition(m_ball, cpv(HALF_DEVICE_PIX_X, TURRET_RADIUS));
+  cpBodySetPosition(m_ball, cpv(HALF_DEVICE_PIX_X, getMinimumY() + TURRET_RADIUS));
   cpBodySetVelocity(m_ball, cpvzero);
   cpBodySetAngle(m_ball, 0);
   cpBodySetAngularVelocity(m_ball, 0);
 }
 
-void updateSpace(float timestep) {
-  cpSpaceStep(m_space, timestep);
+void updateSpace(int32_t fc) {
+  cpSpaceStep(m_space, TIMESTEP);
   
   const float y = cpBodyGetPosition(m_ball).y;
 
@@ -123,6 +131,11 @@ void updateSpace(float timestep) {
   if (!m_ballInPlay && !m_doMotionPath) {
     resetBall();
   }
+
+  const cpVect pos = cpBodyGetPosition(m_ball);
+  m_motionTrailX[fc % MOTION_TRAIL_LEN] = pos.x;
+  m_motionTrailY[fc % MOTION_TRAIL_LEN] = pos.y;
+
 }
 
 void updatePath(void) {

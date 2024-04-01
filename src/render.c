@@ -79,21 +79,29 @@ void renderTitles(int32_t _fc) {
 }
 
 
-void renderBall(void) {
+void renderBall(int32_t fc) {
   cpBody* ball = getBall();
-  const cpVect center = cpBodyGetPosition(ball);
-  const float x = center.x - BALL_RADIUS;
-  const float y = center.y - BALL_RADIUS;
-  pd->graphics->drawBitmap(getBitmapBall(), x, y, kBitmapUnflipped);
+  int16_t* trailX = motionTrailX();
+  int16_t* trailY = motionTrailY();
+  uint8_t size = BALL_RADIUS;
+  for (int32_t i = fc; i > fc - MOTION_TRAIL_LEN; --i) {
+    pd->graphics->fillEllipse(trailX[i%MOTION_TRAIL_LEN] - size, trailY[i%MOTION_TRAIL_LEN] - size, 2*size, 2*size, 0.0f, 360.0f, kColorWhite);
+    size -= (BALL_RADIUS / MOTION_TRAIL_LEN);
+  }
+  const cpVect pos = cpBodyGetPosition(ball);
+  pd->graphics->setDrawMode(kDrawModeInverted);
+  pd->graphics->drawBitmap(getBitmapBall(), pos.x - BALL_RADIUS, pos.y - BALL_RADIUS, kBitmapUnflipped);
+  pd->graphics->setDrawMode(kDrawModeCopy);
 }
 
 void renderTurret(void) {
-  if (getScrollOffset() >= 2*TURRET_RADIUS) {
+  const int16_t minY = getMinimumY();
+  if (getScrollOffset() - minY >= 2*TURRET_RADIUS) {
     return;
   }
   //pd->graphics->drawBitmap(getBitmapHeader(), 0, 0, kBitmapUnflipped);
-  pd->graphics->drawBitmap(getBitmapTurretBody(), DEVICE_PIX_X/2 - TURRET_RADIUS, 0,  kBitmapUnflipped);
-  pd->graphics->drawBitmap(getBitmapTurretBarrel(), DEVICE_PIX_X/2 - TURRET_RADIUS, 0, kBitmapUnflipped);
+  pd->graphics->drawBitmap(getBitmapTurretBody(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY,  kBitmapUnflipped);
+  pd->graphics->drawBitmap(getBitmapTurretBarrel(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY, kBitmapUnflipped);
 }
 
 void renderPath(void) {
@@ -107,7 +115,8 @@ void renderPath(void) {
 }
 
 void renderBackground(void) {
-  const int32_t so = ((int32_t) getScrollOffset()) - UI_OFFSET_TOP;
+  const int32_t parallax = getParalaxFactorFar(); // Note: float -> int here
+  const int32_t so = ((int32_t) getScrollOffset()) - UI_OFFSET_TOP - parallax;
   const uint32_t start = MAX(0, so / WF_DIVISION_PIX_Y);
   // pd->system->logToConsole("so is %i, rendering from %i to %i", so, start, start+5);
   uint8_t wf = 0;
@@ -118,15 +127,18 @@ void renderBackground(void) {
   // NOTE: Need to draw one extra background due to animation
   for (uint32_t i = start; i < start+6; ++i) {
     if (i >= WFSHEET_SIZE_Y) break;
-    pd->graphics->drawBitmap(getBitmapWfBg(wf), WF_BG_OFFSET[wf], UI_OFFSET_TOP + (WF_DIVISION_PIX_Y * i) - wfOff, kBitmapUnflipped);
+    pd->graphics->drawBitmap(getBitmapWfBg(wf), WF_BG_OFFSET[wf], UI_OFFSET_TOP + (WF_DIVISION_PIX_Y * i) - wfOff + parallax, kBitmapUnflipped);
   }
   for (uint32_t i = start; i < start+5; ++i) {
     if (i >= WFSHEET_SIZE_Y) break;
-    pd->graphics->drawBitmap(getBitmapWfFg(wf, 0,i), 0,                UI_OFFSET_TOP + (WF_DIVISION_PIX_Y * i), kBitmapUnflipped);
+    pd->graphics->drawBitmap(getBitmapWfFg(wf, 0,i), 0, UI_OFFSET_TOP + (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
+  }
+  if (start == 0) {
+    pd->graphics->drawBitmap(getInfoTopperBitmap(), 0, -32 + parallax, kBitmapUnflipped);
   }
 }
 
-void renderGameWindow(int32_t _fc) {
+void renderGameWindow(int32_t fc) {
 
   // DRAW BACKGROUND
   renderBackground();
@@ -135,7 +147,7 @@ void renderGameWindow(int32_t _fc) {
   renderTurret();
 
   // DRAW BALL
-  renderBall();
+  renderBall(fc);
 
   // DRAW OBS
   renderBoard();

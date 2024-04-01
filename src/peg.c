@@ -116,6 +116,8 @@ void updatePeg(struct Peg_t* p) {
     float stepLenFrac = 0;
     float totLenFrac = (p->m_time / M_2PIf);
     
+    // TODO - cache this for calls after the first
+
     while (true) {
       stepLenFrac = p->m_pathLength[pathStep] / p->m_totPathLength;
       if (totLenFrac < stepLenFrac) {
@@ -143,7 +145,9 @@ void updatePeg(struct Peg_t* p) {
 
   }
 
-  cpBodySetPosition(p->m_cpBody, cpv(p->m_x, p->m_y));
+  const cpVect pos = cpBodyGetPosition(p->m_cpBody);
+  cpBodySetVelocity(p->m_cpBody, cpv((p->m_x - pos.x)/TIMESTEP, (p->m_y - pos.y)/TIMESTEP));
+  // cpBodySetPosition(p->m_cpBody, cpv(p->m_x, p->m_y));
   setPegBitmapCoordinates(p);
 }
 

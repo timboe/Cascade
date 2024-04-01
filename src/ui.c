@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <math.h>
 #include "ui.h"
 #include "bitmap.h"
@@ -10,6 +11,7 @@
 enum kGameMode m_mode = 0;
 
 float m_scrollOffset = 0;
+int16_t m_minimumY = 0;
 float m_vY = 0;
 bool m_goToTop = false;
 bool m_ballEndSweep = false;
@@ -39,6 +41,9 @@ LCDBitmap* m_UIBitmapTitleCont[3] = {NULL};
 
 /// ///
 
+int16_t getMinimumY(void) { return m_minimumY; }
+
+void setMinimumY(int16_t y) { m_minimumY = y; }
 
 enum kGameMode getGameMode() {
   return m_mode;
@@ -77,7 +82,7 @@ uint16_t getTitleCursorSelected() {
   return m_UITitleSelected;
 }
 
-void updateUITitles(int _fc) {
+void updateUITitles(int fc) {
   // pd->sprite->setDrawMode(m_UISpriteSplash, kDrawModeCopy);
 
   // pd->sprite->setVisible(m_UISpriteTitleSelected, _fc % (TICK_FREQUENCY/2) < TICK_FREQUENCY/4);
@@ -87,7 +92,7 @@ void updateUITitles(int _fc) {
   // pd->sprite->moveTo(m_UISpriteSplash, DEVICE_PIX_X/2, DEVICE_PIX_Y/2 - (3*TILE_PIX)/4 );
 }
 
-void updateUI(int _fc) {
+void updateUI(int fc) {
 
 }
 
@@ -276,8 +281,8 @@ void applyScrollEasing(void) {
 
   if (m_goToTop && !m_ballEndSweep) {
     pd->system->logToConsole("go to top active %i", getFrameCount());
-    setScrollOffset(0.0f);
-    if (m_scrollOffset <= 1.0f) {
+    setScrollOffset(m_minimumY);
+    if (fabsf(m_scrollOffset - m_minimumY) <= 1.0f) {
       m_goToTop = false;
     }
   }
@@ -285,15 +290,17 @@ void applyScrollEasing(void) {
   const float soDiff = SCROLL_OFFSET_MAX - m_scrollOffset;
   if (soDiff < 0) {
     m_scrollOffset += soDiff * SCREEN_BBACK;
-  } else if (m_scrollOffset < 0.0f) {
-    m_scrollOffset += (m_scrollOffset * -SCREEN_BBACK);
+    pd->system->logToConsole("BBACK active (bottom");
+  } else if (m_scrollOffset < m_minimumY) {
+    m_scrollOffset += ((m_scrollOffset - m_minimumY) * -SCREEN_BBACK);
+    pd->system->logToConsole("BBACK active (top");
   }
 }
 
 float getScrollOffset(void) { return m_scrollOffset; }
 
 void setScrollOffset(float set) {
-  if (set < 0) set = 0;
+  if (set < m_minimumY) set = m_minimumY;
   float diff = set - m_scrollOffset;
   m_scrollOffset += diff * SCREEN_EASING;
   // pd->system->logToConsole("req %f, set %f", set, m_scrollOffset);
@@ -302,24 +309,47 @@ void setScrollOffset(float set) {
 void activateBallEndSweep(void) {
   m_ballEndSweep = true;
   m_endSweepProgress = 0.0f;
+
+  int32_t minY = 10000;
+  for (uint32_t i = 0; i < MAX_PEGS; ++i) {
+    const struct Peg_t* peg = getPeg(i);
+    if (peg->m_y < minY && peg->m_state == kPegStateActive) {
+      minY = peg->m_y;
+    }
+  }
+  if (minY > (DEVICE_PIX_Y/2)) {
+    m_minimumY = minY - (DEVICE_PIX_Y/2);
+  }
+  pd->system->logToConsole("smallest y was %i, min y is now %i", minY, m_minimumY);
+
 }
 
 void doBallEndSweep(void) {
   if (!m_ballEndSweep) return;
-  m_endSweepProgress += (TIMESTEP * END_SWEEP_SCALE);
+  // Take less time overall when we get lower down
+  const float distance_mod = WFALL_PIX_Y / (float)(WFALL_PIX_Y - m_minimumY);
+
+  m_endSweepProgress += (TIMESTEP * END_SWEEP_SCALE * distance_mod);
   float progress = getEasing(EaseInOutSine, m_endSweepProgress);
   progress = (1.0f - progress);
 
-  const float target = SCROLL_OFFSET_MAX * progress;
-  setScrollOffset(target);
+  // const float target = SCROLL_OFFSET_MAX * progress;
+  // setScrollOffset(target);
 
-  m_popLevel = target + (progress * DEVICE_PIX_Y);
+  // m_popLevel = target + (progress * DEVICE_PIX_Y);
+  // popBoard(m_popLevel);
+  // // pd->system->logToConsole("end sweep active target %f, pop %f",target, m_popLevel);
+
+  const float target_partial = m_minimumY + ((SCROLL_OFFSET_MAX - m_minimumY) * progress);
+  setScrollOffset(target_partial);
+
+  const float m_popLevel = WFALL_PIX_Y * progress;
   popBoard(m_popLevel);
   // pd->system->logToConsole("end sweep active target %f, pop %f",target, m_popLevel);
 
   if (m_endSweepProgress >= 1) {
     m_ballEndSweep = false;
-    m_scrollOffset = 0;
+    m_scrollOffset = m_minimumY;
   }
 }
 
@@ -327,3 +357,7 @@ void renderBallEndSweep(void) {
   if (!m_ballEndSweep) return;
   pd->graphics->drawLine(0, m_popLevel, DEVICE_PIX_X, m_popLevel, 4, kColorWhite);
 }
+
+float getParalaxFactorNear() { return m_scrollOffset * PARALAX_NEAR; }
+
+float getParalaxFactorFar() { return m_scrollOffset * PARALAX_FAR; }

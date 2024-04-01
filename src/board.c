@@ -18,6 +18,10 @@ struct Peg_t* pegFromPool(void) {
   return &m_pegs[m_nPegs++];
 }
 
+struct Peg_t* getPeg(uint16_t i) {
+  return &m_pegs[i];
+}
+
 void boardAddWheel(const uint8_t n, const float angleMax, const enum PegShape_t s, const uint16_t x, const uint16_t y, const uint16_t a, const uint16_t b, const float speed) {
   for (int i = 0; i < n; ++i) {
     const uint8_t size = 0;
@@ -52,7 +56,7 @@ void boardAddPath(const uint8_t n, const float angleMax, const enum PegShape_t s
 void randomiseBoard(void) {
   clearBoard();
 
-  const int maxStatic = rand() % 2 ? 16 : 64;
+  const int maxStatic = rand() % 2 ? 16 : 16;
 
   for (int i = 0; i < maxStatic; ++i) {
     const int16_t x = rand() % WFALL_PIX_X;
@@ -64,7 +68,7 @@ void randomiseBoard(void) {
     initPeg(p, s, x, y, angle, size);
   }
 
-  if (maxStatic == 64) return;
+  if (maxStatic == 16) return;
 
   #define PEGS_PER_WHEEL 8
   #define WHEELS 4

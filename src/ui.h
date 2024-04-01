@@ -7,9 +7,14 @@ enum kGameMode {
   kNGameModes
 };
 
-void updateUI(int _fc);
+enum kFSM {
+  kGameFSM_,
+  kNFSMModes
+};
 
-void updateUITitles(int _fc);
+void updateUI(int fc);
+
+void updateUITitles(int fc);
 
 void modTitleCursor(bool _increment);
 
@@ -42,3 +47,11 @@ void activateBallEndSweep(void);
 void doBallEndSweep(void);
 
 void renderBallEndSweep(void);
+
+float getParalaxFactorFar(void);
+
+float getParalaxFactorNear(void);
+
+int16_t getMinimumY(void);
+
+void setMinimumY(int16_t y);

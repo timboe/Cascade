@@ -18,3 +18,11 @@ bool IOOperationInProgress(void);
 void enactIO(void);
 
 bool doSave(void);
+
+uint16_t getCurrentLevel(void);
+
+uint16_t getCurrentHole(void);
+
+uint16_t getPar(uint16_t level, uint16_t hole);
+
+uint16_t getCurrentPar(void);

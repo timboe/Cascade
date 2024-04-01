@@ -25,11 +25,13 @@ LCDBitmap* getTitleSelectedBitmap(void);
 
 LCDBitmap* getBitmapTurretBody(void);
 LCDBitmap* getBitmapTurretBarrel(void);
-LCDBitmap* getBitmapHeader(void);
+LCDBitmap* getBitmapHeader(void); // not used
+LCDBitmap* getInfoTopperBitmap(void);
 
 LCDBitmap* getBitmapPeg(const struct Peg_t* p);
 
 LCDBitmap* getBitmapBall(void);
+
 
 float sizeToScale(uint8_t size);
 
