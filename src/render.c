@@ -95,12 +95,13 @@ void renderBall(int32_t fc) {
 }
 
 void renderTurret(void) {
-  if (getScrollOffset() >= 2*TURRET_RADIUS) {
+  const int16_t minY = getMinimumY();
+  if (getScrollOffset() - minY >= 2*TURRET_RADIUS) {
     return;
   }
   //pd->graphics->drawBitmap(getBitmapHeader(), 0, 0, kBitmapUnflipped);
-  pd->graphics->drawBitmap(getBitmapTurretBody(), DEVICE_PIX_X/2 - TURRET_RADIUS, 0,  kBitmapUnflipped);
-  pd->graphics->drawBitmap(getBitmapTurretBarrel(), DEVICE_PIX_X/2 - TURRET_RADIUS, 0, kBitmapUnflipped);
+  pd->graphics->drawBitmap(getBitmapTurretBody(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY,  kBitmapUnflipped);
+  pd->graphics->drawBitmap(getBitmapTurretBarrel(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY, kBitmapUnflipped);
 }
 
 void renderPath(void) {
@@ -114,7 +115,7 @@ void renderPath(void) {
 }
 
 void renderBackground(void) {
-  const float parallax = getParalaxFactorFar(); 
+  const int32_t parallax = getParalaxFactorFar(); // Note: float -> int here
   const int32_t so = ((int32_t) getScrollOffset()) - UI_OFFSET_TOP - parallax;
   const uint32_t start = MAX(0, so / WF_DIVISION_PIX_Y);
   // pd->system->logToConsole("so is %i, rendering from %i to %i", so, start, start+5);

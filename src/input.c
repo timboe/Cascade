@@ -96,9 +96,9 @@ void rotateHandleGameWindow(float angle, float delta) {
   revDetection = angle;
 
   const float so = getScrollOffset();
-  if ((newRev && angle < 180.0f) || so > 0) {
+  if ((newRev && angle < 180.0f) || so > getMinimumY()) {
     topLock = false;
-  } else if (so <= 0.0f) {
+  } else if (so <= getMinimumY()) {
     topLock = true;
   }
 

@@ -13,3 +13,5 @@ void renderBoard(void);
 void clearBoard(void);
 
 void popBoard(float y);
+
+struct Peg_t* getPeg(uint16_t i);

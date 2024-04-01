@@ -108,7 +108,7 @@ uint8_t cpCollisionBeginFunc_ballPeg(cpArbiter* arb, struct cpSpace* space, cpDa
 }
 
 void resetBall(void) {
-  cpBodySetPosition(m_ball, cpv(HALF_DEVICE_PIX_X, TURRET_RADIUS));
+  cpBodySetPosition(m_ball, cpv(HALF_DEVICE_PIX_X, getMinimumY() + TURRET_RADIUS));
   cpBodySetVelocity(m_ball, cpvzero);
   cpBodySetAngle(m_ball, 0);
   cpBodySetAngularVelocity(m_ball, 0);

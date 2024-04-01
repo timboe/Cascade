@@ -21,6 +21,7 @@ enum PegType_t {
 };
 
 enum PegState_t {
+  kPegStateUninitialised,
   kPegStateActive,
   kPegStateHit,
   kPegStateRemoved
