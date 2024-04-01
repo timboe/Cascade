@@ -8,6 +8,7 @@
 #include "board.h"
 
 float m_trauma = 0.0f, m_decay = 0.0f;
+float m_cTraumaAngle = 0.0f, m_sTraumaAngle;
 
 void renderTitles(int32_t _fc);
 
@@ -29,6 +30,9 @@ void addTrauma(float amount) {
   m_trauma += amount;
   m_trauma *= -1;
   m_decay = amount;
+  const float traumaAngle = M_2PIf / (rand() % 255);
+  m_cTraumaAngle = cosf(traumaAngle) * TRAUMA_AMPLIFICATION;
+  m_sTraumaAngle = sinf(traumaAngle) * TRAUMA_AMPLIFICATION;
 }
 
 void render(int32_t fc) {
@@ -36,7 +40,7 @@ void render(int32_t fc) {
   if (true && m_decay > 0.0f) {
     m_decay -= TRAUMA_DECAY;
     m_trauma += (m_trauma > 0 ? -m_decay : m_decay);
-    pd->display->setOffset(0, m_trauma * TRAUMA_AMPLIFICATION);
+    pd->display->setOffset(m_trauma * m_cTraumaAngle, m_trauma * m_sTraumaAngle);
   } else {
     pd->display->setOffset(0, 0);
   }

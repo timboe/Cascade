@@ -38,6 +38,7 @@
 
 #define TRAUMA_DECAY 0.05f;
 #define TRAUMA_AMPLIFICATION 4
+#define TRAMA_PEG_HIT 1.0f
 
 #define SQRT_HALF 0.70710678118f
 

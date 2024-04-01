@@ -1,5 +1,6 @@
 #include "peg.h"
 #include "bitmap.h"
+#include "render.h"
 
 void updateAngle(struct Peg_t* p, float angle);
 
@@ -206,7 +207,10 @@ void renderPeg(const struct Peg_t* p) {
 }
 
 void hitPeg(struct Peg_t* p) {
-  p->m_state = kPegStateHit;
+  if (p->m_state == kPegStateActive) {
+    p->m_state = kPegStateHit;
+    addTrauma(TRAMA_PEG_HIT);
+  }
   // pd->system->logToConsole("bam!");
 }
 
