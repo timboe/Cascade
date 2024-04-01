@@ -3,3 +3,5 @@ Source/pdex.so
 build/
 Cascade.pdx
 editor/.godot/
+
+*.import

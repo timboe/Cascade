@@ -1,4 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://4jairl80n3qw"]
+[gd_scene load_steps=4 format=3 uid="uid://4jairl80n3qw"]
+
+[ext_resource type="Script" path="res://MenuButtonScript.tres.gd" id="1_dtm3l"]
 
 [sub_resource type="GDScript" id="GDScript_gn8tb"]
 script/source = "extends CheckButton
@@ -26,39 +28,7 @@ func _on_value_changed(_value):
 	rend.do_update()
 "
 
-[sub_resource type="GDScript" id="GDScript_rjxf4"]
-script/source = "extends MenuButton
-
-var shape_size : int = 0
-
-@onready var rend = $/root/RootControl.find_child(\"Render\")
-
-func _ready():
-	get_popup().id_pressed.connect(self.on_pressed)
-
-func on_pressed(id: int):
-	$\"../SizeLabel\".text = get_popup().get_item_text( id )
-	shape_size = id
-	rend.do_update()
-"
-
-[sub_resource type="GDScript" id="GDScript_68j38"]
-script/source = "extends MenuButton
-
-var shape_type : int = 0
-
-@onready var rend = $/root/RootControl.find_child(\"Render\")
-
-func _ready():
-	get_popup().id_pressed.connect(self.on_pressed)
-
-func on_pressed(id: int):
-	$\"../TypeLabel\".text = get_popup().get_item_text( id )
-	shape_type = id
-	rend.do_update()
-"
-
-[node name="PegControl" type="Panel" groups=["static_pegs"]]
+[node name="PegControl" type="Panel" groups=["pegs", "static_pegs"]]
 custom_minimum_size = Vector2(100, 200)
 
 [node name="Margin" type="MarginContainer" parent="."]
@@ -136,16 +106,15 @@ script = SubResource("GDScript_vhp14")
 [node name="SizeLabel" type="Label" parent="Margin/VBox/Grid2"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Small
+text = "Size
 "
 horizontal_alignment = 2
 
-[node name="SizeText" type="MenuButton" parent="Margin/VBox/Grid2"]
+[node name="SizeText" type="OptionButton" parent="Margin/VBox/Grid2"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Set Size"
-flat = false
 item_count = 4
+selected = 0
 popup/item_0/text = "Small"
 popup/item_0/id = 0
 popup/item_1/text = "Medium"
@@ -154,7 +123,7 @@ popup/item_2/text = "Large"
 popup/item_2/id = 2
 popup/item_3/text = "Max"
 popup/item_3/id = 3
-script = SubResource("GDScript_rjxf4")
+script = ExtResource("1_dtm3l")
 
 [node name="AngleLabel" type="Label" parent="Margin/VBox/Grid2"]
 layout_mode = 2
@@ -171,21 +140,20 @@ rounded = true
 [node name="TypeLabel" type="Label" parent="Margin/VBox/Grid2"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Normal"
+text = "Type"
 horizontal_alignment = 2
 
-[node name="TypeText" type="MenuButton" parent="Margin/VBox/Grid2"]
+[node name="TypeText" type="OptionButton" parent="Margin/VBox/Grid2"]
 layout_mode = 2
-text = "Set Type"
-flat = false
 item_count = 3
+selected = 0
 popup/item_0/text = "Normal"
 popup/item_0/id = 0
 popup/item_1/text = "Required"
 popup/item_1/id = 1
 popup/item_2/text = "Special"
 popup/item_2/id = 2
-script = SubResource("GDScript_68j38")
+script = ExtResource("1_dtm3l")
 
 [node name="RemoveLabel" type="Label" parent="Margin/VBox/Grid2"]
 layout_mode = 2
@@ -201,5 +169,7 @@ text = "Remove"
 [connection signal="pressed" from="Margin/VBox/Grid1/CheckRect" to="Margin/VBox/Grid1/CheckCirc" method="_on_pressed"]
 [connection signal="value_changed" from="Margin/VBox/Grid2/XText" to="Margin/VBox/Grid2/YText" method="_on_value_changed"]
 [connection signal="value_changed" from="Margin/VBox/Grid2/YText" to="Margin/VBox/Grid2/YText" method="_on_value_changed"]
+[connection signal="pressed" from="Margin/VBox/Grid2/SizeText" to="Margin/VBox/Grid2/SizeText" method="_on_pressed"]
 [connection signal="value_changed" from="Margin/VBox/Grid2/AngleText" to="Margin/VBox/Grid2/YText" method="_on_value_changed"]
+[connection signal="pressed" from="Margin/VBox/Grid2/TypeText" to="Margin/VBox/Grid2/TypeText" method="_on_pressed"]
 [connection signal="pressed" from="Margin/VBox/Grid2/Remove" to="." method="queue_free"]

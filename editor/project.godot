@@ -13,11 +13,17 @@ config_version=5
 config/name="CascadeEditor"
 run/main_scene="res://Editor.tscn"
 config/features=PackedStringArray("4.2", "Forward Plus")
+run/max_fps=30
 config/icon="res://icon.svg"
 
 [display]
 
-window/size/viewport_width=1280
-window/size/viewport_height=720
+window/size/viewport_width=1800
+window/size/viewport_height=1200
 window/stretch/mode="viewport"
 window/stretch/aspect="keep_width"
+window/stretch/scale=2.0
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0

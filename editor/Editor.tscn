@@ -1,13 +1,18 @@
-[gd_scene load_steps=9 format=3 uid="uid://cmuubbicvggs5"]
+[gd_scene load_steps=16 format=3 uid="uid://cmuubbicvggs5"]
 
 [ext_resource type="Script" path="res://RenderScene.gd" id="1_1f7cp"]
+[ext_resource type="Theme" uid="uid://mvm1lqkscosr" path="res://editor/theme/aestro.tres" id="1_3tosr"]
 [ext_resource type="PackedScene" uid="uid://4jairl80n3qw" path="res://peg_control.tscn" id="2_c1rmk"]
+[ext_resource type="StyleBox" uid="uid://cgsvf1qt0q4uy" path="res://background_style_box_flat.tres" id="2_gthnx"]
+[ext_resource type="PackedScene" uid="uid://l2fsqq1mog6x" path="res://elliptic_control.tscn" id="3_r0vrj"]
+[ext_resource type="Texture2D" uid="uid://b645rphiris4n" path="res://turretBody.png" id="3_u03i0"]
+[ext_resource type="PackedScene" uid="uid://bkucdftd1j28k" path="res://line_control.tscn" id="7_1iclo"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_mxqya"]
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_7eq4d"]
-width = 800
-height = 1920
+width = 400
+height = 960
 noise = SubResource("FastNoiseLite_mxqya")
 
 [sub_resource type="GDScript" id="GDScript_vi753"]
@@ -39,12 +44,67 @@ script/source = "extends Button
 @onready var staticScene = load(\"res://peg_control.tscn\")
 var staticCount : int = 0
 
+var newPos := Vector2(32,32)
+
 func _on_pressed():
 	var instance = staticScene.instantiate()
 	staticCount += 1
 	instance.name = \"StaticPeg\" + str(staticCount)
 	instance.find_child(\"StaticPeg\").text = instance.name
+	instance.find_child(\"XText\").value = newPos.x
+	instance.find_child(\"YText\").value = newPos.y
+	newPos.x += 16
+	if (newPos.x >= 400 - 16):
+		newPos.x = 16
+		newPos.y += 16
 	$%RightVBox.add_child(instance)
+	$%Render.queue_redraw()
+"
+
+[sub_resource type="GDScript" id="GDScript_qd471"]
+script/source = "extends Button
+
+@onready var staticScene = load(\"res://elliptic_control.tscn\")
+var ellipticCount : int = 0
+
+var newPos := Vector2(32,64)
+
+func _on_pressed():
+	var instance = staticScene.instantiate()
+	ellipticCount += 1
+	instance.name = \"EllipticPegPath\" + str(ellipticCount)
+	instance.find_child(\"EllipticPathText\").text = instance.name
+	instance.find_child(\"XText\").value = newPos.x
+	instance.find_child(\"YText\").value = newPos.y
+	newPos.x += 16
+	if (newPos.x >= 400 - 16):
+		newPos.x = 16
+		newPos.y += 16
+	$%RightVBox.add_child(instance)
+	$%Render.queue_redraw()
+"
+
+[sub_resource type="GDScript" id="GDScript_sm36e"]
+script/source = "extends Button
+
+@onready var staticScene = load(\"res://line_control.tscn\")
+var lineCount : int = 0
+
+var newPos := Vector2(32,64+32)
+
+func _on_pressed():
+	var instance = staticScene.instantiate()
+	lineCount += 1
+	instance.name = \"LineControl\" + str(lineCount)
+	instance.find_child(\"LinePathText\").text = \"LinearPegPath\" + str(lineCount)
+	instance.find_child(\"XText\").value = newPos.x
+	instance.find_child(\"YText\").value = newPos.y
+	newPos.x += 16
+	if (newPos.x >= 400 - 16):
+		newPos.x = 16
+		newPos.y += 16
+	$%RightVBox.add_child(instance)
+	$%Render.queue_redraw()
 "
 
 [node name="RootControl" type="Control"]
@@ -56,6 +116,16 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme = ExtResource("1_3tosr")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("2_gthnx")
 
 [node name="HBox" type="HBoxContainer" parent="."]
 layout_mode = 1
@@ -72,22 +142,36 @@ horizontal_scroll_mode = 0
 vertical_scroll_mode = 2
 
 [node name="Control" type="Control" parent="HBox/LeftScroll"]
-custom_minimum_size = Vector2(800, 1920)
+custom_minimum_size = Vector2(400, 960)
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="HBox/LeftScroll/Control"]
+[node name="Foreground" type="TextureRect" parent="HBox/LeftScroll/Control"]
 layout_mode = 2
-offset_right = 800.0
-offset_bottom = 1920.0
+offset_right = 400.0
+offset_bottom = 960.0
 texture = SubResource("NoiseTexture2D_7eq4d")
+
+[node name="Turret" type="TextureRect" parent="HBox/LeftScroll/Control"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -32.0
+offset_right = 32.0
+offset_bottom = 64.0
+grow_horizontal = 2
+texture = ExtResource("3_u03i0")
 
 [node name="Render" type="Node2D" parent="HBox/LeftScroll/Control"]
 unique_name_in_owner = true
 script = ExtResource("1_1f7cp")
 
 [node name="RightScroll" type="ScrollContainer" parent="HBox"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
 
 [node name="Margin" type="MarginContainer" parent="HBox/RightScroll"]
 layout_mode = 2
@@ -104,11 +188,10 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
-[node name="LevelSettings" type="RichTextLabel" parent="HBox/RightScroll/Margin/RightVBox"]
+[node name="LevelSettings" type="Label" parent="HBox/RightScroll/Margin/RightVBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "LEVEL SETTINGS"
-fit_content = true
 
 [node name="Grid" type="GridContainer" parent="HBox/RightScroll/Margin/RightVBox"]
 layout_mode = 2
@@ -116,12 +199,12 @@ theme_override_constants/h_separation = 6
 theme_override_constants/v_separation = 6
 columns = 2
 
-[node name="WorldLabel" type="RichTextLabel" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+[node name="WorldLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "World: 1
 "
-fit_content = true
+horizontal_alignment = 2
 
 [node name="WorldSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
@@ -133,11 +216,11 @@ rounded = true
 tick_count = 16
 script = SubResource("GDScript_vi753")
 
-[node name="LevelLabel" type="RichTextLabel" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+[node name="LevelLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Level: 1"
-fit_content = true
+horizontal_alignment = 2
 
 [node name="LevelSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
@@ -149,11 +232,11 @@ rounded = true
 tick_count = 8
 script = SubResource("GDScript_scs8v")
 
-[node name="HeightLabel" type="RichTextLabel" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+[node name="HeightLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Height: 960"
-fit_content = true
+horizontal_alignment = 2
 
 [node name="HeightSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 unique_name_in_owner = true
@@ -167,24 +250,24 @@ rounded = true
 tick_count = 12
 script = SubResource("GDScript_stxm2")
 
-[node name="Background" type="MenuButton" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+[node name="Foreground" type="OptionButton" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
-text = "Background"
-flat = false
+alignment = 1
 item_count = 2
-popup/item_0/text = "Fall0"
+selected = 0
+popup/item_0/text = "Waterfall0"
 popup/item_0/id = 0
-popup/item_1/text = "Fall1"
+popup/item_1/text = "Waterfall1"
 popup/item_1/id = 1
 
-[node name="Foreground" type="MenuButton" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+[node name="Background" type="OptionButton" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
-text = "Foreground"
-flat = false
+alignment = 1
 item_count = 2
-popup/item_0/text = "Fall0"
+selected = 0
+popup/item_0/text = "BackgroundWater0"
 popup/item_0/id = 0
-popup/item_1/text = "Fall1"
+popup/item_1/text = "BackgroundWater1"
 popup/item_1/id = 1
 
 [node name="Save" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
@@ -198,11 +281,10 @@ text = "Load"
 [node name="HSeparator" type="HSeparator" parent="HBox/RightScroll/Margin/RightVBox"]
 layout_mode = 2
 
-[node name="AddPeg" type="RichTextLabel" parent="HBox/RightScroll/Margin/RightVBox"]
+[node name="AddPeg" type="Label" parent="HBox/RightScroll/Margin/RightVBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "ADD PEGS"
-fit_content = true
 
 [node name="AddStatic" type="Button" parent="HBox/RightScroll/Margin/RightVBox"]
 layout_mode = 2
@@ -212,24 +294,36 @@ script = SubResource("GDScript_2mwtp")
 [node name="AddElliptic" type="Button" parent="HBox/RightScroll/Margin/RightVBox"]
 layout_mode = 2
 text = "New Elliptic Peg Path"
+script = SubResource("GDScript_qd471")
 
 [node name="AddPath" type="Button" parent="HBox/RightScroll/Margin/RightVBox"]
 layout_mode = 2
 text = "New Linear Peg Path"
+script = SubResource("GDScript_sm36e")
 
 [node name="HSeparator2" type="HSeparator" parent="HBox/RightScroll/Margin/RightVBox"]
 layout_mode = 2
 
-[node name="Pegs" type="RichTextLabel" parent="HBox/RightScroll/Margin/RightVBox"]
+[node name="Pegs" type="Label" parent="HBox/RightScroll/Margin/RightVBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "PEGS"
-fit_content = true
 
 [node name="PegControl" parent="HBox/RightScroll/Margin/RightVBox" instance=ExtResource("2_c1rmk")]
+visible = false
+layout_mode = 2
+
+[node name="EllipticControl" parent="HBox/RightScroll/Margin/RightVBox" instance=ExtResource("3_r0vrj")]
+visible = false
+layout_mode = 2
+
+[node name="LineControl" parent="HBox/RightScroll/Margin/RightVBox" instance=ExtResource("7_1iclo")]
+visible = false
 layout_mode = 2
 
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/WorldSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/WorldSlider" method="_on_value_changed"]
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/LevelSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/LevelSlider" method="_on_value_changed"]
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/HeightSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/HeightSlider" method="_on_value_changed"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddStatic" to="HBox/RightScroll/Margin/RightVBox/AddStatic" method="_on_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddElliptic" to="HBox/RightScroll/Margin/RightVBox/AddElliptic" method="_on_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddPath" to="HBox/RightScroll/Margin/RightVBox/AddPath" method="_on_pressed"]
