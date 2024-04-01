@@ -60,28 +60,32 @@ int gameLoop(void* _data) {
   //   updateUI(m_frameCount);
   // }
 
-  if (gm == kGameWindow) {
+  if (!getSubFreeze()) {
 
-    float diffY = 0;
-    if      (getPressed(2)) diffY = -SCREEN_ACC;
-    else if (getPressed(3)) diffY =  SCREEN_ACC;
-    modScrollVelocity(diffY);
-    doBallEndSweep();
-    applyScrollEasing();
+    if (gm == kGameWindow) {
+
+      float diffY = 0;
+      if      (getPressed(2)) diffY = -SCREEN_ACC;
+      else if (getPressed(3)) diffY =  SCREEN_ACC;
+      modScrollVelocity(diffY);
+      doBallEndSweep();
+      applyScrollEasing();
 
 
 
-    updateBoard();
-    updateSpace(m_frameCount);
+      updateBoard();
+      updateSpace(m_frameCount);
 
-    // if (m_frameCount % 8 == 0 && !ballInPlay()) {
-    //   updatePath();
-    // }
+      // if (m_frameCount % 8 == 0 && !ballInPlay()) {
+      //   updatePath();
+      // }
+    }
+
+
+    //if (m_frameCount % 2)
+    render(m_frameCount);
+
   }
-
-
-  //if (m_frameCount % 2)
-  render(m_frameCount);
 
   return 1;
 }

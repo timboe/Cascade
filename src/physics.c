@@ -17,10 +17,12 @@ cpCollisionHandler* m_colliderHandle;
 uint8_t cpCollisionBeginFunc_ballPeg(cpArbiter* arb, struct cpSpace* space, cpDataPointer data);
 
 bool m_ballInPlay = false;
-bool m_doMotionPath = false;
 
 int16_t m_motionTrailX[MOTION_TRAIL_LEN];
 int16_t m_motionTrailY[MOTION_TRAIL_LEN];
+
+int16_t m_predictionTrailX[PREDICTION_TRAIL_LEN];
+int16_t m_predictionTrailY[PREDICTION_TRAIL_LEN];
 
 
 /// ///
@@ -128,29 +130,18 @@ void updateSpace(int32_t fc) {
     setScrollOffset(y - HALF_DEVICE_PIX_Y); // TODO - move this call
   }
 
-  if (!m_ballInPlay && !m_doMotionPath) {
-    resetBall();
+  const cpVect pos = cpBodyGetPosition(m_ball);
+
+  if (!m_ballInPlay) {
+    const int i = fc % PREDICTION_TRAIL_LEN;
+    if (i == 0) {
+      resetBall();
+      launchBall();
+    }
+    setBallTrace(i, pos.x, pos.y);
   }
 
-  const cpVect pos = cpBodyGetPosition(m_ball);
   m_motionTrailX[fc % MOTION_TRAIL_LEN] = pos.x;
   m_motionTrailY[fc % MOTION_TRAIL_LEN] = pos.y;
 
-}
-
-void updatePath(void) {
-  m_doMotionPath = true;
-  const cpVect center = cpBodyGetPosition(m_ball);
-  uint8_t iTrace = 0;
-  setBallTrace(iTrace++, center.x, center.y);
-  launchBall();
-  for(int i=0; i<16; i++){
-    updateSpace(TIMESTEP*4);
-    if(i % 4 == 0){
-      const cpVect center = cpBodyGetPosition(m_ball);
-      setBallTrace(iTrace++, center.x, center.y);
-    }
-  }
-  resetBall();
-  m_doMotionPath = false;
 }

@@ -40,6 +40,8 @@
 #define TRAUMA_AMPLIFICATION 4
 #define TRAMA_PEG_HIT 1.0f
 
+#define FREEZE_PEG_HIT (TICK_FREQUENCY / 10)
+
 #define SQRT_HALF 0.70710678118f
 
 /////////////
@@ -79,6 +81,8 @@
 #define BALL_RADIUS 8.0f
 #define BALL_MASS 1.0f
 #define MOTION_TRAIL_LEN 4
+
+#define PREDICTION_TRAIL_LEN 32
 
 #define BOX_WIDTH 22.5f
 #define BOX_HEIGHT 12.5f

@@ -10,12 +10,14 @@
 float m_trauma = 0.0f, m_decay = 0.0f;
 float m_cTraumaAngle = 0.0f, m_sTraumaAngle;
 
+uint16_t m_freeze = 0;
+
 void renderTitles(int32_t _fc);
 
 void renderGameWindow(int32_t _fc);
 
-uint16_t m_ballTraceX[MAX_PEG_PATHS];
-uint16_t m_ballTraceY[MAX_PEG_PATHS];
+uint16_t m_ballTraceX[PREDICTION_TRAIL_LEN];
+uint16_t m_ballTraceY[PREDICTION_TRAIL_LEN];
 uint8_t m_ballTraces = 0;
 
 /// ///
@@ -24,6 +26,17 @@ void setBallTrace(const uint16_t i, const uint16_t x, const uint16_t y) {
   m_ballTraceX[i] = x;
   m_ballTraceY[i] = y;
   m_ballTraces = i;
+}
+
+void addFreeze(uint16_t amount) {
+  m_freeze += amount;
+}
+
+bool getSubFreeze(void) {
+  if (m_freeze) {
+    return m_freeze--;
+  }
+  return false;
 }
 
 void addTrauma(float amount) {
@@ -81,6 +94,13 @@ void renderTitles(int32_t _fc) {
 }
 
 void renderBall(int32_t fc) {
+  if (!ballInPlay()) {
+    // render at dummy location
+    pd->graphics->setDrawMode(kDrawModeInverted);
+    pd->graphics->drawBitmap(getBitmapBall(), DEVICE_PIX_X/2 - BALL_RADIUS, getMinimumY() + TURRET_RADIUS - BALL_RADIUS, kBitmapUnflipped);
+    pd->graphics->setDrawMode(kDrawModeCopy);
+    return;
+  }
   cpBody* ball = getBall();
   int16_t* trailX = motionTrailX();
   int16_t* trailY = motionTrailY();
@@ -105,11 +125,12 @@ void renderTurret(void) {
   pd->graphics->drawBitmap(getBitmapTurretBarrel(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY, kBitmapUnflipped);
 }
 
-void renderPath(void) {
+void renderTrajectory(void) {
   if (ballInPlay()) {
     return;
   }
-  for (int i = 1; i < m_ballTraces; ++i) {
+  for (int i = 2; i < m_ballTraces; ++i) {
+    pd->system->logToConsole("%i is %i %i to %i %i", i, m_ballTraceX[i], m_ballTraceY[i], m_ballTraceX[i-i], m_ballTraceY[i-1]);
     pd->graphics->drawLine(m_ballTraceX[i], m_ballTraceY[i], m_ballTraceX[i-1], m_ballTraceY[i-1], 4, kColorWhite);
     pd->graphics->drawLine(m_ballTraceX[i], m_ballTraceY[i], m_ballTraceX[i-1], m_ballTraceY[i-1], 2, kColorBlack);
   }
@@ -166,8 +187,8 @@ void renderGameWindow(int32_t fc) {
   // pd->graphics->fillEllipse(WFALL_PIX_X/2 - 3, 128 + UI_OFFSET_TOP - 3, 6, 6, 0.0f, 360.0f, kColorBlack);
   // pd->graphics->fillEllipse(WFALL_PIX_X/2 - 2, 128 + UI_OFFSET_TOP - 2, 4, 4, 0.0f, 360.0f, kColorWhite);
 
-  // DRAW PATH
-  renderPath();
+  // DRAW TRAJECTORY
+  renderTrajectory();
 
   renderBallEndSweep();
 

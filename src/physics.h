@@ -6,8 +6,6 @@ void initSpace(void);
 
 void updateSpace(int32_t frameCount);
 
-void updatePath(void);
-
 bool ballInPlay(void);
 
 void setBallInPlay(bool bip);

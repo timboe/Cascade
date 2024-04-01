@@ -70,6 +70,7 @@ void clickHandleGameWindow(uint32_t _buttonPressed) {
       setBallInPlay(false);
       setScrollToTop(true);
     } else {
+      resetBall();
       setBallInPlay(true);
       setScrollToTop(false);
       launchBall();
