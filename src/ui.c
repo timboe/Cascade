@@ -13,10 +13,7 @@ enum kGameMode m_mode = 0;
 float m_scrollOffset = 0;
 int16_t m_minimumY = 0;
 float m_vY = 0;
-bool m_goToTop = false;
-bool m_ballEndSweep = false;
-float m_endSweepProgress = 0;
-float m_popLevel = 0;
+float m_popLevel = 0; // TODO remove me
 
 // LCDSprite* m_UISpriteSave = NULL;
 // LCDSprite* m_UISpriteSaveLoadProgress = NULL;
@@ -270,22 +267,11 @@ void initiUI() {
 void modScrollVelocity(float mod) { 
   if (!mod) { return; }
   m_vY += mod;
-  m_goToTop = false;
 }
 
-void setScrollToTop(bool stt) { m_goToTop = stt; }
-
-void applyScrollEasing(void) {
+float applyScrollEasing(void) {
   m_vY *= SCREEN_FRIC;
   m_scrollOffset += m_vY;
-
-  if (m_goToTop && !m_ballEndSweep) {
-    pd->system->logToConsole("go to top active %i", getFrameCount());
-    setScrollOffset(m_minimumY);
-    if (fabsf(m_scrollOffset - m_minimumY) <= 1.0f) {
-      m_goToTop = false;
-    }
-  }
 
   const float soDiff = SCROLL_OFFSET_MAX - m_scrollOffset;
   if (soDiff < 0) {
@@ -299,66 +285,31 @@ void applyScrollEasing(void) {
     if (toAdd < 0.1f) { m_scrollOffset = m_minimumY; m_vY = 0; }
     else              { m_scrollOffset += toAdd; }
   }
+
+  return m_vY;
 }
 
 float getScrollOffset(void) { return m_scrollOffset; }
 
-void setScrollOffset(float set) {
+void setScrollOffset(float set, bool force) {
+  if (force) {
+    m_scrollOffset = set;
+    return;
+  }
+
   if (set < m_minimumY) set = m_minimumY;
   float diff = set - m_scrollOffset;
   m_scrollOffset += diff * SCREEN_EASING;
   // pd->system->logToConsole("req %f, set %f", set, m_scrollOffset);
 }
 
-void activateBallEndSweep(void) {
-  m_ballEndSweep = true;
-  m_endSweepProgress = 0.0f;
+void renderDebug(void) {
+  pd->graphics->drawLine(0, 0, DEVICE_PIX_X, 0, 4, kColorBlack);
+  pd->graphics->drawLine(0, 0, DEVICE_PIX_X, 0, 2, kColorWhite);
 
-  int32_t minY = 10000;
-  for (uint32_t i = 0; i < MAX_PEGS; ++i) {
-    const struct Peg_t* peg = getPeg(i);
-    if (peg->m_y < minY && peg->m_state == kPegStateActive) {
-      minY = peg->m_y;
-    }
-  }
-  if (minY > (DEVICE_PIX_Y/2)) {
-    m_minimumY = minY - (DEVICE_PIX_Y/2);
-  }
-  pd->system->logToConsole("smallest y was %i, min y is now %i", minY, m_minimumY);
+  pd->graphics->drawLine(0, WFALL_PIX_Y, DEVICE_PIX_X, WFALL_PIX_Y, 4, kColorBlack);
+  pd->graphics->drawLine(0, WFALL_PIX_Y, DEVICE_PIX_X, WFALL_PIX_Y, 2, kColorWhite);
 
-}
-
-void doBallEndSweep(void) {
-  if (!m_ballEndSweep) return;
-  // Take less time overall when we get lower down
-  const float distance_mod = WFALL_PIX_Y / (float)(WFALL_PIX_Y - m_minimumY);
-
-  m_endSweepProgress += (TIMESTEP * END_SWEEP_SCALE * distance_mod);
-  float progress = getEasing(EaseInOutSine, m_endSweepProgress);
-  progress = (1.0f - progress);
-
-  // const float target = SCROLL_OFFSET_MAX * progress;
-  // setScrollOffset(target);
-
-  // m_popLevel = target + (progress * DEVICE_PIX_Y);
-  // popBoard(m_popLevel);
-  // // pd->system->logToConsole("end sweep active target %f, pop %f",target, m_popLevel);
-
-  const float target_partial = m_minimumY + ((SCROLL_OFFSET_MAX - m_minimumY) * progress);
-  setScrollOffset(target_partial);
-
-  const float m_popLevel = WFALL_PIX_Y * progress;
-  popBoard(m_popLevel);
-  // pd->system->logToConsole("end sweep active target %f, pop %f",target, m_popLevel);
-
-  if (m_endSweepProgress >= 1) {
-    m_ballEndSweep = false;
-    m_scrollOffset = m_minimumY;
-  }
-}
-
-void renderBallEndSweep(void) {
-  if (!m_ballEndSweep) return;
   pd->graphics->drawLine(0, m_popLevel, DEVICE_PIX_X, m_popLevel, 4, kColorWhite);
 }
 

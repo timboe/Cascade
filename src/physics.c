@@ -16,13 +16,11 @@ cpCollisionHandler* m_colliderHandle;
 
 uint8_t cpCollisionBeginFunc_ballPeg(cpArbiter* arb, struct cpSpace* space, cpDataPointer data);
 
-bool m_ballInPlay = false;
-
 int16_t m_motionTrailX[MOTION_TRAIL_LEN];
 int16_t m_motionTrailY[MOTION_TRAIL_LEN];
 
-int16_t m_predictionTrailX[PREDICTION_TRAIL_LEN];
-int16_t m_predictionTrailY[PREDICTION_TRAIL_LEN];
+int16_t m_predictionTrailX[PREDICTION_TRACE_LEN];
+int16_t m_predictionTrailY[PREDICTION_TRACE_LEN];
 
 
 /// ///
@@ -47,17 +45,13 @@ int16_t* motionTrailY(void) { return m_motionTrailY; }
 
 cpBody* getBall(void) { return m_ball; }
 
-cpShape* getBallShape(void) { return m_ballShape; }
-
-bool ballInPlay(void) { return m_ballInPlay; }
-
-void setBallInPlay(bool bip) { m_ballInPlay = bip; }
+// cpShape* getBallShape(void) { return m_ballShape; }
 
 cpSpace* getSpace(void) { return m_space; }
 
-void launchBall(void) {
+void launchBall(float strength) {
   const float angleRad = angToRad(getTurretBarrelAngle());
-  cpBodyApplyImpulseAtLocalPoint(m_ball, cpv(POOT_STRENGTH * sinf(angleRad), POOT_STRENGTH * -cosf(angleRad)), cpvzero);
+  cpBodyApplyImpulseAtLocalPoint(m_ball, cpv(POOT_STRENGTH * sinf(angleRad) * strength, POOT_STRENGTH * -cosf(angleRad) * strength), cpvzero);
 }
 
 void initSpace(void) {
@@ -116,27 +110,23 @@ void resetBall(void) {
   cpBodySetAngularVelocity(m_ball, 0);
 }
 
-void updateSpace(int32_t fc) {
+void updateSpace(int32_t fc, enum kFSM fsm) {
   cpSpaceStep(m_space, TIMESTEP);
   
-  const float y = cpBodyGetPosition(m_ball).y;
 
-  if (y > PHYSWALL_PIX_Y + BALL_RADIUS) {
-    setBallInPlay(false);
-    activateBallEndSweep();
-  } 
 
-  if (m_ballInPlay) {
-    setScrollOffset(y - HALF_DEVICE_PIX_Y); // TODO - move this call
-  }
+  // if (y > PHYSWALL_PIX_Y + BALL_RADIUS) {
+  //   //setBallInPlay(false);
+  //   activateBallEndSweep(); // TODO MOVE THIS
+  // } 
 
   const cpVect pos = cpBodyGetPosition(m_ball);
 
-  if (!m_ballInPlay) {
-    const int i = fc % PREDICTION_TRAIL_LEN;
+  if (fsm == kGameFSM_AimMode) {
+    const int i = fc % PREDICTION_TRACE_LEN;
     if (i == 0) {
       resetBall();
-      launchBall();
+      launchBall(1.0f);
     }
     setBallTrace(i, pos.x, pos.y);
   }

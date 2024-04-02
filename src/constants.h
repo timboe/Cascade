@@ -50,7 +50,7 @@
 
 #define MAX_PEGS 256
 
-#define MAX_PEG_PATHS 32
+#define MAX_LINEAR_PATH_SEGMENTS 64
 
 #define MAX_PEG_SIZE 5
 
@@ -82,7 +82,7 @@
 #define BALL_MASS 1.0f
 #define MOTION_TRAIL_LEN 4
 
-#define PREDICTION_TRAIL_LEN 32
+#define PREDICTION_TRACE_LEN 32
 
 #define BOX_WIDTH 22.5f
 #define BOX_HEIGHT 12.5f

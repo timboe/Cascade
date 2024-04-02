@@ -43,7 +43,7 @@ void boardAddPath(const uint8_t n, const float angleMax, const enum PegShape_t s
     setPegMotionSpeed(p, speed);
     setPegMotionOffset(p, angle);
     setPegMotionEasing(p, e);
-    for (int j = 1; j < MAX_PEG_PATHS; ++j) {
+    for (int j = 1; j < MAX_LINEAR_PATH_SEGMENTS-2; ++j) {
       if (!x[j] && !y[j]) {
         break;
       }
@@ -85,11 +85,11 @@ void randomiseBoard(void) {
   #define PEGS_PER_PATH 8
   #define PATHS 4
   for (int pathStep = 0; pathStep < PATHS; ++pathStep) {
-    int16_t x[MAX_PEG_PATHS] = {0};
-    int16_t y[MAX_PEG_PATHS] = {0};
+    int16_t x[MAX_LINEAR_PATH_SEGMENTS] = {0};
+    int16_t y[MAX_LINEAR_PATH_SEGMENTS] = {0};
     x[0] = rand() % WFALL_PIX_X;
     y[0] = (rand() % WFALL_PIX_Y) + TURRET_RADIUS;
-    const uint8_t pathLegs = 1 + rand() % (MAX_PEG_PATHS-2);
+    const uint8_t pathLegs = 1 + rand() % (MAX_LINEAR_PATH_SEGMENTS/2);
     for (int leg = 1; leg <= pathLegs; ++leg) {
       x[leg] = x[leg-1] - 64 + rand() % 128;
       y[leg] = y[leg-1] - 64 + rand() % 128;

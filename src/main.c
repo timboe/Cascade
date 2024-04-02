@@ -31,22 +31,17 @@ static void deinit(void) {
 int eventHandler(PlaydateAPI* playdate, PDSystemEvent event, uint32_t arg) {
   switch (event) {
     case kEventInit:;
-      #ifdef DEV
-      playdate->system->logToConsole("EH: init");
-      #endif
+      pdxlog("EH: init");
       setPDPtr(playdate);
       init();
       playdate->display->setRefreshRate(TICK_FREQUENCY);
-      //playdate->system->setAutoLockDisabled(true);
       playdate->system->setUpdateCallback(gameLoop, NULL);
       break;
     case kEventTerminate:; case kEventLock:; case kEventLowPower:;
-      #ifdef DEV
-      playdate->system->logToConsole("EH: terminate/lock/low-p, %i", event);
-      #endif
+      pdxlog("EH: terminate/lock/low-p");
       //
       #ifdef SYNCHRONOUS_SAVE_ENABLED
-      if (getGameMode() != kTitles && !IOOperationInProgress()) {
+      if (!IOOperationInProgress()) {
         synchronousSave();
       }
       #endif
@@ -56,20 +51,14 @@ int eventHandler(PlaydateAPI* playdate, PDSystemEvent event, uint32_t arg) {
       }
       break;
     case kEventUnlock:;
-      #ifdef DEV
-      playdate->system->logToConsole("EH: unlock");
-      #endif
+      pdxlog("EH: unlock");
       break;
     case kEventPause:;
-      #ifdef DEV
-      playdate->system->logToConsole("EH: pause");
-      #endif
-      //playdate->system->setMenuImage(getPauseImage(), 0);
+      pdxlog("EH: pause");
+      //playdate->system->setMenuImage(getPauseImage(), 0); // TODO
       break;
     case kEventResume:;
-      #ifdef DEV
-      playdate->system->logToConsole("EH: resume");
-      #endif
+      pdxlog("EH: resume");
       break;
     case kEventKeyPressed:;
       #ifdef DEV

@@ -11,6 +11,12 @@ int gameLoop(void* _data);
 
 int getFrameCount(void);
 
+enum kFSM doFSM(enum kFSM transitionTo);
+
+enum kFSM getFSM(void);
+
+bool ballInPlay(void);
+
 uint16_t locToPix(uint16_t _loc);
 
 uint16_t pixToLoc(uint16_t _pix);

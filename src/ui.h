@@ -8,7 +8,19 @@ enum kGameMode {
 };
 
 enum kFSM {
-  kGameFSM_,
+  kTitlesFSM_DisplayTitles,
+  kTitlesFSM_TitlesToSplash,
+  kGameFSM_DisplaySplash,
+  kGameFSM_SplashToStart,
+  kGameFSM_AimMode,
+  kGameFSM_BallInPlay,
+  kGameFSM_BallStuck,
+  kGameFSM_CloseUp,
+  kGameFSM_BallGutter,
+  kGameFSM_GuttetToTurret,
+  kGameFSM_GutterToScores,
+  kGameFSM_ScoresToTitle,
+  kGameFSM_ScoresToSplash,
   kNFSMModes
 };
 
@@ -34,19 +46,13 @@ LCDBitmap* getTitleNewGameBitmap(uint8_t _i);
 
 float getScrollOffset(void);
 
-void setScrollOffset(float set);
-
-void setScrollToTop(bool stt);
+void setScrollOffset(float set, bool force);
 
 void modScrollVelocity(float mod);
 
-void applyScrollEasing(void);
+float applyScrollEasing(void);
 
-void activateBallEndSweep(void);
-
-void doBallEndSweep(void);
-
-void renderBallEndSweep(void);
+void renderDebug(void);
 
 float getParalaxFactorFar(void);
 
@@ -55,3 +61,5 @@ float getParalaxFactorNear(void);
 int16_t getMinimumY(void);
 
 void setMinimumY(int16_t y);
+
+extern float m_popLevel; // TODO remove me

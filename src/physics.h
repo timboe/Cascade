@@ -1,24 +1,21 @@
 #pragma once
 #include "game.h"
+#include "ui.h"
 #include "chipmunk/chipmunk.h"
 
 void initSpace(void);
 
-void updateSpace(int32_t frameCount);
-
-bool ballInPlay(void);
-
-void setBallInPlay(bool bip);
+void updateSpace(int32_t frameCount, enum kFSM fsm);
 
 cpBody* getBall(void);
 
-cpShape* getBallShape(void);
+// cpShape* getBallShape(void);
 
 int16_t* motionTrailX(void);
 
 int16_t* motionTrailY(void);
 
-void launchBall(void);
+void launchBall(float strength);
 
 void resetBall(void);
 

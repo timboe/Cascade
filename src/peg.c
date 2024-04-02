@@ -165,8 +165,8 @@ void setPegMotionEllipse(struct Peg_t* p, const float a, const float b) {
 }
 
 void addPegMotionPath(struct Peg_t* p, const int16_t x, const int16_t y) {
-  if (p->m_pathSteps == MAX_PEG_PATHS) {
-    pd->system->error("Error addPegMotionPath has reached the max of %i paths", MAX_PEG_PATHS);
+  if (p->m_pathSteps == MAX_LINEAR_PATH_SEGMENTS) {
+    pd->system->error("Error addPegMotionPath has reached the max of %i paths", MAX_LINEAR_PATH_SEGMENTS);
     return;
   }
   p->m_pathX[p->m_pathSteps] = x;

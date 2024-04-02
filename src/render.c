@@ -10,14 +10,16 @@
 float m_trauma = 0.0f, m_decay = 0.0f;
 float m_cTraumaAngle = 0.0f, m_sTraumaAngle;
 
+uint16_t m_ballPootRadius = 0.0f;
+
 uint16_t m_freeze = 0;
 
-void renderTitles(int32_t _fc);
+void renderTitles(int32_t fc, enum kFSM fsm);
 
-void renderGameWindow(int32_t _fc);
+void renderGameWindow(int32_t fc, enum kFSM fsm);
 
-uint16_t m_ballTraceX[PREDICTION_TRAIL_LEN];
-uint16_t m_ballTraceY[PREDICTION_TRAIL_LEN];
+uint16_t m_ballTraceX[PREDICTION_TRACE_LEN];
+uint16_t m_ballTraceY[PREDICTION_TRACE_LEN];
 uint8_t m_ballTraces = 0;
 
 /// ///
@@ -27,6 +29,16 @@ void setBallTrace(const uint16_t i, const uint16_t x, const uint16_t y) {
   m_ballTraceY[i] = y;
   m_ballTraces = i;
 }
+
+void resetBallTrace(void) {
+  for (int i = 0; i < PREDICTION_TRACE_LEN; ++i) {
+    m_ballTraceX[i] = HALF_DEVICE_PIX_X;
+    m_ballTraceY[i] = getMinimumY() + TURRET_RADIUS;
+  }
+}
+
+void setBallPootCircle(uint16_t radius) { m_ballPootRadius = radius; }
+
 
 void addFreeze(uint16_t amount) {
   m_freeze += amount;
@@ -48,7 +60,7 @@ void addTrauma(float amount) {
   m_sTraumaAngle = sinf(traumaAngle) * TRAUMA_AMPLIFICATION;
 }
 
-void render(int32_t fc) {
+void render(int32_t fc, enum kFSM fsm) {
 
   if (true && m_decay > 0.0f) {
     m_decay -= TRAUMA_DECAY;
@@ -67,8 +79,8 @@ void render(int32_t fc) {
   pd->graphics->clear(kColorWhite);
 
   switch (getGameMode()) {
-    case kTitles: renderTitles(fc); break;
-    case kGameWindow: renderGameWindow(fc); break;
+    case kTitles: renderTitles(fc, fsm); break;
+    case kGameWindow: renderGameWindow(fc, fsm); break;
     default: break;
   }
 
@@ -80,14 +92,14 @@ void render(int32_t fc) {
   #endif
 }
 
-void renderTitles(int32_t _fc) {
+void renderTitles(int32_t fc, enum kFSM fsm) {
   pd->graphics->drawBitmap(getSpriteSplash(), 0, 0, kBitmapUnflipped);
   const int i = 1;
   pd->graphics->drawBitmap(getTitleNewGameBitmap(i),
     DEVICE_PIX_X/2 - 4*TILE_PIX,
     DEVICE_PIX_Y - 2*TILE_PIX,
     kBitmapUnflipped);
-  if (_fc % TICK_FREQUENCY < TICK_FREQUENCY/2) pd->graphics->drawBitmap(getTitleSelectedBitmap(),
+  if (fc % TICK_FREQUENCY < TICK_FREQUENCY/2) pd->graphics->drawBitmap(getTitleSelectedBitmap(),
     DEVICE_PIX_X/2  - 4*TILE_PIX,
     DEVICE_PIX_Y - TILE_PIX*2,
     kBitmapUnflipped);  
@@ -117,20 +129,21 @@ void renderBall(int32_t fc) {
 
 void renderTurret(void) {
   const int16_t minY = getMinimumY();
-  if (getScrollOffset() - minY >= 2*TURRET_RADIUS) {
+  const int16_t so = getScrollOffset();
+  if (so - minY >= 2*TURRET_RADIUS) {
     return;
   }
-  //pd->graphics->drawBitmap(getBitmapHeader(), 0, 0, kBitmapUnflipped);
+  // pd->graphics->drawBitmap(getBitmapHeader(), 0, 0, kBitmapUnflipped);
   pd->graphics->drawBitmap(getBitmapTurretBody(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY,  kBitmapUnflipped);
   pd->graphics->drawBitmap(getBitmapTurretBarrel(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY, kBitmapUnflipped);
 }
 
 void renderTrajectory(void) {
-  if (ballInPlay()) {
+  if (getFSM() != kGameFSM_AimMode) {
     return;
   }
   for (int i = 2; i < m_ballTraces; ++i) {
-    pd->system->logToConsole("%i is %i %i to %i %i", i, m_ballTraceX[i], m_ballTraceY[i], m_ballTraceX[i-i], m_ballTraceY[i-1]);
+    // pd->system->logToConsole("%i is %i %i to %i %i", i, m_ballTraceX[i], m_ballTraceY[i], m_ballTraceX[i-i], m_ballTraceY[i-1]);
     pd->graphics->drawLine(m_ballTraceX[i], m_ballTraceY[i], m_ballTraceX[i-1], m_ballTraceY[i-1], 4, kColorWhite);
     pd->graphics->drawLine(m_ballTraceX[i], m_ballTraceY[i], m_ballTraceX[i-1], m_ballTraceY[i-1], 2, kColorBlack);
   }
@@ -148,19 +161,24 @@ void renderBackground(void) {
   wfOffC += 2;
   // NOTE: Need to draw one extra background due to animation
   for (uint32_t i = start; i < start+6; ++i) {
-    if (i >= WFSHEET_SIZE_Y) break;
+    if (i >= (WFSHEET_SIZE_Y - 2)) break;
     pd->graphics->drawBitmap(getBitmapWfBg(wf), WF_BG_OFFSET[wf], UI_OFFSET_TOP + (WF_DIVISION_PIX_Y * i) - wfOff + parallax, kBitmapUnflipped);
   }
   for (uint32_t i = start; i < start+5; ++i) {
-    if (i >= WFSHEET_SIZE_Y) break;
-    pd->graphics->drawBitmap(getBitmapWfFg(wf, 0,i), 0, UI_OFFSET_TOP + (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
+    LCDBitmap* bm = getBitmapWfFg(wf, 0, i);
+    if (bm) pd->graphics->drawBitmap(bm, 0, UI_OFFSET_TOP + (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
   }
+
   if (start == 0) {
-    pd->graphics->drawBitmap(getInfoTopperBitmap(), 0, -32 + parallax, kBitmapUnflipped);
+    pd->graphics->drawBitmap(getInfoTopperBitmap(), 0, -TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
+  }
+
+  if (getScrollOffset() <= -TURRET_RADIUS) { // Note no parallax here
+    pd->graphics->drawBitmap(getLevelSplashBitmap(), 0, -DEVICE_PIX_Y - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
   }
 }
 
-void renderGameWindow(int32_t fc) {
+void renderGameWindow(int32_t fc, enum kFSM fsm) {
 
   // DRAW BACKGROUND
   renderBackground();
@@ -170,6 +188,13 @@ void renderGameWindow(int32_t fc) {
 
   // DRAW BALL
   renderBall(fc);
+
+  // Ball poot
+  if (fsm == kGameFSM_AimMode && m_ballPootRadius) {
+    pd->graphics->setDrawMode(kDrawModeNXOR);
+    pd->graphics->drawBitmap(getBitmapAnimPoot(m_ballPootRadius), DEVICE_PIX_X/2 - TURRET_RADIUS, getMinimumY(), kBitmapUnflipped);
+    pd->graphics->setDrawMode(kDrawModeCopy);
+  }
 
   // DRAW OBS
   renderBoard();
@@ -190,7 +215,7 @@ void renderGameWindow(int32_t fc) {
   // DRAW TRAJECTORY
   renderTrajectory();
 
-  renderBallEndSweep();
+  renderDebug();
 
 
 }

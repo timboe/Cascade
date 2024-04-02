@@ -55,9 +55,9 @@ struct Peg_t {
 
   // kPegMotionPath
   uint8_t m_pathSteps;
-  int16_t m_pathX[MAX_PEG_PATHS];
-  int16_t m_pathY[MAX_PEG_PATHS];
-  float m_pathLength[MAX_PEG_PATHS];
+  int16_t m_pathX[MAX_LINEAR_PATH_SEGMENTS];
+  int16_t m_pathY[MAX_LINEAR_PATH_SEGMENTS];
+  float m_pathLength[MAX_LINEAR_PATH_SEGMENTS];
   float m_totPathLength;
   uint8_t m_pathCurrent;
 
