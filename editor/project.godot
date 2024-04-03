@@ -19,10 +19,10 @@ config/icon="res://icon.svg"
 [display]
 
 window/size/viewport_width=1800
-window/size/viewport_height=1200
+window/size/viewport_height=900
 window/stretch/mode="viewport"
 window/stretch/aspect="keep_width"
-window/stretch/scale=2.0
+window/stretch/scale=1.5
 
 [rendering]
 

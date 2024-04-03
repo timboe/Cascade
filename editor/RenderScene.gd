@@ -126,7 +126,7 @@ func render_elliptic_path(ellipticPath : Control):
 		var shape_peg = circ
 		var size_peg = size
 		if custom_shape:
-			shape_peg = 1 if custom_shape == 1 else 0
+			shape_peg = 1 if custom_shape == 0 else 0
 		if custom_size:
 			size_peg = custom_size-1
 		var arc_peg : float = (arc_rad / n_pegs) * i
@@ -164,6 +164,8 @@ func render_line_path(linePath : Control):
 		var x_off = line_container.find_child("XOffText").value
 		var y_off = line_container.find_child("YOffText").value
 		line_path_array.push_back(Vector2(x+x_off, y+y_off))
+		if (y+y_off) > $%HeightSlider.value:
+			line_container.find_child("YOffText").value = $%HeightSlider.value - y
 	line_path_array.push_back(Vector2(x,y))
 	
 	var line_path_lengths : Array
@@ -180,7 +182,7 @@ func render_line_path(linePath : Control):
 		var shape_peg = circ
 		var size_peg = size
 		if custom_shape:
-			shape_peg = 1 if custom_shape == 1 else 0
+			shape_peg = 1 if custom_shape == 0 else 0
 		if custom_size:
 			size_peg = custom_size-1
 		var arc_peg : float = (arc_rad / n_pegs) * i
@@ -309,7 +311,7 @@ func _input(event):
 			if not peg: peg = find_line_segment(v, "line_segments")
 			if peg:
 				var parentLineControl = peg.find_parent("LineControl*")
-				print("Found " , peg)
+				#print("Found " , peg, " with parent ", parentLineControl, " at y ",  parentLineControl.position.y)
 				parentLineControl.add_theme_stylebox_override("panel", load("res://selected_style_box_flat.tres"))
 				$%RightScroll.set_v_scroll( parentLineControl.position.y )
 				dragMode = event.button_index
