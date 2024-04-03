@@ -94,7 +94,43 @@ void render(int32_t fc, enum kFSM fsm) {
 }
 
 void renderTitles(int32_t fc, enum kFSM fsm) {
-  pd->graphics->drawBitmap(getSpriteSplash(), 0, 0, kBitmapUnflipped);
+  if (getScoreHistogram()) pd->graphics->drawBitmap(getScoreHistogram(), 0, 0, kBitmapUnflipped);
+
+  // TEMP
+
+  static float py[13] = {0};
+  static float vy[13] = {0};
+  static uint8_t n = 0;  
+  static uint8_t f = 0;  
+
+  const int16_t histoHeight = 12*2*BALL_RADIUS;
+  const int16_t histoWidth = 9*3*BALL_RADIUS;
+  const int16_t buf = 16;
+  const int16_t tick = 4;
+
+  if (!n) {
+    n = rand() % 12 + 1;
+    for (int i = 0; i < n; ++i) {
+      py[i] = -2*BALL_RADIUS*(i + 1);
+    }
+  }
+
+  for (int i = 0; i < n; ++i) {
+    vy[i] += 0.05f;
+    py[i] += vy[i];
+    if (py[i] > buf+(11 - i)*2*BALL_RADIUS) {
+      py[i] = buf+(11 - i)*2*BALL_RADIUS;
+    }
+    pd->graphics->drawBitmap(getBitmapBall(), buf + BALL_RADIUS/2 + 6*3*BALL_RADIUS, py[i], kBitmapUnflipped);
+    if (i*5 > f) break;
+  }
+  ++f;
+
+
+
+
+  return;
+  // pd->graphics->drawBitmap(getSpriteSplash(), 0, 0, kBitmapUnflipped);
   const int i = 1;
   pd->graphics->drawBitmap(getTitleNewGameBitmap(i),
     DEVICE_PIX_X/2 - 4*TILE_PIX,

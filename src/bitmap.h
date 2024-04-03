@@ -4,6 +4,17 @@
 
 const static uint8_t WF_BG_OFFSET[] = {194};
 
+const static LCDPattern kGreyPattern = {
+  1,1,1,1,1,1,1,1,
+  0b10101010,
+  0b10101010,
+  0b10101010,
+  0b10101010,
+  0b10101010,
+  0b10101010,
+  0b10101010,
+  0b10101010};
+
 void initBitmap(void);
 
 void setRoobert10(void);
@@ -21,6 +32,7 @@ LCDBitmap* getBitmapWfFg_byidx(uint8_t _wf, uint32_t _idx);
 LCDBitmap* getBitmapWfBg(uint8_t wf);
 LCDBitmap* getBitmapWfFront(void);
 
+LCDBitmap* getScoreHistogram(void);
 
 LCDBitmap* getSpriteSplash(void);
 
