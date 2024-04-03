@@ -105,7 +105,7 @@ enum kFSM doFSM(enum kFSM transitionTo) {
   } else if (m_FSM == kGameFSM_SplashToStart) {
 
     static uint16_t timer = 0;
-    static const uint16_t max = 50;
+    static const uint16_t max = TICK_FREQUENCY/2;
     if (newState) {
       timer = 0;
     }
@@ -119,7 +119,7 @@ enum kFSM doFSM(enum kFSM transitionTo) {
   } else if (m_FSM == kGameFSM_AimMode) {
 
     static uint16_t timer = 0;
-    static const uint16_t max = 50;
+    static const uint16_t max = TICK_FREQUENCY;
     if (newState) {
       resetBallTrace();
       timer = 0;
@@ -173,23 +173,31 @@ enum kFSM doFSM(enum kFSM transitionTo) {
 
   } else if (m_FSM == kGameFSM_BallGutter) {
 
-    // A little extra downward camera motion
-    const float y = cpBodyGetPosition(getBall()).y;
-    if (y < WFALL_PIX_Y + 4*TURRET_RADIUS) {
-      setScrollOffset(y - HALF_DEVICE_PIX_Y, false);
-    } 
-
-    // No more manual scroll accepted
-    float vY = applyScrollEasing(); // Allow the over-scroll to correct itself
-    if (!vY) {
+    // A little extra downward camera motion. Note: No more manual scroll accepted
+    static float vY = 0.0;
+    static uint16_t pause = 0;
+    if (newState) {
+      vY = cpBodyGetVelocity(getBall()).y;
+      pause = TICK_FREQUENCY / 2;
+      pd->system->logToConsole("kGameFSM_BallGutter");
+    }
+    pd->system->logToConsole("v %f so %f", vY, getScrollOffset());
+    if (vY > 0.01f) {
+      setScrollOffset(getScrollOffset() + (vY * TIMESTEP), true);
+      vY *= 0.5f;
+    } else if (pause) {
+      --pause;
+    } else {
       return doFSM(kGameFSM_GuttetToTurret);
     }
 
   } else if (m_FSM == kGameFSM_GuttetToTurret) {
 
     static float progress = 0.0f;
+    static float startY = 0.0f;
     if (newState) {
       progress = 0.0f;
+      startY = getScrollOffset();
       //
       int32_t minY = 10000;
       for (uint32_t i = 0; i < MAX_PEGS; ++i) {
@@ -200,20 +208,23 @@ enum kFSM doFSM(enum kFSM transitionTo) {
       }
       if (minY > (DEVICE_PIX_Y/2)) setMinimumY(minY - (DEVICE_PIX_Y/2));
       pd->system->logToConsole("smallest y was %i, min y is now %i", minY, getMinimumY());
+      pd->system->logToConsole("kGameFSM_GuttetToTurret");
     }
     const int16_t minimumY = getMinimumY();
     // Take less time overall when we get lower down
-    const float distance_mod = WFALL_PIX_Y / (float)(WFALL_PIX_Y - minimumY);
-
+    const float distance_mod = startY / (float)(startY - minimumY);
+    //
     progress += (TIMESTEP * END_SWEEP_SCALE * distance_mod);
     float easedProgress = getEasing(EaseInOutSine, progress);
     easedProgress = (1.0f - easedProgress);
     // // pd->system->logToConsole("end sweep active target %f, pop %f",target, m_popLevel);
-    const float targetPartial = minimumY + ((SCROLL_OFFSET_MAX - minimumY) * easedProgress);
+    const float targetPartial = minimumY + ((startY - minimumY) * easedProgress);
     setScrollOffset(targetPartial, true);
-    const float popLevel = WFALL_PIX_Y * easedProgress;
+    //
+    const float popLevel = (startY + DEVICE_PIX_Y) * easedProgress;
     m_popLevel = popLevel; // TODO remove me
     popBoard(popLevel);
+    //
     // pd->system->logToConsole("end sweep active target %f, pop %f",target, m_popLevel);
     if (progress >= 1) {
       setScrollOffset(minimumY, true);

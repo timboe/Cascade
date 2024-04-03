@@ -18,6 +18,7 @@ LCDBitmap* m_pootAnimation[TURRET_RADIUS];
 LCDBitmap* m_ballBitmap[MAX_PEG_SIZE];
 LCDBitmap* m_rectBitmap[MAX_PEG_SIZE][256];
 
+LCDBitmap* m_wfFront;
 LCDBitmap* m_wfBg[N_WATERFALLS];
 LCDBitmapTable* m_sheetWfFg[N_WATERFALLS];
 
@@ -118,6 +119,8 @@ LCDBitmap* getBitmapAnimPoot(uint8_t i) { return m_pootAnimation[i]; }
 
 LCDBitmap* getSpriteSplash() { return m_splash; }
 
+LCDBitmap* getBitmapWfFront() { return m_wfFront; }
+
 LCDBitmap* getBitmapWfBg(uint8_t wf) { return m_wfBg[wf]; }
 
 LCDBitmap* getBitmapWfFg(uint8_t _wf, uint32_t _x, uint32_t _y) {
@@ -209,6 +212,7 @@ void initBitmap() {
     // TODO - temp
     break;
   }
+  m_wfFront = loadImageAtPath("images/falls_fg");
 
   for (int s = 0; s < MAX_PEG_SIZE; ++s) {
     const float scale = sizeToScale(s);

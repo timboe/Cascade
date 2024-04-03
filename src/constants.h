@@ -1,5 +1,5 @@
 
-#define DEV
+#define DEV 1
 
 //#define DEMO
 
@@ -50,7 +50,7 @@
 
 #define MAX_PEGS 256
 
-#define MAX_LINEAR_PATH_SEGMENTS 64
+#define MAX_LINEAR_PATH_SEGMENTS 64 
 
 #define MAX_PEG_SIZE 5
 
@@ -61,7 +61,7 @@
 // Trying without this
 #define UI_OFFSET_TOP 0
 
-#define SCROLL_OFFSET_MAX (WFALL_PIX_Y + UI_OFFSET_TOP - DEVICE_PIX_Y)
+#define SCROLL_OFFSET_MAX (WFALL_PIX_Y - ((3*DEVICE_PIX_Y)/4))
 
 // How many pixels down the side do we have to prevent the ball from bouncing out off
 #define PHYSWALL_PIX_Y (WFALL_PIX_Y + UI_OFFSET_TOP)

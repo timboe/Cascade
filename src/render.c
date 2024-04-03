@@ -77,6 +77,7 @@ void render(int32_t fc, enum kFSM fsm) {
   pd->graphics->setDrawOffset(offX, offY);
 
   pd->graphics->clear(kColorWhite);
+  pd->graphics->setBackgroundColor(kColorBlack);
 
   switch (getGameMode()) {
     case kTitles: renderTitles(fc, fsm); break;
@@ -178,6 +179,14 @@ void renderBackground(void) {
   }
 }
 
+void renderForeground(void) {
+  const int32_t parallax = getParalaxFactorNear(); // Note: float -> int here
+  const int32_t so = getScrollOffset();
+  if (so > WFALL_PIX_Y - DEVICE_PIX_Y) {
+    pd->graphics->drawBitmap(getBitmapWfFront(), 0, WFALL_PIX_Y + (WFALL_PIX_Y/20) + parallax, kBitmapUnflipped);
+  }
+}
+
 void renderGameWindow(int32_t fc, enum kFSM fsm) {
 
   // DRAW BACKGROUND
@@ -214,6 +223,9 @@ void renderGameWindow(int32_t fc, enum kFSM fsm) {
 
   // DRAW TRAJECTORY
   renderTrajectory();
+
+  // DRAW FOREGROUND
+  renderForeground();
 
   renderDebug();
 
