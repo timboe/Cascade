@@ -191,7 +191,8 @@ enum kFSM doFSM(enum kFSM transitionTo) {
     } else if (pause) {
       --pause;
     } else {
-      return doFSM(kGameFSM_GutterToScores); // TODO change me back to kGameFSM_GuttetToTurret
+      if (requiredPegsInPlay()) { return doFSM(kGameFSM_GuttetToTurret); }
+      else                      { return doFSM(kGameFSM_GutterToScores); }
     }
 
   } else if (m_FSM == kGameFSM_GuttetToTurret) {

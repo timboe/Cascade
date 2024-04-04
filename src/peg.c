@@ -226,10 +226,13 @@ void renderPeg(const struct Peg_t* p) {
 void hitPeg(struct Peg_t* p) {
   if (p->m_state == kPegStateActive && ballInPlay()) {
     p->m_state = kPegStateHit;
-    addTrauma(TRAMA_PEG_HIT);
-    addFreeze(FREEZE_PEG_HIT);
     if (p->m_type == kPegTypeRequired) {
+      addTrauma(TRAMA_REQUIRED_HIT);
+      addFreeze(FREEZE_REQUIRED_HIT);
       requiredPegHit();
+    } else {
+      addTrauma(TRAMA_PEG_HIT);
+      addFreeze(FREEZE_PEG_HIT);
     }
   }
   // pd->system->logToConsole("bam!");
