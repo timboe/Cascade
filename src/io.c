@@ -16,9 +16,14 @@ uint32_t m_actionProgress = 0;
 
 SDFile* m_file;
 
+uint16_t m_player = 0;
 uint16_t m_level = 0;
-
 uint16_t m_hole = 0;
+
+uint32_t m_player_score[SAVE_FORMAT_1_MAX_PLAYERS][SAVE_FORMAT_1_MAX_LEVELS][SAVE_FORMAT_1_MAX_HOLES] = {0};
+
+uint32_t m_level_par[SAVE_FORMAT_1_MAX_LEVELS][SAVE_FORMAT_1_MAX_HOLES] = {0};
+
 
 int doRead(void* _userdata, uint8_t* _buf, int _bufsize);
 
@@ -58,13 +63,19 @@ json_decoder m_jd = {
 
 /// ///
 
+uint16_t getCurrentPlayer(void) { return m_player; }
+
 uint16_t getCurrentLevel(void) { return m_level; }
 
 uint16_t getCurrentHole(void) { return m_hole; }
 
-uint16_t getPar(uint16_t level, uint16_t hole) { return 3; }
+uint16_t getPar(uint16_t level, uint16_t hole) { return /*m_level_par[level][hole];*/ 3; }
 
-uint16_t getCurrentPar(void) { return getPar(m_level, m_hole); }
+uint16_t getScore(uint16_t level, uint16_t hole) { return /*m_player_score[m_player][level][hole];*/ 4; }
+
+uint16_t getCurrentLevelPar(void) { return getPar(m_level, m_hole); }
+
+uint16_t getCurrentLevelScore(void) { return getScore(m_level, m_hole); }
 
 void doIO(enum kSaveLoadRequest _first, enum kSaveLoadRequest _andThen, enum kSaveLoadRequest _andFinally) {
   if (IOOperationInProgress()) {

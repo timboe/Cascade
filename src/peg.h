@@ -36,6 +36,7 @@ struct Peg_t {
   uint8_t m_iAngle;
   float m_x;
   float m_y;
+  float m_minY; // Based on movement path
   float m_radius;
   uint8_t m_size;
   int16_t m_xBitmap; // Top left corner for rendering
@@ -71,6 +72,8 @@ void removePeg(struct Peg_t* p);
 
 void updatePeg(struct Peg_t* p);
 
+void setPegType(struct Peg_t* p, enum PegType_t type);
+
 void setPegMotionSpeed(struct Peg_t* p, const float s);
 
 void setPegMotionEasing(struct Peg_t* p, const enum EasingFunction_t e);
@@ -78,6 +81,8 @@ void setPegMotionEasing(struct Peg_t* p, const enum EasingFunction_t e);
 void setPegMotionOffset(struct Peg_t* p, const float offset);
 
 void setPegMotionEllipse(struct Peg_t* p, const float a, const float b);
+
+void setPegMotionStatic(struct Peg_t* p);
 
 void addPegMotionPath(struct Peg_t* p, const int16_t x, const int16_t y);
 

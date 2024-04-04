@@ -1,6 +1,7 @@
 #include "peg.h"
 #include "bitmap.h"
 #include "render.h"
+#include "board.h"
 
 void updateAngle(struct Peg_t* p, float angle);
 
@@ -24,6 +25,7 @@ void initPeg(struct Peg_t* p, const enum PegShape_t s, const float x, const floa
   p->m_state = kPegStateActive;
   p->m_x = x;
   p->m_y = y;
+  p->m_minY = y;
   p->m_angle = a;
   p->m_iAngle = radToByte(a);
   p->m_speed = 1.0f;
@@ -74,6 +76,11 @@ void removePeg(struct Peg_t* p) {
     cpShapeFree(p->m_cpShape);
     p->m_cpShape = NULL;
   }
+}
+
+void setPegType(struct Peg_t* p, enum PegType_t type) {
+  p->m_type = type;
+  p->m_bitmap = getBitmapPeg(p);
 }
 
 void setPegBitmapCoordinates(struct Peg_t* p) {
@@ -150,6 +157,7 @@ void updatePeg(struct Peg_t* p) {
   cpBodySetVelocity(p->m_cpBody, cpv((p->m_x - pos.x)/TIMESTEP, (p->m_y - pos.y)/TIMESTEP));
   // cpBodySetPosition(p->m_cpBody, cpv(p->m_x, p->m_y));
   setPegBitmapCoordinates(p);
+  if (p->m_y < p->m_minY) { p->m_minY = p->m_y; }
 }
 
 void setPegMotionSpeed(struct Peg_t* p, const float s) { p->m_speed = s; }
@@ -157,6 +165,15 @@ void setPegMotionSpeed(struct Peg_t* p, const float s) { p->m_speed = s; }
 void setPegMotionEasing(struct Peg_t* p, const enum EasingFunction_t e) { p->m_easing = e; }
 
 void setPegMotionOffset(struct Peg_t* p, const float offset) { p->m_time = offset; }
+
+void emptyCpBodyVelocityFunc(cpBody* body, cpVect gravity, cpFloat damping, cpFloat dt) {}
+
+void emptyCpBodyPositionFunc(cpBody* body, cpFloat dt) {};
+
+void setPegMotionStatic(struct Peg_t* p) {
+  cpBodySetVelocityUpdateFunc(p->m_cpBody, emptyCpBodyVelocityFunc);
+  cpBodySetPositionUpdateFunc(p->m_cpBody, emptyCpBodyPositionFunc);
+}
 
 void setPegMotionEllipse(struct Peg_t* p, const float a, const float b) {
   p->m_a = a;
@@ -211,6 +228,9 @@ void hitPeg(struct Peg_t* p) {
     p->m_state = kPegStateHit;
     addTrauma(TRAMA_PEG_HIT);
     addFreeze(FREEZE_PEG_HIT);
+    if (p->m_type == kPegTypeRequired) {
+      requiredPegHit();
+    }
   }
   // pd->system->logToConsole("bam!");
 }

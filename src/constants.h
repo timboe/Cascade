@@ -116,4 +116,15 @@
 #define PARALAX_FAR 0.1f;
 #define PARALAX_NEAR -0.1f
 
+// MARGIN BUFFERING
+#define BUF 16
 
+// SAVE FORMAT
+#define SAVE_FORMAT 1
+#define SAVE_FORMAT_1_MAX_PLAYERS 4
+#define SAVE_FORMAT_1_MAX_LEVELS 128
+#define SAVE_FORMAT_1_MAX_HOLES 16
+
+// Must be less than their SAVE_FORMAT counterparts
+#define MAX_LEVELS 99
+#define MAX_HOLES 9

@@ -5,7 +5,15 @@ struct Peg_t m_pegs[MAX_PEGS];
 
 uint16_t m_nPegs = 0;
 
+uint16_t m_requiredPegsInPlay = 0;
+
 ///
+
+int16_t requiredPegsInPlay(void) {
+  return m_requiredPegsInPlay;
+}
+
+void requiredPegHit(void) { --m_requiredPegsInPlay; }
 
 void initBoard(void) {
   memset(&m_pegs, 0, sizeof(struct Peg_t) * MAX_PEGS);
@@ -66,6 +74,11 @@ void randomiseBoard(void) {
     const uint8_t size = rand() % MAX_PEG_SIZE;
     struct Peg_t* p = pegFromPool();
     initPeg(p, s, x, y, angle, size);
+    setPegMotionStatic(p);
+    if (i < 4) {
+      ++m_requiredPegsInPlay;
+      setPegType(p, kPegTypeRequired);
+    }
   }
 
   if (maxStatic == 64) return;

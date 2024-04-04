@@ -5,7 +5,7 @@
 const static uint8_t WF_BG_OFFSET[] = {194};
 
 const static LCDPattern kGreyPattern = {
-  1,1,1,1,1,1,1,1,
+  0,0,0,0,0,0,0,0,
   0b10101010,
   0b10101010,
   0b10101010,
@@ -52,6 +52,7 @@ LCDBitmap* getBitmapAnimPoot(uint8_t i);
 
 void updateInfoTopperBitmap(void);
 void updateLevelSplashBitmap(void);
+void updateScoreHistogramBitmap(void);
 
 float sizeToScale(uint8_t size);
 

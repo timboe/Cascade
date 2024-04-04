@@ -12,6 +12,9 @@ float m_cTraumaAngle = 0.0f, m_sTraumaAngle;
 
 uint16_t m_ballPootRadius = 0.0f;
 
+uint16_t m_ballFallN = 0;
+float m_ballFallY[32] = {0};
+
 uint16_t m_freeze = 0;
 
 void renderTitles(int32_t fc, enum kFSM fsm);
@@ -23,6 +26,10 @@ uint16_t m_ballTraceY[PREDICTION_TRACE_LEN];
 uint8_t m_ballTraces = 0;
 
 /// ///
+
+void setBallFallN(uint16_t n) { m_ballFallN = n; }
+
+void setBallFallY(uint16_t ball, float y) { m_ballFallY[ball] = y; }
 
 void setBallTrace(const uint16_t i, const uint16_t x, const uint16_t y) {
   m_ballTraceX[i] = x;
@@ -94,43 +101,9 @@ void render(int32_t fc, enum kFSM fsm) {
 }
 
 void renderTitles(int32_t fc, enum kFSM fsm) {
-  if (getScoreHistogram()) pd->graphics->drawBitmap(getScoreHistogram(), 0, 0, kBitmapUnflipped);
-
-  // TEMP
-
-  static float py[13] = {0};
-  static float vy[13] = {0};
-  static uint8_t n = 0;  
-  static uint8_t f = 0;  
-
-  const int16_t histoHeight = 12*2*BALL_RADIUS;
-  const int16_t histoWidth = 9*3*BALL_RADIUS;
-  const int16_t buf = 16;
-  const int16_t tick = 4;
-
-  if (!n) {
-    n = rand() % 12 + 1;
-    for (int i = 0; i < n; ++i) {
-      py[i] = -2*BALL_RADIUS*(i + 1);
-    }
-  }
-
-  for (int i = 0; i < n; ++i) {
-    vy[i] += 0.05f;
-    py[i] += vy[i];
-    if (py[i] > buf+(11 - i)*2*BALL_RADIUS) {
-      py[i] = buf+(11 - i)*2*BALL_RADIUS;
-    }
-    pd->graphics->drawBitmap(getBitmapBall(), buf + BALL_RADIUS/2 + 6*3*BALL_RADIUS, py[i], kBitmapUnflipped);
-    if (i*5 > f) break;
-  }
-  ++f;
 
 
-
-
-  return;
-  // pd->graphics->drawBitmap(getSpriteSplash(), 0, 0, kBitmapUnflipped);
+  pd->graphics->drawBitmap(getSpriteSplash(), 0, 0, kBitmapUnflipped);
   const int i = 1;
   pd->graphics->drawBitmap(getTitleNewGameBitmap(i),
     DEVICE_PIX_X/2 - 4*TILE_PIX,
@@ -215,11 +188,23 @@ void renderBackground(void) {
   }
 }
 
-void renderForeground(void) {
+void renderGutter(void) {
   const int32_t parallax = getParalaxFactorNear(); // Note: float -> int here
   const int32_t so = getScrollOffset();
   if (so > WFALL_PIX_Y - DEVICE_PIX_Y) {
     pd->graphics->drawBitmap(getBitmapWfFront(), 0, WFALL_PIX_Y + (WFALL_PIX_Y/20) + parallax, kBitmapUnflipped);
+    pd->graphics->drawRect(0, WFALL_PIX_Y + (WFALL_PIX_Y/20) + parallax, DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
+    pd->graphics->drawRect(1, WFALL_PIX_Y + (WFALL_PIX_Y/20) + parallax + 1, DEVICE_PIX_X-2, DEVICE_PIX_Y-2, kColorBlack);
+  }
+  //Note no parallax here
+  if (so > WFALL_PIX_Y) {
+    pd->graphics->drawBitmap(getScoreHistogram(), 0, WFALL_PIX_Y + DEVICE_PIX_Y, kBitmapUnflipped);
+    for (int i = 0; i < m_ballFallN; ++i) {
+      pd->graphics->drawBitmap(getBitmapBall(),
+        BUF + BALL_RADIUS/2 + getCurrentHole()*3*BALL_RADIUS,
+        WFALL_PIX_Y + DEVICE_PIX_Y + m_ballFallY[i],
+        kBitmapUnflipped);
+    }
   }
 }
 
@@ -260,8 +245,8 @@ void renderGameWindow(int32_t fc, enum kFSM fsm) {
   // DRAW TRAJECTORY
   renderTrajectory();
 
-  // DRAW FOREGROUND
-  renderForeground();
+  // DRAW GUTTER
+  renderGutter();
 
   renderDebug();
 

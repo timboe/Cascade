@@ -16,9 +16,11 @@ enum kFSM {
   kGameFSM_BallInPlay,
   kGameFSM_BallStuck,
   kGameFSM_CloseUp,
+  kGameFSM_WinningToast,
   kGameFSM_BallGutter,
   kGameFSM_GuttetToTurret,
   kGameFSM_GutterToScores,
+  kGameFSM_ScoresAnimation,
   kGameFSM_ScoresToTitle,
   kGameFSM_ScoresToSplash,
   kNFSMModes

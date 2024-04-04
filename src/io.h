@@ -25,4 +25,8 @@ uint16_t getCurrentHole(void);
 
 uint16_t getPar(uint16_t level, uint16_t hole);
 
-uint16_t getCurrentPar(void);
+uint16_t getCurrentLevelPar(void);
+
+uint16_t getScore(uint16_t level, uint16_t hole);
+
+uint16_t getCurrentLevelScore(void);
