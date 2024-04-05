@@ -17,6 +17,8 @@ void setBallPootCircle(uint16_t radius);
 
 void setBallFallN(uint16_t n);
 
+void setBallFallX(uint16_t x);
+
 void setBallFallY(uint16_t ball, float y);
 
 void resetBallTrace(void);

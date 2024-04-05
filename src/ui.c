@@ -40,7 +40,12 @@ LCDBitmap* m_UIBitmapTitleCont[3] = {NULL};
 
 int16_t getMinimumY(void) { return m_minimumY; }
 
-void setMinimumY(int16_t y) { m_minimumY = y; }
+void setMinimumY(int16_t y) { 
+  if (y > WFALL_PIX_Y - DEVICE_PIX_Y) {
+    y = WFALL_PIX_Y - DEVICE_PIX_Y; // This is as low as we are allowed to go
+  }
+  m_minimumY = y;
+}
 
 enum kGameMode getGameMode() {
   return m_mode;

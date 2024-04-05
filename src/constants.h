@@ -101,6 +101,9 @@
 
 #define POOT_STRENGTH 300.0f
 
+#define BALL_IS_STUCK 100.0f
+#define STUCK_TICKS (TICK_FREQUENCY*3)
+
 // SCREEN EASING
 // Larger value to make moving quicker
 #define SCREEN_ACC 0.9f

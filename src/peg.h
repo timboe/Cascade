@@ -92,4 +92,4 @@ void renderPeg(const struct Peg_t* p);
 
 void hitPeg(struct Peg_t* p);
 
-void checkPopPeg(struct Peg_t* p, float y);
+bool checkPopPeg(struct Peg_t* p, float y);

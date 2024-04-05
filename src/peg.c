@@ -30,6 +30,7 @@ void initPeg(struct Peg_t* p, const enum PegShape_t s, const float x, const floa
   p->m_iAngle = radToByte(a);
   p->m_speed = 1.0f;
   p->m_size = size;
+  p->m_easing = EaseLinear;
   const float scale = sizeToScale(size);
 
   p->m_cpBody = cpBodyNewKinematic();
@@ -112,11 +113,10 @@ void updatePeg(struct Peg_t* p) {
 
   } else if (p->m_motion == kPegMotionEllipse) {
 
-    const float easing = getEasing(p->m_easing, p->m_time / M_2PIf);
-    p->m_time += (TIMESTEP * p->m_speed);
-    p->m_x = p->m_pathX[0] + (p->m_a * cosf(p->m_time * easing));
-    p->m_y = p->m_pathY[0] + (p->m_b * sinf(p->m_time * easing));
-    updateAngle(p, (p->m_time * easing) + (M_PIf * 0.5f) ); // Offset to point inwards
+    const float easing = getEasing(p->m_easing, p->m_time / M_2PIf) * M_2PIf;
+    p->m_x = p->m_pathX[0] + (p->m_a * cosf(easing));
+    p->m_y = p->m_pathY[0] + (p->m_b * sinf(easing));
+    updateAngle(p, easing + (M_PIf * 0.5f) ); // Offset to point inwards
 
   } else if (p->m_motion == kPegMotionPath) {
 
@@ -226,6 +226,7 @@ void renderPeg(const struct Peg_t* p) {
 void hitPeg(struct Peg_t* p) {
   if (p->m_state == kPegStateActive && ballInPlay()) {
     p->m_state = kPegStateHit;
+    resetBallStuckCounter();
     if (p->m_type == kPegTypeRequired) {
       addTrauma(TRAMA_REQUIRED_HIT);
       addFreeze(FREEZE_REQUIRED_HIT);
@@ -238,9 +239,11 @@ void hitPeg(struct Peg_t* p) {
   // pd->system->logToConsole("bam!");
 }
 
-void checkPopPeg(struct Peg_t* p, float y) {
+bool checkPopPeg(struct Peg_t* p, float y) {
   if (p->m_state == kPegStateHit && p->m_y >= y) {
     p->m_state = kPegStateRemoved;
     removePeg(p);
+    return true;
   }
+  return false;
 }

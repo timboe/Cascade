@@ -13,6 +13,7 @@ float m_cTraumaAngle = 0.0f, m_sTraumaAngle;
 uint16_t m_ballPootRadius = 0.0f;
 
 uint16_t m_ballFallN = 0;
+uint16_t m_ballFallX = 0;
 float m_ballFallY[32] = {0};
 
 uint16_t m_freeze = 0;
@@ -28,6 +29,8 @@ uint8_t m_ballTraces = 0;
 /// ///
 
 void setBallFallN(uint16_t n) { m_ballFallN = n; }
+
+void setBallFallX(uint16_t x) { m_ballFallX = x; }
 
 void setBallFallY(uint16_t ball, float y) { m_ballFallY[ball] = y; }
 
@@ -189,22 +192,27 @@ void renderBackground(void) {
 }
 
 void renderGutter(void) {
+  const int32_t gutterY = WFALL_PIX_Y - ((WFALL_PIX_Y-DEVICE_PIX_Y) * PARALAX_NEAR);
   const int32_t parallax = getParalaxFactorNear(); // Note: float -> int here
   const int32_t so = getScrollOffset();
-  if (so > WFALL_PIX_Y - DEVICE_PIX_Y) {
-    pd->graphics->drawBitmap(getBitmapWfFront(), 0, WFALL_PIX_Y + (WFALL_PIX_Y/20) + parallax, kBitmapUnflipped);
-    pd->graphics->drawRect(0, WFALL_PIX_Y + (WFALL_PIX_Y/20) + parallax, DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
-    pd->graphics->drawRect(1, WFALL_PIX_Y + (WFALL_PIX_Y/20) + parallax + 1, DEVICE_PIX_X-2, DEVICE_PIX_Y-2, kColorBlack);
+
+  if (so > gutterY + parallax - DEVICE_PIX_Y && getFSM() != kGameFSM_ScoresToTitle) {
+    pd->graphics->drawBitmap(getBitmapWfFront(), 0, gutterY + parallax, kBitmapUnflipped);
+    pd->graphics->drawRect(0, gutterY + parallax, DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
+    pd->graphics->drawRect(1, gutterY + parallax + 1, DEVICE_PIX_X-2, DEVICE_PIX_Y-2, kColorBlack);
   }
   //Note no parallax here
   if (so > WFALL_PIX_Y) {
     pd->graphics->drawBitmap(getScoreHistogram(), 0, WFALL_PIX_Y + DEVICE_PIX_Y, kBitmapUnflipped);
     for (int i = 0; i < m_ballFallN; ++i) {
       pd->graphics->drawBitmap(getBitmapBall(),
-        BUF + BALL_RADIUS/2 + getCurrentHole()*3*BALL_RADIUS,
+        BUF + BALL_RADIUS/2 + m_ballFallX*3*BALL_RADIUS,
         WFALL_PIX_Y + DEVICE_PIX_Y + m_ballFallY[i],
         kBitmapUnflipped);
     }
+  }
+  if (so > WFALL_PIX_Y + DEVICE_PIX_Y) {
+    pd->graphics->drawBitmap(getLevelSplashBitmap(), 0, WFALL_PIX_Y + (2*DEVICE_PIX_Y), kBitmapUnflipped);
   }
 }
 

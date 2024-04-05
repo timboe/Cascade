@@ -77,6 +77,17 @@ uint16_t getCurrentLevelPar(void) { return getPar(m_level, m_hole); }
 
 uint16_t getCurrentLevelScore(void) { return getScore(m_level, m_hole); }
 
+void nextHole(uint16_t currentHoleScore) {
+  if (currentHoleScore < m_player_score[m_player][m_level][m_hole]) {
+    m_player_score[m_player][m_level][m_hole] = currentHoleScore;
+  }
+
+  if (++m_hole == MAX_HOLES) {
+    m_hole = 0;
+    ++m_level;
+  }
+}
+
 void doIO(enum kSaveLoadRequest _first, enum kSaveLoadRequest _andThen, enum kSaveLoadRequest _andFinally) {
   if (IOOperationInProgress()) {
     return;

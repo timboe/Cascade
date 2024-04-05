@@ -6,14 +6,14 @@ const static uint8_t WF_BG_OFFSET[] = {194};
 
 const static LCDPattern kGreyPattern = {
   0,0,0,0,0,0,0,0,
-  0b10101010,
-  0b10101010,
-  0b10101010,
-  0b10101010,
-  0b10101010,
-  0b10101010,
-  0b10101010,
-  0b10101010};
+  0b11001100,
+  0b11001100,
+  0b11001100,
+  0b11001100,
+  0b11001100,
+  0b11001100,
+  0b11001100,
+  0b11001100};
 
 void initBitmap(void);
 
@@ -32,7 +32,6 @@ LCDBitmap* getBitmapWfFg_byidx(uint8_t _wf, uint32_t _idx);
 LCDBitmap* getBitmapWfBg(uint8_t wf);
 LCDBitmap* getBitmapWfFront(void);
 
-LCDBitmap* getScoreHistogram(void);
 
 LCDBitmap* getSpriteSplash(void);
 
@@ -43,6 +42,7 @@ LCDBitmap* getBitmapTurretBarrel(void);
 LCDBitmap* getBitmapHeader(void); // not used
 LCDBitmap* getInfoTopperBitmap(void);
 LCDBitmap* getLevelSplashBitmap(void);
+LCDBitmap* getScoreHistogram(void);
 
 LCDBitmap* getBitmapPeg(const struct Peg_t* p);
 

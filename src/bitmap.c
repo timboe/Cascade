@@ -188,6 +188,36 @@ float sizeToScale(uint8_t size) {
 
 LCDBitmap* getScoreHistogram(void) { return m_scoreHistogram; }
 
+void drawRotatedRect(float x, float y, float w2, float h2, uint8_t iAngle, bool grey) {
+    const float angleRad = (M_PIf / 128.0f) * iAngle;
+    const float ca = cosf(angleRad);
+    const float sa = sinf(angleRad);
+    int points[8] = {
+      -w2*ca - -h2*sa + x,
+      -w2*sa + -h2*ca + y,
+      //
+      -w2*ca - h2*sa + x,
+      -w2*sa + h2*ca + y,
+      //
+      w2*ca - h2*sa + x,
+      w2*sa + h2*ca + y,
+      //
+      w2*ca - -h2*sa + x,
+      w2*sa + -h2*ca + y
+    };
+    if (grey) {
+      pd->graphics->fillPolygon(4, points, kColorWhite, kPolygonFillNonZero);
+      pd->graphics->fillPolygon(4, points, (uintptr_t)kGreyPattern, kPolygonFillNonZero);
+    } else {
+      pd->graphics->fillPolygon(4, points, kColorWhite, kPolygonFillNonZero);
+    }
+    pd->graphics->drawLine(points[0], points[1], points[2], points[3], 2, kColorBlack);
+    pd->graphics->drawLine(points[2], points[3], points[4], points[5], 2, kColorBlack);
+    pd->graphics->drawLine(points[4], points[5], points[6], points[7], 2, kColorBlack);
+    pd->graphics->drawLine(points[6], points[7], points[0], points[1], 2, kColorBlack);
+}
+
+
 void initBitmap() {
   pd->graphics->setDrawMode(kDrawModeCopy);
   m_titleSelected = loadImageAtPath("images/titleSelected");
@@ -236,29 +266,16 @@ void initBitmap() {
 
   for (int s = 0; s < MAX_PEG_SIZE; ++s) {
     const float scale = sizeToScale(s);
-    m_rectBitmap[0][s][0] = pd->graphics->newBitmap(BOX_MAX*2*scale, BOX_MAX*2*scale, kColorClear);
-    pd->graphics->pushContext(m_rectBitmap[0][s][0]);
-    pd->graphics->fillRect((BOX_MAX - BOX_WIDTH/2)*scale, (BOX_MAX - BOX_HEIGHT/2)*scale, BOX_WIDTH*scale, BOX_HEIGHT*scale, kColorWhite);
-    pd->graphics->drawRect((BOX_MAX - BOX_WIDTH/2)*scale, (BOX_MAX - BOX_HEIGHT/2)*scale, BOX_WIDTH*scale, BOX_HEIGHT*scale, kColorBlack);
-    // There is no line width option for draw rect
-    pd->graphics->drawRect((BOX_MAX - BOX_WIDTH/2)*scale + 1, (BOX_MAX - BOX_HEIGHT/2)*scale + 1, BOX_WIDTH*scale - 2, BOX_HEIGHT*scale - 2, kColorBlack);
-    pd->graphics->popContext();
-    m_rectBitmap[1][s][0] = pd->graphics->newBitmap(BOX_MAX*2*scale, BOX_MAX*2*scale, kColorClear);
-    pd->graphics->pushContext(m_rectBitmap[1][s][0]);
-    pd->graphics->fillRect((BOX_MAX - BOX_WIDTH/2)*scale, (BOX_MAX - BOX_HEIGHT/2)*scale, BOX_WIDTH*scale, BOX_HEIGHT*scale, kColorWhite);
-    pd->graphics->fillRect((BOX_MAX - BOX_WIDTH/2)*scale, (BOX_MAX - BOX_HEIGHT/2)*scale, BOX_WIDTH*scale, BOX_HEIGHT*scale, (uintptr_t)kGreyPattern);
-    pd->graphics->drawRect((BOX_MAX - BOX_WIDTH/2)*scale, (BOX_MAX - BOX_HEIGHT/2)*scale, BOX_WIDTH*scale, BOX_HEIGHT*scale, kColorBlack);
-    pd->graphics->drawRect((BOX_MAX - BOX_WIDTH/2)*scale + 1, (BOX_MAX - BOX_HEIGHT/2)*scale + 1, BOX_WIDTH*scale - 2, BOX_HEIGHT*scale - 2, kColorBlack);
-    pd->graphics->popContext();
-    for (int32_t i = 1; i < 128; ++i) {
-      const float angle = (180.0f / 128.0f) * i;
-      m_rectBitmap[0][s][i] = pd->graphics->newBitmap(BOX_MAX*2*scale, BOX_MAX*2*scale, kColorClear);
-      pd->graphics->pushContext(m_rectBitmap[0][s][i]);
-      pd->graphics->drawRotatedBitmap(m_rectBitmap[0][s][0], BOX_MAX*scale, BOX_MAX*scale, angle, 0.5f, 0.5f, 1.0f, 1.0f);
+    for (int32_t iAngle = 0; iAngle < 128; ++iAngle) {
+      m_rectBitmap[0][s][iAngle] = pd->graphics->newBitmap(BOX_MAX*2*scale, BOX_MAX*2*scale, kColorClear);
+      pd->graphics->pushContext(m_rectBitmap[0][s][iAngle]);
+      drawRotatedRect(BOX_MAX * scale, BOX_MAX * scale, (BOX_WIDTH/2) * scale, (BOX_HEIGHT/2) * scale, iAngle, false);
+      pd->graphics->drawRect(0, 0, BOX_MAX*2*scale, BOX_MAX*2*scale, kColorWhite);
       pd->graphics->popContext();
-      m_rectBitmap[1][s][i] = pd->graphics->newBitmap(BOX_MAX*2*scale, BOX_MAX*2*scale, kColorClear);
-      pd->graphics->pushContext(m_rectBitmap[1][s][i]);
-      pd->graphics->drawRotatedBitmap(m_rectBitmap[1][s][0], BOX_MAX*scale, BOX_MAX*scale, angle, 0.5f, 0.5f, 1.0f, 1.0f);
+      m_rectBitmap[1][s][iAngle] = pd->graphics->newBitmap(BOX_MAX*2*scale, BOX_MAX*2*scale, kColorClear);
+      pd->graphics->pushContext(m_rectBitmap[1][s][iAngle]);
+      drawRotatedRect(BOX_MAX * scale, BOX_MAX * scale, (BOX_WIDTH/2) * scale, (BOX_HEIGHT/2) * scale, iAngle, true);
+      pd->graphics->drawRect(0, 0, BOX_MAX*2*scale, BOX_MAX*2*scale, kColorWhite);
       pd->graphics->popContext();
     }
   }

@@ -64,7 +64,7 @@ void boardAddPath(const uint8_t n, const float angleMax, const enum PegShape_t s
 void randomiseBoard(void) {
   clearBoard();
 
-  const int maxStatic = rand() % 2 ? 16 : 64+32;
+  const int maxStatic = 16;//rand() % 2 ? 16 : 64+32;
 
   for (int i = 0; i < maxStatic; ++i) {
     const int16_t x = rand() % WFALL_PIX_X;
@@ -81,7 +81,7 @@ void randomiseBoard(void) {
     }
   }
 
-  if (maxStatic == 64+32) return;
+  if (maxStatic == 16) return;
 
   #define PEGS_PER_WHEEL 8
   #define WHEELS 4
@@ -91,7 +91,7 @@ void randomiseBoard(void) {
     const float a = 64 + rand() % 32;
     const float b = 64 + rand() % 32;
     const enum PegShape_t s = (rand() % 2 ? kPegShapeBall : kPegShapeRect);
-    const float speed = 0.1f * ((rand() % 10) + 1); 
+    const float speed = 1.0f;//0.1f * ((rand() % 10) + 1); 
     boardAddWheel(PEGS_PER_WHEEL, M_2PIf, s, x, y, a, b, speed);
   }
 
@@ -126,6 +126,7 @@ void clearBoard(void) {
     clearPeg(&m_pegs[i]);
   }
   m_nPegs = 0;
+  m_requiredPegsInPlay = 0;
 }
 
 void renderBoard(void) {
@@ -138,4 +139,14 @@ void popBoard(float y) {
   for (int i = 0; i < m_nPegs; ++i) {
     checkPopPeg(&m_pegs[i], y);
   }
+}
+
+bool popRandom(void) {
+  for (int i = 0; i < m_nPegs; ++i) {
+    const bool popped = checkPopPeg(&m_pegs[i], 0);
+    if (popped) {
+      return true;
+    }
+  }
+  return false;
 }

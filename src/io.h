@@ -19,6 +19,8 @@ void enactIO(void);
 
 bool doSave(void);
 
+void nextHole(uint16_t currentHoleScore);
+
 uint16_t getCurrentLevel(void);
 
 uint16_t getCurrentHole(void);

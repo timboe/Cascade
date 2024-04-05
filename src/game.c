@@ -11,7 +11,8 @@
 #include "physics.h"
 
 int32_t m_frameCount = 0;
-uint16_t m_ballCount = 0;
+uint16_t m_ballCount = 0; // Keeping track of the current level score
+uint16_t m_ballStuckCounter = 0; // Keeping track of a stuck ball
 enum kFSM m_FSM = (enum kFSM)0;
 
 ////////////
@@ -19,6 +20,8 @@ enum kFSM m_FSM = (enum kFSM)0;
 int getFrameCount() { return m_frameCount; }
 
 enum kFSM getFSM() { return m_FSM; }
+
+void resetBallStuckCounter(void) { m_ballStuckCounter = 0; }
 
 int gameLoop(void* _data) {
   ++m_frameCount;
@@ -93,23 +96,29 @@ enum kFSM doFSM(enum kFSM transitionTo) {
 
   if (m_FSM == kTitlesFSM_DisplayTitles) {
 
-    //
+    if (newState) {
+      setGameMode(kTitles);
+    }
 
   } else if (m_FSM == kTitlesFSM_TitlesToSplash) {
     
     if (newState) {
       setGameMode(kGameWindow);
       setScrollOffset(-DEVICE_PIX_Y - TURRET_RADIUS, true);
+      randomiseBoard();
+      updateInfoTopperBitmap();
+      updateLevelSplashBitmap(); 
     }
     return doFSM(kGameFSM_DisplaySplash);
 
   } else if (m_FSM == kGameFSM_DisplaySplash) {
 
     static uint16_t timer = 0;
+    static const uint16_t max = TICK_FREQUENCY;
     if (newState) {
-      timer = 50;
+      timer = 0;
     }
-    if (!--timer) return doFSM(kGameFSM_SplashToStart);
+    if (++timer == max) return doFSM(kGameFSM_SplashToStart);
 
   } else if (m_FSM == kGameFSM_SplashToStart) {
 
@@ -151,6 +160,10 @@ enum kFSM doFSM(enum kFSM transitionTo) {
 
   } else if (m_FSM == kGameFSM_BallInPlay) {
 
+    if (newState) {
+      m_ballStuckCounter = 0;
+    }
+    //
     commonArrowScrollAndBounceBack();
     //
     const float y = cpBodyGetPosition(getBall()).y;
@@ -159,12 +172,29 @@ enum kFSM doFSM(enum kFSM transitionTo) {
     if (y > WFALL_PIX_Y + BALL_RADIUS) {
       return doFSM(kGameFSM_BallGutter);
     } 
+    //
+    cpVect v = cpBodyGetVelocity(getBall());
+    // pd->system->logToConsole("cpvlengthsq %f", cpvlengthsq(v));
+    if (cpvlengthsq(v) < BALL_IS_STUCK) {
+      if (m_ballStuckCounter++ > STUCK_TICKS) {
+        return doFSM(kGameFSM_BallStuck);
+      }
+    } else {
+      m_ballStuckCounter = 0;
+    }
 
   } else if (m_FSM == kGameFSM_BallStuck) {
 
-    // TODO
     commonArrowScrollAndBounceBack();
-
+    //
+    bool popped = true;
+    if (m_frameCount % (TICK_FREQUENCY/5) == 0) {
+      popped = popRandom();
+    }
+    cpVect v = cpBodyGetVelocity(getBall());
+    if (cpvlengthsq(v) > BALL_IS_STUCK || !popped) {
+      return doFSM(kGameFSM_BallInPlay);
+    }
 
   } else if (m_FSM == kGameFSM_CloseUp) {
 
@@ -268,12 +298,16 @@ enum kFSM doFSM(enum kFSM transitionTo) {
       ballsToShow = m_ballCount;
       if (ballsToShow > maxBallsToShow) { ballsToShow = maxBallsToShow; }
       setBallFallN(ballsToShow);
+      setBallFallX(getCurrentHole());
       activeBalls = 1;
       for (int i = 0; i < ballsToShow; ++i) {
         py[i] = -2*BALL_RADIUS*(i + 1);
         setBallFallY(i, py[i]);
       }
       pd->system->logToConsole("kGameFSM_ScoresAnimation, ballsToShow %i", ballsToShow);
+      nextHole(m_ballCount); // Giving current score count
+      updateInfoTopperBitmap();
+      updateLevelSplashBitmap(); 
     }
     //
     for (int i = 0; i < activeBalls; ++i) {
@@ -289,11 +323,44 @@ enum kFSM doFSM(enum kFSM transitionTo) {
     }
     if (++timer % 8 == 0 && activeBalls < ballsToShow) { activeBalls++; }
 
+    if (getPressed(kButtonUp))   return doFSM(kGameFSM_ScoresToTitle);
+    if (getPressed(kButtonDown)) return doFSM(kGameFSM_ScoresToSplash);
+
   } else if (m_FSM == kGameFSM_ScoresToTitle) {
+
+    static int16_t timer = 0;
+    static int16_t max = TICK_FREQUENCY/2;
+    if (newState) {
+      timer = 0;
+      pd->system->logToConsole("kGameFSM_ScoresToSplash");
+    }
+    const float so = getScrollOffset();
+    const float progress = getEasing(EaseInSine, (float)timer/max);
+    float targetY = WFALL_PIX_Y;
+    setScrollOffset(so + (targetY - so)*progress, true);
+    if (timer++ == max) {
+      return doFSM(kTitlesFSM_DisplayTitles);
+    }
 
   } else if (m_FSM == kGameFSM_ScoresToSplash) {
 
+    static int16_t timer = 0;
+    static int16_t max = TICK_FREQUENCY/2;
+    if (newState) {
+      timer = 0;
+      pd->system->logToConsole("kGameFSM_ScoresToSplash");
+    }
+    const float so = getScrollOffset();
+    const float progress = getEasing(EaseInSine, (float)timer/max);
+    float targetY = WFALL_PIX_Y + 2*DEVICE_PIX_Y;
+    setScrollOffset(so + (targetY - so)*progress, true);
+    if (timer++ == max) {
+      return doFSM(kGameFSM_SplashToStart);
+    }
+
   } else {
+
+      pd->system->error("FSM error");
 
   }
 
