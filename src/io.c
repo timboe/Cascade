@@ -4,9 +4,6 @@
 #include "input.h"
 #include "sound.h"
 
-char m_filePath[32];
-
-bool m_foundSaveData = false;
 
 enum kSaveLoadRequest m_doFirst = kDoNothing, m_andThen = kDoNothing, m_andFinally = kDoNothing;
 
@@ -22,7 +19,7 @@ uint16_t m_hole = 0;
 
 uint32_t m_player_score[SAVE_FORMAT_1_MAX_PLAYERS][SAVE_FORMAT_1_MAX_LEVELS][SAVE_FORMAT_1_MAX_HOLES] = {0};
 
-uint32_t m_level_par[SAVE_FORMAT_1_MAX_LEVELS][SAVE_FORMAT_1_MAX_HOLES] = {0};
+uint32_t m_level_par[MAX_LEVELS][MAX_HOLES] = {0};
 
 
 int doRead(void* _userdata, uint8_t* _buf, int _bufsize);
@@ -47,18 +44,18 @@ void deserialiseValueSaveFormat(json_decoder* jd, const char* _key, json_value _
 
 int scanShouldDecodeTableValueForKey(json_decoder* jd, const char* _key);
 
-json_encoder m_je;
+// // json_encoder m_je;
 
-json_decoder m_jd_p = {
-  // .decodeError = decodeError,
-  // .didDecodeTableValue = didDecodeTableValuePlayer,
-  // .didDecodeArrayValue = deserialiseArrayValuePlayer
-};
+// json_decoder m_jd_p = {
+//   // .decodeError = decodeError,
+//   // .didDecodeTableValue = didDecodeTableValuePlayer,
+//   // .didDecodeArrayValue = deserialiseArrayValuePlayer
+// };
 
-json_decoder m_jd = {
-  // .decodeError = decodeError,
-  // .willDecodeSublist = willDecodeSublist
-};
+// json_decoder m_jd = {
+//   // .decodeError = decodeError,
+//   // .willDecodeSublist = willDecodeSublist
+// };
 
 
 /// ///
@@ -129,7 +126,7 @@ void enactIO() {
     case kDoLoad: finished = doLoad(); break;
     case kDoTitle: finished = doTitle(); break;
     case kDoSaveDelete: finished = doSaveDelete(); break;
-    case kDoScanSlots: finished = true; scanSlots(); break;
+    case kDoScanSlots: finished = true; scanLevels(); break;
   }
 
   if (finished) {
@@ -159,8 +156,6 @@ void enactIO() {
     }
   }
 }
-
-bool hasSaveData() { return m_foundSaveData; }
 
 int doRead(void* _userdata, uint8_t* _buf, int _bufsize) {
   return pd->file->read((SDFile*)_userdata, _buf, _bufsize);
@@ -223,8 +218,50 @@ bool doSaveDelete() {
 
 ///
 
-void scanSlots() {
-  m_foundSaveData = false;
+FileOptions fileReadMode(uint16_t level) {
+  if (level < 10) return kFileRead; // First 10 levels are built-in
+  return kFileRead|kFileReadData; // Later levels might be side loaded
+}
+
+int shouldDecodeScan(json_decoder* jd, const char* key) {
+  return (strcmp(key, "par") == 0);
+}
+
+void didDecodeScan(json_decoder* jd, const char* key, json_value value) {
+  if (strcmp(key, "par") == 0) {
+    m_level_par[m_level][m_hole] = json_intValue(value);
+    pd->system->logToConsole("m_level_par[%i][%i] = %i", m_level, m_hole, m_level_par[m_level][m_hole]);
+  } else {
+    pd->system->error("didDecodeScan DECODE ISSUE, %s", key);
+  }
+}
+
+void scanLevels() {
+  char filePath[128];
+  for (int32_t l = 0; l < MAX_LEVELS; ++l) {
+    m_level = l;
+    bool abort = false;
+    for (int32_t h = 0; h < MAX_HOLES; ++h) {
+      m_hole = h;
+      snprintf(filePath, 128, "levels/fall_%i_hole_%i.json", (int)l+1, (int)h+1);
+      SDFile* file = pd->file->open(filePath, fileReadMode(l));
+      if (!file) {
+        if (!h) { abort = true; } // If missing the first fall of this level then stop looking here
+        break;
+      }
+      static json_decoder jd = {
+        .decodeError = decodeError,
+        .didDecodeTableValue = didDecodeScan,
+        .shouldDecodeTableValueForKey = shouldDecodeScan
+      };
+      pd->json->decode(&jd, (json_reader){ .read = doRead, .userdata = file }, NULL);
+      int status = pd->file->close(file);
+    }
+    if (abort) { break; }
+  }
+
+
+
   // for (m_scanSlot = 0; m_scanSlot < WORLD_SAVE_SLOTS; ++m_scanSlot) {
   //   m_worldVersions[m_save][m_scanSlot] = -1;
 
@@ -291,9 +328,6 @@ void scanSlots() {
   //   }
   // }
 
-  #ifdef DEV
-  pd->system->logToConsole("Scan world: overall result- %s", m_foundSaveData ? "CAN-BE-LOADED" : "CANNOT-LOAD");
-  #endif
 }
 
 // int scanShouldDecodeTableValueForKey(json_decoder* jd, const char* _key) {

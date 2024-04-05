@@ -105,7 +105,7 @@ enum kFSM doFSM(enum kFSM transitionTo) {
     if (newState) {
       setGameMode(kGameWindow);
       setScrollOffset(-DEVICE_PIX_Y - TURRET_RADIUS, true);
-      randomiseBoard();
+      randomiseBoard(); // // TODO replace me
       updateInfoTopperBitmap();
       updateLevelSplashBitmap(); 
     }
@@ -126,6 +126,7 @@ enum kFSM doFSM(enum kFSM transitionTo) {
     static const uint16_t max = TICK_FREQUENCY/2;
     if (newState) {
       timer = 0;
+      setMinimumY(0);
       m_ballCount = 0;
     }
     ++timer;
@@ -305,9 +306,10 @@ enum kFSM doFSM(enum kFSM transitionTo) {
         setBallFallY(i, py[i]);
       }
       pd->system->logToConsole("kGameFSM_ScoresAnimation, ballsToShow %i", ballsToShow);
-      nextHole(m_ballCount); // Giving current score count
+      updateLevelSplashBitmap(); // call this BEFORE nextHole
+      nextHole(m_ballCount); // Also saving the current score count (will be animated in by setBallFall)
       updateInfoTopperBitmap();
-      updateLevelSplashBitmap(); 
+      randomiseBoard(); // TODO replace me
     }
     //
     for (int i = 0; i < activeBalls; ++i) {

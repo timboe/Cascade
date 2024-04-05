@@ -3,9 +3,8 @@
 
 enum kSaveLoadRequest {kDoNothing, kDoSave, kDoLoad, kDoSaveDelete, kDoScanSlots, kDoTitle};
 
-void scanSlots(void);
+void scanLevels(void);
 
-bool hasSaveData(void);
 
 void hardReset(void);
 

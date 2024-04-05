@@ -20,7 +20,7 @@ static void init(void) {
   initSound();
   initGame();
 
-  scanSlots();
+  scanLevels();
 
   doIO(kDoTitle, /*and then*/ kDoNothing, /*and finally*/ kDoNothing);
 }
