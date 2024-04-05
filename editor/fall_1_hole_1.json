@@ -1,0 +1,119 @@
+{
+  "author": "Tim",
+  "world": 1,
+  "level": 1,
+  "par": 3,
+  "save_format": 1,
+  "n_static": 2,
+  "n_elliptic": 1,
+  "n_linear": 0,
+  "StaticControl1": {
+    "shape": 0,
+    "x": 77,
+    "y": 89,
+    "angle": 0,
+    "size": 3,
+    "type": 1
+  },
+  "StaticControl2": {
+    "shape": 1,
+    "x": 111,
+    "y": 161,
+    "angle": 0,
+    "size": 3,
+    "type": 0
+  },
+  "EllipticControl1": {
+    "shape": 1,
+    "x": 314,
+    "y": 78,
+    "angle": 0,
+    "size": 0,
+    "arc": 330,
+    "use_arc": true,
+    "speed": 0.71,
+    "a": 55,
+    "b": 52,
+    "n_pegs": 16,
+    "PegContainer1": {
+      "shape": 0,
+      "size": 0,
+      "type": 0
+    },
+    "PegContainer2": {
+      "shape": 0,
+      "size": 0,
+      "type": 0
+    },
+    "PegContainer3": {
+      "shape": 0,
+      "size": 0,
+      "type": 0
+    },
+    "PegContainer4": {
+      "shape": 0,
+      "size": 0,
+      "type": 0
+    },
+    "PegContainer5": {
+      "shape": 0,
+      "size": 0,
+      "type": 0
+    },
+    "PegContainer6": {
+      "shape": 0,
+      "size": 0,
+      "type": 0
+    },
+    "PegContainer7": {
+      "shape": 0,
+      "size": 0,
+      "type": 0
+    },
+    "PegContainer8": {
+      "shape": 0,
+      "size": 0,
+      "type": 0
+    },
+    "PegContainer9": {
+      "shape": 0,
+      "size": 0,
+      "type": 0
+    },
+    "PegContainer10": {
+      "shape": 0,
+      "size": 0,
+      "type": 0
+    },
+    "PegContainer11": {
+      "shape": 0,
+      "size": 0,
+      "type": 0
+    },
+    "PegContainer12": {
+      "shape": 0,
+      "size": 0,
+      "type": 0
+    },
+    "PegContainer13": {
+      "shape": 0,
+      "size": 0,
+      "type": 0
+    },
+    "PegContainer14": {
+      "shape": 0,
+      "size": 0,
+      "type": 0
+    },
+    "PegContainer15": {
+      "shape": 0,
+      "size": 0,
+      "type": 0
+    },
+    "PegContainer16": {
+      "shape": 0,
+      "size": 0,
+      "type": 0
+    }
+  }
+}

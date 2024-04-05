@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://cmuubbicvggs5"]
+[gd_scene load_steps=16 format=3 uid="uid://cmuubbicvggs5"]
 
 [ext_resource type="Script" path="res://RenderScene.gd" id="1_1f7cp"]
 [ext_resource type="Theme" uid="uid://mvm1lqkscosr" path="res://editor/theme/aestro.tres" id="1_3tosr"]
@@ -26,6 +26,13 @@ script/source = "extends HSlider
 
 func _on_value_changed(newValue):
 	$\"../LevelLabel\".text = \"Level: \" + str(newValue)
+"
+
+[sub_resource type="GDScript" id="GDScript_lhfae"]
+script/source = "extends HSlider
+
+func _on_value_changed(newValue):
+	$\"../ParLabel\".text = \"Par: \" + str(newValue)
 "
 
 [sub_resource type="GDScript" id="GDScript_stxm2"]
@@ -204,6 +211,18 @@ theme_override_constants/h_separation = 6
 theme_override_constants/v_separation = 6
 columns = 2
 
+[node name="AuthorLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Author:"
+horizontal_alignment = 2
+
+[node name="Author" type="LineEdit" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_length = 15
+
 [node name="WorldLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -238,6 +257,23 @@ value = 1.0
 rounded = true
 tick_count = 8
 script = SubResource("GDScript_scs8v")
+
+[node name="ParLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Par: 1"
+horizontal_alignment = 2
+
+[node name="ParSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 10.0
+value = 3.0
+rounded = true
+tick_count = 8
+script = SubResource("GDScript_lhfae")
 
 [node name="HeightLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
@@ -338,6 +374,7 @@ text = "PEGS"
 
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/WorldSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/WorldSlider" method="_on_value_changed"]
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/LevelSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/LevelSlider" method="_on_value_changed"]
+[connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/ParSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/ParSlider" method="_on_value_changed"]
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/HeightSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/HeightSlider" method="_on_value_changed"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Save" to="HBox/RightScroll/Margin/RightVBox/Grid/Save" method="_on_pressed"]
 [connection signal="canceled" from="HBox/RightScroll/Margin/RightVBox/Grid/Save/FileDialog" to="HBox/RightScroll/Margin/RightVBox/Grid/Save" method="_on_file_dialog_canceled"]

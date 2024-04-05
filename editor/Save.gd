@@ -3,7 +3,7 @@ extends Button
 func _on_pressed():
 	var world : int = $"../WorldSlider".value
 	var level : int = $"../LevelSlider".value
-	var save_name := String("world_" + str(world) + "_level_" + str(level) + ".json")
+	var save_name := String("fall_" + str(world) + "_hole_" + str(level) + ".json")
 	$FileDialog.current_file = save_name
 	$FileDialog.visible = true
 
@@ -90,8 +90,10 @@ func pack_linear(linear_path : Control) -> Array:
 
 func pack_save() -> Dictionary:
 	var save_game : Dictionary
+	save_game["author"] = $"../Author".text
 	save_game["world"] = $"../WorldSlider".value
 	save_game["level"] = $"../LevelSlider".value
+	save_game["par"] = $"../ParSlider".value
 	save_game["save_format"] = 1
 	
 	var static_pegs = get_tree().get_nodes_in_group("static_pegs")

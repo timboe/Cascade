@@ -59,8 +59,14 @@ func reset_level() -> void:
 func restore_save(save_game : Dictionary) -> void:
 	reset_level()
 	
+	$%Author.text = save_game["author"] 
 	$%WorldSlider.value = save_game["world"] 
 	$%LevelSlider.value = save_game["level"]
+	$%ParSlider.value = save_game["par"]
+	
+	$%WorldSlider._on_value_changed($%WorldSlider.value)
+	$%LevelSlider._on_value_changed($%LevelSlider.value)
+	$%ParSlider._on_value_changed($%ParSlider.value)
 	
 	var static_pegs : int = save_game["n_static"]
 	var elliptic_paths : int = save_game["n_elliptic"]
