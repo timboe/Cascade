@@ -32,10 +32,14 @@ LCDBitmap* getBitmapWfFg_byidx(uint8_t _wf, uint32_t _idx);
 LCDBitmap* getBitmapWfBg(uint8_t wf);
 LCDBitmap* getBitmapWfFront(void);
 
-
 LCDBitmap* getSpriteSplash(void);
-
 LCDBitmap* getTitleSelectedBitmap(void);
+LCDBitmap* getBitmapNumeral(int8_t n);
+LCDBitmap* getStencilNumeral(void);
+
+LCDBitmap* getBitmapLevel(void);
+LCDBitmap* getBitmapHole(void);
+
 
 LCDBitmap* getBitmapTurretBody(void);
 LCDBitmap* getBitmapTurretBarrel(void);

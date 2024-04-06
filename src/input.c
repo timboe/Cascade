@@ -7,106 +7,86 @@
 #include "physics.h"
 #include "board.h"
 
-// kButtonLeft
-// kButtonRight
-// kButtonUp
-// kButtonDown
-// kButtonB
-// kButtonA
-
 PDButtons m_current;
 
-float m_turretBarrelAngle = 180.0f;
+float m_crankAngle = 0;
+float m_crankChanged = 0;
 
-void clickHandleTitles(uint32_t _buttonPressed);
+void clickHandleTitles(uint32_t buttonPressed);
 
-void clickHandleGameWindow(uint32_t _buttonPressed);
-
-void rotateHandleGameWindow(float angle, float delta);
-
-void rotateHandleTitles(float _rotation);
+void clickHandleGameWindow(uint32_t buttonPressed);
 
 /// ///
 
 
-bool getPressed(PDButtons b) {
-  return m_current & b;
-}
+bool getPressed(PDButtons b) { return m_current & b; }
 
-bool getPressedAny() {
-  return m_current;
-}
+bool getPressedAny(void) { return m_current; }
 
+float getCrankAngle(void) { return m_crankAngle; }
 
-void gameClickConfigHandler(uint32_t _buttonPressed) {
+float getCrankChanged(void) { return m_crankChanged; }
+
+void gameClickConfigHandler(uint32_t buttonPressed) {
   switch (getGameMode()) {
-    case kTitles: return clickHandleTitles(_buttonPressed);
-    case kGameWindow: return clickHandleGameWindow(_buttonPressed);
+    case kTitles: return clickHandleTitles(buttonPressed);
+    case kGameWindow: return clickHandleGameWindow(buttonPressed);
     case kNGameModes: break;
   }
 }
 
-void clickHandleTitles(uint32_t _buttonPressed) {
-  if (kButtonA == _buttonPressed) {
-    doFSM(kTitlesFSM_TitlesToSplash);
-  } else if (kButtonB == _buttonPressed) {
-    //
+void clickHandleTitles(uint32_t buttonPressed) {
+  if (kButtonA == buttonPressed) {
+    switch (getFSM()) {
+      case kTitlesFSM_DisplayTitles: doFSM(kTitlesFSM_PlayerSelectToLevelSelect); return;
+      case kTitlesFSM_ChoosePlayer: doFSM(kTitlesFSM_PlayerSelectToLevelSelect); return;
+      case kTitlesFSM_ChooseLevel: doFSM(kTitlesFSM_ChooseLevelToChooseHole); return;
+      case kTitlesFSM_ChooseHole: doFSM(kTitlesFSM_ChooseHoleToSplash); return;
+      default: break;
+    }
+  } else if (kButtonB == buttonPressed) {
+    switch (getFSM()) {
+      case kTitlesFSM_ChooseLevel: doFSM(kTitlesFSM_ChooseLevelToPlayerSelect); return;
+      case kTitlesFSM_ChooseHole: doFSM(kTitlesFSM_ChooseHoleToLevelSelect); return;
+      default: break;
+    }
   }
 }
 
-void clickHandleGameWindow(uint32_t _buttonPressed) {
-  // if (kButtonA == _buttonPressed) {
-    
-  //   // if (ballInPlay()) {
-  //   //   setBallInPlay(false);
-  //   //   setScrollToTop(true);
-  //   // } else {
-  //   //   resetBall();
-  //   //   setBallInPlay(true);
-  //   //   setScrollToTop(false);
-  //   //   launchBall();
-  //   // }
-
-  // } else if (kButtonB == _buttonPressed) {
-
-  //   // setBallInPlay(false);
-  //   // randomiseBoard();
-  //   // setScrollToTop(true);
-
-  // }
-
-  if (kButtonB == _buttonPressed) randomiseBoard();
-}
-
-void rotateHandleTitles(float _rotation) {
- //
-}
-
-void rotateHandleGameWindow(float angle, float delta) {
-  static bool topLock = true;
-  static float revDetection = 180.0f;
-
-  const bool newRev = fabsf(angle - revDetection) > 180.0f;
-  revDetection = angle;
-
-  const float so = getScrollOffset();
-  if ((newRev && angle < 180.0f) || so > getMinimumY()) {
-    topLock = false;
-  } else if (so <= getMinimumY()) {
-    topLock = true;
+void clickHandleGameWindow(uint32_t buttonPressed) {
+  if (kButtonA == buttonPressed && getFSM() == kGameFSM_ScoresAnimation) {
+    doFSM(kGameFSM_ScoresToSplash);
+  } else if (kButtonB == buttonPressed && getFSM() == kGameFSM_ScoresAnimation) {
+    doFSM(kGameFSM_ScoresToTitle);
   }
-
-  if (!topLock) modScrollVelocity(delta*CRANK_SCROLL_MODIFIER);
-
-  if (angle > TURRET_ANGLE_MAX) { angle = TURRET_ANGLE_MAX; }
-  else if (angle < TURRET_ANGLE_MIN) { angle = TURRET_ANGLE_MIN; }
-  m_turretBarrelAngle = angle;
-
-} 
-
-float getTurretBarrelAngle(void) {
-  return m_turretBarrelAngle;
 }
+
+// void rotateHandleTitles(float _rotation) {
+//  //
+// }
+
+// void rotateHandleGameWindow(float angle, float delta) {
+//   static bool topLock = true;
+//   static float revDetection = 180.0f;
+
+//   const bool newRev = fabsf(angle - revDetection) > 180.0f;
+//   revDetection = angle;
+
+//   const float so = getScrollOffset();
+//   if ((newRev && angle < 180.0f) || so > getMinimumY()) {
+//     topLock = false;
+//   } else if (so <= getMinimumY()) {
+//     topLock = true;
+//   }
+
+//   if (!topLock) modScrollVelocity(delta*CRANK_SCROLL_MODIFIER);
+
+//   if (angle > TURRET_ANGLE_MAX) { angle = TURRET_ANGLE_MAX; }
+//   else if (angle < TURRET_ANGLE_MIN) { angle = TURRET_ANGLE_MIN; }
+//   m_turretBarrelAngle = angle;
+
+// } 
+
 
 void clickHandlerReplacement() {
   enum kGameMode gm = getGameMode();
@@ -120,13 +100,14 @@ void clickHandlerReplacement() {
   if (released & kButtonB) gameClickConfigHandler(kButtonB);
   if (released & kButtonA) gameClickConfigHandler(kButtonA);
 
-  const float cc = pd->system->getCrankChange();
-  if (cc) {
-    switch (gm) {
-      case kTitles: rotateHandleTitles(pd->system->getCrankChange()); break; 
-      case kGameWindow: rotateHandleGameWindow(pd->system->getCrankAngle(), cc); break;
-      default: break;
-    }
-  }
+  m_crankChanged = pd->system->getCrankChange();
+  m_crankAngle = pd->system->getCrankAngle();
+  // if (cc) {
+  //   switch (gm) {
+  //     case kTitles: rotateHandleTitles(pd->system->getCrankChange()); break; 
+  //     case kGameWindow: rotateHandleGameWindow(pd->system->getCrankAngle(), cc); break;
+  //     default: break;
+  //   }
+  // }
 
 }

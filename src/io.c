@@ -64,6 +64,65 @@ uint16_t getCurrentPlayer(void) { return m_player; }
 
 uint16_t getCurrentLevel(void) { return m_level; }
 
+uint16_t getPreviousLevel(void) {
+  int16_t level = m_level;
+  while (true) {
+    if (--level < 0) { level += MAX_LEVELS; }
+    if (m_level_par[level][0]) return level;
+  }
+  return 0;
+}
+
+uint16_t getNextLevel(void) {
+  int16_t level = m_level;
+  while (true) {
+    level = (level + 1) % MAX_LEVELS;
+    if (m_level_par[level][0]) return level;
+  }
+  return 0;
+}
+
+uint16_t getPreviousHole(void) {
+  int16_t hole = m_hole;
+  while (true) {
+    if (--hole < 0) { hole += MAX_HOLES; }
+    if (m_level_par[m_level][hole]) return hole;
+  }
+  return 0;
+}
+
+uint16_t getNextHole(void) {
+  int16_t hole = (m_hole + 1) % MAX_HOLES;
+  if (m_level_par[m_level][hole]) return hole;
+  return 0;
+}
+
+void doPreviousLevel(void) { 
+  pd->system->logToConsole("doPreviousLevel");
+  m_level = getPreviousLevel();
+}
+
+void doNextLevel(void) {
+  pd->system->logToConsole("doNextLevel");
+  m_level = getNextLevel();
+}
+
+void doPreviousHole(void) { 
+  pd->system->logToConsole("doPreviousHole");
+  m_hole = getPreviousHole();
+}
+
+void doNextHole(void) {
+  pd->system->logToConsole("doNextHole");
+  m_hole = getNextHole();
+}
+
+void setHoleScore(uint16_t score) {
+  if (score && score < m_player_score[m_player][m_level][m_hole]) {
+    m_player_score[m_player][m_level][m_hole] = score;
+  }
+}
+
 uint16_t getCurrentHole(void) { return m_hole; }
 
 uint16_t getPar(uint16_t level, uint16_t hole) { return /*m_level_par[level][hole];*/ 3; }
@@ -73,17 +132,6 @@ uint16_t getScore(uint16_t level, uint16_t hole) { return /*m_player_score[m_pla
 uint16_t getCurrentLevelPar(void) { return getPar(m_level, m_hole); }
 
 uint16_t getCurrentLevelScore(void) { return getScore(m_level, m_hole); }
-
-void nextHole(uint16_t currentHoleScore) {
-  if (currentHoleScore < m_player_score[m_player][m_level][m_hole]) {
-    m_player_score[m_player][m_level][m_hole] = currentHoleScore;
-  }
-
-  if (++m_hole == MAX_HOLES) {
-    m_hole = 0;
-    ++m_level;
-  }
-}
 
 void doIO(enum kSaveLoadRequest _first, enum kSaveLoadRequest _andThen, enum kSaveLoadRequest _andFinally) {
   if (IOOperationInProgress()) {
@@ -218,11 +266,6 @@ bool doSaveDelete() {
 
 ///
 
-FileOptions fileReadMode(uint16_t level) {
-  if (level < 10) return kFileRead; // First 10 levels are built-in
-  return kFileRead|kFileReadData; // Later levels might be side loaded
-}
-
 int shouldDecodeScan(json_decoder* jd, const char* key) {
   return (strcmp(key, "par") == 0);
 }
@@ -243,8 +286,14 @@ void scanLevels() {
     bool abort = false;
     for (int32_t h = 0; h < MAX_HOLES; ++h) {
       m_hole = h;
+      // snprintf(filePath, 128, "levels/fall_%i_hole_%i.json", 1, 1);
       snprintf(filePath, 128, "levels/fall_%i_hole_%i.json", (int)l+1, (int)h+1);
-      SDFile* file = pd->file->open(filePath, fileReadMode(l));
+      SDFile* file = pd->file->open(filePath, kFileRead);
+      if (!file && m_level >= 10) {
+        // Look for user-supplied levels instead
+        snprintf(filePath, 128, "fall_%i_hole_%i.json", (int)l+1, (int)h+1);
+        SDFile* file = pd->file->open(filePath, kFileReadData);
+      }
       if (!file) {
         if (!h) { abort = true; } // If missing the first fall of this level then stop looking here
         break;
@@ -257,77 +306,21 @@ void scanLevels() {
       pd->json->decode(&jd, (json_reader){ .read = doRead, .userdata = file }, NULL);
       int status = pd->file->close(file);
     }
-    if (abort) { break; }
+    // if (abort) { break; }
   }
+  m_level = 0;
+  m_hole = 0;
 
-
-
-  // for (m_scanSlot = 0; m_scanSlot < WORLD_SAVE_SLOTS; ++m_scanSlot) {
-  //   m_worldVersions[m_save][m_scanSlot] = -1;
-
-  //   snprintf(m_filePath, 32, "world_%i_%i.json", m_save+1, m_scanSlot+1);
-  //   SDFile* file = pd->file->open(m_filePath, kFileRead|kFileReadData);
-  //   if (!file) {
-  //     #ifdef DEV
-  //     pd->system->logToConsole("Scan world: Save:%i, Slot:%i, No Save", m_save, m_scanSlot);
-  //     #endif
-  //     m_worldExists[m_save][m_scanSlot] = false;
-  //     continue;
-  //   }
-
-  //   json_decoder jd = {
-  //     .decodeError = decodeError,
-  //     .didDecodeTableValue = scanDidDecodeSaveFormat,
-  //     .shouldDecodeTableValueForKey = scanShouldDecodeTableValueForKey
-  //   };
-
-  //   pd->json->decode(&jd, (json_reader){ .read = doRead, .userdata = file }, NULL);
-  //   int status = pd->file->close(file);
-  //   if (status) pd->system->error("SCAN SLOTS ERROR: wold file->close status code: %i", status);
-
-  //   #ifdef DEV
-  //   pd->system->logToConsole("Scan world: Save:%i, Slot:%i, Version:%i", m_save, m_scanSlot, m_worldVersions[m_save][m_scanSlot]);
-  //   #endif
-  //   m_worldExists[m_save][m_scanSlot] = true;
-  //   m_foundSaveData[m_save] = true;
-  // }
-
-  // // Filter
-  // for (uint16_t ss = 0; ss < WORLD_SAVE_SLOTS; ++ss) {
-  //   if (m_worldExists[m_save][ss]) {
-  //     if (m_worldVersions[m_save][ss] == -1) {
-  //       pd->system->error("Scan world: Unable to determine save version for save file %i", m_save);
-  //       m_foundSaveData[m_save] = false;
-  //       m_worldExists[m_save][ss] = false;
-  //     } else if (m_worldVersions[m_save][ss] < EARLIEST_SUPPORTED_SAVE_FORMAT) {
-  //       #ifdef DEV
-  //       pd->system->logToConsole("Scan world: PRE-BETA WORLD DETECTED! Version %i < %i."
-  //         " ACTION: Delete everything and start again", m_worldVersions[m_save][ss], EARLIEST_SUPPORTED_SAVE_FORMAT);
-  //       #endif
-  //       m_foundSaveData[m_save] = false;
-  //       m_worldExists[m_save][ss] = false;
-  //       doSaveDelete();
-  //     }
-  //   }
-  // }
-
-  // {
-  //   snprintf(m_filePath, 32, "player_%i.json", m_save+1);
-  //   SDFile* file = pd->file->open(m_filePath, kFileRead|kFileReadData);
-  //   if (!file) {
-  //     m_foundSaveData[m_save] = false;
-  //     #ifdef DEV
-  //     pd->system->logToConsole("Scan world: No Player data found!");
-  //     #endif
-  //   } else {
-  //     int status = pd->file->close(file);
-  //     if (status) pd->system->error("SCAN SLOTS ERROR: player file->close status code: %i", status);
-  //     #ifdef DEV
-  //     pd->system->logToConsole("Scan world: Player data found");
-  //     #endif
-  //   }
-  // }
-
+  // Check for save-game file
+  snprintf(filePath, 128, "cascade_savegame_v1.dat");
+  SDFile* file = pd->file->open(filePath, kFileRead);
+  if (file) { // Load save data
+    const uint16_t saveSize = sizeof(uint32_t) * SAVE_FORMAT_1_MAX_PLAYERS * SAVE_FORMAT_1_MAX_LEVELS * SAVE_FORMAT_1_MAX_HOLES;
+    int result = pd->file->read(file, m_player_score, saveSize);
+    pd->system->logToConsole("Reading %i bytes of save data, result %i", saveSize, result);
+  } else {
+    pd->system->logToConsole("No save-game data");
+  }
 }
 
 // int scanShouldDecodeTableValueForKey(json_decoder* jd, const char* _key) {

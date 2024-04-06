@@ -21,4 +21,6 @@ void setBallFallX(uint16_t x);
 
 void setBallFallY(uint16_t ball, float y);
 
+void setNumeralOffset(float no);
+
 void resetBallTrace(void);

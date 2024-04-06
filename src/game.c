@@ -13,7 +13,12 @@
 int32_t m_frameCount = 0;
 uint16_t m_ballCount = 0; // Keeping track of the current level score
 uint16_t m_ballStuckCounter = 0; // Keeping track of a stuck ball
+float m_turretBarrelAngle = 180.0f;
+
 enum kFSM m_FSM = (enum kFSM)0;
+
+enum kFSM doFSM_Titles(bool newState);
+enum kFSM doFSM_Game(bool newState);
 
 ////////////
 
@@ -22,6 +27,8 @@ int getFrameCount() { return m_frameCount; }
 enum kFSM getFSM() { return m_FSM; }
 
 void resetBallStuckCounter(void) { m_ballStuckCounter = 0; }
+
+float getTurretBarrelAngle(void) { return m_turretBarrelAngle; }
 
 int gameLoop(void* _data) {
   ++m_frameCount;
@@ -77,22 +84,58 @@ bool ballInPlay(void) {
   return (m_FSM >= kGameFSM_BallInPlay && m_FSM <= kGameFSM_BallGutter);
 }
 
-void commonArrowScrollAndBounceBack(void) {
+void commonScrollAndBounceBack(void) {
+  // Button based
   float diffY = 0;
   if      (getPressed(kButtonUp)) diffY = -SCREEN_ACC;
   else if (getPressed(kButtonDown)) diffY =  SCREEN_ACC;
   modScrollVelocity(diffY);
+  // Crank based
+  float angle = getCrankAngle();
+  static bool topLock = true;
+  static float revDetection = 180.0f;
+
+  const bool newRev = fabsf(angle - revDetection) > 180.0f;
+  revDetection = angle;
+
+  const float so = getScrollOffset();
+  if ((newRev && angle < 180.0f) || so > getMinimumY()) {
+    topLock = false;
+  } else if (so <= getMinimumY()) {
+    topLock = true;
+  }
+
+  if (!topLock) modScrollVelocity(getCrankChanged() * CRANK_SCROLL_MODIFIER);
+
+  if (angle > TURRET_ANGLE_MAX) { angle = TURRET_ANGLE_MAX; }
+  else if (angle < TURRET_ANGLE_MIN) { angle = TURRET_ANGLE_MIN; }
+  m_turretBarrelAngle = angle;
+
+  // Apply
   applyScrollEasing();
 }
 
-enum kFSM doFSM(enum kFSM transitionTo) {
+void commonScrollTo(int16_t destination, float progress, enum EasingFunction_t e) {
+  const float so = getScrollOffset();
+  setScrollOffset(so + (destination - so)*getEasing(e, progress), true);
+}
 
+enum kFSM doFSM(enum kFSM transitionTo) {
   bool newState = (m_FSM != transitionTo);
   if (newState) { 
-    m_FSM = transitionTo; // Transition
+    m_FSM = transitionTo;
+    pd->system->logToConsole("State change %i", (int)transitionTo);
   }
 
-  ///
+  if (m_FSM < kFSM_SPLIT_TitlesGame) return doFSM_Titles(newState);
+  else return doFSM_Game(newState);
+}
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+enum kFSM doFSM_Titles(bool newState) {
 
   if (m_FSM == kTitlesFSM_DisplayTitles) {
 
@@ -100,54 +143,155 @@ enum kFSM doFSM(enum kFSM transitionTo) {
       setGameMode(kTitles);
     }
 
-  } else if (m_FSM == kTitlesFSM_TitlesToSplash) {
-    
+  } else if (m_FSM == kTitlesFSM_TitlesToPlayerSelect) {
+
+    static int16_t timer = 0;
+    if (newState) { timer = 0; }
+    commonScrollTo(DEVICE_PIX_Y, (float)timer/TIME_TITLE_TRANSITION, EaseInOutQuad);
+    if (timer++ == TIME_TITLE_TRANSITION) { return doFSM(kTitlesFSM_ChooseLevel); }
+
+  } else if (m_FSM == kTitlesFSM_ChoosePlayer) {
+
+  } else if (m_FSM == kTitlesFSM_PlayerSelectToLevelSelect) {
+
+    static int16_t timer = 0;
+    if (newState) { timer = 0; }
+    commonScrollTo(DEVICE_PIX_Y * 2, (float)timer/TIME_TITLE_TRANSITION, EaseInOutQuad);
+    if (timer++ == TIME_TITLE_TRANSITION) { return doFSM(kTitlesFSM_ChooseLevel); }
+
+      pd->system->logToConsole("X %i", (int)timer);
+
+
+  } else if (m_FSM == kTitlesFSM_ChooseLevel) {
+
+    static float progress = 0.0f;
+    if (newState) progress = 0.0f;
+
+    progress += getCrankChanged() * CRANK_NUMBERSCROLL_MODIFIER;
+    if      (getPressed(kButtonUp)) progress += 10 * CRANK_NUMBERSCROLL_MODIFIER;
+    else if (getPressed(kButtonDown)) progress -=  10 * CRANK_NUMBERSCROLL_MODIFIER;    
+    progress *= 0.99f;
+    if (progress >= 1.0f) {
+      progress -= 2.0f;
+      doPreviousLevel();
+    } else if (progress < -1.0f) {
+      progress += 2.0f;
+      doNextLevel();
+    }
+    setNumeralOffset(progress);
+
+  } else if (m_FSM == kTitlesFSM_ChooseLevelToChooseHole) {
+
+    static int16_t timer = 0;
+    if (newState) { 
+      timer = 0;
+      setNumeralOffset(0.0f);
+    }
+    commonScrollTo(DEVICE_PIX_Y * 3, (float)timer/TIME_TITLE_TRANSITION, EaseInOutQuad);
+    if (timer++ == TIME_TITLE_TRANSITION) { return doFSM(kTitlesFSM_ChooseHole); }
+
+  } else if (m_FSM == kTitlesFSM_ChooseLevelToPlayerSelect) {
+
+    static int16_t timer = 0;
     if (newState) {
-      setGameMode(kGameWindow);
-      setScrollOffset(-DEVICE_PIX_Y - TURRET_RADIUS, true);
-      randomiseBoard(); // // TODO replace me
+      timer = 0;
+      setNumeralOffset(0.0f);
+    }
+    commonScrollTo(DEVICE_PIX_Y, (float)timer/TIME_TITLE_TRANSITION, EaseInOutQuad);
+    if (timer++ == TIME_TITLE_TRANSITION) { return doFSM(kTitlesFSM_ChoosePlayer); }
+
+  } else if (m_FSM == kTitlesFSM_ChooseHole) {
+
+    static float progress = 0.0f;
+    if (newState) progress = 0.0f;
+
+    progress += getCrankChanged() * CRANK_NUMBERSCROLL_MODIFIER;
+    if      (getPressed(kButtonUp)) progress += 10 * CRANK_NUMBERSCROLL_MODIFIER;
+    else if (getPressed(kButtonDown)) progress -=  10 * CRANK_NUMBERSCROLL_MODIFIER;    
+    progress *= 0.99f;
+    if (progress >= 1.0f) {
+      progress -= 2.0f;
+      doPreviousHole();
+    } else if (progress < -1.0f) {
+      progress += 2.0f;
+      doNextHole();
+    }
+    setNumeralOffset(progress);
+
+  } else if (m_FSM == kTitlesFSM_ChooseHoleToSplash) {
+    
+    static int16_t timer = 0;
+    if (newState) {
+      timer = 0;
+      setNumeralOffset(0.0f);
       updateInfoTopperBitmap();
       updateLevelSplashBitmap(); 
     }
-    return doFSM(kGameFSM_DisplaySplash);
+    commonScrollTo(DEVICE_PIX_Y * 4, (float)timer/TIME_TITLE_TRANSITION, EaseInOutQuad);
+    if (timer++ == TIME_TITLE_TRANSITION) { return doFSM(kGameFSM_DisplaySplash); }
 
-  } else if (m_FSM == kGameFSM_DisplaySplash) {
+  } else if (m_FSM == kTitlesFSM_ChooseHoleToLevelSelect) {
+
+    static int16_t timer = 0;
+    if (newState) { 
+      timer = 0;
+      setNumeralOffset(0.0f);
+    }
+    commonScrollTo(DEVICE_PIX_Y * 2, (float)timer/TIME_TITLE_TRANSITION, EaseInOutQuad);
+    if (timer++ == TIME_TITLE_TRANSITION) { return doFSM(kTitlesFSM_ChooseLevel); }
+
+  } else {
+
+      pd->system->error("FSM error titles");
+
+  }
+
+  return m_FSM;
+}
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+enum kFSM doFSM_Game(bool newState) {
+
+  if (m_FSM == kGameFSM_DisplaySplash) {
 
     static uint16_t timer = 0;
-    static const uint16_t max = TICK_FREQUENCY;
-    if (newState) {
+    if (newState) { 
       timer = 0;
+      setGameMode(kGameWindow);
+      setScrollOffset(-DEVICE_PIX_Y - TURRET_RADIUS, true);
+      updateScoreHistogramBitmap();
+      randomiseBoard(); // // TODO replace me
     }
-    if (++timer == max) return doFSM(kGameFSM_SplashToStart);
+    if (timer++ == TIME_DISPLAY_SPLASH) return doFSM(kGameFSM_SplashToStart);
 
   } else if (m_FSM == kGameFSM_SplashToStart) {
 
     static uint16_t timer = 0;
-    static const uint16_t max = TICK_FREQUENCY/2;
     if (newState) {
       timer = 0;
-      setMinimumY(0);
       m_ballCount = 0;
+      setMinimumY(0);
     }
-    ++timer;
-    float progress = getEasing(EaseInOutQuint, 1.0f - (float)timer/max);
+    float progress = getEasing(EaseInOutQuint, 1.0f - (float)timer/TIME_SPLASH_TO_GAME);
     setScrollOffset((-DEVICE_PIX_Y - TURRET_RADIUS) * progress, true);
-    if (timer == max) {
+    if (timer++ == TIME_SPLASH_TO_GAME) {
       return doFSM(kGameFSM_AimMode);
     }
 
   } else if (m_FSM == kGameFSM_AimMode) {
 
     static uint16_t timer = 0;
-    static const uint16_t max = TICK_FREQUENCY;
     if (newState) {
       resetBallTrace();
       timer = 0;
     }
-    commonArrowScrollAndBounceBack();
+    commonScrollAndBounceBack();
     //
-    float progress = getEasing(EaseOutQuart, (float)timer/max);
-    if ((timer >= max) || (progress > 0.5f && !getPressed(kButtonA))) { // Fire
+    float progress = getEasing(EaseOutQuart, (float)timer/TIME_FIRE_BALL);
+    if ((timer >= TIME_FIRE_BALL) || (progress > 0.5f && !getPressed(kButtonA))) { // Fire
       resetBall();
       launchBall(progress);
       ++m_ballCount;
@@ -165,7 +309,7 @@ enum kFSM doFSM(enum kFSM transitionTo) {
       m_ballStuckCounter = 0;
     }
     //
-    commonArrowScrollAndBounceBack();
+    commonScrollAndBounceBack();
     //
     const float y = cpBodyGetPosition(getBall()).y;
     setScrollOffset(y - HALF_DEVICE_PIX_Y, false);
@@ -186,10 +330,10 @@ enum kFSM doFSM(enum kFSM transitionTo) {
 
   } else if (m_FSM == kGameFSM_BallStuck) {
 
-    commonArrowScrollAndBounceBack();
+    commonScrollAndBounceBack();
     //
     bool popped = true;
-    if (m_frameCount % (TICK_FREQUENCY/5) == 0) {
+    if (m_frameCount % TIME_STUCK_POP == 0) {
       popped = popRandom();
     }
     cpVect v = cpBodyGetVelocity(getBall());
@@ -213,7 +357,6 @@ enum kFSM doFSM(enum kFSM transitionTo) {
     if (newState) {
       vY = cpBodyGetVelocity(getBall()).y;
       pause = TICK_FREQUENCY / 2;
-      pd->system->logToConsole("kGameFSM_BallGutter");
     }
     // pd->system->logToConsole("v %f so %f", vY, getScrollOffset());
     if (vY > 0.01f) {
@@ -269,16 +412,12 @@ enum kFSM doFSM(enum kFSM transitionTo) {
   } else if (m_FSM == kGameFSM_GutterToScores) {
 
     static int16_t timer = 0;
-    static int16_t max = TICK_FREQUENCY/2;
     if (newState) {
       timer = 0;
       pd->system->logToConsole("kGameFSM_GuttetToTurret");
     }
-    const float so = getScrollOffset();
-    const float progress = getEasing(EaseOutSine, (float)timer/max);
-    float targetY = WFALL_PIX_Y + DEVICE_PIX_Y;
-    setScrollOffset(so + (targetY - so)*progress, true);
-    if (timer++ == max) {
+    commonScrollTo(WFALL_PIX_Y + DEVICE_PIX_Y, (float)timer/TIME_GUTTER_TO_SCORE, EaseOutSine);
+    if (timer++ == TIME_GUTTER_TO_SCORE) {
       setBallFallN(0);
       return doFSM(kGameFSM_ScoresAnimation);
     }
@@ -291,9 +430,7 @@ enum kFSM doFSM(enum kFSM transitionTo) {
     static uint16_t timer = 0;
     static uint16_t ballsToShow = 0;
     static uint16_t activeBalls = 1; 
-    static const float ballAcceleration = 0.05f;
     static const uint16_t maxBallsToShow = 12;
-    static const uint16_t ballDropDelayFrames = 8;
     if (newState) {
       timer = 0;
       ballsToShow = m_ballCount;
@@ -306,10 +443,7 @@ enum kFSM doFSM(enum kFSM transitionTo) {
         setBallFallY(i, py[i]);
       }
       pd->system->logToConsole("kGameFSM_ScoresAnimation, ballsToShow %i", ballsToShow);
-      updateLevelSplashBitmap(); // call this BEFORE nextHole
-      nextHole(m_ballCount); // Also saving the current score count (will be animated in by setBallFall)
-      updateInfoTopperBitmap();
-      randomiseBoard(); // TODO replace me
+      setHoleScore(m_ballCount);
     }
     //
     for (int i = 0; i < activeBalls; ++i) {
@@ -317,13 +451,13 @@ enum kFSM doFSM(enum kFSM transitionTo) {
       if (py[i] >= floorY) {
         py[i] = floorY;
       } else {
-        vy[i] += ballAcceleration;
+        vy[i] += HISTO_BALL_ACCELERATION;
         py[i] += vy[i];
       }
       setBallFallY(i, py[i]);
       // pd->system->logToConsole("kGameFSM_ScoresAnimation, i %i y %f",i, py[i]);
     }
-    if (++timer % 8 == 0 && activeBalls < ballsToShow) { activeBalls++; }
+    if (timer++ % TIME_BALL_DROP_DELAY == 0 && activeBalls < ballsToShow) { activeBalls++; }
 
     if (getPressed(kButtonUp))   return doFSM(kGameFSM_ScoresToTitle);
     if (getPressed(kButtonDown)) return doFSM(kGameFSM_ScoresToSplash);
@@ -331,38 +465,32 @@ enum kFSM doFSM(enum kFSM transitionTo) {
   } else if (m_FSM == kGameFSM_ScoresToTitle) {
 
     static int16_t timer = 0;
-    static int16_t max = TICK_FREQUENCY/2;
     if (newState) {
       timer = 0;
       pd->system->logToConsole("kGameFSM_ScoresToSplash");
     }
-    const float so = getScrollOffset();
-    const float progress = getEasing(EaseInSine, (float)timer/max);
-    float targetY = WFALL_PIX_Y;
-    setScrollOffset(so + (targetY - so)*progress, true);
-    if (timer++ == max) {
-      return doFSM(kTitlesFSM_DisplayTitles);
-    }
+    commonScrollTo(WFALL_PIX_Y, (float)timer/TIME_SCORE_TO_TITLE, EaseInSine);
+    if (timer++ == TIME_SCORE_TO_TITLE) { return doFSM(kTitlesFSM_DisplayTitles); }
 
   } else if (m_FSM == kGameFSM_ScoresToSplash) {
 
     static int16_t timer = 0;
-    static int16_t max = TICK_FREQUENCY/2;
     if (newState) {
       timer = 0;
+      doNextHole();
+      if (getCurrentHole() == 0) {
+        doNextLevel();
+      }
+      updateLevelSplashBitmap();
+      updateInfoTopperBitmap();
       pd->system->logToConsole("kGameFSM_ScoresToSplash");
     }
-    const float so = getScrollOffset();
-    const float progress = getEasing(EaseInSine, (float)timer/max);
-    float targetY = WFALL_PIX_Y + 2*DEVICE_PIX_Y;
-    setScrollOffset(so + (targetY - so)*progress, true);
-    if (timer++ == max) {
-      return doFSM(kGameFSM_SplashToStart);
-    }
+    commonScrollTo(WFALL_PIX_Y + 2*DEVICE_PIX_Y, (float)timer/TIME_SCORE_TO_SPLASH, EaseOutSine);
+    if (timer++ == TIME_SCORE_TO_SPLASH) { return doFSM(kGameFSM_DisplaySplash); }
 
   } else {
 
-      pd->system->error("FSM error");
+      pd->system->error("FSM error game");
 
   }
 
@@ -370,7 +498,6 @@ enum kFSM doFSM(enum kFSM transitionTo) {
 }
 
 void initGame() {
-  initSpace();
 }
 
 char* ftos(float _value, int16_t _size, char* _dest) {

@@ -45,8 +45,6 @@ int16_t* motionTrailY(void) { return m_motionTrailY; }
 
 cpBody* getBall(void) { return m_ball; }
 
-// cpShape* getBallShape(void) { return m_ballShape; }
-
 cpSpace* getSpace(void) { return m_space; }
 
 void launchBall(float strength) {
@@ -113,12 +111,6 @@ void resetBall(void) {
 void updateSpace(int32_t fc, enum kFSM fsm) {
   cpSpaceStep(m_space, TIMESTEP);
   
-
-
-  // if (y > PHYSWALL_PIX_Y + BALL_RADIUS) {
-  //   //setBallInPlay(false);
-  //   activateBallEndSweep(); // TODO MOVE THIS
-  // } 
 
   const cpVect pos = cpBodyGetPosition(m_ball);
 

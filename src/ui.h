@@ -9,7 +9,16 @@ enum kGameMode {
 
 enum kFSM {
   kTitlesFSM_DisplayTitles,
-  kTitlesFSM_TitlesToSplash,
+  kTitlesFSM_TitlesToPlayerSelect,
+  kTitlesFSM_ChoosePlayer,
+  kTitlesFSM_PlayerSelectToLevelSelect,
+  kTitlesFSM_ChooseLevel,
+  kTitlesFSM_ChooseLevelToChooseHole,
+  kTitlesFSM_ChooseLevelToPlayerSelect,
+  kTitlesFSM_ChooseHole,
+  kTitlesFSM_ChooseHoleToSplash,
+  kTitlesFSM_ChooseHoleToLevelSelect,
+  kFSM_SPLIT_TitlesGame,
   kGameFSM_DisplaySplash,
   kGameFSM_SplashToStart,
   kGameFSM_AimMode,

@@ -3,8 +3,15 @@
 #include "physics.h"
 #include "io.h"
 
+// Titiles
+
 LCDBitmap* m_titleSelected;
 LCDBitmap* m_splash;
+
+LCDBitmap* m_levelBitmap;
+LCDBitmap* m_holeBitmap;
+
+// Game
 
 LCDBitmap* m_header;
 LCDBitmap* m_turretBody;
@@ -12,6 +19,11 @@ LCDBitmap* m_turretBarrel[8][256];
 LCDBitmapTable* m_turretBarrelTabel;
 LCDBitmap* m_infoTopperBitmap;
 LCDBitmap* m_levelSplashBitmap;
+
+LCDBitmap* m_numeralBitmap[10];
+LCDBitmap* m_numeralStencil;
+
+
 
 LCDBitmap* m_scoreHistogram = NULL;
 
@@ -133,6 +145,10 @@ LCDBitmap* getBitmapWfFg_byidx(uint8_t _wf, uint32_t _idx) {
   return pd->graphics->getTableBitmap(m_sheetWfFg[_wf], _idx);
 }
 
+LCDBitmap* getBitmapLevel(void) { return m_levelBitmap; }
+
+LCDBitmap* getBitmapHole(void) { return m_holeBitmap; }
+
 LCDBitmap* getBitmapPeg(const struct Peg_t* p) {
   switch (p->m_shape) {
     case kPegShapeBall: return m_ballBitmap[p->m_type == 0 ? 0 : 1][p->m_size];
@@ -143,6 +159,10 @@ LCDBitmap* getBitmapPeg(const struct Peg_t* p) {
 }
 
 LCDBitmap* getBitmapBall(void) { return m_ballBitmap[0][0]; }
+
+LCDBitmap* getBitmapNumeral(int8_t n) { return m_numeralBitmap[n % 10]; }
+
+LCDBitmap* getStencilNumeral(void) { return m_numeralStencil; }
 
 LCDBitmap* getTitleSelectedBitmap() { return m_titleSelected; }
 
@@ -215,6 +235,58 @@ void drawRotatedRect(float x, float y, float w2, float h2, uint8_t iAngle, bool 
     pd->graphics->drawLine(points[2], points[3], points[4], points[5], 2, kColorBlack);
     pd->graphics->drawLine(points[4], points[5], points[6], points[7], 2, kColorBlack);
     pd->graphics->drawLine(points[6], points[7], points[0], points[1], 2, kColorBlack);
+}
+
+void updateScoreHistogramBitmap(void) {
+  pd->graphics->clearBitmap(m_scoreHistogram, kColorBlack);
+  pd->graphics->pushContext(m_scoreHistogram);
+  const int16_t maxHistoBalls = 12;
+  const int16_t histoHeight = maxHistoBalls*2*BALL_RADIUS;
+  const int16_t histoWidth = MAX_HOLES*3*BALL_RADIUS;
+  const int16_t tick = 4;
+  int16_t balls[MAX_HOLES] = {0};
+  int16_t par[MAX_HOLES] = {0};
+  for (int hole = 0; hole < MAX_HOLES;  ++hole) {
+    balls[hole] = getScore(getCurrentLevel(), hole);
+    par[hole] = getPar(getCurrentLevel(), hole);
+  }
+  // This will be animated in instead
+  balls[getCurrentHole()] = 0;
+
+  for (int i = 0; i < MAX_HOLES;  ++i) {
+    pd->graphics->fillRect(
+      BUF + i*3*BALL_RADIUS, BUF + (maxHistoBalls - par[i])*2*BALL_RADIUS,
+      3*BALL_RADIUS,         par[i]*2*BALL_RADIUS,
+      kColorWhite);
+  }
+  pd->graphics->fillRect(0, 0, DEVICE_PIX_X, DEVICE_PIX_Y, (uintptr_t)kGreyPattern);
+
+  pd->graphics->drawLine(BUF, BUF, BUF, BUF+histoHeight, 4, kColorWhite);
+  pd->graphics->drawLine(BUF, BUF+histoHeight, BUF+histoWidth, BUF+histoHeight, 4, kColorWhite);
+
+  for (int i = 1; i <= MAX_HOLES; ++i) {
+    pd->graphics->drawLine(BUF + i*3*BALL_RADIUS, BUF+histoHeight+tick, BUF + i*3*BALL_RADIUS, BUF+histoHeight-tick, 2, kColorWhite);
+  }
+  for (int i = 0; i < maxHistoBalls; ++i) {
+    pd->graphics->drawLine(BUF+tick, BUF + i*2*BALL_RADIUS, BUF-tick, BUF + i*2*BALL_RADIUS, 2, kColorWhite);
+  }
+
+  setRoobert10();
+  pd->graphics->setDrawMode(kDrawModeFillWhite);
+  char text[8];
+  for (int i = 0; i < MAX_HOLES; ++i) {
+    snprintf(text, 8, "%i", i+1);
+    pd->graphics->drawText(text, 8, kUTF8Encoding, BUF + tick*2 + i*3*BALL_RADIUS, BUF+histoHeight+tick);
+  }
+
+  pd->graphics->setDrawMode(kDrawModeCopy);
+  for (int i = 0; i < MAX_HOLES; ++i) {
+    for (int j = 1; j <= balls[i]; j++) {
+      pd->graphics->drawBitmap(m_ballBitmap[0][0], BUF + BALL_RADIUS/2 + i*3*BALL_RADIUS, BUF + (maxHistoBalls - j)*2*BALL_RADIUS, kBitmapUnflipped);
+    }
+  }
+
+  pd->graphics->popContext();
 }
 
 
@@ -297,59 +369,52 @@ void initBitmap() {
   m_fontGreatvibes109 = loadFontAtPath("fonts/GreatVibes-Regular-109");
   pd->graphics->setFont(m_fontGreatvibes24);
 
-  updateInfoTopperBitmap();
-  updateLevelSplashBitmap();
-  updateScoreHistogramBitmap();
-}
-
-void updateScoreHistogramBitmap(void) {
-  pd->graphics->clearBitmap(m_scoreHistogram, kColorBlack);
-  pd->graphics->pushContext(m_scoreHistogram);
-  const int16_t maxHistoBalls = 12;
-  const int16_t histoHeight = maxHistoBalls*2*BALL_RADIUS;
-  const int16_t histoWidth = MAX_HOLES*3*BALL_RADIUS;
-  const int16_t tick = 4;
-  int16_t balls[MAX_HOLES] = {0};
-  int16_t par[MAX_HOLES] = {0};
-  for (int hole = 0; hole < MAX_HOLES;  ++hole) {
-    balls[hole] = getScore(getCurrentLevel(), hole);
-    par[hole] = getPar(getCurrentLevel(), hole);
+  for (int n = 0; n < 10; ++n) {
+    m_numeralBitmap[n] = pd->graphics->newBitmap(NUMERAL_PIX_X, NUMERAL_PIX_Y, kColorBlack);
+    pd->graphics->pushContext(m_numeralBitmap[n]);
+    char text[128];
+    snprintf(text, 128, "%i", n);
+    const int32_t w = pd->graphics->getTextWidth(getGreatVibes109(), text, 128, kUTF8Encoding, 0);
+    setGreatVibes109();
+    pd->graphics->setDrawMode(kDrawModeFillBlack);
+    drawOutlineText(text, 128, NUMERAL_PIX_X/2 - w/2, 0, 4);
+    pd->graphics->popContext();
   }
-  // This will be animated in instead
-  balls[getCurrentHole()] = 0;
-
-  for (int i = 0; i < MAX_HOLES;  ++i) {
-    pd->graphics->fillRect(
-      BUF + i*3*BALL_RADIUS, BUF + (maxHistoBalls - par[i])*2*BALL_RADIUS,
-      3*BALL_RADIUS,         par[i]*2*BALL_RADIUS,
-      kColorWhite);
-  }
-  pd->graphics->fillRect(0, 0, DEVICE_PIX_X, DEVICE_PIX_Y, (uintptr_t)kGreyPattern);
-
-  pd->graphics->drawLine(BUF, BUF, BUF, BUF+histoHeight, 4, kColorWhite);
-  pd->graphics->drawLine(BUF, BUF+histoHeight, BUF+histoWidth, BUF+histoHeight, 4, kColorWhite);
-
-  for (int i = 1; i <= MAX_HOLES; ++i) {
-    pd->graphics->drawLine(BUF + i*3*BALL_RADIUS, BUF+histoHeight+tick, BUF + i*3*BALL_RADIUS, BUF+histoHeight-tick, 2, kColorWhite);
-  }
-  for (int i = 0; i < maxHistoBalls; ++i) {
-    pd->graphics->drawLine(BUF+tick, BUF + i*2*BALL_RADIUS, BUF-tick, BUF + i*2*BALL_RADIUS, 2, kColorWhite);
-  }
-
-  setRoobert10();
-  pd->graphics->setDrawMode(kDrawModeFillWhite);
-  char text[8];
-  for (int i = 0; i < MAX_HOLES; ++i) {
-    snprintf(text, 8, "%i", i+1);
-    pd->graphics->drawText(text, 8, kUTF8Encoding, BUF + tick*2 + i*3*BALL_RADIUS, BUF+histoHeight+tick);
-  }
-
-  pd->graphics->setDrawMode(kDrawModeCopy);
-  for (int i = 0; i < MAX_HOLES; ++i) {
-    for (int j = 1; j <= balls[i]; j++) {
-      pd->graphics->drawBitmap(m_ballBitmap[0][0], BUF + BALL_RADIUS/2 + i*3*BALL_RADIUS, BUF + (maxHistoBalls - j)*2*BALL_RADIUS, kBitmapUnflipped);
-    }
-  }
-
+  m_numeralStencil = pd->graphics->newBitmap(DEVICE_PIX_X, DEVICE_PIX_Y, kColorBlack);
+  pd->graphics->pushContext(m_numeralStencil);
+  pd->graphics->fillRect(0, (DEVICE_PIX_Y - NUMERAL_PIX_Y)/2, DEVICE_PIX_X, NUMERAL_PIX_Y, kColorWhite);
   pd->graphics->popContext();
+
+  LCDBitmap* tempBitmap = pd->graphics->newBitmap(NUMERAL_PIX_Y, 32, kColorBlack);
+  pd->graphics->pushContext(tempBitmap);
+  setRoobert24();
+  const int32_t w1 = pd->graphics->getTextWidth(getRoobert24(), "LEVEL", 128, kUTF8Encoding, 0);
+  pd->graphics->setDrawMode(kDrawModeFillBlack);
+  drawOutlineText("LEVEL", 129, NUMERAL_PIX_Y/2 - w1/2, 0, 2);
+  pd->graphics->popContext();
+
+  m_levelBitmap = pd->graphics->newBitmap(32, NUMERAL_PIX_Y, kColorBlack);
+  pd->graphics->pushContext(m_levelBitmap);
+  pd->graphics->drawRotatedBitmap(tempBitmap, 32/2, NUMERAL_PIX_Y/2, 3.0f*90.0f, 0.5f, 0.5f, 1.0f, 1.0f);
+  pd->graphics->popContext();
+
+  //
+
+  pd->graphics->clearBitmap(tempBitmap, kColorBlack);
+  pd->graphics->pushContext(tempBitmap);
+  setRoobert24();
+  const int32_t w2 = pd->graphics->getTextWidth(getRoobert24(), "HOLE", 128, kUTF8Encoding, 0);
+  pd->graphics->setDrawMode(kDrawModeFillBlack);
+  drawOutlineText("HOLE", 129, NUMERAL_PIX_Y/2 - w2/2, 0, 2);
+  pd->graphics->popContext();
+
+  m_holeBitmap = pd->graphics->newBitmap(32, NUMERAL_PIX_Y, kColorBlack);
+  pd->graphics->pushContext(m_holeBitmap);
+  pd->graphics->drawRotatedBitmap(tempBitmap, 32/2, NUMERAL_PIX_Y/2, 90.0f, 0.5f, 0.5f, 1.0f, 1.0f);
+  pd->graphics->popContext();
+
+  pd->graphics->freeBitmap(tempBitmap);
+  tempBitmap = NULL;
+
+
 }

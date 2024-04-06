@@ -19,6 +19,8 @@ bool ballInPlay(void);
 
 void resetBallStuckCounter(void);
 
+float getTurretBarrelAngle(void);
+
 uint16_t locToPix(uint16_t _loc);
 
 uint16_t pixToLoc(uint16_t _pix);

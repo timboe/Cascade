@@ -19,6 +19,7 @@ static void init(void) {
   initiUI();
   initSound();
   initGame();
+  initSpace();
 
   scanLevels();
 

@@ -7,8 +7,10 @@ void clickHandlerReplacement(void);
 
 bool getPressed(PDButtons b);
 
-bool getPressedAny(void);
+float getCrankAngle(void);
 
-float getTurretBarrelAngle(void);
+float getCrankChanged(void);
+
+bool getPressedAny(void);
 
 bool bPressed(void);

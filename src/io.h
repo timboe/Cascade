@@ -18,11 +18,27 @@ void enactIO(void);
 
 bool doSave(void);
 
-void nextHole(uint16_t currentHoleScore);
-
 uint16_t getCurrentLevel(void);
 
+uint16_t getPreviousLevel(void);
+
+uint16_t getNextLevel(void);
+
+void doPreviousLevel(void);
+
+void doNextLevel(void);
+
 uint16_t getCurrentHole(void);
+
+uint16_t getPreviousHole(void);
+
+uint16_t getNextHole(void);
+
+void doPreviousHole(void);
+
+void doNextHole(void);
+
+void setHoleScore(uint16_t score);
 
 uint16_t getPar(uint16_t level, uint16_t hole);
 
