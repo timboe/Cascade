@@ -59,29 +59,31 @@ func reset_level() -> void:
 func restore_save(save_game : Dictionary) -> void:
 	reset_level()
 	
-	$%Author.text = save_game["author"] 
-	$%WorldSlider.value = save_game["world"] 
-	$%LevelSlider.value = save_game["level"]
-	$%ParSlider.value = save_game["par"]
-	
+	$%Author.text = save_game["header"]["author"] 
+	$%WorldSlider.value = save_game["header"]["world"] 
+	$%LevelSlider.value = save_game["header"]["level"]
+	$%ParSlider.value = save_game["header"]["par"]
+	$%Foreground.selected = save_game["header"]["foreground"]
+	$%Background.selected = save_game["header"]["background"]
+		
 	$%WorldSlider._on_value_changed($%WorldSlider.value)
 	$%LevelSlider._on_value_changed($%LevelSlider.value)
 	$%ParSlider._on_value_changed($%ParSlider.value)
 	
-	var static_pegs : int = save_game["n_static"]
-	var elliptic_paths : int = save_game["n_elliptic"]
-	var linear_paths : int = save_game["n_linear"]
+	var static_pegs : int = save_game["header"]["n_static"]
+	var elliptic_paths : int = save_game["header"]["n_elliptic"]
+	var linear_paths : int = save_game["header"]["n_linear"]
 	
 	$%AddStatic.reset_count()
 	for i in range(1, static_pegs+1):
 		$%AddStatic._on_pressed()
 		var static_name = "StaticControl" + str(i)
 		var static_instance = $%RightVBox.find_child(static_name, true, false)
-		populate_static(save_game[static_name], static_instance)
+		populate_static(save_game["body"][static_name], static_instance)
 		
 	$%AddElliptic.reset_count()
 	for i in range(1, elliptic_paths+1):
 		$%AddElliptic._on_pressed()
 		var elliptic_name = "EllipticControl" + str(i)
 		var elliptic_instance = $%RightVBox.find_child(elliptic_name, true, false)
-		populate_elliptic(save_game[elliptic_name], elliptic_instance)
+		populate_elliptic(save_game["body"][elliptic_name], elliptic_instance)

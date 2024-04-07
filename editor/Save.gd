@@ -90,28 +90,36 @@ func pack_linear(linear_path : Control) -> Array:
 
 func pack_save() -> Dictionary:
 	var save_game : Dictionary
-	save_game["author"] = $"../Author".text
-	save_game["world"] = $"../WorldSlider".value
-	save_game["level"] = $"../LevelSlider".value
-	save_game["par"] = $"../ParSlider".value
-	save_game["save_format"] = 1
+	var header : Dictionary
+	header["author"] = $"../Author".text
+	header["world"] = $"../WorldSlider".value
+	header["level"] = $"../LevelSlider".value
+	header["par"] = $"../ParSlider".value
+	header["foreground"] = $"../Foreground".selected
+	header["background"] = $"../Background".selected
+	header["save_format"] = 1
 	
 	var static_pegs = get_tree().get_nodes_in_group("static_pegs")
 	var elliptic_paths = get_tree().get_nodes_in_group("elliptic_pegs")
 	var line_paths = get_tree().get_nodes_in_group("line_pegs")
 	
-	save_game["n_static"] = len(static_pegs)
-	save_game["n_elliptic"] = len(elliptic_paths)
-	save_game["n_linear"] = len(line_paths)
+	header["n_static"] = len(static_pegs)
+	header["n_elliptic"] = len(elliptic_paths)
+	header["n_linear"] = len(line_paths)
 	
+	save_game["header"] = header
+	
+	var body : Dictionary
 	for static_peg in static_pegs:
 		var packed : Array = pack_static(static_peg)
-		save_game[packed[0]] = packed[1]
+		body[packed[0]] = packed[1]
 	for elliptic_path in elliptic_paths:
 		var packed : Array = pack_elliptic(elliptic_path)
-		save_game[packed[0]] = packed[1]
+		body[packed[0]] = packed[1]
 	for linear_path in line_paths:
 		var packed : Array = pack_linear(linear_path)
-		save_game[packed[0]] = packed[1]
+		body[packed[0]] = packed[1]
+		
+	save_game["body"] = body
 		
 	return save_game
