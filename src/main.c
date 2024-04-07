@@ -15,15 +15,14 @@ __declspec(dllexport)
 
 static void init(void) {
   initBoard();
-  initBitmap();
+  initBitmap(); // Expensive
   initiUI();
   initSound();
   initGame();
   initSpace();
 
-  scanLevels();
-
-  doIO(kDoTitle, /*and then*/ kDoNothing, /*and finally*/ kDoNothing);
+  scanLevels(); // Expensive?
+  doFSM(kTitlesFSM_DisplayTitles);
 }
 
 static void deinit(void) {
@@ -40,13 +39,7 @@ int eventHandler(PlaydateAPI* playdate, PDSystemEvent event, uint32_t arg) {
       break;
     case kEventTerminate:; case kEventLock:; case kEventLowPower:;
       pdxlog("EH: terminate/lock/low-p");
-      //
-      #ifdef SYNCHRONOUS_SAVE_ENABLED
-      if (!IOOperationInProgress()) {
-        synchronousSave();
-      }
-      #endif
-      //
+      doSave();
       if (event == kEventTerminate) {
         deinit();
       }

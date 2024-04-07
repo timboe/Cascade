@@ -8,6 +8,7 @@ enum kGameMode {
 };
 
 enum kFSM {
+  kFSM_INITIAL,
   kTitlesFSM_DisplayTitles,
   kTitlesFSM_TitlesToChoosePlayer,
   kTitlesFSM_ChoosePlayer,

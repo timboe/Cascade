@@ -1,32 +1,23 @@
 #pragma once
 #include "game.h"
 
-enum kSaveLoadRequest {kDoNothing, kDoSave, kDoLoad, kDoSaveDelete, kDoScanSlots, kDoTitle};
-
 void scanLevels(void);
 
+void loadCurrentHole(void);
 
-void hardReset(void);
+void doSave(void);
 
-void doIO(enum kSaveLoadRequest _first, enum kSaveLoadRequest _andThen, enum kSaveLoadRequest _andFinally);
+void resetPlayerSave(uint16_t player);
 
-enum kSaveLoadRequest currentIOAction(void);
+uint16_t getWaterfallBackground(uint16_t level, uint16_t hole);
 
-bool IOOperationInProgress(void);
-
-void enactIO(void);
-
-bool doSave(void);
+uint16_t getWaterfallForeground(uint16_t level, uint16_t hole);
 
 uint16_t getCurrentPlayer(void);
 
 void doPreviousPlayer(void);
 
 void doNextPlayer(void);
-
-uint16_t getWaterfallBackground(uint16_t level, uint16_t hole);
-
-uint16_t getWaterfallForeground(uint16_t level, uint16_t hole);
 
 uint16_t getCurrentLevel(void);
 
@@ -40,15 +31,15 @@ void doNextLevel(void);
 
 void goToNextUnplayedLevel(void);
 
-void getLevelStatistics(uint16_t level, uint16_t* score, uint16_t* par);
-
-void getHoleStatistics(uint16_t level, uint16_t hole, uint16_t* score, uint16_t* par);
-
 uint16_t getCurrentHole(void);
 
 uint16_t getPreviousHole(void);
 
 uint16_t getNextHole(void);
+
+void getLevelStatistics(uint16_t level, uint16_t* score, uint16_t* par);
+
+void getHoleStatistics(uint16_t level, uint16_t hole, uint16_t* score, uint16_t* par);
 
 void doPreviousHole(void);
 

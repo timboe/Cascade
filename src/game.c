@@ -38,12 +38,12 @@ void resetPreviousWaterfall(void) { m_previousWaterfall = getWaterfallForeground
 
 int gameLoop(void* _data) {
   ++m_frameCount;
-  pd->graphics->setBackgroundColor(kColorWhite);
+  pd->graphics->setBackgroundColor(kColorWhite); // TODO make me black
 
-  if (IOOperationInProgress()) { 
-    enactIO();
-    return 1;
-  }
+  // if (IOOperationInProgress()) { 
+  //   enactIO();
+  //   return 1;
+  // }
 
   const enum kGameMode gm = getGameMode();
   m_FSM = doFSM(m_FSM);
@@ -66,9 +66,31 @@ int gameLoop(void* _data) {
   return 1;
 }
 
-void menuOptionsCallbackMenu(void* blank) {
-  if (IOOperationInProgress()) { return; }
-  pdxlog("menuOptionsCallbackMenu");
+void menuOptionsCallbackResetSave(void* toReset) {
+  pdxlog("menuOptionsCallbackResetSave");
+  resetPlayerSave(*(uint16_t*)toReset);
+}
+
+void menuOptionsCallbackQuitHole(void* _unused) {
+  pdxlog("menuOptionsCallbackQuitHole");
+  // TODO
+}
+
+void menuOptionsCallbackAudio(void* userData) {
+  int value = pd->system->getMenuItemValue((PDMenuItem*)userData);
+  // if (value == 0) {
+  //   music(true);
+  //   sfx(true);
+  // } else if (value == 1) {
+  //   music(true);
+  //   sfx(false);
+  // } else if (value == 2) {
+  //   music(false);
+  //   sfx(true);
+  // } else {
+  //   music(false);
+  //   sfx(false);
+  // }
 }
 
 // Call prior to loading anything
@@ -76,16 +98,26 @@ void reset() {
   resetUI();
 }
 
-void populateMenuPlayer(void) {
+void populateMenuTitlesPlayer(void) {
   pd->system->removeAllMenuItems();
-  pd->system->addMenuItem("reset slot 1", menuOptionsCallbackMenu, (void*)0);
-  pd->system->addMenuItem("reset slot 2", menuOptionsCallbackMenu, (void*)1);
-  pd->system->addMenuItem("reset slot 3", menuOptionsCallbackMenu, (void*)2);
+  pd->system->addMenuItem("reset slot 1", menuOptionsCallbackResetSave, (void*)0);
+  pd->system->addMenuItem("reset slot 2", menuOptionsCallbackResetSave, (void*)1);
+  pd->system->addMenuItem("reset slot 3", menuOptionsCallbackResetSave, (void*)2);
+}
+
+void populateMenuTitles(void) {
+  pd->system->removeAllMenuItems();
+  static const char* options[] = {"Music+SFX", "Music", "SFX", "None"};
+  PDMenuItem* menu = pd->system->addOptionsMenuItem("audio", options, 4, menuOptionsCallbackAudio, NULL);
+  pd->system->setMenuItemUserdata(menu, (void*) menu); // User data is a pointer to the menu itself
 }
 
 void populateMenuGame() {
   pd->system->removeAllMenuItems();
-  //pd->system->addMenuItem("menu", menuOptionsCallbackMenu, NULL);
+  static const char* options[] = {"Music+SFX", "Music", "SFX", "None"};
+  PDMenuItem* menu = pd->system->addOptionsMenuItem("audio", options, 4, menuOptionsCallbackAudio, NULL);
+  pd->system->setMenuItemUserdata(menu, (void*) menu); // User data is a pointer to the menu itself
+  pd->system->addMenuItem("quit hole", menuOptionsCallbackQuitHole, NULL);
 }
 
 bool ballInPlay(void) {
@@ -171,7 +203,10 @@ enum kFSM doFSM_Titles(bool newState) {
 
   if (m_FSM == kTitlesFSM_DisplayTitles) {
 
-    if (newState) { setGameMode(kTitles); }
+    if (newState) { 
+      populateMenuTitles();
+      setGameMode(kTitles);
+    }
     if (!pd->system->isCrankDocked()) { return doFSM(kTitlesFSM_TitlesToChoosePlayer); }
 
   } else if (m_FSM == kTitlesFSM_TitlesToChoosePlayer) {
@@ -186,7 +221,7 @@ enum kFSM doFSM_Titles(bool newState) {
     static float progress = 0.0f;
     if (newState) {
       progress = 0.0f;
-      populateMenuPlayer();
+      populateMenuTitlesPlayer();
     }
     const float status = commonCrankNumeral(&progress);
     if      (status > 0) {
@@ -214,7 +249,10 @@ enum kFSM doFSM_Titles(bool newState) {
   } else if (m_FSM == kTitlesFSM_ChooseLevel) {
 
     static float progress = 0.0f;
-    if (newState) progress = 0.0f;
+    if (newState) {
+      progress = 0.0f;
+      populateMenuTitles();
+    }
     const float status = commonCrankNumeral(&progress);
     if (status > 0) {
       resetPreviousWaterfall(); // Ordering important
@@ -306,7 +344,9 @@ enum kFSM doFSM_Game(bool newState) {
       setGameMode(kGameWindow);
       setScrollOffset(-DEVICE_PIX_Y - TURRET_RADIUS, true);
       updateScoreHistogramBitmap();
+      populateMenuGame();
       randomiseBoard(); // // TODO replace me
+      loadCurrentHole();
     }
     if (timer++ == TIME_DISPLAY_SPLASH) return doFSM(kGameFSM_SplashToStart);
 

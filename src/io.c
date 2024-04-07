@@ -3,61 +3,45 @@
 #include "render.h"
 #include "input.h"
 #include "sound.h"
+#include "peg.h"
 
+enum DecodeType_t {
+  kDecodeStatic,
+  kDecodeElliptic,
+  kDecodeLinear
+};
 
-enum kSaveLoadRequest m_doFirst = kDoNothing, m_andThen = kDoNothing, m_andFinally = kDoNothing;
+enum DecodeType_t m_decodeType;
 
-int8_t m_ioStage = 0;
+struct StaticLoader_t {
+  enum PegShape_t shape;
+  float x;
+  float y;
+  uint16_t angle; // in degrees
+  uint8_t size;
+  enum PegType_t type;
+};
 
-uint32_t m_actionProgress = 0;
-
-SDFile* m_file;
+char m_nameStatic[128];
+uint16_t m_staticID = 0;
+struct StaticLoader_t m_static = {0};
 
 uint16_t m_player = 0;
 uint16_t m_level = 0;
 uint16_t m_hole = 0;
 
+const uint16_t SAVE_SIZE_V1 = sizeof(uint32_t) * SAVE_FORMAT_1_MAX_PLAYERS * SAVE_FORMAT_1_MAX_LEVELS * SAVE_FORMAT_1_MAX_HOLES;
 uint32_t m_player_score[SAVE_FORMAT_1_MAX_PLAYERS][SAVE_FORMAT_1_MAX_LEVELS][SAVE_FORMAT_1_MAX_HOLES] = {0};
 
 uint16_t m_level_par[MAX_LEVELS][MAX_HOLES] = {0};
 uint16_t m_level_foreground[MAX_LEVELS][MAX_HOLES] = {0};
 uint16_t m_level_background[MAX_LEVELS][MAX_HOLES] = {0};
 
+int doRead(void* userdata, uint8_t* buf, int bufsize);
 
-int doRead(void* _userdata, uint8_t* _buf, int _bufsize);
+void doWrite(void* userdata, const char* str, int len);
 
-void doWrite(void* _userdata, const char* _str, int _len);
-
-bool doLoad(void);
-
-bool doNewWorld(void);
-
-bool doSaveDelete(void);
-
-bool doTitle(void);
-
-void decodeError(json_decoder* jd, const char* _error, int _linenum);
-
-void willDecodeSublist(json_decoder* jd, const char* _name, json_value_type _type);
-
-void scanDidDecodeSaveFormat(json_decoder* jd, const char* _key, json_value _value);
-
-void deserialiseValueSaveFormat(json_decoder* jd, const char* _key, json_value _value);
-
-int scanShouldDecodeTableValueForKey(json_decoder* jd, const char* _key);
-
-// // json_encoder m_je;
-
-// json_decoder m_jd_p = {
-//   // .decodeError = decodeError,
-//   // .didDecodeTableValue = didDecodeTableValuePlayer,
-//   // .didDecodeArrayValue = deserialiseArrayValuePlayer
-// };
-
-// json_decoder m_jd = {
-//   // .decodeError = decodeError,
-//   // .willDecodeSublist = willDecodeSublist
-// };
+void decodeError(json_decoder* jd, const char* error, int linenum);
 
 
 /// ///
@@ -77,6 +61,14 @@ void doPreviousPlayer(void) {
 void doNextPlayer(void) {
   m_player = (m_player + 1) % MAX_PLAYERS;
   pd->system->logToConsole("Now player %i", (int)m_player);
+}
+
+void resetPlayerSave(uint16_t player) {
+  for (int l = 0; l < MAX_LEVELS; ++l) {
+    for (int h = 0; h < MAX_HOLES; ++h) {
+      m_player_score[player][l][h] = 0; 
+    }
+  }
 }
 
 uint16_t getCurrentLevel(void) { return m_level; }
@@ -174,6 +166,8 @@ void getLevelStatistics(uint16_t level, uint16_t* score, uint16_t* par) {
     }
     if (m_player_score[m_player][level][h] == 0) { // the player hasn't finished all holes in the level
       return;
+      *score = 0;
+      *par = 0;
     }
     *score += m_player_score[m_player][level][h];
     *par += m_level_par[level][h];
@@ -195,135 +189,19 @@ uint16_t getCurrentHolePar(void) { return getPar(m_level, m_hole); }
 
 uint16_t getCurrentHoleScore(void) { return getScore(m_level, m_hole); }
 
-void doIO(enum kSaveLoadRequest _first, enum kSaveLoadRequest _andThen, enum kSaveLoadRequest _andFinally) {
-  if (IOOperationInProgress()) {
-    return;
-  }
-  m_doFirst = _first;
-  m_andThen = _andThen;
-  m_andFinally = _andFinally;
-  m_ioStage = 0;
-  m_actionProgress = 0;
-  pauseMusic();
-  #ifdef DEV
-  pd->system->logToConsole("IO: Requested %i, %i, %i", _first, _andThen, _andFinally);
-  #endif
+
+int doRead(void* userdata, uint8_t* buf, int bufsize) {
+  return pd->file->read((SDFile*)userdata, buf, bufsize);
 }
 
-bool IOOperationInProgress() {
-  return m_doFirst != kDoNothing;
+void doWrite(void* userdata, const char* str, int len) {
+  pd->file->write((SDFile*)userdata, str, len);
 }
 
-enum kSaveLoadRequest currentIOAction() {
-  switch (m_ioStage) {
-    case 0: return m_doFirst;
-    case 1: return m_andThen;
-    case 2: return m_andFinally;
-    default: return kDoNothing;
-  }
-  return kDoNothing;
+void decodeError(json_decoder* jd, const char* error, int linenum) {
+  pd->system->logToConsole("decode error line %i: %s", linenum, error);
 }
 
-void enactIO() {
-  #ifdef DEV
-  pd->system->logToConsole("IO: Enact IO - %i", currentIOAction());
-  #endif
-
-  bool finished = false;
-  switch (currentIOAction()) {
-    case kDoNothing: finished = true; break;
-    case kDoSave: finished = doSave(); break;
-    case kDoLoad: finished = doLoad(); break;
-    case kDoTitle: finished = doTitle(); break;
-    case kDoSaveDelete: finished = doSaveDelete(); break;
-    case kDoScanSlots: finished = true; scanLevels(); break;
-  }
-
-  if (finished) {
-    if (m_ioStage == 0) {
-      #ifdef DEV
-      pd->system->logToConsole("IO: Stage 1 Finished");
-      #endif
-      ++m_ioStage;
-      m_actionProgress = 0;
-    } else if (m_ioStage == 1) {
-      #ifdef DEV
-      pd->system->logToConsole("IO: Stage 2 Finished");
-      #endif
-      ++m_ioStage;
-      m_actionProgress = 0;
-    } else {
-      // Specials...
-      #ifdef DEV
-      pd->system->logToConsole("IO: Stage 3 Finished");
-      #endif
-      m_ioStage = 0;
-      m_actionProgress = 0;
-      m_doFirst = kDoNothing;
-      m_andThen = kDoNothing;
-      m_andFinally = kDoNothing;
-      resumeMusic();
-    }
-  }
-}
-
-int doRead(void* _userdata, uint8_t* _buf, int _bufsize) {
-  return pd->file->read((SDFile*)_userdata, _buf, _bufsize);
-}
-
-void doWrite(void* _userdata, const char* _str, int _len) {
-  pd->file->write((SDFile*)_userdata, _str, _len);
-}
-
-void decodeError(json_decoder* jd, const char* _error, int _linenum) {
-  pd->system->logToConsole("decode error line %i: %s", _linenum, _error);
-  doIO(kDoTitle, /*and then*/ kDoNothing, /*and finally*/ kDoNothing);
-}
-
-
-///
-
-bool doTitle() {
-
-  reset();
-  setGameMode(kTitles);
-
-  updateMusic(/*isTitle=*/true);
-
-  return true;
-}
-
-///
-
-bool doSaveDelete() {
-  #ifdef DEV
-  pd->system->logToConsole("DELETE SAVE (via rename to delete_world and delete_save)");
-  #endif
-
-  // char filePathDelete[32];
-
-  // // Don't actually delete, just rename to "deleted_"
-  // for (uint16_t ss = 0; ss < WORLD_SAVE_SLOTS; ++ss) {
-  //   snprintf(m_filePath, 32, "world_%i_%i.json", m_save+1, ss+1);
-  //   snprintf(filePathDelete, 32, "deleted_world_%i_%i.json", m_save+1, ss+1);
-  //   // First unlink before moving
-  //   int status = pd->file->unlink(filePathDelete, 0);
-  //   #ifdef DEV
-  //   pd->system->logToConsole("DELETE: unlink previous world save %s, status %i", filePathDelete, status);
-  //   #endif
-  //   pd->file->rename(m_filePath, filePathDelete);
-  // }
-  // snprintf(m_filePath, 32, "player_%i.json", m_save+1);
-  // snprintf(filePathDelete, 32, "deleted_player_%i.json", m_save+1);
-  // int status = pd->file->unlink(filePathDelete, 0);
-  // #ifdef DEV
-  // pd->system->logToConsole("DELETE unlink previous player save %s, status %i", filePathDelete, status);
-  // #endifs
-  // pd->file->rename(m_filePath, filePathDelete);
-
-  // Finished
-  return true;
-}
 
 ///
 
@@ -353,7 +231,7 @@ void scanLevels() {
   char filePath[128];
   for (int32_t l = 0; l < MAX_LEVELS; ++l) {
     m_level = l;
-    bool abort = false;
+    // bool abort = false;
     for (int32_t h = 0; h < MAX_HOLES; ++h) {
       m_hole = h;
       // snprintf(filePath, 128, "levels/fall_%i_hole_%i.json", 1, 1);
@@ -365,7 +243,7 @@ void scanLevels() {
         SDFile* file = pd->file->open(filePath, kFileReadData);
       }
       if (!file) {
-        if (!h) { abort = true; } // If missing the first fall of this level then stop looking here
+        // if (!h) { abort = true; } // If missing the first fall of this level then stop looking here
         break;
       }
       static json_decoder jd = {
@@ -382,14 +260,13 @@ void scanLevels() {
   m_hole = 0;
 
   // Check for save-game file
-  snprintf(filePath, 128, "cascade_savegame_v1.dat");
+  snprintf(filePath, 128, SAVE_FORMAT_1_NAME);
   SDFile* file = pd->file->open(filePath, kFileRead);
   if (file) { // Load save data
-    const uint16_t saveSize = sizeof(uint32_t) * SAVE_FORMAT_1_MAX_PLAYERS * SAVE_FORMAT_1_MAX_LEVELS * SAVE_FORMAT_1_MAX_HOLES;
-    int result = pd->file->read(file, m_player_score, saveSize);
-    pd->system->logToConsole("Reading %i bytes of save data, result %i", saveSize, result);
+    int result = pd->file->read(file, m_player_score, SAVE_SIZE_V1);
+    pd->system->logToConsole("Reading %i bytes of save data, result %i", SAVE_SIZE_V1, result);
   } else {
-    pd->system->logToConsole("No save-game data");
+    pd->system->logToConsole("No save-game data at %s", SAVE_FORMAT_1_NAME);
   }
 
 
@@ -398,297 +275,107 @@ void scanLevels() {
 
 }
 
-// int scanShouldDecodeTableValueForKey(json_decoder* jd, const char* _key) {
-//   return (strcmp(_key, "sf") == 0);
-// }
+////
 
-// void scanDidDecodeSaveFormat(json_decoder* jd, const char* _key, json_value _value) {
-//   if (strcmp(_key, "sf") == 0) {
-//     m_worldVersions[m_save][m_scanSlot] = json_intValue(_value);
-//   } else {
-//     pd->system->error("scanDidDecodeSaveFormat DECODE ISSUE, %s", _key);
-//   }
-// }
+void willDecode(json_decoder* jd, const char* key, json_value_type type) {
 
-// void deserialiseValueSaveFormat(json_decoder* jd, const char* _key, json_value _value) {
-//   if (strcmp(_key, "sf") == 0) {
-//     m_worldVersions[m_save][m_slot] = json_intValue(_value);
-//   } else {
-//     pd->system->error("deserialiseValueSaveFormat DECODE ISSUE, %s", _key);
-//   }
-// }
+  if (strcmp(key, m_nameStatic) == 0) {
+    pd->system->logToConsole("willDecode Decoding %s", m_nameStatic);
+    m_decodeType = kDecodeStatic;
+    return;
+  }
+
+}
 
 
+void didDecode(json_decoder* jd, const char* key, json_value value) {
 
-bool doSave() {
-  uint8_t pretty = 0;
-  #ifdef DEV
-  pretty = 1;
-  pd->system->logToConsole("SAVE", m_actionProgress);
-  #endif
+  if (strcmp(key, "x") == 0) {
+    switch (m_decodeType) {
+      case kDecodeStatic: m_static.x = json_intValue(value); return;
+    }
+  }
 
-  // if (m_actionProgress == 0) {
+  if (strcmp(key, "y") == 0) {
+    switch (m_decodeType) {
+      case kDecodeStatic: m_static.y = json_intValue(value); return;
+    }
+  }
 
-  //   // Should get the latest export averages, guaranteed to be between 60 and 120s worth of data
-  //   snprintf(m_filePath, 32, "TMP_player_%i.json", m_save+1);
+  if (strcmp(key, "angle") == 0) {
+    switch (m_decodeType) {
+      case kDecodeStatic: m_static.angle = json_intValue(value); return;
+    }
+  }
 
-  //   // This file should not already exist, double check
-  //   int status = pd->file->unlink(m_filePath, 0);
-  //   #ifdef DEV
-  //   pd->system->logToConsole("SAVE: unlink previous TMP_player %s, status %i (expect this to fail, err: %s)", m_filePath, status, pd->file->geterr());
-  //   #endif
+  if (strcmp(key, "size") == 0) {
+    switch (m_decodeType) {
+      case kDecodeStatic: m_static.size = json_intValue(value); return;
+    }
+  }
 
-  //   if (m_file) pd->system->error("SAVE ERROR: tmp player error: overwriting exiting file ptr");
-  //   m_file = pd->file->open(m_filePath, kFileWrite);
-  //   if (!m_file) pd->system->error("SAVE ERROR: tmp player file creation error: %s", pd->file->geterr());
+  if (strcmp(key, "type") == 0) {
+    switch (m_decodeType) {
+      case kDecodeStatic: m_static.type = (enum PegType_t)json_intValue(value); return;
+    }
+  }
 
-  //   pd->json->initEncoder(&m_je, doWrite, m_file, pretty);
+}
 
-  // } else if (m_actionProgress == 1) {
 
-  //   m_je.startTable(&m_je);
-  //   serialisePlayer(&m_je);
-  //   m_je.endTable(&m_je);
+void* finishDecode(json_decoder* jd, const char* key, json_value_type type) {
 
-  //   int status = pd->file->close(m_file);
-  //   if (status) pd->system->error("SAVE ERROR: tmp player file->close status code: %i, err: %s", status, pd->file->geterr());
-  //   m_file = NULL;
+  if (strcmp(key, m_nameStatic) == 0) {
+    pd->system->logToConsole("finishDecode %s", m_nameStatic);
+    m_staticID++;
+    snprintf(m_nameStatic, 128, "StaticControl%i", (int)m_staticID+1);
+    return NULL;
+  }
 
-  // } else if (m_actionProgress == 2) {
+  return NULL;
+}
 
-  //   snprintf(m_filePath, 32, "TMP_world_%i_%i.json", m_save+1, m_slot+1);
+void loadCurrentHole() {
+  char filePath[128];
+  snprintf(filePath, 128, "levels/level_%i_hole_%i.json", (int)m_level+1, (int)m_hole+1);
+  SDFile* file = pd->file->open(filePath, kFileRead);
+  if (!file && m_level >= 10) {
+    // Look for user-supplied levels instead
+    snprintf(filePath, 128, "level_%i_hole_%i.json", (int)m_level+1, (int)m_hole+1);
+    SDFile* file = pd->file->open(filePath, kFileReadData);
+  }
+  if (!file) {
+    pd->system->error("loadCurrentHole CANNOT FIND LEVEL %i %i", (int)m_level+1, (int)m_hole+1);
+    doFSM(kTitlesFSM_DisplayTitles);
+    return;
+  }
+  static json_decoder jd = {
+    .decodeError = decodeError,
+    .willDecodeSublist = willDecode,
+    .didDecodeTableValue = didDecode,
+    .didDecodeSublist = finishDecode
+  };
 
-  //   // This file should not already exist, double check
-  //   int status = pd->file->unlink(m_filePath, 0);
-  //   #ifdef DEV
-  //   pd->system->logToConsole("SAVE: unlink previous TMP_world %s, status %i (expect this to fail, err: %s)", m_filePath, status, pd->file->geterr());
-  //   #endif
 
-  //   if (m_file) pd->system->error("SAVE ERROR: tmp world error: overwriting exiting file ptr");
-  //   m_file = pd->file->open(m_filePath, kFileWrite);
-  //   if (!m_file) pd->system->error("SAVE ERROR: tmp world file creation error: %s", pd->file->geterr());
 
-  //   pd->json->initEncoder(&m_je, doWrite, m_file, pretty);
+  m_staticID = 0;
+  snprintf(m_nameStatic, 128, "StaticControl%i", (int)m_staticID+1);
 
-  //   m_je.startTable(&m_je);
+  pd->json->decode(&jd, (json_reader){ .read = doRead, .userdata = file }, NULL);
+  int status = pd->file->close(file);
 
-  //   m_je.addTableMember(&m_je, "sf", 2);
-  //   m_je.writeInt(&m_je, CURRENT_SAVE_FORMAT);
-
-  // } else if (m_actionProgress == 3) {
-  //   serialiseCargo(&m_je);
-  // } else if (m_actionProgress == 4) {
-  //   serialiseBuilding(&m_je);
-  // } else if (m_actionProgress == 5) {
-  //   serialiseLocation(&m_je);
-  // } else if (m_actionProgress == 6) {
-  //   serialiseWorld(&m_je);
-  // } else if (m_actionProgress == 7) {
-  //   m_je.endTable(&m_je);
-
-  //   int status = pd->file->close(m_file);
-  //   if (status) pd->system->error("SAVE ERROR: tmp world file->close status code: %i, err %s", status, pd->file->geterr());
-  //   m_file = NULL;
-
-  //   // Create backup
-  //   char filePathBackup[32] = {0};
-  //   FileStat fs;
-
-  //   // We can only backup the player if we are not resetting them (new game)
-  //   snprintf(filePathBackup, 32, "backup_player_%i.json", m_save+1);
-  //   status = pd->file->stat(filePathBackup, &fs); // Check also we have a player to backup
-  //   if (m_doFirst != kDoResetPlayer && status == 0) {
-  //     snprintf(m_filePath, 32, "player_%i.json", m_save+1);
-  //     status = pd->file->unlink(filePathBackup, 0);
-  //     #ifdef DEV
-  //     pd->system->logToConsole("SAVE: unlink previous player backup %s, status %i", filePathBackup, status);
-  //     pd->system->logToConsole("SAVE: Backup: %s -> %s", m_filePath, filePathBackup);
-  //     #endif
-  //     status = pd->file->rename(m_filePath, filePathBackup);
-  //     if (status) pd->system->error("SAVE ERROR: backup player file->rename status code: %i, err: %s", status, pd->file->geterr());
-  //   }
-
-  //   // We can only backup a previous world file if we are not in worldgen mode
-  //   snprintf(filePathBackup, 32, "backup_world_%i_%i.json", m_save+1, m_slot+1);
-  //   status = pd->file->stat(filePathBackup, &fs); // Check also we have a world to backup
-  //   if (m_andThen != kDoNewWorld && status == 0) {
-  //     snprintf(m_filePath, 32, "world_%i_%i.json", m_save+1, m_slot+1);
-  //     status = pd->file->unlink(filePathBackup, 0);
-  //     #ifdef DEV
-  //     pd->system->logToConsole("SAVE: unlink previous world backup %s, status %i", filePathBackup, status);
-  //     pd->system->logToConsole("SAVE: Backup: %s -> %s", m_filePath, filePathBackup);
-  //     #endif
-  //     status = pd->file->rename(m_filePath, filePathBackup);
-  //     if (status) pd->system->error("SAVE ERROR: backup world file->rename status code: %i, err: %s", status, pd->file->geterr());
-  //   }
-
-  //   // Finish by moving into location
-  //   {
-  //     char filePathFinal[32];
-  //     snprintf(m_filePath, 32, "TMP_player_%i.json", m_save+1);
-  //     snprintf(filePathFinal, 32, "player_%i.json", m_save+1);
-  //     status = pd->file->unlink(filePathFinal, 0);
-  //     #ifdef DEV
-  //     pd->system->logToConsole("SAVE: unlink previous player %s, status %i (expect this to fail, err: %s)", filePathFinal, status, pd->file->geterr());
-  //     pd->system->logToConsole("SAVE: Finalise: %s -> %s", m_filePath, filePathFinal);
-  //     #endif
-  //     status = pd->file->rename(m_filePath, filePathFinal);
-  //     if (status) pd->system->error("SAVE ERROR: mv player file->rename status code: %i, err: %s", status, pd->file->geterr());
-
-  //     snprintf(m_filePath, 32, "TMP_world_%i_%i.json", m_save+1, m_slot+1);
-  //     snprintf(filePathFinal, 32, "world_%i_%i.json", m_save+1, m_slot+1);
-  //     status = pd->file->unlink(filePathFinal, 0);
-  //     #ifdef DEV
-  //     pd->system->logToConsole("SAVE: unlink previous world %s, status %i (expect this to fail, err: %s)", filePathFinal, status, pd->file->geterr());
-  //     pd->system->logToConsole("SAVE: Finalise: %s -> %s", m_filePath, filePathFinal);
-  //     #endif
-  //     status = pd->file->rename(m_filePath, filePathFinal);
-  //     if (status) pd->system->error("SAVE ERROR: mv world file->rename status code: %i, err: %s", status, pd->file->geterr());
-  //   }
-
-  //   #ifdef DEV
-  //   pd->system->logToConsole("SAVE: Saved to Save:%i, Slot %u, save status %i", m_save, m_slot, status);
-  //   #endif
-
-  // } else if (m_actionProgress == 8) {
-    
-  //   scanSlots();
-
-  //   // Finished
-  //   #ifdef SLOW_LOAD
-  //   float f; for (int32_t i = 0; i < 10000; ++i) for (int32_t j = 0; j < 10000; ++j) { f*=i*j; }
-  //   #endif
-
-  //   return true;
-  // }
-
-  ++m_actionProgress;
-  return true;
 }
 
 ///
 
-bool doLoad() {
-
-  #ifdef DEV
-  pd->system->logToConsole("LOAD: Progress %i", m_actionProgress);
-  #endif
-
-  // if (m_actionProgress == 0) {
-
-  //   // Clear in preparation for load (including player, if we haven't been given a slot override)
-  //   const bool resetThePlayerToo = (m_forceSlot == -1);
-  //   reset(resetThePlayerToo);
-
-  //   snprintf(m_filePath, 32, "player_%i.json", m_save+1);
-  //   if (m_file) pd->system->error("LOAD ERROR: read player error: overwriting exiting file ptr");
-  //   m_file = pd->file->open(m_filePath, kFileRead|kFileReadData);
-  //   if (!m_file) pd->system->error("LOAD ERROR: read player error: %s", pd->file->geterr());
-
-  //   pd->json->decode(&m_jd_p, (json_reader){ .read = doRead, .userdata = m_file }, NULL);
-
-  //   int status = pd->file->close(m_file);
-  //   if (status) pd->system->error("LOAD ERROR: player file->close status code: %i", status);
-  //   m_file = NULL;
-
-  // } else if (m_actionProgress >= 1 && m_actionProgress <= 4) {
-
-  //   // We have now loaded the correct slot number for this player-save.
-  //   // But we might want to be loading into a different world 
-  //   if (m_forceSlot != -1) {
-  //     #ifdef DEV
-  //     pd->system->logToConsole("LOAD: Save:%i, Slot Override from %i to %i", m_save, m_slot, m_forceSlot);
-  //     #endif
-  //     setSlot(m_forceSlot);
-  //   }
-
-  //   snprintf(m_filePath, 32, "world_%i_%i.json", m_save+1, m_slot+1);
-  //   if (m_file) pd->system->error("LOAD ERROR: read world error: overwriting exiting file ptr");
-  //   m_file = pd->file->open(m_filePath, kFileRead|kFileReadData);
-  //   if (!m_file) pd->system->error("LOAD ERROR: read world error: %s", pd->file->geterr());
-
-  //   pd->json->decode(&m_jd, (json_reader){ .read = doRead, .userdata = m_file }, NULL);
-
-  //   int status = pd->file->close(m_file);
-  //   if (status) pd->system->error("LOAD ERROR: world file->close status code: %i", status);
-  //   m_file = NULL;
-
-  // } else if (m_actionProgress == 5) {
-
-  //   // SCHEMA EVOLUTION - V4 to V5 (v1.0 to v1.1)
-  //   // Factories now save their production time internally. Need to compute this for all existing factories.
-  //   if (m_worldVersions[m_save][m_slot] == V1p0_SAVE_FORMAT) {
-  //     m_worldVersions[m_save][m_slot] = V1p1_SAVE_FORMAT;
-  //     uint16_t nFacsUpdated = 0;
-  //     for (uint16_t i = 0; i < TOT_CARGO_OR_BUILDINGS; ++i) {
-  //       struct Building_t* b = buildingManagerGetByIndex(i);
-  //       if (!b) continue;
-  //       if (b->m_type != kFactory) continue;
-  //       ++nFacsUpdated;
-  //       updateFactoryUpgrade(b);
-  //     } 
-  //     pd->system->logToConsole("-- Performed world schema evolution from v%i to v%i (Save:%i, World:%i), updated %i factories", 
-  //       V1p0_SAVE_FORMAT, V1p1_SAVE_FORMAT, m_save, m_slot, nFacsUpdated);
-  //   }
-
-
-  //   // Things which need to run post-load
-  //   setGameMode(kWanderMode);
-
-  //   // need to refresh conveyor sprite connections
-  //   for (uint16_t i = 0; i < TOT_CARGO_OR_BUILDINGS; ++i) {
-  //     conveyorUpdateSprite(buildingManagerGetByIndex(i));
-  //   } 
-
-  //   addObstacles();
-  //   doWetness(/*for titles = */ false);
-  //   setChunkBackgrounds(/*for title = */ false);
-  //   showTutorialMsg(getTutorialStage());
-
-  //   // Update audio settings
-  //   updateSfx();
-  //   updateMusic(/*isTitle=*/ false);
-  //   updateMusicVol();
-
-  //   populateMenuGame();
-
-  //   forceTorus();
-
-  //   // Finished
-  //   #ifdef SLOW_LOAD
-  //   float f; for (int32_t i = 0; i < 10000; ++i) for (int32_t j = 0; j < 10000; ++j) { f*=i*j; }
-  //   #endif
-
-  //   return true;
-  // }
-
-  ++m_actionProgress;    
-  return true;
+void doSave() {
+  char filePath[128];
+  snprintf(filePath, 128, SAVE_FORMAT_1_NAME);
+  SDFile* file = pd->file->open(filePath, kFileWrite);
+  const int wrote = pd->file->write(file, m_player_score, SAVE_SIZE_V1);
+  pd->system->logToConsole("SAVE wrote %i bytes, expected to write %i bytes", wrote, SAVE_SIZE_V1);
+  pd->file->close(file);
 }
 
-// void willDecodeSublist(json_decoder* jd, const char* _name, json_value_type _type) {
+///
 
-//   static char truncated[6];
-//   strncpy(truncated, _name, 5);
-//   truncated[5] = '\0';
-
-//   if (strcmp(truncated, "sf") == 0 && _type == kJSONTable) {
-//     jd->didDecodeTableValue = deserialiseValueSaveFormat;
-//   } else if (m_actionProgress == 1 && strcmp(truncated, "cargo") == 0 && _type == kJSONTable) {
-//     jd->didDecodeTableValue = deserialiseValueCargo;
-//     jd->didDecodeSublist = deserialiseStructDoneCargo;
-//   } else if (m_actionProgress == 2 && strcmp(truncated, "build") == 0 && _type == kJSONTable) {
-//     jd->didDecodeTableValue = deserialiseValueBuilding;
-//     jd->didDecodeSublist = deserialiseStructDoneBuilding;
-//   } else if (m_actionProgress == 3 && strcmp(truncated, "locat") == 0 && _type == kJSONTable) {
-//     jd->didDecodeTableValue = deserialiseValueLocation;
-//     jd->didDecodeSublist = deserialiseStructDoneLocation;
-//   } else if (m_actionProgress == 4 && strcmp(truncated, "world") == 0 && _type == kJSONArray) {
-//     jd->didDecodeTableValue = NULL;
-//     jd->didDecodeSublist = NULL;
-//     jd->didDecodeArrayValue = deserialiseArrayValueWorld;
-//   } else {
-//     jd->didDecodeTableValue = NULL;
-//   }
-  
-// }

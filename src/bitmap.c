@@ -320,20 +320,27 @@ void updateLevelStatsBitmap(void) {
   uint16_t score = 0;
   uint16_t par = 0;
   getLevelStatistics(getCurrentLevel(), &score, &par);
-  int16_t displayScore = par - score;
-  pd->graphics->clearBitmap(m_levelStatsBitmap, kColorClear);
   if (!score && !par) {
     // This means that the player hasn't finished any of the level yet
-    return;
-  }
-  if (displayScore < 0) {
-    snprintf(text, 128, "%i UNDER PAR", (int)displayScore*-1);
-  } else if (displayScore > 0) {
-    snprintf(text, 128, "%i OVER PAR", (int)displayScore);
+    uint16_t holes = 0;
+    uint16_t played = 0;
+    for (int h = 0; h < MAX_HOLES; ++h) {
+      if (getPar(getCurrentLevel(), h)) { holes++; }
+      if (getScore(getCurrentLevel(), h)) { played++; }
+    }
+    snprintf(text, 128, "%i OF %i HOLES", (int)played, (int)holes);
   } else {
-    snprintf(text, 128, "EQUAL TO PAR");
+    const int16_t displayScore = par - score;
+    if (displayScore < 0) {
+      snprintf(text, 128, "%i UNDER PAR", (int)displayScore*-1);
+    } else if (displayScore > 0) {
+      snprintf(text, 128, "%i OVER PAR", (int)displayScore);
+    } else {
+      snprintf(text, 128, "EQUAL TO PAR");
+    }
   }
   const int32_t w = pd->graphics->getTextWidth(getRoobert24(), text, 128, kUTF8Encoding, 0);
+  pd->graphics->clearBitmap(m_levelStatsBitmap, kColorClear);
   pd->graphics->pushContext(m_levelStatsBitmap);
   pd->graphics->setDrawMode(kDrawModeFillBlack);
   drawOutlineText(text, 129, NUMERAL_PIX_X - w/2, 0, 2);

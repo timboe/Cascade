@@ -147,6 +147,7 @@ void renderTitles(int32_t fc, enum kFSM fsm) {
     setRoobert10();
     pd->graphics->setDrawMode(kDrawModeFillWhite);
     pd->graphics->drawText(VERSION, 8, kUTF8Encoding, 8, DEVICE_PIX_Y-16);
+    pd->graphics->drawText("Tim Martin, 2024", 32, kUTF8Encoding, 8, 4);
     pd->graphics->setDrawMode(kDrawModeCopy);
     pd->graphics->drawBitmap(getSpriteSplash(), 0, 0, kBitmapUnflipped);
     if (pd->system->isCrankDocked()) { 
@@ -313,6 +314,7 @@ void renderTurret(void) {
   if (so - minY >= 2*TURRET_RADIUS) {
     return;
   }
+  pd->graphics->drawLine(0, minY+1, DEVICE_PIX_X, minY+1, 2, kColorWhite);
   // pd->graphics->drawBitmap(getBitmapHeader(), 0, 0, kBitmapUnflipped);
   pd->graphics->drawBitmap(getBitmapTurretBody(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY,  kBitmapUnflipped);
   pd->graphics->drawBitmap(getBitmapTurretBarrel(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY, kBitmapUnflipped);
@@ -349,8 +351,10 @@ void renderBackground(void) {
     if (bm) pd->graphics->drawBitmap(bm, 0, UI_OFFSET_TOP + (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
   }
 
-  if (start == 0) {
-    pd->graphics->drawBitmap(getInfoTopperBitmap(), 0, -TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
+  const float minY = getMinimumY(); 
+  if (getScrollOffset() - minY < 0) {
+    pd->graphics->fillRect(0, minY - TURRET_RADIUS - 60, DEVICE_PIX_X, 60, kColorBlack); // mask in case of over-scroll
+    pd->graphics->drawBitmap(getInfoTopperBitmap(), 0, minY - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
   }
 
   if (getScrollOffset() <= -TURRET_RADIUS) { // Note no parallax here

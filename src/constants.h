@@ -150,6 +150,7 @@
 #define SAVE_FORMAT_1_MAX_PLAYERS 4
 #define SAVE_FORMAT_1_MAX_LEVELS 128
 #define SAVE_FORMAT_1_MAX_HOLES 16
+#define SAVE_FORMAT_1_NAME "cascade_savegame_v1.dat"
 
 // Must be less than their SAVE_FORMAT counterparts
 #define MAX_PLAYERS 3
