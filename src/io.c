@@ -19,7 +19,9 @@ uint16_t m_hole = 0;
 
 uint32_t m_player_score[SAVE_FORMAT_1_MAX_PLAYERS][SAVE_FORMAT_1_MAX_LEVELS][SAVE_FORMAT_1_MAX_HOLES] = {0};
 
-uint32_t m_level_par[MAX_LEVELS][MAX_HOLES] = {0};
+uint16_t m_level_par[MAX_LEVELS][MAX_HOLES] = {0};
+uint16_t m_level_foreground[MAX_LEVELS][MAX_HOLES] = {0};
+uint16_t m_level_background[MAX_LEVELS][MAX_HOLES] = {0};
 
 
 int doRead(void* _userdata, uint8_t* _buf, int _bufsize);
@@ -60,7 +62,22 @@ int scanShouldDecodeTableValueForKey(json_decoder* jd, const char* _key);
 
 /// ///
 
+uint16_t getWaterfallBackground(uint16_t level, uint16_t hole) { return m_level_background[level][hole];}
+
+uint16_t getWaterfallForeground(uint16_t level, uint16_t hole) { return m_level_foreground[level][hole]; }
+
 uint16_t getCurrentPlayer(void) { return m_player; }
+
+void doPreviousPlayer(void) {
+  if (!m_player) { m_player = MAX_PLAYERS - 1; }
+  else --m_player;
+  pd->system->logToConsole("Now player %i", (int)m_player);
+}
+
+void doNextPlayer(void) {
+  m_player = (m_player + 1) % MAX_PLAYERS;
+  pd->system->logToConsole("Now player %i", (int)m_player);
+}
 
 uint16_t getCurrentLevel(void) { return m_level; }
 
@@ -98,23 +115,23 @@ uint16_t getNextHole(void) {
 }
 
 void doPreviousLevel(void) { 
-  pd->system->logToConsole("doPreviousLevel");
   m_level = getPreviousLevel();
+  pd->system->logToConsole("Now level %i", (int)m_level);
 }
 
 void doNextLevel(void) {
-  pd->system->logToConsole("doNextLevel");
   m_level = getNextLevel();
+  pd->system->logToConsole("Now level %i", (int)m_level);
 }
 
 void doPreviousHole(void) { 
-  pd->system->logToConsole("doPreviousHole");
   m_hole = getPreviousHole();
+  pd->system->logToConsole("Now hole %i", (int)m_hole);
 }
 
 void doNextHole(void) {
-  pd->system->logToConsole("doNextHole");
   m_hole = getNextHole();
+  pd->system->logToConsole("Now hole %i", (int)m_hole);
 }
 
 void setHoleScore(uint16_t score) {
@@ -123,15 +140,30 @@ void setHoleScore(uint16_t score) {
   }
 }
 
+void getLevelStatistics(uint16_t level, uint16_t* score, uint16_t* par) {
+  for (int h = 0; h < MAX_HOLES; ++h) {
+    if (m_level_par[level][h] == 0) { // h-1 was the last hole in this level
+      return;
+    }
+    if (m_player_score[m_player][level][h] == 0) { // the player hasn't finished all holes in the level
+      *score = 0;
+      *par = 0;
+      return;
+    }
+    *score += m_player_score[m_player][level][h];
+    *par += m_level_par[level][h];
+  }
+}
+
 uint16_t getCurrentHole(void) { return m_hole; }
 
-uint16_t getPar(uint16_t level, uint16_t hole) { return /*m_level_par[level][hole];*/ 3; }
+uint16_t getPar(uint16_t level, uint16_t hole) { return m_level_par[level][hole]; }
 
-uint16_t getScore(uint16_t level, uint16_t hole) { return /*m_player_score[m_player][level][hole];*/ 4; }
+uint16_t getScore(uint16_t level, uint16_t hole) { return m_player_score[m_player][level][hole]; }
 
-uint16_t getCurrentLevelPar(void) { return getPar(m_level, m_hole); }
+uint16_t getCurrentHolePar(void) { return getPar(m_level, m_hole); }
 
-uint16_t getCurrentLevelScore(void) { return getScore(m_level, m_hole); }
+uint16_t getCurrentHoleScore(void) { return getScore(m_level, m_hole); }
 
 void doIO(enum kSaveLoadRequest _first, enum kSaveLoadRequest _andThen, enum kSaveLoadRequest _andFinally) {
   if (IOOperationInProgress()) {
@@ -226,7 +258,6 @@ bool doTitle() {
   reset();
   setGameMode(kTitles);
 
-  populateMenuTitle();
   updateMusic(/*isTitle=*/true);
 
   return true;
@@ -257,7 +288,7 @@ bool doSaveDelete() {
   // int status = pd->file->unlink(filePathDelete, 0);
   // #ifdef DEV
   // pd->system->logToConsole("DELETE unlink previous player save %s, status %i", filePathDelete, status);
-  // #endif
+  // #endifs
   // pd->file->rename(m_filePath, filePathDelete);
 
   // Finished
@@ -267,15 +298,24 @@ bool doSaveDelete() {
 ///
 
 int shouldDecodeScan(json_decoder* jd, const char* key) {
-  return (strcmp(key, "par") == 0);
+  return (! strcmp(key, "body") == 0); // Decode everything in the header
 }
 
 void didDecodeScan(json_decoder* jd, const char* key, json_value value) {
+  pd->system->logToConsole("didDecodeScan deode %s", key);
   if (strcmp(key, "par") == 0) {
     m_level_par[m_level][m_hole] = json_intValue(value);
     pd->system->logToConsole("m_level_par[%i][%i] = %i", m_level, m_hole, m_level_par[m_level][m_hole]);
-  } else {
-    pd->system->error("didDecodeScan DECODE ISSUE, %s", key);
+  } else if (strcmp(key, "foreground") == 0) {
+    m_level_foreground[m_level][m_hole] = json_intValue(value);
+    pd->system->logToConsole("m_level_foreground[%i][%i] = %i", m_level, m_hole, m_level_foreground[m_level][m_hole]);
+  } else if (strcmp(key, "background") == 0) {
+    m_level_background[m_level][m_hole] = json_intValue(value);
+    pd->system->logToConsole("m_level_background[%i][%i] = %i", m_level, m_hole, m_level_background[m_level][m_hole]);
+  } else if (strcmp(key, "level") == 0 && json_intValue(value)-1 != m_level) {
+    pd->system->error("didDecodeScan LEVEL MISSMATCH %i %i", json_intValue(value)-1, (int)m_level);
+  } else if (strcmp(key, "hole") == 0 && json_intValue(value)-1 != m_hole) {
+    pd->system->error("didDecodeScan HOLE MISSMATCH %i %i", json_intValue(value)-1, (int)m_hole);
   }
 }
 
@@ -287,11 +327,11 @@ void scanLevels() {
     for (int32_t h = 0; h < MAX_HOLES; ++h) {
       m_hole = h;
       // snprintf(filePath, 128, "levels/fall_%i_hole_%i.json", 1, 1);
-      snprintf(filePath, 128, "levels/fall_%i_hole_%i.json", (int)l+1, (int)h+1);
+      snprintf(filePath, 128, "levels/level_%i_hole_%i.json", (int)l+1, (int)h+1);
       SDFile* file = pd->file->open(filePath, kFileRead);
       if (!file && m_level >= 10) {
         // Look for user-supplied levels instead
-        snprintf(filePath, 128, "fall_%i_hole_%i.json", (int)l+1, (int)h+1);
+        snprintf(filePath, 128, "level_%i_hole_%i.json", (int)l+1, (int)h+1);
         SDFile* file = pd->file->open(filePath, kFileReadData);
       }
       if (!file) {

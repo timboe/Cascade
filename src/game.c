@@ -15,6 +15,8 @@ uint16_t m_ballCount = 0; // Keeping track of the current level score
 uint16_t m_ballStuckCounter = 0; // Keeping track of a stuck ball
 float m_turretBarrelAngle = 180.0f;
 
+uint16_t m_previousWaterfall = 0;
+
 enum kFSM m_FSM = (enum kFSM)0;
 
 enum kFSM doFSM_Titles(bool newState);
@@ -29,6 +31,10 @@ enum kFSM getFSM() { return m_FSM; }
 void resetBallStuckCounter(void) { m_ballStuckCounter = 0; }
 
 float getTurretBarrelAngle(void) { return m_turretBarrelAngle; }
+
+uint16_t getPreviousWaterfall(void) { return m_previousWaterfall; }
+
+void resetPreviousWaterfall(void) { m_previousWaterfall = getWaterfallForeground(getCurrentLevel(), 0); }
 
 int gameLoop(void* _data) {
   ++m_frameCount;
@@ -70,9 +76,11 @@ void reset() {
   resetUI();
 }
 
-void populateMenuTitle() {
+void populateMenuPlayer(void) {
   pd->system->removeAllMenuItems();
-  //pd->system->addMenuItem("delete save 3", menuOptionsCallbackDelete, (void*)2);
+  pd->system->addMenuItem("reset player 1", menuOptionsCallbackMenu, (void*)0);
+  pd->system->addMenuItem("reset player 2", menuOptionsCallbackMenu, (void*)1);
+  pd->system->addMenuItem("reset player 3", menuOptionsCallbackMenu, (void*)2);
 }
 
 void populateMenuGame() {
@@ -91,9 +99,16 @@ void commonScrollAndBounceBack(void) {
   else if (getPressed(kButtonDown)) diffY =  SCREEN_ACC;
   modScrollVelocity(diffY);
   // Crank based
-  float angle = getCrankAngle();
+  static float angle = 180.0f;
   static bool topLock = true;
   static float revDetection = 180.0f;
+  // Backup non-crank
+  if (pd->system->isCrankDocked()) {
+    if      (getPressed(kButtonLeft)) angle += 1.0f;
+    else if (getPressed(kButtonRight)) angle -= 1.0f;
+  } else {
+    angle = getCrankAngle();
+  }
 
   const bool newRev = fabsf(angle - revDetection) > 180.0f;
   revDetection = angle;
@@ -120,6 +135,23 @@ void commonScrollTo(int16_t destination, float progress, enum EasingFunction_t e
   setScrollOffset(so + (destination - so)*getEasing(e, progress), true);
 }
 
+float commonCrankNumeral(float* progress) {
+  float ret = 0.0f;
+  *progress -= getCrankChanged() * CRANK_NUMBERSCROLL_MODIFIER;
+  if      (getPressed(kButtonUp)) *progress += 10 * CRANK_NUMBERSCROLL_MODIFIER;
+  else if (getPressed(kButtonDown)) *progress -=  10 * CRANK_NUMBERSCROLL_MODIFIER;    
+  *progress *= 0.99f;
+  if (*progress >= 1.0f) {
+    *progress -= 2.0f;
+    ret = 1.0f;
+  } else if (*progress < -1.0f) {
+    *progress += 2.0f;
+    ret = -1.0f;
+  }
+  setNumeralOffset(*progress);
+  return ret;
+}
+
 enum kFSM doFSM(enum kFSM transitionTo) {
   bool newState = (m_FSM != transitionTo);
   if (newState) { 
@@ -139,46 +171,52 @@ enum kFSM doFSM_Titles(bool newState) {
 
   if (m_FSM == kTitlesFSM_DisplayTitles) {
 
-    if (newState) {
-      setGameMode(kTitles);
-    }
+    if (newState) { setGameMode(kTitles); }
+    if (!pd->system->isCrankDocked()) { return doFSM(kTitlesFSM_TitlesToChoosePlayer); }
 
-  } else if (m_FSM == kTitlesFSM_TitlesToPlayerSelect) {
+  } else if (m_FSM == kTitlesFSM_TitlesToChoosePlayer) {
 
     static int16_t timer = 0;
     if (newState) { timer = 0; }
     commonScrollTo(DEVICE_PIX_Y, (float)timer/TIME_TITLE_TRANSITION, EaseInOutQuad);
-    if (timer++ == TIME_TITLE_TRANSITION) { return doFSM(kTitlesFSM_ChooseLevel); }
+    if (timer++ == TIME_TITLE_TRANSITION) { return doFSM(kTitlesFSM_ChoosePlayer); }
 
   } else if (m_FSM == kTitlesFSM_ChoosePlayer) {
 
-  } else if (m_FSM == kTitlesFSM_PlayerSelectToLevelSelect) {
+    static float progress = 0.0f;
+    if (newState) {
+      progress = 0.0f;
+      populateMenuPlayer();
+    }
+    const float status = commonCrankNumeral(&progress);
+    if      (status > 0) doPreviousPlayer();
+    else if (status < 0) doNextPlayer();
+
+  } else if (m_FSM == kTitlesFSM_ChoosePlayerToChooseLevel) {
 
     static int16_t timer = 0;
-    if (newState) { timer = 0; }
+    if (newState) { 
+      timer = 0;
+      updateLevelStatsBitmap();
+      resetPreviousWaterfall();
+    }
     commonScrollTo(DEVICE_PIX_Y * 2, (float)timer/TIME_TITLE_TRANSITION, EaseInOutQuad);
     if (timer++ == TIME_TITLE_TRANSITION) { return doFSM(kTitlesFSM_ChooseLevel); }
-
-      pd->system->logToConsole("X %i", (int)timer);
-
 
   } else if (m_FSM == kTitlesFSM_ChooseLevel) {
 
     static float progress = 0.0f;
     if (newState) progress = 0.0f;
-
-    progress += getCrankChanged() * CRANK_NUMBERSCROLL_MODIFIER;
-    if      (getPressed(kButtonUp)) progress += 10 * CRANK_NUMBERSCROLL_MODIFIER;
-    else if (getPressed(kButtonDown)) progress -=  10 * CRANK_NUMBERSCROLL_MODIFIER;    
-    progress *= 0.99f;
-    if (progress >= 1.0f) {
-      progress -= 2.0f;
+    const float status = commonCrankNumeral(&progress);
+    if (status > 0) {
+      resetPreviousWaterfall(); // Ordering important
       doPreviousLevel();
-    } else if (progress < -1.0f) {
-      progress += 2.0f;
+      updateLevelStatsBitmap();
+    } else if (status < 0) {
+      resetPreviousWaterfall();
       doNextLevel();
+      updateLevelStatsBitmap();
     }
-    setNumeralOffset(progress);
 
   } else if (m_FSM == kTitlesFSM_ChooseLevelToChooseHole) {
 
@@ -186,11 +224,12 @@ enum kFSM doFSM_Titles(bool newState) {
     if (newState) { 
       timer = 0;
       setNumeralOffset(0.0f);
+      updateHoleStatsBitmap();
     }
     commonScrollTo(DEVICE_PIX_Y * 3, (float)timer/TIME_TITLE_TRANSITION, EaseInOutQuad);
     if (timer++ == TIME_TITLE_TRANSITION) { return doFSM(kTitlesFSM_ChooseHole); }
 
-  } else if (m_FSM == kTitlesFSM_ChooseLevelToPlayerSelect) {
+  } else if (m_FSM == kTitlesFSM_ChooseLevelToChoosePlayer) {
 
     static int16_t timer = 0;
     if (newState) {
@@ -204,19 +243,14 @@ enum kFSM doFSM_Titles(bool newState) {
 
     static float progress = 0.0f;
     if (newState) progress = 0.0f;
-
-    progress += getCrankChanged() * CRANK_NUMBERSCROLL_MODIFIER;
-    if      (getPressed(kButtonUp)) progress += 10 * CRANK_NUMBERSCROLL_MODIFIER;
-    else if (getPressed(kButtonDown)) progress -=  10 * CRANK_NUMBERSCROLL_MODIFIER;    
-    progress *= 0.99f;
-    if (progress >= 1.0f) {
-      progress -= 2.0f;
-      doPreviousHole();
-    } else if (progress < -1.0f) {
-      progress += 2.0f;
+    const float status = commonCrankNumeral(&progress);
+    if (status > 0) {
+      doPreviousHole(); // Ordering important
+      updateHoleStatsBitmap();
+    } else if (status < 0) {
       doNextHole();
+      updateHoleStatsBitmap();
     }
-    setNumeralOffset(progress);
 
   } else if (m_FSM == kTitlesFSM_ChooseHoleToSplash) {
     
@@ -230,12 +264,13 @@ enum kFSM doFSM_Titles(bool newState) {
     commonScrollTo(DEVICE_PIX_Y * 4, (float)timer/TIME_TITLE_TRANSITION, EaseInOutQuad);
     if (timer++ == TIME_TITLE_TRANSITION) { return doFSM(kGameFSM_DisplaySplash); }
 
-  } else if (m_FSM == kTitlesFSM_ChooseHoleToLevelSelect) {
+  } else if (m_FSM == kTitlesFSM_ChooseHoleToChooseLevel) {
 
     static int16_t timer = 0;
     if (newState) { 
       timer = 0;
       setNumeralOffset(0.0f);
+      resetPreviousWaterfall();
     }
     commonScrollTo(DEVICE_PIX_Y * 2, (float)timer/TIME_TITLE_TRANSITION, EaseInOutQuad);
     if (timer++ == TIME_TITLE_TRANSITION) { return doFSM(kTitlesFSM_ChooseLevel); }

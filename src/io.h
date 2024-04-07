@@ -18,6 +18,16 @@ void enactIO(void);
 
 bool doSave(void);
 
+uint16_t getCurrentPlayer(void);
+
+void doPreviousPlayer(void);
+
+void doNextPlayer(void);
+
+uint16_t getWaterfallBackground(uint16_t level, uint16_t hole);
+
+uint16_t getWaterfallForeground(uint16_t level, uint16_t hole);
+
 uint16_t getCurrentLevel(void);
 
 uint16_t getPreviousLevel(void);
@@ -27,6 +37,8 @@ uint16_t getNextLevel(void);
 void doPreviousLevel(void);
 
 void doNextLevel(void);
+
+void getLevelStatistics(uint16_t level, uint16_t* score, uint16_t* par);
 
 uint16_t getCurrentHole(void);
 
@@ -42,8 +54,8 @@ void setHoleScore(uint16_t score);
 
 uint16_t getPar(uint16_t level, uint16_t hole);
 
-uint16_t getCurrentLevelPar(void);
+uint16_t getCurrentHolePar(void);
 
 uint16_t getScore(uint16_t level, uint16_t hole);
 
-uint16_t getCurrentLevelScore(void);
+uint16_t getCurrentHoleScore(void);

@@ -14,8 +14,6 @@
 
 #define TICK_FREQUENCY 50
 
-#define TILE_PIX 16
-
 #define TURRET_RADIUS 32
 #define TURRET_ANGLE_MIN 15.0f
 #define TURRET_ANGLE_MAX (360.0f - TURRET_ANGLE_MIN)
@@ -37,6 +35,8 @@
 
 #define NUMERAL_PIX_X 128
 #define NUMERAL_PIX_Y 160
+
+#define STENCIL_WIPE_N 30
 
 // TIMINGS
 
@@ -74,7 +74,7 @@
 
 /////////////
 
-#define N_WATERFALLS 8
+#define N_WATERFALLS 2
 
 // Trying without this
 #define UI_OFFSET_TOP 0
@@ -111,6 +111,7 @@
 
 #define POOT_STRENGTH 300.0f
 
+// Velocity squared under which the ball is considered stuck
 #define BALL_IS_STUCK 100.0f
 #define STUCK_TICKS (TICK_FREQUENCY*3)
 
@@ -150,6 +151,7 @@
 #define SAVE_FORMAT_1_MAX_HOLES 16
 
 // Must be less than their SAVE_FORMAT counterparts
+#define MAX_PLAYERS 3
 #define MAX_LEVELS 99
 #define MAX_HOLES 9
 

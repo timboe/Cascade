@@ -9,15 +9,15 @@ enum kGameMode {
 
 enum kFSM {
   kTitlesFSM_DisplayTitles,
-  kTitlesFSM_TitlesToPlayerSelect,
+  kTitlesFSM_TitlesToChoosePlayer,
   kTitlesFSM_ChoosePlayer,
-  kTitlesFSM_PlayerSelectToLevelSelect,
+  kTitlesFSM_ChoosePlayerToChooseLevel,
   kTitlesFSM_ChooseLevel,
   kTitlesFSM_ChooseLevelToChooseHole,
-  kTitlesFSM_ChooseLevelToPlayerSelect,
+  kTitlesFSM_ChooseLevelToChoosePlayer,
   kTitlesFSM_ChooseHole,
   kTitlesFSM_ChooseHoleToSplash,
-  kTitlesFSM_ChooseHoleToLevelSelect,
+  kTitlesFSM_ChooseHoleToChooseLevel,
   kFSM_SPLIT_TitlesGame,
   kGameFSM_DisplaySplash,
   kGameFSM_SplashToStart,
@@ -37,12 +37,6 @@ enum kFSM {
 
 void updateUI(int fc);
 
-void updateUITitles(int fc);
-
-void modTitleCursor(bool _increment);
-
-uint16_t getTitleCursorSelected(void);
-
 void snprintf_c(char* _buf, uint8_t _bufSize, int _n);
 
 void setGameMode(enum kGameMode _mode);
@@ -52,8 +46,6 @@ enum kGameMode getGameMode(void);
 void initiUI(void);
 
 void resetUI(void);
-
-LCDBitmap* getTitleNewGameBitmap(uint8_t _i);
 
 float getScrollOffset(void);
 

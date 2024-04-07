@@ -30,16 +30,22 @@ LCDFont* getGreatVibes109(void);
 LCDBitmap* getBitmapWfFg(uint8_t _wf, uint32_t _x, uint32_t _y);
 LCDBitmap* getBitmapWfFg_byidx(uint8_t _wf, uint32_t _idx);
 LCDBitmap* getBitmapWfBg(uint8_t wf);
-LCDBitmap* getBitmapWfFront(void);
+LCDBitmap* getBitmapWfPond(void);
 
+LCDBitmap* getBitmapUseTheCrank(void);
 LCDBitmap* getSpriteSplash(void);
 LCDBitmap* getTitleSelectedBitmap(void);
 LCDBitmap* getBitmapNumeral(int8_t n);
 LCDBitmap* getStencilNumeral(void);
+LCDBitmap* getStencilWipe(int8_t n);
+LCDBitmap* getBitmapDither(void);
 
+LCDBitmap* getBitmapPlayer(void);
 LCDBitmap* getBitmapLevel(void);
+LCDBitmap* getBitmapLevelStats(void);
 LCDBitmap* getBitmapHole(void);
-
+LCDBitmap* getBitmapHoleStats(void);
+LCDBitmap* getBitmapHoleTutorial(void);
 
 LCDBitmap* getBitmapTurretBody(void);
 LCDBitmap* getBitmapTurretBarrel(void);
@@ -56,6 +62,8 @@ LCDBitmap* getBitmapAnimPoot(uint8_t i);
 
 void updateInfoTopperBitmap(void);
 void updateLevelSplashBitmap(void);
+void updateLevelStatsBitmap(void);
+void updateHoleStatsBitmap(void);
 void updateScoreHistogramBitmap(void);
 
 float sizeToScale(uint8_t size);

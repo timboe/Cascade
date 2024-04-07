@@ -110,26 +110,78 @@ void render(int32_t fc, enum kFSM fsm) {
 void renderTitles(int32_t fc, enum kFSM fsm) {
   const int32_t so = getScrollOffset();
 
+  // INTRO SPLASH
   if (so < DEVICE_PIX_Y) {
+
+    for (int i = 0; i < 4; ++i) {
+      pd->graphics->drawBitmap(getBitmapWfFg(0, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
+    }
     setRoobert10();
-    pd->graphics->setDrawMode(kDrawModeNXOR);
+    pd->graphics->setDrawMode(kDrawModeFillWhite);
     pd->graphics->drawText(VERSION, 8, kUTF8Encoding, 8, DEVICE_PIX_Y-16);
     pd->graphics->setDrawMode(kDrawModeCopy);
-
     pd->graphics->drawBitmap(getSpriteSplash(), 0, 0, kBitmapUnflipped);
-
-    const int i = 1;
-    pd->graphics->drawBitmap(getTitleNewGameBitmap(i),
-      DEVICE_PIX_X/2 - 4*TILE_PIX,
-      DEVICE_PIX_Y - 2*TILE_PIX,
-      kBitmapUnflipped);
-    if (fc % TICK_FREQUENCY < TICK_FREQUENCY/2) pd->graphics->drawBitmap(getTitleSelectedBitmap(),
-      DEVICE_PIX_X/2  - 4*TILE_PIX,
-      DEVICE_PIX_Y - TILE_PIX*2,
-      kBitmapUnflipped);
+    if (pd->system->isCrankDocked()) { 
+      pd->graphics->drawBitmap(getBitmapUseTheCrank(), DEVICE_PIX_X - 88, DEVICE_PIX_Y - 51 - 16, kBitmapUnflipped);
+    }
   }
 
-  if (so > DEVICE_PIX_Y) {
+  // PLAYER
+  if (so > 0 && so <= DEVICE_PIX_Y*2 ) {
+    const uint16_t currentWf = getWaterfallForeground(getCurrentLevel(), 0);
+    for (int i = 4; i < 8; ++i) {
+      pd->graphics->drawBitmap(getBitmapWfFg(currentWf, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
+    }
+
+    uint8_t digit[3];
+    digit[1] = getCurrentPlayer();
+    digit[0] = digit[1] == 0 ? MAX_PLAYERS-1 : digit[1]-1;
+    digit[2] = (digit[1] + 1) % MAX_PLAYERS;
+    for (int i = 0; i < 3; ++i) { digit[i]++; }
+    float offY = (NUMERAL_PIX_Y / 2) * m_numeralOffset;
+    const bool locked = (so == DEVICE_PIX_Y);
+
+    pd->graphics->drawBitmap(getBitmapPlayer(), DEVICE_PIX_X - 40, DEVICE_PIX_Y + 40, kBitmapUnflipped);
+    if (!locked) {
+      pd->graphics->drawBitmap(getBitmapNumeral(digit[1]),
+        DEVICE_PIX_X - NUMERAL_PIX_X - 40, DEVICE_PIX_Y + 40, kBitmapUnflipped);
+    } else {
+      pd->graphics->setStencilImage(getStencilNumeral(), 0);
+      pd->graphics->drawBitmap(getBitmapNumeral(digit[0]),
+        DEVICE_PIX_X - NUMERAL_PIX_X - 40, DEVICE_PIX_Y + 40 - NUMERAL_PIX_Y + offY, kBitmapUnflipped);
+      pd->graphics->drawBitmap(getBitmapNumeral(digit[1]),
+        DEVICE_PIX_X - NUMERAL_PIX_X - 40, DEVICE_PIX_Y + 40 + offY, kBitmapUnflipped);
+      pd->graphics->drawBitmap(getBitmapNumeral(digit[2]),
+        DEVICE_PIX_X - NUMERAL_PIX_X - 40, DEVICE_PIX_Y + 40 + NUMERAL_PIX_Y + offY, kBitmapUnflipped);
+      pd->graphics->setStencilImage(NULL, 0);
+    }
+
+  }
+
+  // LEVEL
+  if (so > DEVICE_PIX_Y && so <= DEVICE_PIX_Y*3) {
+    const uint16_t prevWf = getPreviousWaterfall();
+    for (int i = 8; i < 12; ++i) {
+      pd->graphics->drawBitmap(getBitmapWfFg(prevWf, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
+    }
+
+    const bool locked = (so == 2*DEVICE_PIX_Y);
+
+    // Animate in new waterfall
+    const uint16_t currentWf = getWaterfallForeground(getCurrentLevel(), 0);
+    static uint16_t newWaterfallTimer = 0;
+    if (currentWf != prevWf) {
+      pd->graphics->setStencilImage(getStencilWipe(newWaterfallTimer), 0);
+      for (int i = 8; i < 12; ++i) {
+        pd->graphics->drawBitmap(getBitmapWfFg(currentWf, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
+      }
+      pd->graphics->setStencilImage(NULL, 0);
+      if (++newWaterfallTimer == STENCIL_WIPE_N || !locked) {
+        resetPreviousWaterfall();
+        newWaterfallTimer = 0;
+      }
+    }
+
     uint8_t digit0[3];
     uint8_t digit1[3];
     // +1 is because we display levels 0-98 as 1-99
@@ -140,9 +192,9 @@ void renderTitles(int32_t fc, enum kFSM fsm) {
     digit0[2] = (getNextLevel() + 1) / 10;
     digit1[2] = (getNextLevel() + 1) % 10;
     float offY = (NUMERAL_PIX_Y / 2) * m_numeralOffset;
-    const bool locked = (so == 2*DEVICE_PIX_Y);
 
     pd->graphics->drawBitmap(getBitmapLevel(), 40 - 32, (DEVICE_PIX_Y*2) + 40, kBitmapUnflipped);
+    pd->graphics->drawBitmap(getBitmapLevelStats(), 40, (DEVICE_PIX_Y*2) + 40 + NUMERAL_PIX_Y, kBitmapUnflipped);
     if (!locked) {
       pd->graphics->drawBitmap(getBitmapNumeral(digit0[1]),
         40, (DEVICE_PIX_Y*2) + 40, kBitmapUnflipped);
@@ -168,32 +220,52 @@ void renderTitles(int32_t fc, enum kFSM fsm) {
     }
   }
 
-  if (so > 2*DEVICE_PIX_Y) {
+  // HOLE
+  if (so > DEVICE_PIX_Y*2 && so <= DEVICE_PIX_Y*4) {
+    const uint16_t currentWf = getWaterfallForeground(getCurrentLevel(), 0);
+    for (int i = 12; i < 16; ++i) {
+      pd->graphics->drawBitmap(getBitmapWfFg(currentWf, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
+    }
+    pd->graphics->drawBitmap(getBitmapDither(), 0, (WF_DIVISION_PIX_Y * 15), kBitmapUnflipped);
+
     uint8_t digit[3];
+    LCDBitmap* digitBm[3];
     // +1 is because we display levels 0-98 as 1-99
     digit[0] = (getPreviousHole() + 1);
     digit[1] = (getCurrentHole() + 1);
     digit[2] = (getNextHole() + 1);
+    digitBm[0] = getBitmapNumeral(digit[0]);
+    digitBm[1] = getBitmapNumeral(digit[1]);
+    digitBm[2] = getBitmapNumeral(digit[2]);
+    if (getCurrentLevel() == 0) {
+      for (int i = 0; i < 3; ++i) {
+        if (digit[i] == 1) { // Remmber we have already +1 for display
+          digitBm[i] = getBitmapHoleTutorial();
+        }
+      }
+    } 
     float offY = (NUMERAL_PIX_Y / 2) * m_numeralOffset;
     const bool locked = (so == 3*DEVICE_PIX_Y);
 
     pd->graphics->drawBitmap(getBitmapHole(), DEVICE_PIX_X - 40, (DEVICE_PIX_Y*3) + 40, kBitmapUnflipped);
+    pd->graphics->drawBitmap(getBitmapHoleStats(), DEVICE_PIX_X - 40 - NUMERAL_PIX_X, (DEVICE_PIX_Y*3) + 40 - 32, kBitmapUnflipped);
     if (!locked) {
-      pd->graphics->drawBitmap(getBitmapNumeral(digit[1]),
+      pd->graphics->drawBitmap(digitBm[1],
         DEVICE_PIX_X - NUMERAL_PIX_X - 40, (DEVICE_PIX_Y*3) + 40, kBitmapUnflipped);
     } else {
       pd->graphics->setStencilImage(getStencilNumeral(), 0);
-      pd->graphics->drawBitmap(getBitmapNumeral(digit[0]),
+      pd->graphics->drawBitmap(digitBm[0],
         DEVICE_PIX_X - NUMERAL_PIX_X - 40, (DEVICE_PIX_Y*3) + 40 - NUMERAL_PIX_Y + offY, kBitmapUnflipped);
-      pd->graphics->drawBitmap(getBitmapNumeral(digit[1]),
+      pd->graphics->drawBitmap(digitBm[1],
         DEVICE_PIX_X - NUMERAL_PIX_X - 40, (DEVICE_PIX_Y*3) + 40 + offY, kBitmapUnflipped);
-      pd->graphics->drawBitmap(getBitmapNumeral(digit[2]),
+      pd->graphics->drawBitmap(digitBm[2],
         DEVICE_PIX_X - NUMERAL_PIX_X - 40, (DEVICE_PIX_Y*3) + 40 + NUMERAL_PIX_Y + offY, kBitmapUnflipped);
       pd->graphics->setStencilImage(NULL, 0);
     }
   }
 
-  if (so > 3*DEVICE_PIX_Y) {
+  // LEVEL SPLASH
+  if (so > DEVICE_PIX_Y*3) {
     pd->graphics->drawBitmap(getLevelSplashBitmap(), 0, DEVICE_PIX_Y*4, kBitmapUnflipped);
   }
 
@@ -278,7 +350,7 @@ void renderGutter(void) {
   const int32_t so = getScrollOffset();
 
   if (so > gutterY + parallax - DEVICE_PIX_Y && getFSM() != kGameFSM_ScoresToTitle) {
-    pd->graphics->drawBitmap(getBitmapWfFront(), 0, gutterY + parallax, kBitmapUnflipped);
+    pd->graphics->drawBitmap(getBitmapWfPond(), 0, gutterY + parallax, kBitmapUnflipped);
     pd->graphics->drawRect(0, gutterY + parallax, DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
     pd->graphics->drawRect(1, gutterY + parallax + 1, DEVICE_PIX_X-2, DEVICE_PIX_Y-2, kColorBlack);
   }
