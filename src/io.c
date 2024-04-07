@@ -173,13 +173,16 @@ void getLevelStatistics(uint16_t level, uint16_t* score, uint16_t* par) {
       return;
     }
     if (m_player_score[m_player][level][h] == 0) { // the player hasn't finished all holes in the level
-      *score = 0;
-      *par = 0;
       return;
     }
     *score += m_player_score[m_player][level][h];
     *par += m_level_par[level][h];
   }
+}
+
+void getHoleStatistics(uint16_t level, uint16_t hole, uint16_t* score, uint16_t* par) {
+  *par = m_level_par[level][hole];
+  *score = m_player_score[m_player][level][hole];
 }
 
 uint16_t getCurrentHole(void) { return m_hole; }

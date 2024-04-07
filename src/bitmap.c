@@ -12,7 +12,7 @@ LCDBitmap* m_playerBitmap;
 LCDBitmap* m_levelBitmap;
 LCDBitmap* m_levelStatsBitmap;
 LCDBitmap* m_holeBitmap;
-LCDBitmap* m_holeStatsBitmap;
+LCDBitmap* m_holeStatsBitmap[2];
 LCDBitmap* m_holeTutorialBitmap;
 
 LCDBitmap* m_useTheCrankBitmap;
@@ -163,7 +163,9 @@ LCDBitmap* getBitmapLevelStats(void) { return m_levelStatsBitmap; }
 
 LCDBitmap* getBitmapHole(void) { return m_holeBitmap; }
 
-LCDBitmap* getBitmapHoleStats(void) { return m_holeStatsBitmap; }
+LCDBitmap* getBitmapHoleStatsA(void) { return m_holeStatsBitmap[0]; }
+
+LCDBitmap* getBitmapHoleStatsB(void) { return m_holeStatsBitmap[1]; }
 
 LCDBitmap* getBitmapHoleTutorial(void) { return m_holeTutorialBitmap; }
 
@@ -321,7 +323,7 @@ void updateLevelStatsBitmap(void) {
   int16_t displayScore = par - score;
   pd->graphics->clearBitmap(m_levelStatsBitmap, kColorClear);
   if (!score && !par) {
-    // This means that the player hasn't finished this level yet
+    // This means that the player hasn't finished any of the level yet
     return;
   }
   if (displayScore < 0) {
@@ -339,13 +341,32 @@ void updateLevelStatsBitmap(void) {
 }
 
 void updateHoleStatsBitmap(void) {
+  uint16_t score = 0;
+  uint16_t par = 0;
+  getHoleStatistics(getCurrentLevel(), getCurrentHole(), &score, &par);
   setRoobert24();
   char text[128];
-  snprintf(text, 128, "PAR %i", (int)getCurrentHolePar());
-  const int32_t w = pd->graphics->getTextWidth(getRoobert24(), text, 128, kUTF8Encoding, 0);
-  pd->graphics->pushContext(m_holeStatsBitmap);
+  snprintf(text, 128, "PAR %i", par);
+  const int32_t w1 = pd->graphics->getTextWidth(getRoobert24(), text, 128, kUTF8Encoding, 0);
+  pd->graphics->pushContext(m_holeStatsBitmap[0]);
   pd->graphics->setDrawMode(kDrawModeFillBlack);
-  drawOutlineText(text, 129, NUMERAL_PIX_X/2 - w/2, 0, 2);
+  drawOutlineText(text, 129, NUMERAL_PIX_X/2 - w1/2, 0, 2);
+  pd->graphics->popContext();
+
+  pd->graphics->clearBitmap(m_holeStatsBitmap[1], kColorClear);
+  if (!score) { return; }
+  int16_t displayScore = par - score;
+  if (displayScore < 0) {
+    snprintf(text, 128, "%i UNDER", (int)displayScore*-1);
+  } else if (displayScore > 0) {
+    snprintf(text, 128, "%i OVER", (int)displayScore);
+  } else {
+    snprintf(text, 128, "PAR");
+  }
+  const int32_t w2 = pd->graphics->getTextWidth(getRoobert24(), text, 128, kUTF8Encoding, 0);
+  pd->graphics->pushContext(m_holeStatsBitmap[1]);
+  pd->graphics->setDrawMode(kDrawModeFillBlack);
+  drawOutlineText(text, 129, (NUMERAL_PIX_X+(NUMERAL_BUF*2))/2 - w2/2, 0, 2);
   pd->graphics->popContext();
 }
 
@@ -455,7 +476,8 @@ void initBitmap() {
 
   m_levelBitmap = pd->graphics->newBitmap(32, NUMERAL_PIX_Y, kColorClear);
   m_levelStatsBitmap = pd->graphics->newBitmap(NUMERAL_PIX_X*2, 32, kColorClear);
-  m_holeStatsBitmap = pd->graphics->newBitmap(NUMERAL_PIX_X, 32, kColorClear);
+  m_holeStatsBitmap[0] = pd->graphics->newBitmap(NUMERAL_PIX_X, 32, kColorClear);
+  m_holeStatsBitmap[1] = pd->graphics->newBitmap(NUMERAL_PIX_X + (2*NUMERAL_BUF), 32, kColorClear);
 
   pd->graphics->pushContext(m_levelBitmap);
   pd->graphics->drawRotatedBitmap(tempBitmap, 32/2, NUMERAL_PIX_Y/2, 90.0f, 0.5f, 0.5f, 1.0f, 1.0f);

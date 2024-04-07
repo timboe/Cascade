@@ -44,7 +44,8 @@ LCDBitmap* getBitmapPlayer(void);
 LCDBitmap* getBitmapLevel(void);
 LCDBitmap* getBitmapLevelStats(void);
 LCDBitmap* getBitmapHole(void);
-LCDBitmap* getBitmapHoleStats(void);
+LCDBitmap* getBitmapHoleStatsA(void);
+LCDBitmap* getBitmapHoleStatsB(void);
 LCDBitmap* getBitmapHoleTutorial(void);
 
 LCDBitmap* getBitmapTurretBody(void);
