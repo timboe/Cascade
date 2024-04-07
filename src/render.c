@@ -169,18 +169,18 @@ void renderTitles(int32_t fc, enum kFSM fsm) {
     for (int i = 0; i < 3; ++i) { digit[i]++; }
     const float offY = (NUMERAL_PIX_Y / 2) * m_numeralOffset;
 
-    pd->graphics->drawBitmap(getBitmapPlayer(), DEVICE_PIX_X - 40, DEVICE_PIX_Y + 40, kBitmapUnflipped);
+    pd->graphics->drawBitmap(getBitmapPlayer(), NUMERAL_BUF - 32, DEVICE_PIX_Y + 40, kBitmapUnflipped);
     if (!locked) {
       pd->graphics->drawBitmap(getBitmapNumeral(digit[1]),
-        DEVICE_PIX_X - NUMERAL_PIX_X - 40, DEVICE_PIX_Y + 40, kBitmapUnflipped);
+        NUMERAL_BUF, DEVICE_PIX_Y + NUMERAL_BUF, kBitmapUnflipped);
     } else {
       pd->graphics->setStencilImage(getStencilNumeral(), 0);
       pd->graphics->drawBitmap(getBitmapNumeral(digit[0]),
-        DEVICE_PIX_X - NUMERAL_PIX_X - 40, DEVICE_PIX_Y + 40 - NUMERAL_PIX_Y + offY, kBitmapUnflipped);
+        NUMERAL_BUF, DEVICE_PIX_Y + NUMERAL_BUF - NUMERAL_PIX_Y + offY, kBitmapUnflipped);
       pd->graphics->drawBitmap(getBitmapNumeral(digit[1]),
-        DEVICE_PIX_X - NUMERAL_PIX_X - 40, DEVICE_PIX_Y + 40 + offY, kBitmapUnflipped);
+        NUMERAL_BUF, DEVICE_PIX_Y + NUMERAL_BUF + offY, kBitmapUnflipped);
       pd->graphics->drawBitmap(getBitmapNumeral(digit[2]),
-        DEVICE_PIX_X - NUMERAL_PIX_X - 40, DEVICE_PIX_Y + 40 + NUMERAL_PIX_Y + offY, kBitmapUnflipped);
+        NUMERAL_BUF, DEVICE_PIX_Y + NUMERAL_BUF + NUMERAL_PIX_Y + offY, kBitmapUnflipped);
       pd->graphics->setStencilImage(NULL, 0);
     }
 
@@ -205,29 +205,29 @@ void renderTitles(int32_t fc, enum kFSM fsm) {
     digit1[2] = (getNextLevel() + 1) % 10;
     float offY = (NUMERAL_PIX_Y / 2) * m_numeralOffset;
 
-    pd->graphics->drawBitmap(getBitmapLevel(), 40 - 32, (DEVICE_PIX_Y*2) + 40, kBitmapUnflipped);
-    pd->graphics->drawBitmap(getBitmapLevelStats(), 40, (DEVICE_PIX_Y*2) + 40 + NUMERAL_PIX_Y, kBitmapUnflipped);
+    pd->graphics->drawBitmap(getBitmapLevel(), DEVICE_PIX_X - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF, kBitmapUnflipped);
+    pd->graphics->drawBitmap(getBitmapLevelStats(), DEVICE_PIX_X - (2*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF + NUMERAL_PIX_Y, kBitmapUnflipped);
     if (!locked) {
       pd->graphics->drawBitmap(getBitmapNumeral(digit0[1]),
-        40, (DEVICE_PIX_Y*2) + 40, kBitmapUnflipped);
+        DEVICE_PIX_X - (2*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF, kBitmapUnflipped);
       pd->graphics->drawBitmap(getBitmapNumeral(digit1[1]),
-        40 + NUMERAL_PIX_X, (DEVICE_PIX_Y*2) + 40, kBitmapUnflipped);
+        DEVICE_PIX_X - (1*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF, kBitmapUnflipped);
     } else {
       pd->graphics->setStencilImage(getStencilNumeral(), 0);
       pd->graphics->drawBitmap(getBitmapNumeral(digit1[0]),
-        40 + NUMERAL_PIX_X, (DEVICE_PIX_Y*2) + 40 - NUMERAL_PIX_Y + offY, kBitmapUnflipped);
+        DEVICE_PIX_X - (1*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + 40 - NUMERAL_PIX_Y + offY, kBitmapUnflipped);
       pd->graphics->drawBitmap(getBitmapNumeral(digit1[1]),
-        40 + NUMERAL_PIX_X, (DEVICE_PIX_Y*2) + 40 + offY, kBitmapUnflipped);
+        DEVICE_PIX_X - (1*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + 40 + offY, kBitmapUnflipped);
       pd->graphics->drawBitmap(getBitmapNumeral(digit1[2]),
-        40 + NUMERAL_PIX_X, (DEVICE_PIX_Y*2) + 40 + NUMERAL_PIX_Y + offY, kBitmapUnflipped);
+        DEVICE_PIX_X - (1*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + 40 + NUMERAL_PIX_Y + offY, kBitmapUnflipped);
       if (m_numeralOffset < 0 && digit0[1] == digit0[2]) { offY = 0.0f; }
       if (m_numeralOffset > 0 && digit0[0] == digit0[1]) { offY = 0.0f; }
       pd->graphics->drawBitmap(getBitmapNumeral(digit0[0]),
-        40, (DEVICE_PIX_Y*2) + 40 - NUMERAL_PIX_Y + offY, kBitmapUnflipped);
+        DEVICE_PIX_X - (2*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + 40 - NUMERAL_PIX_Y + offY, kBitmapUnflipped);
       pd->graphics->drawBitmap(getBitmapNumeral(digit0[1]),
-        40, (DEVICE_PIX_Y*2) + 40 + offY, kBitmapUnflipped);
+        DEVICE_PIX_X - (2*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + 40 + offY, kBitmapUnflipped);
       pd->graphics->drawBitmap(getBitmapNumeral(digit0[2]),
-        40, (DEVICE_PIX_Y*2) + 40 + NUMERAL_PIX_Y + offY, kBitmapUnflipped);
+        DEVICE_PIX_X - (2*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + 40 + NUMERAL_PIX_Y + offY, kBitmapUnflipped);
       pd->graphics->setStencilImage(NULL, 0);
     }
   }
@@ -259,19 +259,19 @@ void renderTitles(int32_t fc, enum kFSM fsm) {
     const float offY = (NUMERAL_PIX_Y / 2) * m_numeralOffset;
     const bool locked = (so == 3*DEVICE_PIX_Y);
 
-    pd->graphics->drawBitmap(getBitmapHole(), DEVICE_PIX_X - 40, (DEVICE_PIX_Y*3) + 40, kBitmapUnflipped);
-    pd->graphics->drawBitmap(getBitmapHoleStats(), DEVICE_PIX_X - 40 - NUMERAL_PIX_X, (DEVICE_PIX_Y*3) + 40 - 32, kBitmapUnflipped);
+    pd->graphics->drawBitmap(getBitmapHole(), NUMERAL_BUF - 32, (DEVICE_PIX_Y*3) + 40, kBitmapUnflipped);
+    pd->graphics->drawBitmap(getBitmapHoleStats(), NUMERAL_BUF, (DEVICE_PIX_Y*3) + 40 - 32, kBitmapUnflipped);
     if (!locked) {
       pd->graphics->drawBitmap(digitBm[1],
-        DEVICE_PIX_X - NUMERAL_PIX_X - 40, (DEVICE_PIX_Y*3) + 40, kBitmapUnflipped);
+        NUMERAL_BUF, (DEVICE_PIX_Y*3) + NUMERAL_BUF, kBitmapUnflipped);
     } else {
       pd->graphics->setStencilImage(getStencilNumeral(), 0);
       pd->graphics->drawBitmap(digitBm[0],
-        DEVICE_PIX_X - NUMERAL_PIX_X - 40, (DEVICE_PIX_Y*3) + 40 - NUMERAL_PIX_Y + offY, kBitmapUnflipped);
+        NUMERAL_BUF, (DEVICE_PIX_Y*3) + NUMERAL_BUF - NUMERAL_PIX_Y + offY, kBitmapUnflipped);
       pd->graphics->drawBitmap(digitBm[1],
-        DEVICE_PIX_X - NUMERAL_PIX_X - 40, (DEVICE_PIX_Y*3) + 40 + offY, kBitmapUnflipped);
+        NUMERAL_BUF, (DEVICE_PIX_Y*3) + NUMERAL_BUF + offY, kBitmapUnflipped);
       pd->graphics->drawBitmap(digitBm[2],
-        DEVICE_PIX_X - NUMERAL_PIX_X - 40, (DEVICE_PIX_Y*3) + 40 + NUMERAL_PIX_Y + offY, kBitmapUnflipped);
+        NUMERAL_BUF, (DEVICE_PIX_Y*3) + NUMERAL_BUF + NUMERAL_PIX_Y + offY, kBitmapUnflipped);
       pd->graphics->setStencilImage(NULL, 0);
     }
   }

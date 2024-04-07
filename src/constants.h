@@ -35,6 +35,7 @@
 
 #define NUMERAL_PIX_X 128
 #define NUMERAL_PIX_Y 160
+#define NUMERAL_BUF 40
 
 #define STENCIL_WIPE_N 30
 

@@ -458,7 +458,7 @@ void initBitmap() {
   m_holeStatsBitmap = pd->graphics->newBitmap(NUMERAL_PIX_X, 32, kColorClear);
 
   pd->graphics->pushContext(m_levelBitmap);
-  pd->graphics->drawRotatedBitmap(tempBitmap, 32/2, NUMERAL_PIX_Y/2, 3.0f*90.0f, 0.5f, 0.5f, 1.0f, 1.0f);
+  pd->graphics->drawRotatedBitmap(tempBitmap, 32/2, NUMERAL_PIX_Y/2, 90.0f, 0.5f, 0.5f, 1.0f, 1.0f);
   pd->graphics->popContext();
 
   //
@@ -473,7 +473,7 @@ void initBitmap() {
 
   m_holeBitmap = pd->graphics->newBitmap(32, NUMERAL_PIX_Y, kColorClear);
   pd->graphics->pushContext(m_holeBitmap);
-  pd->graphics->drawRotatedBitmap(tempBitmap, 32/2, NUMERAL_PIX_Y/2, 90.0f, 0.5f, 0.5f, 1.0f, 1.0f);
+  pd->graphics->drawRotatedBitmap(tempBitmap, 32/2, NUMERAL_PIX_Y/2, 3*90.0f, 0.5f, 0.5f, 1.0f, 1.0f);
   pd->graphics->popContext();
 
   //
@@ -488,7 +488,7 @@ void initBitmap() {
 
   m_playerBitmap = pd->graphics->newBitmap(32, NUMERAL_PIX_Y, kColorClear);
   pd->graphics->pushContext(m_playerBitmap);
-  pd->graphics->drawRotatedBitmap(tempBitmap, 32/2, NUMERAL_PIX_Y/2, 90.0f, 0.5f, 0.5f, 1.0f, 1.0f);
+  pd->graphics->drawRotatedBitmap(tempBitmap, 32/2, NUMERAL_PIX_Y/2, 3*90.0f, 0.5f, 0.5f, 1.0f, 1.0f);
   pd->graphics->popContext();
 
   pd->graphics->freeBitmap(tempBitmap);
