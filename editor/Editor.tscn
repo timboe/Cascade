@@ -27,14 +27,14 @@ func _on_text_changed(new_text):
 script/source = "extends HSlider
 
 func _on_value_changed(newValue):
-	$\"../WorldLabel\".text = \"World: \" + str(newValue)
+	$\"../LevelLabel\".text = \"Level: \" + str(newValue)
 "
 
 [sub_resource type="GDScript" id="GDScript_scs8v"]
 script/source = "extends HSlider
 
 func _on_value_changed(newValue):
-	$\"../LevelLabel\".text = \"Level: \" + str(newValue)
+	$\"../HoleLabel\".text = \"Hole: \" + str(newValue)
 "
 
 [sub_resource type="GDScript" id="GDScript_lhfae"]
@@ -233,14 +233,14 @@ size_flags_horizontal = 3
 max_length = 15
 script = SubResource("GDScript_pob6t")
 
-[node name="WorldLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+[node name="LevelLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "World: 1
 "
 horizontal_alignment = 2
 
-[node name="WorldSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+[node name="LevelSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -251,13 +251,13 @@ rounded = true
 tick_count = 16
 script = SubResource("GDScript_vi753")
 
-[node name="LevelLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+[node name="HoleLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Level: 1"
 horizontal_alignment = 2
 
-[node name="LevelSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+[node name="HoleSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -385,8 +385,8 @@ size_flags_horizontal = 3
 text = "PEGS"
 
 [connection signal="text_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/Author" to="HBox/RightScroll/Margin/RightVBox/Grid/Author" method="_on_text_changed"]
-[connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/WorldSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/WorldSlider" method="_on_value_changed"]
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/LevelSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/LevelSlider" method="_on_value_changed"]
+[connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/HoleSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/HoleSlider" method="_on_value_changed"]
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/ParSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/ParSlider" method="_on_value_changed"]
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/HeightSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/HeightSlider" method="_on_value_changed"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Save" to="HBox/RightScroll/Margin/RightVBox/Grid/Save" method="_on_pressed"]

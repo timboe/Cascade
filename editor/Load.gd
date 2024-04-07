@@ -60,14 +60,14 @@ func restore_save(save_game : Dictionary) -> void:
 	reset_level()
 	
 	$%Author.text = save_game["header"]["author"] 
-	$%WorldSlider.value = save_game["header"]["world"] 
-	$%LevelSlider.value = save_game["header"]["level"]
+	$%LevelSlider.value = save_game["header"]["level"] 
+	$%HoleSlider.value = save_game["header"]["hole"]
 	$%ParSlider.value = save_game["header"]["par"]
 	$%Foreground.selected = save_game["header"]["foreground"]
 	$%Background.selected = save_game["header"]["background"]
 		
-	$%WorldSlider._on_value_changed($%WorldSlider.value)
 	$%LevelSlider._on_value_changed($%LevelSlider.value)
+	$%HoleSlider._on_value_changed($%HoleSlider.value)
 	$%ParSlider._on_value_changed($%ParSlider.value)
 	
 	var static_pegs : int = save_game["header"]["n_static"]
