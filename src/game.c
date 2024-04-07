@@ -78,9 +78,9 @@ void reset() {
 
 void populateMenuPlayer(void) {
   pd->system->removeAllMenuItems();
-  pd->system->addMenuItem("reset player 1", menuOptionsCallbackMenu, (void*)0);
-  pd->system->addMenuItem("reset player 2", menuOptionsCallbackMenu, (void*)1);
-  pd->system->addMenuItem("reset player 3", menuOptionsCallbackMenu, (void*)2);
+  pd->system->addMenuItem("reset slot 1", menuOptionsCallbackMenu, (void*)0);
+  pd->system->addMenuItem("reset slot 2", menuOptionsCallbackMenu, (void*)1);
+  pd->system->addMenuItem("reset slot 3", menuOptionsCallbackMenu, (void*)2);
 }
 
 void populateMenuGame() {
@@ -189,14 +189,22 @@ enum kFSM doFSM_Titles(bool newState) {
       populateMenuPlayer();
     }
     const float status = commonCrankNumeral(&progress);
-    if      (status > 0) doPreviousPlayer();
-    else if (status < 0) doNextPlayer();
+    if      (status > 0) {
+      resetPreviousWaterfall();
+      doPreviousPlayer();
+      goToNextUnplayedLevel();
+    } else if (status < 0) {
+      resetPreviousWaterfall();
+      doNextPlayer();
+      goToNextUnplayedLevel();
+    }
 
   } else if (m_FSM == kTitlesFSM_ChoosePlayerToChooseLevel) {
 
     static int16_t timer = 0;
     if (newState) { 
       timer = 0;
+      setNumeralOffset(0.0f);
       updateLevelStatsBitmap();
       resetPreviousWaterfall();
     }

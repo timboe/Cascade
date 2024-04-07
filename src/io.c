@@ -140,6 +140,33 @@ void setHoleScore(uint16_t score) {
   }
 }
 
+void goToNextUnplayedLevel(void) {
+  bool found = false;
+  // Find highest played level number
+  for (int l = MAX_LEVELS-1; l >= 0; --l) {
+    for (int h = MAX_HOLES-1; h >= 0; --h) {
+      if (m_player_score[m_player][l][h] && m_level_par[l][h]) {
+        m_level = l;
+        m_hole = h;
+        found = true;
+        break;
+      }
+    }
+    if (found) { break; }
+  }
+  if (found) {
+    doNextHole();
+    if (m_hole == 0) {
+      doNextLevel();
+    }
+  } else {
+    m_level = 0;
+    m_hole = 0;
+    pd->system->logToConsole("Now hole 0");
+    pd->system->logToConsole("Now level 0");
+  }
+}
+
 void getLevelStatistics(uint16_t level, uint16_t* score, uint16_t* par) {
   for (int h = 0; h < MAX_HOLES; ++h) {
     if (m_level_par[level][h] == 0) { // h-1 was the last hole in this level
@@ -361,6 +388,11 @@ void scanLevels() {
   } else {
     pd->system->logToConsole("No save-game data");
   }
+
+
+  pd->system->logToConsole("TESTING setting player 2 to have finished l=1 h=1 with 5 shots");
+  m_player_score[1][0][0] = 5;
+
 }
 
 // int scanShouldDecodeTableValueForKey(json_decoder* jd, const char* _key) {

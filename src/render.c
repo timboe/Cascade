@@ -107,6 +107,34 @@ void render(int32_t fc, enum kFSM fsm) {
   #endif
 }
 
+void commonRenderBackgroundWaterfallWithAnim(bool locked, uint8_t offY, uint16_t* timer) {
+  // Draw "previous" waterfall (will become current once resetPreviousWaterfall is called)
+  const uint16_t prevWf = getPreviousWaterfall();
+  for (int i = offY; i < (offY+4); ++i) {
+    pd->graphics->drawBitmap(getBitmapWfFg(prevWf, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
+  }
+
+  // Animate in new waterfall
+  const uint16_t currentWf = getWaterfallForeground(getCurrentLevel(), 0);
+  if (currentWf != prevWf) {
+    if (locked) {
+      pd->graphics->setStencilImage(getStencilWipe(*timer), 0);
+      for (int i = offY; i < (offY+4); ++i) {
+        pd->graphics->drawBitmap(getBitmapWfFg(currentWf, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
+      }
+      pd->graphics->setStencilImage(NULL, 0);
+      if (++(*timer) == STENCIL_WIPE_N) {
+        resetPreviousWaterfall();
+        *timer = 0;
+      }
+    } else {
+      for (int i = offY; i < (offY+4); ++i) {
+        pd->graphics->drawBitmap(getBitmapWfFg(currentWf, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
+      }
+    }
+  }
+}
+
 void renderTitles(int32_t fc, enum kFSM fsm) {
   const int32_t so = getScrollOffset();
 
@@ -128,18 +156,18 @@ void renderTitles(int32_t fc, enum kFSM fsm) {
 
   // PLAYER
   if (so > 0 && so <= DEVICE_PIX_Y*2 ) {
-    const uint16_t currentWf = getWaterfallForeground(getCurrentLevel(), 0);
-    for (int i = 4; i < 8; ++i) {
-      pd->graphics->drawBitmap(getBitmapWfFg(currentWf, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
-    }
+
+    static uint16_t newWaterfallTimer = 0;
+    const bool locked = (so == DEVICE_PIX_Y);
+    if (!locked) newWaterfallTimer = 0;
+    commonRenderBackgroundWaterfallWithAnim(locked, 4, &newWaterfallTimer);
 
     uint8_t digit[3];
     digit[1] = getCurrentPlayer();
     digit[0] = digit[1] == 0 ? MAX_PLAYERS-1 : digit[1]-1;
     digit[2] = (digit[1] + 1) % MAX_PLAYERS;
     for (int i = 0; i < 3; ++i) { digit[i]++; }
-    float offY = (NUMERAL_PIX_Y / 2) * m_numeralOffset;
-    const bool locked = (so == DEVICE_PIX_Y);
+    const float offY = (NUMERAL_PIX_Y / 2) * m_numeralOffset;
 
     pd->graphics->drawBitmap(getBitmapPlayer(), DEVICE_PIX_X - 40, DEVICE_PIX_Y + 40, kBitmapUnflipped);
     if (!locked) {
@@ -160,27 +188,11 @@ void renderTitles(int32_t fc, enum kFSM fsm) {
 
   // LEVEL
   if (so > DEVICE_PIX_Y && so <= DEVICE_PIX_Y*3) {
-    const uint16_t prevWf = getPreviousWaterfall();
-    for (int i = 8; i < 12; ++i) {
-      pd->graphics->drawBitmap(getBitmapWfFg(prevWf, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
-    }
 
-    const bool locked = (so == 2*DEVICE_PIX_Y);
-
-    // Animate in new waterfall
-    const uint16_t currentWf = getWaterfallForeground(getCurrentLevel(), 0);
     static uint16_t newWaterfallTimer = 0;
-    if (currentWf != prevWf) {
-      pd->graphics->setStencilImage(getStencilWipe(newWaterfallTimer), 0);
-      for (int i = 8; i < 12; ++i) {
-        pd->graphics->drawBitmap(getBitmapWfFg(currentWf, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
-      }
-      pd->graphics->setStencilImage(NULL, 0);
-      if (++newWaterfallTimer == STENCIL_WIPE_N || !locked) {
-        resetPreviousWaterfall();
-        newWaterfallTimer = 0;
-      }
-    }
+    const bool locked = (so == 2*DEVICE_PIX_Y);
+    if (!locked) newWaterfallTimer = 0;
+    commonRenderBackgroundWaterfallWithAnim(locked, 8, &newWaterfallTimer);
 
     uint8_t digit0[3];
     uint8_t digit1[3];
@@ -244,7 +256,7 @@ void renderTitles(int32_t fc, enum kFSM fsm) {
         }
       }
     } 
-    float offY = (NUMERAL_PIX_Y / 2) * m_numeralOffset;
+    const float offY = (NUMERAL_PIX_Y / 2) * m_numeralOffset;
     const bool locked = (so == 3*DEVICE_PIX_Y);
 
     pd->graphics->drawBitmap(getBitmapHole(), DEVICE_PIX_X - 40, (DEVICE_PIX_Y*3) + 40, kBitmapUnflipped);

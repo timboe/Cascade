@@ -38,6 +38,8 @@ void doPreviousLevel(void);
 
 void doNextLevel(void);
 
+void goToNextUnplayedLevel(void);
+
 void getLevelStatistics(uint16_t level, uint16_t* score, uint16_t* par);
 
 uint16_t getCurrentHole(void);
