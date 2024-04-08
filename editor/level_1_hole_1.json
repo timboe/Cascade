@@ -9,7 +9,7 @@
     "background": 0,
     "n_static": 2,
     "n_elliptic": 1,
-    "n_linear": 0
+    "n_linear": 1
   },
   "body": {
     "StaticControl1": {
@@ -119,6 +119,44 @@
         "shape": 0,
         "size": 0,
         "type": 0
+      }
+    },
+    "LineControl2": {
+      "shape": 0,
+      "x": 145,
+      "y": 169,
+      "angle": 0,
+      "size": 0,
+      "arc": 360,
+      "use_arc": true,
+      "speed": 1,
+      "n_pegs": 2,
+      "n_lines": 4,
+      "PegContainer1": {
+        "shape": 0,
+        "size": 0,
+        "type": 0
+      },
+      "PegContainer2": {
+        "shape": 0,
+        "size": 0,
+        "type": 0
+      },
+      "LineContainer1": {
+        "x": 214,
+        "y": 116
+      },
+      "LineContainer2": {
+        "x": 283,
+        "y": 156
+      },
+      "LineContainer3": {
+        "x": 275,
+        "y": 253
+      },
+      "LineContainer4": {
+        "x": 167,
+        "y": 252
       }
     }
   }

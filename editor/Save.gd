@@ -48,8 +48,8 @@ func pack_elliptic(elliptic_path : Control) -> Array:
 	for i in range(0, payload["n_pegs"]):
 		var peg_payload : Dictionary
 		var peg_container : Control = elliptic_path.find_child("PegContainer"+str(i+1), true, false)
-		peg_payload["shape"] = peg_container.find_child("ShapeButton").selected
-		peg_payload["size"] = peg_container.find_child("SizeButton").selected
+		peg_payload["shape_override"] = peg_container.find_child("ShapeButton").selected
+		peg_payload["size_override"] = peg_container.find_child("SizeButton").selected
 		peg_payload["type"] = peg_container.find_child("TypeButton").selected
 		payload[peg_container.name] = peg_payload
 	return [peg_name, payload]
@@ -70,21 +70,15 @@ func pack_linear(linear_path : Control) -> Array:
 	for i in range(0, payload["n_pegs"]):
 		var peg_payload : Dictionary
 		var peg_container : Control = linear_path.find_child("PegContainer"+str(i+1), true, false)
-		var custom_shape = peg_container.find_child("ShapeButton").selected
-		if custom_shape == 0: custom_shape = payload["shape"]
-		else: custom_shape -= 1 
-		peg_payload["shape"] = custom_shape
-		var custom_size = peg_container.find_child("SizeButton").selected
-		if custom_size == 0: custom_size = payload["size"]
-		else: custom_size -= 1 
-		peg_payload["size"] = custom_size
+		peg_payload["shape_override"] = peg_container.find_child("ShapeButton").selected
+		peg_payload["size_override"] = peg_container.find_child("SizeButton").selected
 		peg_payload["type"] = peg_container.find_child("TypeButton").selected
 		payload[peg_container.name] = peg_payload
 	for i in range(0, payload["n_lines"]):
 		var line_payload : Dictionary
 		var line_container : Control = linear_path.find_child("LineContainer"+str(i+1), true, false)
-		line_payload["x"] = payload["x"] + line_container.find_child("XOffText").value
-		line_payload["y"] = payload["y"] + line_container.find_child("YOffText").value
+		line_payload["lc_x"] = payload["x"] + line_container.find_child("XOffText").value
+		line_payload["lc_y"] = payload["y"] + line_container.find_child("YOffText").value
 		payload[line_container.name] = line_payload
 	return [peg_name, payload]
 

@@ -45,8 +45,8 @@ func populate_elliptic(save_game : Dictionary, elliptic_instance : Control) -> v
 		var peg_name : String = "PegContainer"+str(i+1)
 		var peg_container : Control = elliptic_instance.find_child(peg_name, true, false)
 		var peg_save : Dictionary = save_game[peg_name]
-		peg_container.find_child("ShapeButton").selected = peg_save["shape"]
-		peg_container.find_child("SizeButton").selected = peg_save["size"]
+		peg_container.find_child("ShapeButton").selected = peg_save["shape_override"]
+		peg_container.find_child("SizeButton").selected = peg_save["size_override"]
 		peg_container.find_child("TypeButton").selected = peg_save["type"]
 
 func reset_level() -> void:
