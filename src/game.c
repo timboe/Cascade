@@ -345,7 +345,8 @@ enum kFSM doFSM_Game(bool newState) {
       setScrollOffset(-DEVICE_PIX_Y - TURRET_RADIUS, true);
       updateScoreHistogramBitmap();
       populateMenuGame();
-      randomiseBoard(); // // TODO replace me
+      // randomiseBoard(); // // TODO replace me
+      clearBoard();
       loadCurrentHole();
     }
     if (timer++ == TIME_DISPLAY_SPLASH) return doFSM(kGameFSM_SplashToStart);

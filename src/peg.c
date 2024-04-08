@@ -116,7 +116,9 @@ void updatePeg(struct Peg_t* p) {
     const float easing = getEasing(p->m_easing, p->m_time / M_2PIf) * M_2PIf;
     p->m_x = p->m_pathX[0] + (p->m_a * cosf(easing));
     p->m_y = p->m_pathY[0] + (p->m_b * sinf(easing));
-    updateAngle(p, easing + (M_PIf * 0.5f) ); // Offset to point inwards
+    if (p->m_doArcAngle) {
+      updateAngle(p, easing + (M_PIf * 0.5f) ); // Offset to point inwards
+    }
 
   } else if (p->m_motion == kPegMotionPath) {
 
@@ -175,9 +177,10 @@ void setPegMotionStatic(struct Peg_t* p) {
   cpBodySetPositionUpdateFunc(p->m_cpBody, emptyCpBodyPositionFunc);
 }
 
-void setPegMotionEllipse(struct Peg_t* p, const float a, const float b) {
+void setPegMotionEllipse(struct Peg_t* p, const float a, const float b, const bool doArcAngle) {
   p->m_a = a;
   p->m_b = b;
+  p->m_doArcAngle = doArcAngle;
   p->m_motion = kPegMotionEllipse;
 }
 

@@ -73,6 +73,8 @@
 
 #define MAX_PEG_SIZE 5
 
+#define MAX_PEGS_ON_PATH 32
+
 /////////////
 
 #define N_WATERFALLS 2

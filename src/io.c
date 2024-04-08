@@ -4,6 +4,10 @@
 #include "input.h"
 #include "sound.h"
 #include "peg.h"
+#include "board.h"
+#include "physics.h"
+
+///
 
 enum DecodeType_t {
   kDecodeStatic,
@@ -13,18 +17,33 @@ enum DecodeType_t {
 
 enum DecodeType_t m_decodeType;
 
-struct StaticLoader_t {
-  enum PegShape_t shape;
-  float x;
-  float y;
-  uint16_t angle; // in degrees
-  uint8_t size;
-  enum PegType_t type;
-};
+///
 
 char m_nameStatic[128];
 uint16_t m_staticID = 0;
 struct StaticLoader_t m_static = {0};
+
+///
+
+char m_nameElliptic[128];
+uint16_t m_ellipticID = 0;
+struct EllipticLoader_t m_elliptic = {0};
+
+///
+
+char m_nameLinear[128];
+uint16_t m_linearID = 0;
+struct LinearLoader_t m_linear = {0};
+
+///
+
+char m_namePegContainer[128];
+uint16_t m_pegContainerID = 0;
+
+char m_nameLineContainer[128];
+uint16_t m_lineContainerID = 0;
+
+///
 
 uint16_t m_player = 0;
 uint16_t m_level = 0;
@@ -261,7 +280,7 @@ void scanLevels() {
 
   // Check for save-game file
   snprintf(filePath, 128, SAVE_FORMAT_1_NAME);
-  SDFile* file = pd->file->open(filePath, kFileRead);
+  SDFile* file = pd->file->open(filePath, kFileReadData);
   if (file) { // Load save data
     int result = pd->file->read(file, m_player_score, SAVE_SIZE_V1);
     pd->system->logToConsole("Reading %i bytes of save data, result %i", SAVE_SIZE_V1, result);
@@ -280,8 +299,26 @@ void scanLevels() {
 void willDecode(json_decoder* jd, const char* key, json_value_type type) {
 
   if (strcmp(key, m_nameStatic) == 0) {
-    pd->system->logToConsole("willDecode Decoding %s", m_nameStatic);
+    pd->system->logToConsole("willDecode %s", m_nameStatic);
     m_decodeType = kDecodeStatic;
+    return;
+  }
+
+  if (strcmp(key, m_nameElliptic) == 0) {
+    pd->system->logToConsole("willDecode %s", m_nameStatic);
+    m_decodeType = kDecodeElliptic;
+    m_pegContainerID = 0;
+    snprintf(m_namePegContainer, 128, "PegContainer%i", (int)m_pegContainerID+1);
+    return;
+  }
+
+  if (strcmp(key, m_nameLinear) == 0) {
+    pd->system->logToConsole("willDecode %s", m_nameLinear);
+    m_decodeType = kDecodeLinear;
+    m_pegContainerID = 0;
+    snprintf(m_namePegContainer, 128, "PegContainer%i", (int)m_pegContainerID+1);
+    m_lineContainerID = 0;
+    snprintf(m_nameLineContainer, 128, "LineContainer%i", (int)m_lineContainerID+1);
     return;
   }
 
@@ -290,33 +327,127 @@ void willDecode(json_decoder* jd, const char* key, json_value_type type) {
 
 void didDecode(json_decoder* jd, const char* key, json_value value) {
 
+  if (strcmp(key, "shape") == 0) {
+    switch (m_decodeType) {
+      case kDecodeStatic: m_static.shape = (enum PegShape_t) json_intValue(value); return;
+      case kDecodeElliptic: m_elliptic.shape = (enum PegShape_t) json_intValue(value); return;
+      case kDecodeLinear: m_linear.shape = (enum PegShape_t) json_intValue(value); return;
+    }
+  }
+
+  if (strcmp(key, "shape_override") == 0) {
+    switch (m_decodeType) {
+      case kDecodeStatic: return;
+      case kDecodeElliptic: m_elliptic.shapeOverride[m_pegContainerID] = (enum PegShape_t) json_intValue(value); return;
+      case kDecodeLinear: m_linear.shapeOverride[m_pegContainerID] = (enum PegShape_t) json_intValue(value); return;
+    }
+  }
+
+  if (strcmp(key, "n_pegs") == 0) {
+    switch (m_decodeType) {
+      case kDecodeStatic: return;
+      case kDecodeElliptic: m_elliptic.nPegs = json_intValue(value); return;
+      case kDecodeLinear: m_linear.nPegs = json_intValue(value); return;
+    }
+  }
+
+  if (strcmp(key, "n_lines") == 0) {
+    m_linear.nPegs = json_intValue(value); return;
+  }
+
   if (strcmp(key, "x") == 0) {
     switch (m_decodeType) {
       case kDecodeStatic: m_static.x = json_intValue(value); return;
+      case kDecodeElliptic: m_elliptic.x = json_intValue(value); return;
+      case kDecodeLinear: m_linear.x = json_intValue(value); return;
     }
   }
 
   if (strcmp(key, "y") == 0) {
     switch (m_decodeType) {
       case kDecodeStatic: m_static.y = json_intValue(value); return;
+      case kDecodeElliptic: m_elliptic.y = json_intValue(value); return;
+      case kDecodeLinear: m_linear.y = json_intValue(value); return;
     }
+  }
+
+  if (strcmp(key, "lc_x") == 0) {
+    m_linear.pathX[m_lineContainerID] = json_intValue(value); return;
+  }
+
+  if (strcmp(key, "lc_y") == 0) {
+    m_linear.pathY[m_lineContainerID] = json_intValue(value); return;
+  }
+
+  if (strcmp(key, "a") == 0) {
+    m_elliptic.a = json_intValue(value); return;
+  }
+
+  if (strcmp(key, "b") == 0) {
+    m_elliptic.b = json_intValue(value); return;
   }
 
   if (strcmp(key, "angle") == 0) {
     switch (m_decodeType) {
-      case kDecodeStatic: m_static.angle = json_intValue(value); return;
+      case kDecodeStatic: m_static.angle = angToRad(json_intValue(value)); return;
+      case kDecodeElliptic: m_elliptic.angle = angToRad(json_intValue(value)); return;
+      case kDecodeLinear: m_linear.angle = angToRad(json_intValue(value)); return;
+    }
+  }
+
+  if (strcmp(key, "arc") == 0) {
+    switch (m_decodeType) {
+      case kDecodeStatic: return;
+      case kDecodeElliptic: m_elliptic.maxAngle = angToRad(json_intValue(value)); return;
+      case kDecodeLinear: m_linear.maxAngle = angToRad(json_intValue(value)); return;
+    }
+  }
+
+  if (strcmp(key, "use_arc") == 0) {
+    switch (m_decodeType) {
+      case kDecodeStatic: return;
+      case kDecodeElliptic: m_elliptic.useArc = json_intValue(value); return;
+      case kDecodeLinear: m_linear.useArc = json_intValue(value); return;
+    }
+  }
+
+  if (strcmp(key, "speed") == 0) {
+    switch (m_decodeType) {
+      case kDecodeStatic: return;
+      case kDecodeElliptic: m_elliptic.speed = json_floatValue(value); return;
+      case kDecodeLinear: m_linear.speed = json_floatValue(value); return;
     }
   }
 
   if (strcmp(key, "size") == 0) {
     switch (m_decodeType) {
       case kDecodeStatic: m_static.size = json_intValue(value); return;
+      case kDecodeElliptic: m_elliptic.size = json_intValue(value); return;
+      case kDecodeLinear: m_linear.size = json_intValue(value); return;
+    }
+  }
+
+  if (strcmp(key, "size_override") == 0) {
+    switch (m_decodeType) {
+      case kDecodeStatic: ; return;
+      case kDecodeElliptic: m_elliptic.sizeOveride[m_pegContainerID] = json_intValue(value); return;
+      case kDecodeLinear: m_linear.sizeOveride[m_pegContainerID] = json_intValue(value); return;
     }
   }
 
   if (strcmp(key, "type") == 0) {
     switch (m_decodeType) {
-      case kDecodeStatic: m_static.type = (enum PegType_t)json_intValue(value); return;
+      case kDecodeStatic: m_static.type = (enum PegType_t) json_intValue(value); return;
+      case kDecodeElliptic: m_elliptic.types[m_pegContainerID] = (enum PegType_t) json_intValue(value); return;
+      case kDecodeLinear: m_linear.types[m_pegContainerID] = (enum PegType_t) json_intValue(value); return;
+    }
+  }
+
+  if (strcmp(key, "easing") == 0) {
+    switch (m_decodeType) {
+      case kDecodeStatic: return;
+      case kDecodeElliptic: m_elliptic.easing = (enum EasingFunction_t)json_intValue(value); return;
+      case kDecodeLinear: m_linear.easing = (enum EasingFunction_t)json_intValue(value); return;
     }
   }
 
@@ -326,9 +457,40 @@ void didDecode(json_decoder* jd, const char* key, json_value value) {
 void* finishDecode(json_decoder* jd, const char* key, json_value_type type) {
 
   if (strcmp(key, m_nameStatic) == 0) {
+    boardAddStatic(&m_static);
     pd->system->logToConsole("finishDecode %s", m_nameStatic);
     m_staticID++;
     snprintf(m_nameStatic, 128, "StaticControl%i", (int)m_staticID+1);
+    return NULL;
+  }
+
+  if (strcmp(key, m_nameElliptic) == 0) {
+    boardAddWheel(&m_elliptic);
+    pd->system->logToConsole("finishDecode %s", m_nameElliptic);
+    m_ellipticID++;
+    snprintf(m_nameElliptic, 128, "EllipticControl%i", (int)m_ellipticID+1);
+    return NULL;
+  }
+
+  if (strcmp(key, m_nameLinear) == 0) {
+    boardAddLinear(&m_linear);
+    pd->system->logToConsole("finishDecode %s", m_nameLinear);
+    m_linearID++;
+    snprintf(m_nameLinear, 128, "LinearControl%i", (int)m_linearID+1);
+    return NULL;
+  }
+
+  if (strcmp(key, m_namePegContainer) == 0) {
+    pd->system->logToConsole("finishDecode %s", m_namePegContainer);
+    m_pegContainerID++;
+    snprintf(m_namePegContainer, 128, "PegContainer%i", (int)m_pegContainerID+1);
+    return NULL;
+  }
+
+  if (strcmp(key, m_nameLineContainer) == 0) {
+    pd->system->logToConsole("finishDecode %s", m_nameLineContainer);
+    m_lineContainerID++;
+    snprintf(m_nameLineContainer, 128, "PegContainer%i", (int)m_lineContainerID+1);
     return NULL;
   }
 
@@ -356,10 +518,12 @@ void loadCurrentHole() {
     .didDecodeSublist = finishDecode
   };
 
-
-
   m_staticID = 0;
   snprintf(m_nameStatic, 128, "StaticControl%i", (int)m_staticID+1);
+  m_ellipticID = 0;
+  snprintf(m_nameElliptic, 128, "EllipticControl%i", (int)m_ellipticID+1);
+  m_linearID = 0;
+  snprintf(m_nameElliptic, 128, "LinearControl%i", (int)m_linearID+1);
 
   pd->json->decode(&jd, (json_reader){ .read = doRead, .userdata = file }, NULL);
   int status = pd->file->close(file);

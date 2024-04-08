@@ -4,8 +4,8 @@
 #include "easing.h"
 
 enum PegShape_t {
-  kPegShapeBall,
-  kPegShapeRect
+  kPegShapeRect,
+  kPegShapeBall
 };
 
 enum PegMotion_t {
@@ -50,6 +50,7 @@ struct Peg_t {
   float m_time;
   float m_speed;
   enum EasingFunction_t m_easing;
+  bool m_doArcAngle;
 
   // kPegMotionEllipse
   float m_a, m_b;
@@ -80,7 +81,7 @@ void setPegMotionEasing(struct Peg_t* p, const enum EasingFunction_t e);
 
 void setPegMotionOffset(struct Peg_t* p, const float offset);
 
-void setPegMotionEllipse(struct Peg_t* p, const float a, const float b);
+void setPegMotionEllipse(struct Peg_t* p, const float a, const float b, const bool doArcAngle);
 
 void setPegMotionStatic(struct Peg_t* p);
 

@@ -30,88 +30,96 @@ struct Peg_t* getPeg(uint16_t i) {
   return &m_pegs[i];
 }
 
-void boardAddWheel(const uint8_t n, const float angleMax, const enum PegShape_t s, const uint16_t x, const uint16_t y, const uint16_t a, const uint16_t b, const float speed) {
-  for (int i = 0; i < n; ++i) {
-    const uint8_t size = 0;
-    const float angle = (angleMax / n) * i;
+void boardAddWheel(const struct EllipticLoader_t* ellipticLoader) {
+  for (int i = 0; i < ellipticLoader->nPegs; ++i) {
     struct Peg_t* p = pegFromPool();
-    initPeg(p, s, x, y, angle, size);
-    setPegMotionSpeed(p, speed);
-    setPegMotionOffset(p, angle);
-    setPegMotionEllipse(p, a, b);
+    initPeg(p, ellipticLoader->shape, ellipticLoader->x, ellipticLoader->y, ellipticLoader->angle, ellipticLoader->size);
+    setPegMotionSpeed(p, ellipticLoader->speed);
+    const float angleOffset = (ellipticLoader->maxAngle / ellipticLoader->nPegs) * i;
+    setPegMotionOffset(p, angleOffset);
+    setPegMotionEasing(p, ellipticLoader->easing);
+    setPegMotionEllipse(p, ellipticLoader->a, ellipticLoader->b, ellipticLoader->useArc);
   }
 }
 
-void boardAddPath(const uint8_t n, const float angleMax, const enum PegShape_t s, const enum EasingFunction_t e, int16_t x[], int16_t y[], const float speed) {
-  for (int i = 0; i < n; ++i) {
-    const uint8_t size = 0;
-    const float angle = (angleMax / n) * i;
-    struct Peg_t* p = pegFromPool();
-    initPeg(p, s, x[0], y[0], angle, size);
-    setPegMotionSpeed(p, speed);
-    setPegMotionOffset(p, angle);
-    setPegMotionEasing(p, e);
-    for (int j = 1; j < MAX_LINEAR_PATH_SEGMENTS-2; ++j) {
-      if (!x[j] && !y[j]) {
-        break;
-      }
-      addPegMotionPath(p, x[j], y[j]);
-    }
-    pegMotionPathFinalise(p);
+void boardAddLinear(const struct LinearLoader_t* linearLoader) {
+  // for (int i = 0; i < linearLoader->nPegs; ++i) {
+    
+  //   struct Peg_t* p = pegFromPool();
+  //   initPeg(p, s, x[0], y[0], angle, size);
+  //   setPegMotionSpeed(p, linearLoader->speed);
+  //   const float angleOffset = (linearLoader->angleMax / linearLoader->nPegs) * i;
+  //   setPegMotionOffset(p, angleOffset);
+  //   setPegMotionEasing(p, linearLoader->easing);
+  //   for (int j = 1; j < MAX_LINEAR_PATH_SEGMENTS-2; ++j) {
+  //     if (!x[j] && !y[j]) {
+  //       break;
+  //     }
+  //     addPegMotionPath(p, x[j], y[j]);
+  //   }
+  //   pegMotionPathFinalise(p);
+  // }
+}
+
+
+struct Peg_t* boardAddStatic(const struct StaticLoader_t* staticLoader) {
+  struct Peg_t* p = pegFromPool();
+  initPeg(p, staticLoader->shape, staticLoader->x, staticLoader->y, staticLoader->angle, staticLoader->size);
+  setPegMotionStatic(p);
+  if (staticLoader->type == kPegTypeRequired) {
+    ++m_requiredPegsInPlay;
+    setPegType(p, kPegTypeRequired);
   }
+  return p;
 }
 
 void randomiseBoard(void) {
   clearBoard();
 
-  const int maxStatic = 16;//rand() % 2 ? 16 : 64+32;
+  // const int maxStatic = 16;//rand() % 2 ? 16 : 64+32;
 
-  for (int i = 0; i < maxStatic; ++i) {
-    const int16_t x = rand() % WFALL_PIX_X;
-    const int16_t y = (rand() % WFALL_PIX_Y) + TURRET_RADIUS;
-    const float angle = (M_2PIf / 256.0f) * (rand() % 256);
-    const enum PegShape_t s = (rand() % 2 ? kPegShapeBall : kPegShapeRect);
-    const uint8_t size = rand() % MAX_PEG_SIZE;
-    struct Peg_t* p = pegFromPool();
-    initPeg(p, s, x, y, angle, size);
-    setPegMotionStatic(p);
-    if (i < 4) {
-      ++m_requiredPegsInPlay;
-      setPegType(p, kPegTypeRequired);
-    }
-  }
+  // for (int i = 0; i < maxStatic; ++i) {
+  //   const int16_t x = rand() % WFALL_PIX_X;
+  //   const int16_t y = (rand() % WFALL_PIX_Y) + TURRET_RADIUS;
+  //   const float angle = (M_2PIf / 256.0f) * (rand() % 256);
+  //   const enum PegShape_t shape = (rand() % 2 ? kPegShapeBall : kPegShapeRect);
+  //   const uint8_t size = rand() % MAX_PEG_SIZE;
+  //   const enum PegType_t type = (i < 4 ? kPegTypeRequired : kPegTypeNormal);
+  //   boardAddStatic(shape, typr, x, y, angle, size);
+  // }
 
-  if (maxStatic == 16) return;
+  // if (maxStatic == 16) return;
 
-  #define PEGS_PER_WHEEL 8
-  #define WHEELS 4
-  for (int wheelStep = 0; wheelStep < WHEELS; ++wheelStep) {
-    const int16_t x = rand() % WFALL_PIX_X;
-    const int16_t y = (rand() % WFALL_PIX_Y) + TURRET_RADIUS;
-    const float a = 64 + rand() % 32;
-    const float b = 64 + rand() % 32;
-    const enum PegShape_t s = (rand() % 2 ? kPegShapeBall : kPegShapeRect);
-    const float speed = 1.0f;//0.1f * ((rand() % 10) + 1); 
-    boardAddWheel(PEGS_PER_WHEEL, M_2PIf, s, x, y, a, b, speed);
-  }
+  // #define PEGS_PER_WHEEL 8
+  // #define WHEELS 4
+  // for (int wheelStep = 0; wheelStep < WHEELS; ++wheelStep) {
+  //   const int16_t x = rand() % WFALL_PIX_X;
+  //   const int16_t y = (rand() % WFALL_PIX_Y) + TURRET_RADIUS;
+  //   const float a = 64 + rand() % 32;
+  //   const float b = 64 + rand() % 32;
+  //   const enum PegShape_t s = (rand() % 2 ? kPegShapeBall : kPegShapeRect);
+  //   const float speed = 1.0f;//0.1f * ((rand() % 10) + 1); 
+  //   struct Peg_t* pegs[32] = {0};
+  //   boardAddWheel(pegs, PEGS_PER_WHEEL, M_2PIf, shape, x, y, angle, a, b, speed);
+  // }
 
-  #define PEGS_PER_PATH 8
-  #define PATHS 4
-  for (int pathStep = 0; pathStep < PATHS; ++pathStep) {
-    int16_t x[MAX_LINEAR_PATH_SEGMENTS] = {0};
-    int16_t y[MAX_LINEAR_PATH_SEGMENTS] = {0};
-    x[0] = rand() % WFALL_PIX_X;
-    y[0] = (rand() % WFALL_PIX_Y) + TURRET_RADIUS;
-    const uint8_t pathLegs = 1 + rand() % (MAX_LINEAR_PATH_SEGMENTS/2);
-    for (int leg = 1; leg <= pathLegs; ++leg) {
-      x[leg] = x[leg-1] - 64 + rand() % 128;
-      y[leg] = y[leg-1] - 64 + rand() % 128;
-    }
-    const enum PegShape_t s = (rand() % 2 ? kPegShapeBall : kPegShapeRect);
-    const enum EasingFunction_t e = (enum EasingFunction_t) rand() % NEasingFunctions;
-    const float speed = 0.1f * ((rand() % 10) + 1); 
-    boardAddPath(PEGS_PER_PATH, M_2PIf, s, e, x, y, speed);    
-  }
+  // #define PEGS_PER_PATH 8
+  // #define PATHS 4
+  // for (int pathStep = 0; pathStep < PATHS; ++pathStep) {
+  //   int16_t x[MAX_LINEAR_PATH_SEGMENTS] = {0};
+  //   int16_t y[MAX_LINEAR_PATH_SEGMENTS] = {0};
+  //   x[0] = rand() % WFALL_PIX_X;
+  //   y[0] = (rand() % WFALL_PIX_Y) + TURRET_RADIUS;
+  //   const uint8_t pathLegs = 1 + rand() % (MAX_LINEAR_PATH_SEGMENTS/2);
+  //   for (int leg = 1; leg <= pathLegs; ++leg) {
+  //     x[leg] = x[leg-1] - 64 + rand() % 128;
+  //     y[leg] = y[leg-1] - 64 + rand() % 128;
+  //   }
+  //   const enum PegShape_t s = (rand() % 2 ? kPegShapeBall : kPegShapeRect);
+  //   const enum EasingFunction_t e = (enum EasingFunction_t) rand() % NEasingFunctions;
+  //   const float speed = 0.1f * ((rand() % 10) + 1); 
+  //   boardAddPath(PEGS_PER_PATH, M_2PIf, s, e, x, y, speed);    
+  // }
 
 }
 

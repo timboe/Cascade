@@ -104,8 +104,7 @@ void setScrollOffset(float set, bool force) {
 }
 
 void renderDebug(void) {
-  pd->graphics->drawLine(0, 0, DEVICE_PIX_X, 0, 4, kColorBlack);
-  pd->graphics->drawLine(0, 0, DEVICE_PIX_X, 0, 2, kColorWhite);
+
 
   pd->graphics->drawLine(0, WFALL_PIX_Y, DEVICE_PIX_X, WFALL_PIX_Y, 4, kColorBlack);
   pd->graphics->drawLine(0, WFALL_PIX_Y, DEVICE_PIX_X, WFALL_PIX_Y, 2, kColorWhite);
