@@ -31,7 +31,7 @@ LCDBitmap* m_infoTopperBitmap;
 LCDBitmap* m_levelSplashBitmap;
 
 LCDBitmap* m_numeralBitmap[10];
-LCDBitmap* m_numeralStencil;
+LCDBitmap* m_cardBitmap;
 
 LCDBitmap* m_scoreHistogram = NULL;
 
@@ -184,11 +184,7 @@ LCDBitmap* getBitmapBall(void) { return m_ballBitmap[0][0]; }
 
 LCDBitmap* getBitmapNumeral(int8_t n) { return m_numeralBitmap[n % 10]; }
 
-LCDBitmap* getStencilNumeral(void) { return m_numeralStencil; }
-
 LCDBitmap* getStencilWipe(int8_t n) { return m_stencilWipeBitmap[n % STENCIL_WIPE_N]; }
-
-LCDBitmap* getTitleSelectedBitmap() { return m_titleSelected; }
 
 LCDBitmap* getBitmapTurretBody(void) { return m_turretBody; }
 
@@ -457,9 +453,11 @@ void initBitmap() {
   m_fontGreatvibes109 = loadFontAtPath("fonts/GreatVibes-Regular-109");
   pd->graphics->setFont(m_fontGreatvibes24);
 
+  m_cardBitmap = loadImageAtPath("images/card");
   for (int n = 0; n < 10; ++n) {
-    m_numeralBitmap[n] = pd->graphics->newBitmap(NUMERAL_PIX_X, NUMERAL_PIX_Y, kColorBlack);
+    m_numeralBitmap[n] = pd->graphics->newBitmap(NUMERAL_PIX_X, NUMERAL_PIX_Y, kColorClear);
     pd->graphics->pushContext(m_numeralBitmap[n]);
+    pd->graphics->drawBitmap(m_cardBitmap, 0, 0, kBitmapFlippedY);
     char text[128];
     snprintf(text, 128, "%i", n);
     const int32_t w = pd->graphics->getTextWidth(getGreatVibes109(), text, 128, kUTF8Encoding, 0);
@@ -468,10 +466,6 @@ void initBitmap() {
     drawOutlineText(text, 128, NUMERAL_PIX_X/2 - w/2, 0, 4);
     pd->graphics->popContext();
   }
-  m_numeralStencil = pd->graphics->newBitmap(DEVICE_PIX_X, DEVICE_PIX_Y, kColorBlack);
-  pd->graphics->pushContext(m_numeralStencil);
-  pd->graphics->fillRect(0, (DEVICE_PIX_Y - NUMERAL_PIX_Y)/2, DEVICE_PIX_X, NUMERAL_PIX_Y, kColorWhite);
-  pd->graphics->popContext();
 
   LCDBitmap* tempBitmap = pd->graphics->newBitmap(NUMERAL_PIX_Y, 32, kColorClear);
   pd->graphics->pushContext(tempBitmap);

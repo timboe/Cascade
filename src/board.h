@@ -26,8 +26,8 @@ struct EllipticLoader_t {
   bool useArc;
 
   enum PegType_t types[MAX_PEGS_ON_PATH];
-  enum PegShape_t shapeOverride[MAX_PEGS_ON_PATH];
-  uint8_t sizeOveride[MAX_PEGS_ON_PATH];
+  uint8_t shapeOverride[MAX_PEGS_ON_PATH];
+  uint8_t sizeOverride[MAX_PEGS_ON_PATH];
 };
 
 struct LinearLoader_t {
@@ -44,8 +44,8 @@ struct LinearLoader_t {
   bool useArc;
 
   enum PegType_t types[MAX_PEGS_ON_PATH];
-  enum PegShape_t shapeOverride[MAX_PEGS_ON_PATH];
-  uint8_t sizeOveride[MAX_PEGS_ON_PATH];
+  uint8_t shapeOverride[MAX_PEGS_ON_PATH];
+  uint8_t sizeOverride[MAX_PEGS_ON_PATH];
 
   int16_t pathX[MAX_LINEAR_PATH_SEGMENTS];
   int16_t pathY[MAX_LINEAR_PATH_SEGMENTS];

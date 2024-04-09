@@ -124,7 +124,7 @@ bool ballInPlay(void) {
   return (m_FSM >= kGameFSM_BallInPlay && m_FSM <= kGameFSM_BallGutter);
 }
 
-void commonScrollAndBounceBack(void) {
+void commonTurretScrollAndBounceBack(bool allowScroll) {
   // Button based
   float diffY = 0;
   if      (getPressed(kButtonUp)) diffY = -SCREEN_ACC;
@@ -152,14 +152,15 @@ void commonScrollAndBounceBack(void) {
     topLock = true;
   }
 
-  if (!topLock) modScrollVelocity(getCrankChanged() * CRANK_SCROLL_MODIFIER);
+  if (allowScroll) {
+    if (!topLock) modScrollVelocity(getCrankChanged() * CRANK_SCROLL_MODIFIER);
+    applyScrollEasing();
+  }
 
   if (angle > TURRET_ANGLE_MAX) { angle = TURRET_ANGLE_MAX; }
   else if (angle < TURRET_ANGLE_MIN) { angle = TURRET_ANGLE_MIN; }
   m_turretBarrelAngle = angle;
 
-  // Apply
-  applyScrollEasing();
 }
 
 void commonScrollTo(int16_t destination, float progress, enum EasingFunction_t e) {
@@ -361,9 +362,16 @@ enum kFSM doFSM_Game(bool newState) {
     }
     float progress = getEasing(EaseInOutQuint, 1.0f - (float)timer/TIME_SPLASH_TO_GAME);
     setScrollOffset((-DEVICE_PIX_Y - TURRET_RADIUS) * progress, true);
-    if (timer++ == TIME_SPLASH_TO_GAME) {
-      return doFSM(kGameFSM_AimMode);
-    }
+    if (timer++ == TIME_SPLASH_TO_GAME) { return doFSM(kGameFSM_AimMode); }
+
+  } else if (m_FSM == kGameFSM_AimModeScrollToTop) {
+
+    static uint16_t timer = 0;
+    if (newState) { timer = 0; }
+    const float progress = getEasing(EaseInOutQuint, 1.0f - (float)timer/TIME_AIM_SCROLL_TO_TOP);
+    setScrollOffset(getMinimumY() + ((getScrollOffset() - getMinimumY())*progress), true);
+    commonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
+    if (timer++ == TIME_AIM_SCROLL_TO_TOP) { return doFSM(kGameFSM_AimMode); }
 
   } else if (m_FSM == kGameFSM_AimMode) {
 
@@ -372,7 +380,7 @@ enum kFSM doFSM_Game(bool newState) {
       resetBallTrace();
       timer = 0;
     }
-    commonScrollAndBounceBack();
+    commonTurretScrollAndBounceBack(true);
     //
     float progress = getEasing(EaseOutQuart, (float)timer/TIME_FIRE_BALL);
     if ((timer >= TIME_FIRE_BALL) || (progress > 0.5f && !getPressed(kButtonA))) { // Fire
@@ -393,7 +401,7 @@ enum kFSM doFSM_Game(bool newState) {
       m_ballStuckCounter = 0;
     }
     //
-    commonScrollAndBounceBack();
+    commonTurretScrollAndBounceBack(true);
     //
     const float y = cpBodyGetPosition(getBall()).y;
     setScrollOffset(y - HALF_DEVICE_PIX_Y, false);
@@ -414,7 +422,7 @@ enum kFSM doFSM_Game(bool newState) {
 
   } else if (m_FSM == kGameFSM_BallStuck) {
 
-    commonScrollAndBounceBack();
+    commonTurretScrollAndBounceBack(true);
     //
     bool popped = true;
     if (m_frameCount % TIME_STUCK_POP == 0) {
@@ -475,6 +483,8 @@ enum kFSM doFSM_Game(bool newState) {
     const int16_t minimumY = getMinimumY();
     // Take less time overall when we get lower down
     const float distance_mod = startY / (float)(startY - minimumY);
+    //
+    commonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
     //
     progress += (TIMESTEP * END_SWEEP_SCALE * distance_mod);
     float easedProgress = getEasing(EaseInOutSine, progress);

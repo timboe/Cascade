@@ -175,14 +175,14 @@ void renderTitles(int32_t fc, enum kFSM fsm) {
       pd->graphics->drawBitmap(getBitmapNumeral(digit[1]),
         NUMERAL_BUF, DEVICE_PIX_Y + NUMERAL_BUF, kBitmapUnflipped);
     } else {
-      pd->graphics->setStencilImage(getStencilNumeral(), 0);
+      pd->graphics->setScreenClipRect(NUMERAL_BUF, NUMERAL_BUF, NUMERAL_PIX_X, NUMERAL_PIX_Y);
       pd->graphics->drawBitmap(getBitmapNumeral(digit[0]),
         NUMERAL_BUF, DEVICE_PIX_Y + NUMERAL_BUF - NUMERAL_PIX_Y + offY, kBitmapUnflipped);
       pd->graphics->drawBitmap(getBitmapNumeral(digit[1]),
         NUMERAL_BUF, DEVICE_PIX_Y + NUMERAL_BUF + offY, kBitmapUnflipped);
       pd->graphics->drawBitmap(getBitmapNumeral(digit[2]),
         NUMERAL_BUF, DEVICE_PIX_Y + NUMERAL_BUF + NUMERAL_PIX_Y + offY, kBitmapUnflipped);
-      pd->graphics->setStencilImage(NULL, 0);
+      pd->graphics->clearClipRect();
     }
 
   }
@@ -214,7 +214,7 @@ void renderTitles(int32_t fc, enum kFSM fsm) {
       pd->graphics->drawBitmap(getBitmapNumeral(digit1[1]),
         DEVICE_PIX_X - (1*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF, kBitmapUnflipped);
     } else {
-      pd->graphics->setStencilImage(getStencilNumeral(), 0);
+      pd->graphics->setScreenClipRect(DEVICE_PIX_X - (NUMERAL_PIX_X*2) - NUMERAL_BUF, NUMERAL_BUF, NUMERAL_PIX_X*2, NUMERAL_PIX_Y);
       pd->graphics->drawBitmap(getBitmapNumeral(digit1[0]),
         DEVICE_PIX_X - (1*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF - NUMERAL_PIX_Y + offY, kBitmapUnflipped);
       pd->graphics->drawBitmap(getBitmapNumeral(digit1[1]),
@@ -229,7 +229,7 @@ void renderTitles(int32_t fc, enum kFSM fsm) {
         DEVICE_PIX_X - (2*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF + offY, kBitmapUnflipped);
       pd->graphics->drawBitmap(getBitmapNumeral(digit0[2]),
         DEVICE_PIX_X - (2*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF + NUMERAL_PIX_Y + offY, kBitmapUnflipped);
-      pd->graphics->setStencilImage(NULL, 0);
+      pd->graphics->clearClipRect();
     }
   }
 
@@ -268,14 +268,14 @@ void renderTitles(int32_t fc, enum kFSM fsm) {
       pd->graphics->drawBitmap(digitBm[1],
         NUMERAL_BUF, (DEVICE_PIX_Y*3) + NUMERAL_BUF, kBitmapUnflipped);
     } else {
-      pd->graphics->setStencilImage(getStencilNumeral(), 0);
+      pd->graphics->setScreenClipRect(NUMERAL_BUF, NUMERAL_BUF, NUMERAL_PIX_X, NUMERAL_PIX_Y);
       pd->graphics->drawBitmap(digitBm[0],
         NUMERAL_BUF, (DEVICE_PIX_Y*3) + NUMERAL_BUF - NUMERAL_PIX_Y + offY, kBitmapUnflipped);
       pd->graphics->drawBitmap(digitBm[1],
         NUMERAL_BUF, (DEVICE_PIX_Y*3) + NUMERAL_BUF + offY, kBitmapUnflipped);
       pd->graphics->drawBitmap(digitBm[2],
         NUMERAL_BUF, (DEVICE_PIX_Y*3) + NUMERAL_BUF + NUMERAL_PIX_Y + offY, kBitmapUnflipped);
-      pd->graphics->setStencilImage(NULL, 0);
+      pd->graphics->clearClipRect();
     }
   }
 

@@ -81,7 +81,9 @@ void setPegMotionEasing(struct Peg_t* p, const enum EasingFunction_t e);
 
 void setPegMotionOffset(struct Peg_t* p, const float offset);
 
-void setPegMotionEllipse(struct Peg_t* p, const float a, const float b, const bool doArcAngle);
+void setPegMotionEllipse(struct Peg_t* p, const float a, const float b);
+
+void setPegMotionDoArcAngle(struct Peg_t* p, const bool doArcAngle);
 
 void setPegMotionStatic(struct Peg_t* p);
 

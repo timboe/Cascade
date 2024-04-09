@@ -56,7 +56,9 @@ void clickHandleTitles(uint32_t buttonPressed) {
 }
 
 void clickHandleGameWindow(uint32_t buttonPressed) {
-  if ((kButtonA == buttonPressed || kButtonDown == buttonPressed) && getFSM() == kGameFSM_ScoresAnimation) {
+  if (kButtonB == buttonPressed  && getFSM() == kGameFSM_AimMode) {
+    doFSM(kGameFSM_AimModeScrollToTop);
+  } else if ((kButtonA == buttonPressed || kButtonDown == buttonPressed) && getFSM() == kGameFSM_ScoresAnimation) {
     doFSM(kGameFSM_ScoresToSplash);
   } else if ((kButtonB == buttonPressed || kButtonUp == buttonPressed) && getFSM() == kGameFSM_ScoresAnimation) {
     doFSM(kGameFSM_ScoresToTitle);

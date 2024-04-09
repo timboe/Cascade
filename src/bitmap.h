@@ -36,7 +36,6 @@ LCDBitmap* getBitmapUseTheCrank(void);
 LCDBitmap* getSpriteSplash(void);
 LCDBitmap* getTitleSelectedBitmap(void);
 LCDBitmap* getBitmapNumeral(int8_t n);
-LCDBitmap* getStencilNumeral(void);
 LCDBitmap* getStencilWipe(int8_t n);
 LCDBitmap* getBitmapDither(void);
 

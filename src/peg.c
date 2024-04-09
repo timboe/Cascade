@@ -126,6 +126,11 @@ void updatePeg(struct Peg_t* p) {
     float stepLenFrac = 0;
     float totLenFrac = (p->m_time / M_2PIf);
     
+    // TODO - this isn't great, no easing
+    if (p->m_doArcAngle) {
+      updateAngle(p, (totLenFrac * M_2PIf) + (M_PIf * 0.5f) ); // Offset to point inwards
+    }
+
     // TODO - cache this for calls after the first
 
     while (true) {
@@ -141,6 +146,7 @@ void updatePeg(struct Peg_t* p) {
     // totLenFrac is now 0-X, where X is this step's fraction of the total path length: stepLenFrac.
     // we want to scale this back into the range 0-1 and apply easing
     const float lenFrac = getEasing(p->m_easing, totLenFrac / stepLenFrac);
+
 
     // and we scale the difference between the points by this value
     const float dx = (p->m_pathX[pathStep+1] - p->m_pathX[pathStep]) * lenFrac;
@@ -177,10 +183,13 @@ void setPegMotionStatic(struct Peg_t* p) {
   cpBodySetPositionUpdateFunc(p->m_cpBody, emptyCpBodyPositionFunc);
 }
 
-void setPegMotionEllipse(struct Peg_t* p, const float a, const float b, const bool doArcAngle) {
+void setPegMotionDoArcAngle(struct Peg_t* p, const bool doArcAngle) {
+  p->m_doArcAngle = doArcAngle;
+}
+
+void setPegMotionEllipse(struct Peg_t* p, const float a, const float b) {
   p->m_a = a;
   p->m_b = b;
-  p->m_doArcAngle = doArcAngle;
   p->m_motion = kPegMotionEllipse;
 }
 

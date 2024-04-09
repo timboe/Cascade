@@ -23,6 +23,7 @@ enum kFSM {
   kGameFSM_DisplaySplash,
   kGameFSM_SplashToStart,
   kGameFSM_AimMode,
+  kGameFSM_AimModeScrollToTop,
   kGameFSM_BallInPlay,
   kGameFSM_BallStuck,
   kGameFSM_CloseUp,

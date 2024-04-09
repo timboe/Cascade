@@ -219,6 +219,7 @@ void doWrite(void* userdata, const char* str, int len) {
 
 void decodeError(json_decoder* jd, const char* error, int linenum) {
   pd->system->logToConsole("decode error line %i: %s", linenum, error);
+  doFSM(kTitlesFSM_DisplayTitles);
 }
 
 
@@ -256,7 +257,7 @@ void scanLevels() {
       // snprintf(filePath, 128, "levels/fall_%i_hole_%i.json", 1, 1);
       snprintf(filePath, 128, "levels/level_%i_hole_%i.json", (int)l+1, (int)h+1);
       SDFile* file = pd->file->open(filePath, kFileRead);
-      if (!file && m_level >= 10) {
+      if (!file) {
         // Look for user-supplied levels instead
         snprintf(filePath, 128, "level_%i_hole_%i.json", (int)l+1, (int)h+1);
         SDFile* file = pd->file->open(filePath, kFileReadData);
@@ -305,7 +306,7 @@ void willDecode(json_decoder* jd, const char* key, json_value_type type) {
   }
 
   if (strcmp(key, m_nameElliptic) == 0) {
-    pd->system->logToConsole("willDecode %s", m_nameStatic);
+    pd->system->logToConsole("willDecode %s", m_nameElliptic);
     m_decodeType = kDecodeElliptic;
     m_pegContainerID = 0;
     snprintf(m_namePegContainer, 128, "PegContainer%i", (int)m_pegContainerID+1);
@@ -321,6 +322,9 @@ void willDecode(json_decoder* jd, const char* key, json_value_type type) {
     snprintf(m_nameLineContainer, 128, "LineContainer%i", (int)m_lineContainerID+1);
     return;
   }
+
+  // pd->system->logToConsole("WILL DECODE %s looking for %s, diff is %i ", key, m_nameElliptic, strcmp(key, m_nameElliptic));
+
 
 }
 
@@ -338,8 +342,8 @@ void didDecode(json_decoder* jd, const char* key, json_value value) {
   if (strcmp(key, "shape_override") == 0) {
     switch (m_decodeType) {
       case kDecodeStatic: return;
-      case kDecodeElliptic: m_elliptic.shapeOverride[m_pegContainerID] = (enum PegShape_t) json_intValue(value); return;
-      case kDecodeLinear: m_linear.shapeOverride[m_pegContainerID] = (enum PegShape_t) json_intValue(value); return;
+      case kDecodeElliptic: m_elliptic.shapeOverride[m_pegContainerID] = json_intValue(value); return;
+      case kDecodeLinear: m_linear.shapeOverride[m_pegContainerID] = json_intValue(value); return;
     }
   }
 
@@ -352,7 +356,7 @@ void didDecode(json_decoder* jd, const char* key, json_value value) {
   }
 
   if (strcmp(key, "n_lines") == 0) {
-    m_linear.nPegs = json_intValue(value); return;
+    m_linear.nLines = json_intValue(value); return;
   }
 
   if (strcmp(key, "x") == 0) {
@@ -430,8 +434,8 @@ void didDecode(json_decoder* jd, const char* key, json_value value) {
   if (strcmp(key, "size_override") == 0) {
     switch (m_decodeType) {
       case kDecodeStatic: ; return;
-      case kDecodeElliptic: m_elliptic.sizeOveride[m_pegContainerID] = json_intValue(value); return;
-      case kDecodeLinear: m_linear.sizeOveride[m_pegContainerID] = json_intValue(value); return;
+      case kDecodeElliptic: m_elliptic.sizeOverride[m_pegContainerID] = json_intValue(value); return;
+      case kDecodeLinear: m_linear.sizeOverride[m_pegContainerID] = json_intValue(value); return;
     }
   }
 
@@ -455,6 +459,7 @@ void didDecode(json_decoder* jd, const char* key, json_value value) {
 
 
 void* finishDecode(json_decoder* jd, const char* key, json_value_type type) {
+
 
   if (strcmp(key, m_nameStatic) == 0) {
     boardAddStatic(&m_static);
@@ -490,9 +495,12 @@ void* finishDecode(json_decoder* jd, const char* key, json_value_type type) {
   if (strcmp(key, m_nameLineContainer) == 0) {
     pd->system->logToConsole("finishDecode %s", m_nameLineContainer);
     m_lineContainerID++;
-    snprintf(m_nameLineContainer, 128, "PegContainer%i", (int)m_lineContainerID+1);
+    snprintf(m_nameLineContainer, 128, "LineContainer%i", (int)m_lineContainerID+1);
     return NULL;
   }
+
+    // pd->system->logToConsole("FINISH DECODE %s ", key);
+
 
   return NULL;
 }
@@ -501,7 +509,7 @@ void loadCurrentHole() {
   char filePath[128];
   snprintf(filePath, 128, "levels/level_%i_hole_%i.json", (int)m_level+1, (int)m_hole+1);
   SDFile* file = pd->file->open(filePath, kFileRead);
-  if (!file && m_level >= 10) {
+  if (!file) {
     // Look for user-supplied levels instead
     snprintf(filePath, 128, "level_%i_hole_%i.json", (int)m_level+1, (int)m_hole+1);
     SDFile* file = pd->file->open(filePath, kFileReadData);
@@ -523,7 +531,7 @@ void loadCurrentHole() {
   m_ellipticID = 0;
   snprintf(m_nameElliptic, 128, "EllipticControl%i", (int)m_ellipticID+1);
   m_linearID = 0;
-  snprintf(m_nameElliptic, 128, "LinearControl%i", (int)m_linearID+1);
+  snprintf(m_nameLinear, 128, "LinearControl%i", (int)m_linearID+1);
 
   pd->json->decode(&jd, (json_reader){ .read = doRead, .userdata = file }, NULL);
   int status = pd->file->close(file);
