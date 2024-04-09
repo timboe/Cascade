@@ -113,10 +113,13 @@ var lineCount : int = 0
 
 var newPos := Vector2(32,64+32)
 
+func reset_count():
+	lineCount = 0
+
 func _on_pressed():
 	var instance = staticScene.instantiate()
 	lineCount += 1
-	instance.name = \"LineControl\" + str(lineCount)
+	instance.name = \"LinearControl\" + str(lineCount)
 	instance.find_child(\"LinePathText\").text = \"LinearPegPath\" + str(lineCount)
 	instance.find_child(\"XText\").value = newPos.x
 	instance.find_child(\"YText\").value = newPos.y
@@ -370,7 +373,7 @@ layout_mode = 2
 text = "New Elliptic Peg Path"
 script = SubResource("GDScript_qd471")
 
-[node name="AddPath" type="Button" parent="HBox/RightScroll/Margin/RightVBox"]
+[node name="AddLinear" type="Button" parent="HBox/RightScroll/Margin/RightVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "New Linear Peg Path"
@@ -397,4 +400,4 @@ text = "PEGS"
 [connection signal="confirmed" from="HBox/RightScroll/Margin/RightVBox/Grid/Load/FileDialog" to="HBox/RightScroll/Margin/RightVBox/Grid/Load" method="_on_file_dialog_confirmed"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddStatic" to="HBox/RightScroll/Margin/RightVBox/AddStatic" method="_on_pressed"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddElliptic" to="HBox/RightScroll/Margin/RightVBox/AddElliptic" method="_on_pressed"]
-[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddPath" to="HBox/RightScroll/Margin/RightVBox/AddPath" method="_on_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddLinear" to="HBox/RightScroll/Margin/RightVBox/AddLinear" method="_on_pressed"]

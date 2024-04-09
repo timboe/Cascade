@@ -260,8 +260,8 @@ func find_peg(v : Vector2, n : String) -> Control:
 func find_line_segment(v : Vector2, n : String) -> Control:
 	for peg in get_tree().get_nodes_in_group(n):
 		var v1 := Vector2()
-		v1.x = peg.find_parent("LineControl*").find_child("XText").value
-		v1.y = peg.find_parent("LineControl*").find_child("YText").value
+		v1.x = peg.find_parent("LinearControl*").find_child("XText").value
+		v1.y = peg.find_parent("LinearControl*").find_child("YText").value
 		var v2 := Vector2()
 		v2.x = peg.find_child("XOffText").value
 		v2.y = peg.find_child("YOffText").value
@@ -279,8 +279,8 @@ func move_peg(peg : Control, v : Vector2) -> void:
 		x_text.value = v.x
 		y_text.value = v.y
 	elif x_off_text and y_off_text:
-		var parent_x = peg.find_parent("LineControl*").find_child("XText").value
-		var parent_y = peg.find_parent("LineControl*").find_child("YText").value
+		var parent_x = peg.find_parent("LinearControl*").find_child("XText").value
+		var parent_y = peg.find_parent("LinearControl*").find_child("YText").value
 		x_off_text.value = v.x - parent_x
 		y_off_text.value = v.y - parent_y
 	
@@ -310,7 +310,7 @@ func _input(event):
 				return
 			if not peg: peg = find_line_segment(v, "line_segments")
 			if peg:
-				var parentLineControl = peg.find_parent("LineControl*")
+				var parentLineControl = peg.find_parent("LinearControl*")
 				#print("Found " , peg, " with parent ", parentLineControl, " at y ",  parentLineControl.position.y)
 				parentLineControl.add_theme_stylebox_override("panel", load("res://selected_style_box_flat.tres"))
 				$%RightScroll.set_v_scroll( parentLineControl.position.y )

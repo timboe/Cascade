@@ -48,6 +48,34 @@ func populate_elliptic(save_game : Dictionary, elliptic_instance : Control) -> v
 		peg_container.find_child("ShapeButton").selected = peg_save["shape_override"]
 		peg_container.find_child("SizeButton").selected = peg_save["size_override"]
 		peg_container.find_child("TypeButton").selected = peg_save["type"]
+		
+func populate_linear(save_game : Dictionary, linear_instance : Control) -> void:
+	if save_game["shape"] == 0:
+		linear_instance.find_child("CheckRect").button_pressed = 1
+	linear_instance.find_child("XText").value = save_game["x"]
+	linear_instance.find_child("YText").value = save_game["y"]
+	linear_instance.find_child("AngleText").value = save_game["angle"]
+	linear_instance.find_child("SizeText").selected = save_game["size"] 
+	linear_instance.find_child("ArcText").value = save_game["arc"]
+	linear_instance.find_child("ArcAngleCheckbox").button_pressed = save_game["use_arc"]
+	linear_instance.find_child("SpeedText").value = save_game["speed"]
+	linear_instance.find_child("PathSlider").value = save_game["n_pegs"]
+	# Changing PathSliderPathSlider. value will populate the sub-nodes already, just need to set them
+	for i in range(0, save_game["n_pegs"]):
+		var peg_name : String = "PegContainer"+str(i+1)
+		var peg_container : Control = linear_instance.find_child(peg_name, true, false)
+		var peg_save : Dictionary = save_game[peg_name]
+		peg_container.find_child("ShapeButton").selected = peg_save["shape_override"]
+		peg_container.find_child("SizeButton").selected = peg_save["size_override"]
+		peg_container.find_child("TypeButton").selected = peg_save["type"]
+	linear_instance.find_child("LineSlider").value = save_game["n_lines"]
+	for i in range(0, save_game["n_lines"]):
+		var line_name : String = "LineContainer"+str(i+1)
+		var line_container : Control = linear_instance.find_child(line_name, true, false)
+		var line_save : Dictionary = save_game[line_name]
+		line_container.find_child("XOffText").value = line_save["lc_x"] - save_game["x"] 
+		line_container.find_child("YOffText").value = line_save["lc_y"] - save_game["y"]
+
 
 func reset_level() -> void:
 	var i := 0
@@ -87,3 +115,10 @@ func restore_save(save_game : Dictionary) -> void:
 		var elliptic_name = "EllipticControl" + str(i)
 		var elliptic_instance = $%RightVBox.find_child(elliptic_name, true, false)
 		populate_elliptic(save_game["body"][elliptic_name], elliptic_instance)
+		
+	$%AddLinear.reset_count()
+	for i in range(1, linear_paths+1):
+		$%AddLinear._on_pressed()
+		var linear_name = "LinearControl" + str(i)
+		var linear_instance = $%RightVBox.find_child(linear_name, true, false)
+		populate_linear(save_game["body"][linear_name], linear_instance)
