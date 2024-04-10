@@ -236,15 +236,28 @@ void renderTitles(int32_t fc, enum kFSM fsm) {
 
   // HOLE
   if (so > DEVICE_PIX_Y*2 && so <= DEVICE_PIX_Y*4) {
+    const bool locked = (so == 3*DEVICE_PIX_Y);
+
     const uint16_t currentWf = getWaterfallForeground(getCurrentLevel(), 0);
     for (int i = 12; i < 16; ++i) {
       pd->graphics->drawBitmap(getBitmapWfFg(currentWf, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
     }
 
-    pd->graphics->drawBitmap(getBitmapDither(), 0, (WF_DIVISION_PIX_Y * 15), kBitmapUnflipped);
-
     LCDBitmap* bm = getBitmapPreview(getCurrentLevel(), getCurrentHole());
-    if (bm) pd->graphics->drawBitmap(bm, DEVICE_PIX_X - 200, DEVICE_PIX_Y*3, kBitmapUnflipped);
+    static uint16_t offset = 0;
+    if (!locked && bm) {
+      pd->graphics->drawBitmap(bm, DEVICE_PIX_X - 200, DEVICE_PIX_Y*3, kBitmapUnflipped);
+      offset = 0;
+    } else if (bm) {
+      pd->graphics->drawBitmap(bm, HALF_DEVICE_PIX_X, DEVICE_PIX_Y*3 - offset, kBitmapUnflipped);
+      pd->graphics->drawBitmap(bm, HALF_DEVICE_PIX_X, DEVICE_PIX_Y*3 - offset + (DEVICE_PIX_Y*2), kBitmapUnflipped);
+      offset += 2;
+      if (offset >= DEVICE_PIX_Y*2) { offset -= DEVICE_PIX_Y*2; }
+    }
+
+    pd->graphics->drawBitmap(getBitmapDither(), 0, (WF_DIVISION_PIX_Y * 15), kBitmapUnflipped);
+    pd->graphics->drawBitmap(getBitmapHoleCreator(), HALF_DEVICE_PIX_X, (DEVICE_PIX_Y * 4) - NUMERAL_BUF, kBitmapUnflipped);
+
 
 
     uint8_t digit[3];
@@ -264,7 +277,6 @@ void renderTitles(int32_t fc, enum kFSM fsm) {
       }
     } 
     const float offY = (NUMERAL_PIX_Y / 2) * m_numeralOffset;
-    const bool locked = (so == 3*DEVICE_PIX_Y);
 
     pd->graphics->drawBitmap(getBitmapHole(), NUMERAL_BUF - 32, (DEVICE_PIX_Y*3) + NUMERAL_BUF, kBitmapUnflipped);
     pd->graphics->drawBitmap(getBitmapHoleStatsA(), NUMERAL_BUF, (DEVICE_PIX_Y*3) + NUMERAL_BUF - 32, kBitmapUnflipped);

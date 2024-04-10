@@ -13,6 +13,7 @@ LCDBitmap* m_levelBitmap;
 LCDBitmap* m_levelStatsBitmap;
 LCDBitmap* m_holeBitmap;
 LCDBitmap* m_holeStatsBitmap[2];
+LCDBitmap* m_holeCreatorBitmap;
 LCDBitmap* m_holeTutorialBitmap;
 
 LCDBitmap* m_useTheCrankBitmap;
@@ -168,6 +169,8 @@ LCDBitmap* getBitmapHole(void) { return m_holeBitmap; }
 LCDBitmap* getBitmapHoleStatsA(void) { return m_holeStatsBitmap[0]; }
 
 LCDBitmap* getBitmapHoleStatsB(void) { return m_holeStatsBitmap[1]; }
+
+LCDBitmap* getBitmapHoleCreator(void) { return m_holeCreatorBitmap; }
 
 LCDBitmap* getBitmapHoleTutorial(void) { return m_holeTutorialBitmap; }
 
@@ -399,8 +402,8 @@ void initBitmap() {
     }
   }
 
+  char text[128];
   for (int32_t i = 0; i < N_WATERFALLS; ++i) {
-    char text[128];
     snprintf(text, 128, "images/falls%i_bg", (int)i);
     m_wfBg[i] = loadImageAtPath(text);
     snprintf(text, 128, "images/falls%i_fg", (int)i);
@@ -411,7 +414,6 @@ void initBitmap() {
   for (int l = 0; l < MAX_LEVELS; ++l) {
     for (int h = 0; h < MAX_HOLES; ++h) {
       if (!getPar(l,h)) { continue; } // No level
-      char text[128];
       snprintf(text, 128, "images/holes/level_%i_hole_%i.png", l+1, h+1);
       m_previewBitmap[l][h] = loadImageAtPath(text);
     }
@@ -514,12 +516,23 @@ void initBitmap() {
 
   //
 
+  m_holeCreatorBitmap = pd->graphics->newBitmap(HALF_DEVICE_PIX_X, 32, kColorClear);
+  pd->graphics->pushContext(m_holeCreatorBitmap);
+  setRoobert24();
+  snprintf(text, 128, "BY ZZZZZZ");
+  const int32_t w3 = pd->graphics->getTextWidth(getRoobert24(), text, 128, kUTF8Encoding, 0);
+  pd->graphics->setDrawMode(kDrawModeFillBlack);
+  drawOutlineText(text, 128, HALF_DEVICE_PIX_X/2 - w3/2, 0, 2);
+  pd->graphics->popContext();
+
+  //
+
   pd->graphics->clearBitmap(tempBitmap, kColorClear);
   pd->graphics->pushContext(tempBitmap);
   setRoobert24();
-  const int32_t w3 = pd->graphics->getTextWidth(getRoobert24(), "PLAYER", 128, kUTF8Encoding, 0);
+  const int32_t w4 = pd->graphics->getTextWidth(getRoobert24(), "PLAYER", 128, kUTF8Encoding, 0);
   pd->graphics->setDrawMode(kDrawModeFillBlack);
-  drawOutlineText("PLAYER", 128, NUMERAL_PIX_Y/2 - w3/2, 0, 2);
+  drawOutlineText("PLAYER", 128, NUMERAL_PIX_Y/2 - w4/2, 0, 2);
   pd->graphics->popContext();
 
   m_playerBitmap = pd->graphics->newBitmap(32, NUMERAL_PIX_Y, kColorClear);
