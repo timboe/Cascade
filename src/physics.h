@@ -19,6 +19,8 @@ void launchBall(float strength);
 
 void resetBall(void);
 
+void secondTryBall(void);
+
 cpSpace* getSpace(void);
 
 uint8_t radToByte(float rad);

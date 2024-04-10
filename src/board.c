@@ -7,6 +7,8 @@ uint16_t m_nPegs = 0;
 
 uint16_t m_requiredPegsInPlay = 0;
 
+enum PegSpecial_t m_special = kPegSpecialNotSpecial;
+
 ///
 
 int16_t requiredPegsInPlay(void) {
@@ -20,6 +22,13 @@ void initBoard(void) {
   for (int i = 0; i < MAX_PEGS; ++i) {
     m_pegs[i].m_id = i;
   }
+
+  // TEMP
+  int i = rand() % 3;
+  if (i == 0) m_special = kPegSpecialAim;
+  else if (i == 1) m_special = kPegSpecialSecondTry;
+  else m_special = kPegSpecialBounce;
+
 }
 
 struct Peg_t* pegFromPool(void) {
@@ -90,17 +99,20 @@ struct Peg_t* boardAddStatic(const struct StaticLoader_t* staticLoader) {
 void randomiseBoard(void) {
   clearBoard();
 
-  // const int maxStatic = 16;//rand() % 2 ? 16 : 64+32;
+  const int maxStatic = 64;//rand() % 2 ? 16 : 64+32;
 
-  // for (int i = 0; i < maxStatic; ++i) {
-  //   const int16_t x = rand() % WFALL_PIX_X;
-  //   const int16_t y = (rand() % WFALL_PIX_Y) + TURRET_RADIUS;
-  //   const float angle = (M_2PIf / 256.0f) * (rand() % 256);
-  //   const enum PegShape_t shape = (rand() % 2 ? kPegShapeBall : kPegShapeRect);
-  //   const uint8_t size = rand() % MAX_PEG_SIZE;
-  //   const enum PegType_t type = (i < 4 ? kPegTypeRequired : kPegTypeNormal);
-  //   boardAddStatic(shape, typr, x, y, angle, size);
-  // }
+  for (int i = 0; i < maxStatic; ++i) {
+    struct StaticLoader_t staticLoader;
+    staticLoader.x = rand() % WFALL_PIX_X;
+    staticLoader.y = (rand() % WFALL_PIX_Y) + TURRET_RADIUS;
+    staticLoader.angle = (M_2PIf / 256.0f) * (rand() % 256);
+    staticLoader.shape = (rand() % 2 ? kPegShapeBall : kPegShapeRect);
+    staticLoader.size = rand() % MAX_PEG_SIZE;
+    staticLoader.type = (i < 4 ? kPegTypeRequired : kPegTypeNormal);
+    boardAddStatic(&staticLoader);
+  }
+
+  return;
 
   // if (maxStatic == 16) return;
 
@@ -171,4 +183,12 @@ bool popRandom(void) {
     }
   }
   return false;
+}
+
+enum PegSpecial_t getCurrentSpecial(void) {
+  return m_special;
+}
+
+void clearSpecial(void) {
+  m_special = kPegSpecialNotSpecial;
 }

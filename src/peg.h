@@ -27,6 +27,16 @@ enum PegState_t {
   kPegStateRemoved
 };
 
+enum PegSpecial_t {
+  kPegSpecialNotSpecial,
+  kPegSpecialAim,
+  kPegSpecialSecondTry,
+  kPegSpecialBurst, // TODO
+  kPegSpecialMultiball, // TODO
+  kPegSpecialBounce,
+  kPegSpecialPenetrate // TODO
+};
+
 struct Peg_t {
   uint16_t m_id;
   cpShape* m_cpShape;

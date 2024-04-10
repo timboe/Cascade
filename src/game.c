@@ -27,6 +27,8 @@ enum kFSM doFSM_Game(bool newState);
 
 int getFrameCount() { return m_frameCount; }
 
+void resetFrameCount(void) { m_frameCount = 0; }
+
 enum kFSM getFSM() { return m_FSM; }
 
 void resetBallStuckCounter(void) { m_ballStuckCounter = 0; }
@@ -38,11 +40,11 @@ uint16_t getPreviousWaterfall(void) { return m_previousWaterfall; }
 void resetPreviousWaterfall(void) { m_previousWaterfall = getWaterfallForeground(getCurrentLevel(), 0); }
 
 int gameLoop(void* _data) {
-  ++m_frameCount;
   pd->graphics->setBackgroundColor(kColorWhite); // TODO make me black
 
   if (getScreenShotInProgress()) {
     doScreenShot();
+    ++m_frameCount;
     return 1;
   }
 
@@ -64,6 +66,7 @@ int gameLoop(void* _data) {
 
   }
 
+  ++m_frameCount;
   return 1;
 }
 
@@ -347,9 +350,9 @@ enum kFSM doFSM_Game(bool newState) {
       setScrollOffset(-DEVICE_PIX_Y - TURRET_RADIUS, true);
       updateScoreHistogramBitmap();
       populateMenuGame();
-      // randomiseBoard(); // // TODO replace me
-      clearBoard();
-      loadCurrentHole();
+       randomiseBoard(); // // TODO replace me
+      //clearBoard();
+      //loadCurrentHole();
     }
     if (timer++ == TIME_DISPLAY_SPLASH) return doFSM(kGameFSM_SplashToStart);
 
@@ -379,6 +382,7 @@ enum kFSM doFSM_Game(bool newState) {
     static uint16_t timer = 0;
     if (newState) {
       resetBallTrace();
+      resetFrameCount();
       timer = 0;
     }
     commonTurretScrollAndBounceBack(true);
@@ -448,6 +452,12 @@ enum kFSM doFSM_Game(bool newState) {
     static float vY = 0.0;
     static uint16_t pause = 0;
     if (newState) {
+      if (getCurrentSpecial() == kPegSpecialSecondTry) {
+        secondTryBall();
+        clearSpecial();
+        return doFSM(kGameFSM_BallInPlay);
+      }
+      clearSpecial();
       vY = cpBodyGetVelocity(getBall()).y;
       pause = TICK_FREQUENCY / 2;
     }

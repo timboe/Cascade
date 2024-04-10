@@ -25,8 +25,8 @@ void renderTitles(int32_t fc, enum kFSM fsm);
 
 void renderGameWindow(int32_t fc, enum kFSM fsm);
 
-uint16_t m_ballTraceX[PREDICTION_TRACE_LEN];
-uint16_t m_ballTraceY[PREDICTION_TRACE_LEN];
+uint16_t m_ballTraceX[PREDICTION_TRACE_LEN * 2];
+uint16_t m_ballTraceY[PREDICTION_TRACE_LEN * 2];
 uint8_t m_ballTraces = 0;
 
 /// ///
@@ -46,7 +46,7 @@ void setBallTrace(const uint16_t i, const uint16_t x, const uint16_t y) {
 }
 
 void resetBallTrace(void) {
-  for (int i = 0; i < PREDICTION_TRACE_LEN; ++i) {
+  for (int i = 0; i < PREDICTION_TRACE_LEN * 2; ++i) {
     m_ballTraceX[i] = HALF_DEVICE_PIX_X;
     m_ballTraceY[i] = getMinimumY() + TURRET_RADIUS;
   }
@@ -258,8 +258,6 @@ void renderTitles(int32_t fc, enum kFSM fsm) {
     pd->graphics->drawBitmap(getBitmapDither(), 0, (WF_DIVISION_PIX_Y * 15), kBitmapUnflipped);
     pd->graphics->drawBitmap(getBitmapHoleCreator(), HALF_DEVICE_PIX_X, (DEVICE_PIX_Y * 4) - NUMERAL_BUF, kBitmapUnflipped);
 
-
-
     uint8_t digit[3];
     LCDBitmap* digitBm[3];
     // +1 is because we display levels 0-98 as 1-99
@@ -427,19 +425,6 @@ void renderGameWindow(int32_t fc, enum kFSM fsm) {
 
   // DRAW OBS
   renderBoard();
-
-  // for (uint32_t i = 0; i < N_OBST; ++i) {
-  //   cpBody* obst = getBox(i);
-  //   const cpVect center = cpBodyGetPosition(obst);
-  //   const float y = center.y - BOX_MAX;
-  //   const int off = y - getScrollOffset();
-  //   if (off < 0 || off > DEVICE_PIX_Y) continue;
-  //   const float x = center.x - BOX_MAX;
-  //   pd->graphics->drawBitmap(getBitmapBox(cpBodyGetAngle(obst)), x, y, kBitmapUnflipped);
-  // }
-
-  // pd->graphics->fillEllipse(WFALL_PIX_X/2 - 3, 128 + UI_OFFSET_TOP - 3, 6, 6, 0.0f, 360.0f, kColorBlack);
-  // pd->graphics->fillEllipse(WFALL_PIX_X/2 - 2, 128 + UI_OFFSET_TOP - 2, 4, 4, 0.0f, 360.0f, kColorWhite);
 
   // DRAW TRAJECTORY
   renderTrajectory();

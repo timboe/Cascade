@@ -11,6 +11,8 @@ int gameLoop(void* _data);
 
 int getFrameCount(void);
 
+void resetFrameCount(void);
+
 enum kFSM doFSM(enum kFSM transitionTo);
 
 enum kFSM getFSM(void);

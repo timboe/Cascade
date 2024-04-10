@@ -76,3 +76,7 @@ struct Peg_t* boardAddStatic(const struct StaticLoader_t* staticLoader);
 void boardAddLinear(const struct LinearLoader_t* linearLoader);
 
 void boardAddWheel(const struct EllipticLoader_t* ellipticLoader);
+
+enum PegSpecial_t getCurrentSpecial(void);
+
+void clearSpecial(void);

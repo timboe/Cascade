@@ -6,6 +6,7 @@
 #include "render.h"
 #include "ui.h"
 #include "peg.h"
+#include "board.h"
 
 cpSpace* m_space;
 
@@ -50,6 +51,10 @@ cpSpace* getSpace(void) { return m_space; }
 void launchBall(float strength) {
   const float angleRad = angToRad(getTurretBarrelAngle());
   cpBodyApplyImpulseAtLocalPoint(m_ball, cpv(POOT_STRENGTH * sinf(angleRad) * strength, POOT_STRENGTH * -cosf(angleRad) * strength), cpvzero);
+  if (getCurrentSpecial() == kPegSpecialBounce) {
+    cpShapeSetElasticity(m_ballShape, ULTRA_BOUNCE);
+  }
+
 }
 
 void initSpace(void) {
@@ -101,21 +106,26 @@ uint8_t cpCollisionBeginFunc_ballPeg(cpArbiter* arb, struct cpSpace* space, cpDa
   return 1;
 }
 
+void secondTryBall(void) {
+  const cpVect pos = cpBodyGetPosition(m_ball);
+  cpBodySetPosition(m_ball, cpv(pos.x, getMinimumY() + BALL_RADIUS));
+}
+
 void resetBall(void) {
   cpBodySetPosition(m_ball, cpv(HALF_DEVICE_PIX_X, getMinimumY() + TURRET_RADIUS));
   cpBodySetVelocity(m_ball, cpvzero);
   cpBodySetAngle(m_ball, 0);
   cpBodySetAngularVelocity(m_ball, 0);
+  cpShapeSetElasticity(m_ballShape, ELASTICITY);
 }
 
 void updateSpace(int32_t fc, enum kFSM fsm) {
   cpSpaceStep(m_space, TIMESTEP);
   
-
   const cpVect pos = cpBodyGetPosition(m_ball);
 
   if (fsm == kGameFSM_AimMode) {
-    const int i = fc % PREDICTION_TRACE_LEN;
+    const int i = (getCurrentSpecial() == kPegSpecialAim ? fc % (PREDICTION_TRACE_LEN*2) : fc % PREDICTION_TRACE_LEN);
     if (i == 0) {
       resetBall();
       launchBall(1.0f);

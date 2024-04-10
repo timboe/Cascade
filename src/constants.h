@@ -112,6 +112,7 @@
 
 #define TIMESTEP (1.0f / TICK_FREQUENCY)
 #define ELASTICITY 0.8f 
+#define ULTRA_BOUNCE 1.1f
 #define FRICTION 0.0f 
 #define G cpv(0.0f, 256.0f)
 
