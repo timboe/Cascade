@@ -2,6 +2,7 @@
 #include "bitmap.h"
 #include "render.h"
 #include "board.h"
+#include "sshot.h"
 
 void updateAngle(struct Peg_t* p, float angle);
 
@@ -223,7 +224,7 @@ void renderPeg(const struct Peg_t* p) {
   }
   pd->graphics->drawBitmap(p->m_bitmap, p->m_xBitmap, p->m_yBitmap, kBitmapUnflipped);
   pd->graphics->setDrawMode(kDrawModeCopy);
-  if (!ballInPlay()) {
+  if (!ballInPlay() && !getScreenShotInProgress()) {
     if (p->m_motion == kPegMotionEllipse) {
       pd->graphics->fillEllipse(p->m_pathX[0]-3, p->m_pathY[0]-3, 6, 6, 0.0f, 360.0f, kColorWhite);
       pd->graphics->fillEllipse(p->m_pathX[0]-2, p->m_pathY[0]-2, 4, 4, 0.0f, 360.0f, kColorBlack);

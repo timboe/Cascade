@@ -9,11 +9,12 @@
 #include "ui.h"
 #include "io.h"
 #include "physics.h"
+#include "sshot.h"
 
 int32_t m_frameCount = 0;
 uint16_t m_ballCount = 0; // Keeping track of the current level score
 uint16_t m_ballStuckCounter = 0; // Keeping track of a stuck ball
-float m_turretBarrelAngle = 180.0f;
+float m_turretBarrelAngle = 179.0f;
 
 uint16_t m_previousWaterfall = 0;
 
@@ -40,10 +41,10 @@ int gameLoop(void* _data) {
   ++m_frameCount;
   pd->graphics->setBackgroundColor(kColorWhite); // TODO make me black
 
-  // if (IOOperationInProgress()) { 
-  //   enactIO();
-  //   return 1;
-  // }
+  if (getScreenShotInProgress()) {
+    doScreenShot();
+    return 1;
+  }
 
   const enum kGameMode gm = getGameMode();
   m_FSM = doFSM(m_FSM);
@@ -131,7 +132,7 @@ void commonTurretScrollAndBounceBack(bool allowScroll) {
   else if (getPressed(kButtonDown)) diffY =  SCREEN_ACC;
   modScrollVelocity(diffY);
   // Crank based
-  static float angle = 180.0f;
+  static float angle = 179.0f;
   static bool topLock = true;
   static float revDetection = 180.0f;
   // Backup non-crank

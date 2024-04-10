@@ -38,6 +38,7 @@ LCDBitmap* getTitleSelectedBitmap(void);
 LCDBitmap* getBitmapNumeral(int8_t n);
 LCDBitmap* getStencilWipe(int8_t n);
 LCDBitmap* getBitmapDither(void);
+LCDBitmap* getBitmapPreview(uint16_t level, uint16_t hole);
 
 LCDBitmap* getBitmapPlayer(void);
 LCDBitmap* getBitmapLevel(void);

@@ -6,6 +6,7 @@
 #include "ui.h"
 #include "physics.h"
 #include "board.h"
+#include "sshot.h"
 
 float m_trauma = 0.0f, m_decay = 0.0f;
 float m_cTraumaAngle = 0.0f, m_sTraumaAngle;
@@ -101,7 +102,7 @@ void render(int32_t fc, enum kFSM fsm) {
 
   // Draw FPS indicator (dbg only)
   #ifdef DEV
-  if (ALWAYS_FPS) {
+  if (ALWAYS_FPS && !getScreenShotInProgress()) {
     pd->system->drawFPS(0, 0);
   }
   #endif
@@ -239,7 +240,12 @@ void renderTitles(int32_t fc, enum kFSM fsm) {
     for (int i = 12; i < 16; ++i) {
       pd->graphics->drawBitmap(getBitmapWfFg(currentWf, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
     }
+
     pd->graphics->drawBitmap(getBitmapDither(), 0, (WF_DIVISION_PIX_Y * 15), kBitmapUnflipped);
+
+    LCDBitmap* bm = getBitmapPreview(getCurrentLevel(), getCurrentHole());
+    if (bm) pd->graphics->drawBitmap(bm, DEVICE_PIX_X - 200, DEVICE_PIX_Y*3, kBitmapUnflipped);
+
 
     uint8_t digit[3];
     LCDBitmap* digitBm[3];
@@ -332,6 +338,8 @@ void renderTrajectory(void) {
 }
 
 void renderBackground(void) {
+  if (getScreenShotInProgress()) { return; }
+
   const int32_t parallax = getParalaxFactorFar(); // Note: float -> int here
   const int32_t so = ((int32_t) getScrollOffset()) - UI_OFFSET_TOP - parallax;
   const uint32_t start = MAX(0, so / WF_DIVISION_PIX_Y);

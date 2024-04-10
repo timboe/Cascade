@@ -19,6 +19,8 @@ LCDBitmap* m_useTheCrankBitmap;
 
 LCDBitmap* m_ditherBitmap;
 
+LCDBitmap* m_previewBitmap[MAX_LEVELS][MAX_HOLES] = {0};
+
 LCDBitmap* m_stencilWipeBitmap[STENCIL_WIPE_N];
 
 // Game
@@ -170,6 +172,8 @@ LCDBitmap* getBitmapHoleStatsB(void) { return m_holeStatsBitmap[1]; }
 LCDBitmap* getBitmapHoleTutorial(void) { return m_holeTutorialBitmap; }
 
 LCDBitmap* getBitmapDither(void) { return m_ditherBitmap; }
+
+LCDBitmap* getBitmapPreview(uint16_t level, uint16_t hole) { return m_previewBitmap[level][hole]; }
 
 LCDBitmap* getBitmapPeg(const struct Peg_t* p) {
   switch (p->m_shape) {
@@ -404,6 +408,15 @@ void initBitmap() {
   }
   m_wfPond = loadImageAtPath("images/falls_pond");
 
+  for (int l = 0; l < MAX_LEVELS; ++l) {
+    for (int h = 0; h < MAX_HOLES; ++h) {
+      if (!getPar(l,h)) { continue; } // No level
+      char text[128];
+      snprintf(text, 128, "images/holes/level_%i_hole_%i.png", l+1, h+1);
+      m_previewBitmap[l][h] = loadImageAtPath(text);
+    }
+  }
+  
   for (int s = 0; s < MAX_PEG_SIZE; ++s) {
     const float scale = sizeToScale(s);
     const float ballSize = BALL_RADIUS * 2.0f * scale;

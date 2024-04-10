@@ -255,7 +255,7 @@ void scanLevels() {
     for (int32_t h = 0; h < MAX_HOLES; ++h) {
       m_hole = h;
       // snprintf(filePath, 128, "levels/fall_%i_hole_%i.json", 1, 1);
-      snprintf(filePath, 128, "levels/level_%i_hole_%i.json", (int)l+1, (int)h+1);
+      snprintf(filePath, 128, "holes/level_%i_hole_%i.json", (int)l+1, (int)h+1);
       SDFile* file = pd->file->open(filePath, kFileRead);
       if (!file) {
         // Look for user-supplied levels instead
@@ -507,7 +507,7 @@ void* finishDecode(json_decoder* jd, const char* key, json_value_type type) {
 
 void loadCurrentHole() {
   char filePath[128];
-  snprintf(filePath, 128, "levels/level_%i_hole_%i.json", (int)m_level+1, (int)m_hole+1);
+  snprintf(filePath, 128, "holes/level_%i_hole_%i.json", (int)m_level+1, (int)m_hole+1);
   SDFile* file = pd->file->open(filePath, kFileRead);
   if (!file) {
     // Look for user-supplied levels instead

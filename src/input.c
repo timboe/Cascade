@@ -6,6 +6,7 @@
 #include "io.h"
 #include "physics.h"
 #include "board.h"
+#include "sshot.h"
 
 PDButtons m_current;
 float m_crankAngle = 0;
@@ -57,6 +58,7 @@ void clickHandleTitles(uint32_t buttonPressed) {
 
 void clickHandleGameWindow(uint32_t buttonPressed) {
   if (kButtonB == buttonPressed  && getFSM() == kGameFSM_AimMode) {
+    doScreenShot();
     doFSM(kGameFSM_AimModeScrollToTop);
   } else if ((kButtonA == buttonPressed || kButtonDown == buttonPressed) && getFSM() == kGameFSM_ScoresAnimation) {
     doFSM(kGameFSM_ScoresToSplash);

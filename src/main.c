@@ -15,13 +15,13 @@ __declspec(dllexport)
 
 static void init(void) {
   initBoard();
-  initBitmap(); // Expensive
+  scanLevels(); // Expensive?
+  initBitmap(); // Expensive - after scan level
   initiUI();
   initSound();
   initGame();
   initSpace();
 
-  scanLevels(); // Expensive?
   doFSM(kTitlesFSM_DisplayTitles);
 }
 
