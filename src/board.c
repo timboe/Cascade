@@ -29,6 +29,8 @@ void initBoard(void) {
   else if (i == 1) m_special = kPegSpecialSecondTry;
   else m_special = kPegSpecialBounce;
 
+  m_special = kPegSpecialMultiball;
+
 }
 
 struct Peg_t* pegFromPool(void) {
@@ -99,7 +101,7 @@ struct Peg_t* boardAddStatic(const struct StaticLoader_t* staticLoader) {
 void randomiseBoard(void) {
   clearBoard();
 
-  const int maxStatic = 64;//rand() % 2 ? 16 : 64+32;
+  const int maxStatic = 6;//rand() % 2 ? 16 : 64+32;
 
   for (int i = 0; i < maxStatic; ++i) {
     struct StaticLoader_t staticLoader;

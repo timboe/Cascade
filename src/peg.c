@@ -224,16 +224,16 @@ void renderPeg(const struct Peg_t* p) {
   }
   pd->graphics->drawBitmap(p->m_bitmap, p->m_xBitmap, p->m_yBitmap, kBitmapUnflipped);
   pd->graphics->setDrawMode(kDrawModeCopy);
-  if (!ballInPlay() && !getScreenShotInProgress()) {
-    if (p->m_motion == kPegMotionEllipse) {
-      pd->graphics->fillEllipse(p->m_pathX[0]-3, p->m_pathY[0]-3, 6, 6, 0.0f, 360.0f, kColorWhite);
-      pd->graphics->fillEllipse(p->m_pathX[0]-2, p->m_pathY[0]-2, 4, 4, 0.0f, 360.0f, kColorBlack);
-    } else if (p->m_motion == kPegMotionPath) {
-      for (int j = 1; j < p->m_pathSteps; ++j) {
-        pd->graphics->drawLine(p->m_pathX[j], p->m_pathY[j], p->m_pathX[j-1], p->m_pathY[j-1], 2, kColorWhite);
-      }
-    }
-  }
+  // if (!ballInPlay() && !getScreenShotInProgress()) {
+  //   if (p->m_motion == kPegMotionEllipse) {
+  //     pd->graphics->fillEllipse(p->m_pathX[0]-3, p->m_pathY[0]-3, 6, 6, 0.0f, 360.0f, kColorWhite);
+  //     pd->graphics->fillEllipse(p->m_pathX[0]-2, p->m_pathY[0]-2, 4, 4, 0.0f, 360.0f, kColorBlack);
+  //   } else if (p->m_motion == kPegMotionPath) {
+  //     for (int j = 1; j < p->m_pathSteps; ++j) {
+  //       pd->graphics->drawLine(p->m_pathX[j], p->m_pathY[j], p->m_pathX[j-1], p->m_pathY[j-1], 2, kColorWhite);
+  //     }
+  //   }
+  // }
 }
 
 void hitPeg(struct Peg_t* p) {
@@ -247,6 +247,9 @@ void hitPeg(struct Peg_t* p) {
     } else {
       addTrauma(TRAMA_PEG_HIT);
       addFreeze(FREEZE_PEG_HIT);
+    }
+    if (getCurrentSpecial() == kPegSpecialMultiball && !getSecondBallInPlay()) {
+      setSecondBallInPlay();
     }
   }
   // pd->system->logToConsole("bam!");

@@ -331,7 +331,8 @@ void updateLevelStatsBitmap(void) {
       if (getPar(getCurrentLevel(), h)) { holes++; }
       if (getScore(getCurrentLevel(), h)) { played++; }
     }
-    snprintf(text, 128, "%i OF %i HOLES", (int)played, (int)holes);
+    if (holes == 1) { snprintf(text, 128, "%i OF 1 HOLE", (int)played); }
+    else { snprintf(text, 128, "%i OF %i HOLES", (int)played, (int)holes); }
   } else {
     const int16_t displayScore = par - score;
     if (displayScore < 0) {
@@ -441,12 +442,12 @@ void initBitmap() {
       m_rectBitmap[0][s][iAngle] = pd->graphics->newBitmap(BOX_MAX*2*scale, BOX_MAX*2*scale, kColorClear);
       pd->graphics->pushContext(m_rectBitmap[0][s][iAngle]);
       drawRotatedRect(BOX_MAX * scale, BOX_MAX * scale, (BOX_WIDTH/2) * scale, (BOX_HEIGHT/2) * scale, iAngle, false);
-      pd->graphics->drawRect(0, 0, BOX_MAX*2*scale, BOX_MAX*2*scale, kColorWhite);
+      // pd->graphics->drawRect(0, 0, BOX_MAX*2*scale, BOX_MAX*2*scale, kColorWhite);
       pd->graphics->popContext();
       m_rectBitmap[1][s][iAngle] = pd->graphics->newBitmap(BOX_MAX*2*scale, BOX_MAX*2*scale, kColorClear);
       pd->graphics->pushContext(m_rectBitmap[1][s][iAngle]);
       drawRotatedRect(BOX_MAX * scale, BOX_MAX * scale, (BOX_WIDTH/2) * scale, (BOX_HEIGHT/2) * scale, iAngle, true);
-      pd->graphics->drawRect(0, 0, BOX_MAX*2*scale, BOX_MAX*2*scale, kColorWhite);
+      // pd->graphics->drawRect(0, 0, BOX_MAX*2*scale, BOX_MAX*2*scale, kColorWhite);
       pd->graphics->popContext();
     }
   }

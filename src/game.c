@@ -13,7 +13,7 @@
 
 int32_t m_frameCount = 0;
 uint16_t m_ballCount = 0; // Keeping track of the current level score
-uint16_t m_ballStuckCounter = 0; // Keeping track of a stuck ball
+uint16_t m_ballStuckCounter[2] = {0}; // Keeping track of a stuck ball
 float m_turretBarrelAngle = 179.0f;
 
 uint16_t m_previousWaterfall = 0;
@@ -31,7 +31,10 @@ void resetFrameCount(void) { m_frameCount = 0; }
 
 enum kFSM getFSM() { return m_FSM; }
 
-void resetBallStuckCounter(void) { m_ballStuckCounter = 0; }
+void resetBallStuckCounter(void) { 
+  m_ballStuckCounter[0] = 0;
+  m_ballStuckCounter[1] = 0;
+}
 
 float getTurretBarrelAngle(void) { return m_turretBarrelAngle; }
 
@@ -389,9 +392,10 @@ enum kFSM doFSM_Game(bool newState) {
     //
     float progress = getEasing(EaseOutQuart, (float)timer/TIME_FIRE_BALL);
     if ((timer >= TIME_FIRE_BALL) || (progress > 0.5f && !getPressed(kButtonA))) { // Fire
-      resetBall();
+      resetBall(0);
       launchBall(progress);
       ++m_ballCount;
+      if (getCurrentSpecial() == kPegSpecialMultiball) { addSecondBall(); }
       return doFSM(kGameFSM_BallInPlay);
     } else if (getPressed(kButtonA)) { // Arm
       timer++;
@@ -402,27 +406,31 @@ enum kFSM doFSM_Game(bool newState) {
 
   } else if (m_FSM == kGameFSM_BallInPlay) {
 
-    if (newState) {
-      m_ballStuckCounter = 0;
-    }
+    const enum PegSpecial_t special = getCurrentSpecial();
+    if (newState) { resetBallStuckCounter(); }
     //
     commonTurretScrollAndBounceBack(true);
     //
-    const float y = cpBodyGetPosition(getBall()).y;
+    const float y1 = cpBodyGetPosition(getBall(0)).y;
+    const float y2 = (special == kPegSpecialMultiball ? cpBodyGetPosition(getBall(1)).y : 0);
+    float y = MAX(y1, y2);
+    if (special == kPegSpecialMultiball && getSecondBallInPlay() && y >= WFALL_PIX_Y + BALL_RADIUS) { y = MIN(y1,y2); }
     setScrollOffset(y - HALF_DEVICE_PIX_Y, false);
     //
     if (y > WFALL_PIX_Y + BALL_RADIUS) {
       return doFSM(kGameFSM_BallGutter);
     } 
     //
-    cpVect v = cpBodyGetVelocity(getBall());
-    // pd->system->logToConsole("cpvlengthsq %f", cpvlengthsq(v));
-    if (cpvlengthsq(v) < BALL_IS_STUCK) {
-      if (m_ballStuckCounter++ > STUCK_TICKS) {
-        return doFSM(kGameFSM_BallStuck);
+    for (int i = 0; i < 2; ++i) {
+      if (i == 1 && special != kPegSpecialMultiball) { continue; }
+      const cpVect v = cpBodyGetVelocity(getBall(i));
+      if (cpvlengthsq(v) < BALL_IS_STUCK) {
+        if (m_ballStuckCounter[i]++ > STUCK_TICKS) {
+          return doFSM(kGameFSM_BallStuck);
+        }
+      } else {
+        m_ballStuckCounter[i] = 0;
       }
-    } else {
-      m_ballStuckCounter = 0;
     }
 
   } else if (m_FSM == kGameFSM_BallStuck) {
@@ -433,8 +441,13 @@ enum kFSM doFSM_Game(bool newState) {
     if (m_frameCount % TIME_STUCK_POP == 0) {
       popped = popRandom();
     }
-    cpVect v = cpBodyGetVelocity(getBall());
-    if (cpvlengthsq(v) > BALL_IS_STUCK || !popped) {
+    cpVect v = cpBodyGetVelocity(getBall(0));
+    bool ballIsStuck = cpvlengthsq(v) < BALL_IS_STUCK;
+    if (getCurrentSpecial() == kPegSpecialMultiball) {
+      v = cpBodyGetVelocity(getBall(1));
+      ballIsStuck |= cpvlengthsq(v) < BALL_IS_STUCK;
+    }
+    if (!ballIsStuck || !popped) {
       return doFSM(kGameFSM_BallInPlay);
     }
 
@@ -451,14 +464,17 @@ enum kFSM doFSM_Game(bool newState) {
     // A little extra downward camera motion. Note: No more manual scroll accepted
     static float vY = 0.0;
     static uint16_t pause = 0;
+    const enum PegSpecial_t special = getCurrentSpecial();
     if (newState) {
-      if (getCurrentSpecial() == kPegSpecialSecondTry) {
+      if (special == kPegSpecialMultiball) {
+        removeSecondBall();
+      } else if (special == kPegSpecialSecondTry) {
         secondTryBall();
         clearSpecial();
         return doFSM(kGameFSM_BallInPlay);
       }
       clearSpecial();
-      vY = cpBodyGetVelocity(getBall()).y;
+      vY = cpBodyGetVelocity(getBall(0)).y;
       pause = TICK_FREQUENCY / 2;
     }
     // pd->system->logToConsole("v %f so %f", vY, getScrollOffset());

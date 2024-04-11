@@ -246,11 +246,15 @@ void renderTitles(int32_t fc, enum kFSM fsm) {
     LCDBitmap* bm = getBitmapPreview(getCurrentLevel(), getCurrentHole());
     static uint16_t offset = 0;
     if (!locked && bm) {
+      pd->graphics->setDrawMode(kDrawModeInverted);
       pd->graphics->drawBitmap(bm, DEVICE_PIX_X - 200, DEVICE_PIX_Y*3, kBitmapUnflipped);
+      pd->graphics->setDrawMode(kDrawModeCopy);
       offset = 0;
     } else if (bm) {
+      pd->graphics->setDrawMode(kDrawModeInverted);
       pd->graphics->drawBitmap(bm, HALF_DEVICE_PIX_X, DEVICE_PIX_Y*3 - offset, kBitmapUnflipped);
       pd->graphics->drawBitmap(bm, HALF_DEVICE_PIX_X, DEVICE_PIX_Y*3 - offset + (DEVICE_PIX_Y*2), kBitmapUnflipped);
+      pd->graphics->setDrawMode(kDrawModeCopy);
       offset += 2;
       if (offset >= DEVICE_PIX_Y*2) { offset -= DEVICE_PIX_Y*2; }
     }
@@ -310,18 +314,21 @@ void renderBall(int32_t fc) {
     pd->graphics->setDrawMode(kDrawModeCopy);
     return;
   }
-  cpBody* ball = getBall();
-  int16_t* trailX = motionTrailX();
-  int16_t* trailY = motionTrailY();
-  uint8_t size = BALL_RADIUS;
-  for (int32_t i = fc; i > fc - MOTION_TRAIL_LEN; --i) {
-    pd->graphics->fillEllipse(trailX[i%MOTION_TRAIL_LEN] - size, trailY[i%MOTION_TRAIL_LEN] - size, 2*size, 2*size, 0.0f, 360.0f, kColorWhite);
-    size -= (BALL_RADIUS / MOTION_TRAIL_LEN);
+  for (int i = 0; i < 2; ++i) {
+    if (i == 1 && !getSecondBallInPlay()) { continue; }
+    cpBody* ball = getBall(i);
+    int16_t* trailX = motionTrailX(i);
+    int16_t* trailY = motionTrailY(i);
+    uint8_t size = BALL_RADIUS;
+    for (int32_t i = fc; i > fc - MOTION_TRAIL_LEN; --i) {
+      pd->graphics->fillEllipse(trailX[i%MOTION_TRAIL_LEN] - size, trailY[i%MOTION_TRAIL_LEN] - size, 2*size, 2*size, 0.0f, 360.0f, kColorWhite);
+      size -= (BALL_RADIUS / MOTION_TRAIL_LEN);
+    }
+    const cpVect pos = cpBodyGetPosition(ball);
+    pd->graphics->setDrawMode(kDrawModeInverted);
+    pd->graphics->drawBitmap(getBitmapBall(), pos.x - BALL_RADIUS, pos.y - BALL_RADIUS, kBitmapUnflipped);
+    pd->graphics->setDrawMode(kDrawModeCopy);
   }
-  const cpVect pos = cpBodyGetPosition(ball);
-  pd->graphics->setDrawMode(kDrawModeInverted);
-  pd->graphics->drawBitmap(getBitmapBall(), pos.x - BALL_RADIUS, pos.y - BALL_RADIUS, kBitmapUnflipped);
-  pd->graphics->setDrawMode(kDrawModeCopy);
 }
 
 void renderTurret(void) {
