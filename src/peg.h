@@ -31,11 +31,11 @@ enum PegSpecial_t {
   kPegSpecialNotSpecial,
   kPegSpecialAim,
   kPegSpecialSecondTry,
-  kPegSpecialBurst, // TODO
-  kPegSpecialMultiball, // TODO
+  kPegSpecialBurst,
+  kPegSpecialMultiball,
   kPegSpecialBounce,
-  kPegSpecialPenetrate // TODO
-};
+  kPegSpecialPenetrate
+}; // magnets?
 
 struct Peg_t {
   uint16_t m_id;

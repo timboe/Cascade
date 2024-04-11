@@ -80,3 +80,5 @@ void boardAddWheel(const struct EllipticLoader_t* ellipticLoader);
 enum PegSpecial_t getCurrentSpecial(void);
 
 void clearSpecial(void);
+
+void specialBurst(void);

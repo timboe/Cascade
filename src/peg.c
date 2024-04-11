@@ -248,8 +248,12 @@ void hitPeg(struct Peg_t* p) {
       addTrauma(TRAMA_PEG_HIT);
       addFreeze(FREEZE_PEG_HIT);
     }
-    if (getCurrentSpecial() == kPegSpecialMultiball && !getSecondBallInPlay()) {
+    const enum PegSpecial_t special = getCurrentSpecial();
+    if (special == kPegSpecialMultiball && !getSecondBallInPlay()) {
       setSecondBallInPlay();
+    } else if (special == kPegSpecialBurst) {
+      clearSpecial(); // Do this first, it's going to recurse!
+      specialBurst();
     }
   }
   // pd->system->logToConsole("bam!");

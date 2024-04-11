@@ -131,7 +131,10 @@ uint8_t cpCollisionBeginFunc_ballPeg(cpArbiter* arb, struct cpSpace* space, cpDa
   cpArbiterGetBodies(arb, &cpBall, &cpPeg);
   struct Peg_t* p = (struct Peg_t*) cpBodyGetUserData(cpPeg);
   hitPeg(p);
-  return 1;
+  if (getCurrentSpecial() == kPegSpecialPenetrate) {
+    return false;
+  }
+  return true;
 }
 
 void secondTryBall(void) {

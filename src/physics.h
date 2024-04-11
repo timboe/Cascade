@@ -19,6 +19,8 @@ bool getSecondBallInPlay(void);
 
 // cpShape* getBallShape(void);
 
+void specialBurst(void);
+
 int16_t* motionTrailX(uint8_t n);
 
 int16_t* motionTrailY(uint8_t n);

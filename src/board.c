@@ -29,7 +29,7 @@ void initBoard(void) {
   else if (i == 1) m_special = kPegSpecialSecondTry;
   else m_special = kPegSpecialBounce;
 
-  m_special = kPegSpecialMultiball;
+  m_special = kPegSpecialPenetrate;
 
 }
 
@@ -40,6 +40,20 @@ struct Peg_t* pegFromPool(void) {
 struct Peg_t* getPeg(uint16_t i) {
   return &m_pegs[i];
 }
+
+void specialBurst(void) {
+  const cpVect pos = cpBodyGetPosition(getBall(0));
+  for (int i = 0; i < m_nPegs; ++i) {
+    struct Peg_t* p = getPeg(i);
+    if (p->m_state == kPegStateActive) {
+      const cpVect pegPos = cpv(p->m_x, p->m_y);
+      if (cpvdist(pos, pegPos) < SPECIAL_BURST_RADIUS) {
+        hitPeg(p);
+      }
+    }
+  }
+}
+
 
 void boardAddWheel(const struct EllipticLoader_t* ellipticLoader) {
   for (int i = 0; i < ellipticLoader->nPegs; ++i) {
@@ -101,7 +115,7 @@ struct Peg_t* boardAddStatic(const struct StaticLoader_t* staticLoader) {
 void randomiseBoard(void) {
   clearBoard();
 
-  const int maxStatic = 6;//rand() % 2 ? 16 : 64+32;
+  const int maxStatic = 64;//rand() % 2 ? 16 : 64+32;
 
   for (int i = 0; i < maxStatic; ++i) {
     struct StaticLoader_t staticLoader;
