@@ -46,7 +46,7 @@ void render(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) {
   }
 
   const float offX = 0.0f;
-  const float offY = -getScrollOffset();
+  const float offY = -gameGetScrollOffset();
 
   pd->graphics->setDrawMode(kDrawModeCopy);
   pd->graphics->setDrawOffset(offX, offY);
@@ -69,7 +69,7 @@ void render(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) {
 }
 
 void renderTitles(void) {
-  const int32_t so = getScrollOffset();
+  const int32_t so = gameGetScrollOffset();
 
   // INTRO SPLASH
   if (so < DEVICE_PIX_Y) { renderTitlesSplash(); }

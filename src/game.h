@@ -9,31 +9,29 @@
 
 int gameLoop(void* data);
 
-int getFrameCount(void);
-void resetFrameCount(void);
+int gameGetFrameCount(void);
+void gameResetFrameCount(void);
 
 
-void setTurretBarrelAngle(const float angle);
-float getTurretBarrelAngle(void);
+void gameSetTurretBarrelAngle(const float angle);
+float gameGetTurretBarrelAngle(void);
 
-uint16_t getPreviousWaterfall(void);
-void resetPreviousWaterfall(void);
+uint16_t gameGetPreviousWaterfall(void);
+void gameDoResetPreviousWaterfall(void);
 
-int16_t getMinimumY(void);
-void setMinimumY(int16_t y);
+int16_t gameGetMinimumY(void);
+void gameSetMinimumY(int16_t y);
+int16_t gameGetMaximumY(void);
+void gameSetMaximumY(const int16_t y);
 
-float getScrollOffset(void);
-void setScrollOffset(float set, const bool force);
-void modScrollVelocity(const float mod);
-float applyScrollEasing(void);
+float gameGetScrollOffset(void);
+void gameSetScrollOffset(float set, const bool force);
+void gameModScrollVelocity(const float mod);
+float gameDoApplyScrollEasing(void);
 
-float getParalaxFactorFar(void);
-float getParalaxFactorNear(void);
+float gameGetParalaxFactorFar(void);
+float gameGetParalaxFactorNear(void);
 
-void populateMenuGame(void);
-void populateMenuTitlesPlayer(void);
-void populateMenuTitles(void);
-
-char* ftos(const float value, const int16_t size, char* dest);
-
-void snprintf_c(char* buf, const uint8_t bufSize, const int n);
+void gamePopulateMenuGame(void);
+void gamePopulateMenuTitlesPlayer(void);
+void gamePopulateMenuTitles(void);

@@ -3,6 +3,7 @@
 #include "render.h"
 #include "board.h"
 #include "sshot.h"
+#include "util.h"
 
 void pegUpdateAngle(struct Peg_t* p, float angle);
 

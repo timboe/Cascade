@@ -1,6 +1,6 @@
 #include "bitmap.h"
 #include "input.h"
-#include "physics.h"
+#include "util.h"
 #include "io.h"
 
 // Titiles
@@ -202,7 +202,7 @@ LCDBitmap* getInfoTopperBitmap(void) { return m_infoTopperBitmap; }
 LCDBitmap* getLevelSplashBitmap(void) { return m_levelSplashBitmap; }
 
 LCDBitmap* getBitmapTurretBarrel(void) {
-  return m_turretBarrel[(getFrameCount() % 32) / 4][ angToByte(getTurretBarrelAngle()) ];
+  return m_turretBarrel[(gameGetFrameCount() % 32) / 4][ angToByte(gameGetTurretBarrelAngle()) ];
 }
 
 void setRoobert10() { pd->graphics->setFont(m_fontRoobert10); }

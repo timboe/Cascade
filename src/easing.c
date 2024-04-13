@@ -1,6 +1,8 @@
 #include "easing.h"
 #include <stdlib.h>
 
+/// ///
+
 float getEasing(const enum EasingFunction_t e, const float t) {
   switch (e) {
     case kEaseLinear: return t;
@@ -44,7 +46,8 @@ float easeInSine(float t) {
 }
 
 float easeOutSine(float t) {
-  return 1.0f + sinf(1.5707963f * (--t));
+  t -= 1.0f;
+  return 1.0f + sinf(1.5707963f * t);
 }
 
 float easeInOutSine(float t) {
@@ -68,11 +71,17 @@ float easeInCubic(float t) {
 }
 
 float easeOutCubic(float t) {
-  return 1.0f + (--t) * t * t;
+  t -= 1.0f;
+  return 1.0f + t * t * t;
 }
 
 float easeInOutCubic(float t) {
-  return t < 0.5f ? 4.0f * t * t * t : 1.0f + (--t) * (2.0f * (--t)) * (2.0f * t);
+  if (t < 0.5f) {
+    return 4.0f * t * t * t;
+  }
+  t -= 1.0f;
+  float tm2 = t - 1.0f;
+  return 1.0f + t * (2.0f * tm2) * (2.0f * tm2); // TODO check this
 }
 
 float easeInQuart(float t) {
@@ -81,7 +90,8 @@ float easeInQuart(float t) {
 }
 
 float easeOutQuart(float t) {
-  t = (--t) * t;
+  t -= 1.0f;
+  t = t * t;
   return 1.0f - t * t;
 }
 
@@ -90,7 +100,8 @@ float easeInOutQuart(float t) {
     t *= t;
     return 8.0f * t * t;
   } else {
-    t = (--t) * t;
+    t -= 1.0f;
+    t = t * t;
     return 1.0f - 8.0f * t * t;
   }
 }
@@ -101,7 +112,8 @@ float easeInQuint(float t) {
 }
 
 float easeOutQuint(float t) {
-  float t2 = (--t) * t;
+  t -= 1.0f;
+  float t2 = t * t;
   return 1.0f + t * t2 * t2;
 }
 
@@ -111,7 +123,8 @@ float easeInOutQuint(float t) {
     t2 = t * t;
     return 16.0f * t * t2 * t2;
   } else {
-    t2 = (--t) * t;
+    t -= 1.0f;
+    t2 = t * t;
     return 1.0f + 16.0f * t * t2 * t2;
   }
 }
@@ -153,24 +166,26 @@ float easeInBack(float t) {
 }
 
 float easeOutBack(float t) {
-  return 1.0f + (--t) * t * (2.70158f * t + 1.70158f);
+  t -= 1.0f;
+  return 1.0f + t * t * (2.70158f * t + 1.70158f);
 }
 
 float easeInOutBack(float t) {
   if(t < 0.5f) {
     return t * t * (7.0f * t - 2.5f) * 2.0f;
   } else {
-    return 1.0f + (--t) * t * 2.0f * (7.0f * t + 2.5f);
+    t -= 1.0f;
+    return 1.0f + t * t * 2.0f * (7.0f * t + 2.5f);
   }
 }
 
 float easeInElastic(float t) {
-  float t2 = t * t;
+  const float t2 = t * t;
   return t2 * t2 * sinf(t * M_PIf * 4.5f);
 }
 
 float easeOutElastic(float t) {
-  float t2 = (t - 1.0f) * (t - 1.0f);
+  const float t2 = (t - 1.0f) * (t - 1.0f);
   return 1.0f - t2 * t2 * cosf(t * M_PIf * 4.5f);
 }
 

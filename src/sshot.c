@@ -55,7 +55,7 @@ void doScreenShot() {
 }
 
 void ssInit(void) {
-  pd->system->logToConsole("ssInit frame %i", getFrameCount());
+  pd->system->logToConsole("ssInit frame %i", gameGetFrameCount());
   char filePath[128];
   snprintf(filePath, 128, "level_%i_hole_%i.bmp", getCurrentLevel()+1, getCurrentHole()+1);
   m_imageFile = pd->file->open(filePath, kFileWrite);
@@ -76,15 +76,15 @@ void ssInit(void) {
 }
 
 void ssRender(void) {
-  pd->system->logToConsole("ssRender, y=%i frame %i", m_yOffset, getFrameCount());
-  setScrollOffset(DEVICE_PIX_Y * m_yOffset, true);
+  pd->system->logToConsole("ssRender, y=%i frame %i", m_yOffset, gameGetFrameCount());
+  gameSetScrollOffset(DEVICE_PIX_Y * m_yOffset, true);
   pd->graphics->setDrawOffset(0, -DEVICE_PIX_Y * m_yOffset);
-  render(getFrameCount(), FSMGetGameMode(), FSMGet());
+  render(gameGetFrameCount(), FSMGetGameMode(), FSMGet());
   m_doRender = false;
 }
 
 void ssEncode(void) {
-  pd->system->logToConsole("ssEncode, y=%i frame %i", m_yOffset, getFrameCount());
+  pd->system->logToConsole("ssEncode, y=%i frame %i", m_yOffset, gameGetFrameCount());
   LCDBitmap* frame = pd->graphics->getDisplayBufferBitmap(); // Not owned
   pd->graphics->pushContext(m_imageBitmap);
   pd->graphics->drawBitmap(frame, 0, DEVICE_PIX_Y * m_yOffset, kBitmapUnflipped);
@@ -93,7 +93,7 @@ void ssEncode(void) {
 }
 
 void ssWrite(void) {
-  pd->system->logToConsole("ssWrite, frame %i", getFrameCount());
+  pd->system->logToConsole("ssWrite, frame %i", gameGetFrameCount());
   bool finished = false;
   while (!finished) { finished = saveLCDBitmapToFile(m_imageFile); }
   pd->file->close(m_imageFile);

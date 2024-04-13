@@ -12,21 +12,21 @@
 uint16_t m_ballStuckCounter[2] = {0}; // Keeping track of a stuck ball
 uint16_t m_ballCount = 0; // Keeping track of the current level score
 
-void commonTurretScrollAndBounceBack(const bool allowScroll);
+void FSMCommonTurretScrollAndBounceBack(const bool allowScroll);
 
-///
+/// ///
 
 void FSMDoResetBallStuckCounter(void) { 
   m_ballStuckCounter[0] = 0;
   m_ballStuckCounter[1] = 0;
 }
 
-void commonTurretScrollAndBounceBack(const bool allowScroll) {
+void FSMCommonTurretScrollAndBounceBack(const bool allowScroll) {
   // Button based
   float diffY = 0;
   if      (getPressed(kButtonUp)) diffY = -SCREEN_ACC;
   else if (getPressed(kButtonDown)) diffY =  SCREEN_ACC;
-  modScrollVelocity(diffY);
+  gameModScrollVelocity(diffY);
   // Crank based
   static float angle = 179.0f;
   static bool topLock = true;
@@ -42,21 +42,21 @@ void commonTurretScrollAndBounceBack(const bool allowScroll) {
   const bool newRev = fabsf(angle - revDetection) > 180.0f;
   revDetection = angle;
 
-  const float so = getScrollOffset();
-  if ((newRev && angle < 180.0f) || so > getMinimumY()) {
+  const float so = gameGetScrollOffset();
+  if ((newRev && angle < 180.0f) || so > gameGetMinimumY()) {
     topLock = false;
-  } else if (so <= getMinimumY()) {
+  } else if (so <= gameGetMinimumY()) {
     topLock = true;
   }
 
   if (allowScroll) {
-    if (!topLock) modScrollVelocity(getCrankChanged() * CRANK_SCROLL_MODIFIER);
-    applyScrollEasing();
+    if (!topLock) gameModScrollVelocity(getCrankChanged() * CRANK_SCROLL_MODIFIER);
+    gameDoApplyScrollEasing();
   }
 
   if (angle > TURRET_ANGLE_MAX) { angle = TURRET_ANGLE_MAX; }
   else if (angle < TURRET_ANGLE_MIN) { angle = TURRET_ANGLE_MIN; }
-  setTurretBarrelAngle(angle);
+  gameSetTurretBarrelAngle(angle);
 }
 
 
@@ -64,9 +64,9 @@ void FSMDisplaySplash(const bool newState) {
   static uint16_t timer = 0;
   if (newState) { 
     timer = 0;
-    setScrollOffset(-DEVICE_PIX_Y - TURRET_RADIUS, true);
+    gameSetScrollOffset(-DEVICE_PIX_Y - TURRET_RADIUS, true);
     updateScoreHistogramBitmap();
-    populateMenuGame();
+    gamePopulateMenuGame();
     boardRandomise(); // // TODO replace me
     //boardClear();
     //loadCurrentHole();
@@ -79,10 +79,10 @@ void FSMSplashToStart(const bool newState) {
   if (newState) {
     timer = 0;
     m_ballCount = 0;
-    setMinimumY(0);
+    gameSetMinimumY(0);
   }
   float progress = getEasing(kEaseInOutQuint, 1.0f - (float)timer/TIME_SPLASH_TO_GAME);
-  setScrollOffset((-DEVICE_PIX_Y - TURRET_RADIUS) * progress, true);
+  gameSetScrollOffset((-DEVICE_PIX_Y - TURRET_RADIUS) * progress, true);
   if (timer++ == TIME_SPLASH_TO_GAME) { return FSMDo(kGameFSM_AimMode); }
 }
 
@@ -90,8 +90,8 @@ void FSMAimModeScrollToTop(const bool newState) {
   static uint16_t timer = 0;
   if (newState) { timer = 0; }
   const float progress = getEasing(kEaseInOutQuint, 1.0f - (float)timer/TIME_AIM_SCROLL_TO_TOP);
-  setScrollOffset(getMinimumY() + ((getScrollOffset() - getMinimumY())*progress), true);
-  commonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
+  gameSetScrollOffset(gameGetMinimumY() + ((gameGetScrollOffset() - gameGetMinimumY())*progress), true);
+  FSMCommonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
   if (timer++ == TIME_AIM_SCROLL_TO_TOP) { return FSMDo(kGameFSM_AimMode); }
 
 }
@@ -100,10 +100,10 @@ void FSMAimMode(const bool newState) {
   static uint16_t timer = 0;
   if (newState) {
     resetBallTrace();
-    resetFrameCount();
+    gameResetFrameCount();
     timer = 0;
   }
-  commonTurretScrollAndBounceBack(true);
+  FSMCommonTurretScrollAndBounceBack(true);
   //
   float progress = getEasing(kEaseOutQuart, (float)timer/TIME_FIRE_BALL);
   if ((timer >= TIME_FIRE_BALL) || (progress > 0.5f && !getPressed(kButtonA))) { // Fire
@@ -124,13 +124,13 @@ void FSMBallInPlay(const bool newState) {
   const enum PegSpecial_t special = boardGetCurrentSpecial();
   if (newState) { FSMDoResetBallStuckCounter(); }
   //
-  commonTurretScrollAndBounceBack(true);
+  FSMCommonTurretScrollAndBounceBack(true);
   //
   const float y1 = cpBodyGetPosition(getBall(0)).y;
   const float y2 = (special == kPegSpecialMultiball ? cpBodyGetPosition(getBall(1)).y : 0);
   float y = MAX(y1, y2);
   if (special == kPegSpecialMultiball && getSecondBallInPlay() && y >= WFALL_PIX_Y + BALL_RADIUS) { y = MIN(y1,y2); }
-  setScrollOffset(y - HALF_DEVICE_PIX_Y, false);
+  gameSetScrollOffset(y - HALF_DEVICE_PIX_Y, false);
   //
   if (y > WFALL_PIX_Y + BALL_RADIUS) {
     return FSMDo(kGameFSM_BallGutter);
@@ -150,10 +150,10 @@ void FSMBallInPlay(const bool newState) {
 }
 
 void FSMBallStuck(const bool newState) {
-  commonTurretScrollAndBounceBack(true);
+  FSMCommonTurretScrollAndBounceBack(true);
   //
   bool popped = true;
-  if (getFrameCount() % TIME_STUCK_POP == 0) {
+  if (gameGetFrameCount() % TIME_STUCK_POP == 0) {
     popped = boardBurstRandomPeg();
   }
   cpVect v = cpBodyGetVelocity(getBall(0));
@@ -192,9 +192,9 @@ void FSMBallGutter(const bool newState) {
     vY = cpBodyGetVelocity(getBall(0)).y;
     pause = TICK_FREQUENCY / 2;
   }
-  // pd->system->logToConsole("v %f so %f", vY, getScrollOffset());
+  // pd->system->logToConsole("v %f so %f", vY, gameGetScrollOffset());
   if (vY > 0.01f) {
-    setScrollOffset(getScrollOffset() + (vY * TIMESTEP), true);
+    gameSetScrollOffset(gameGetScrollOffset() + (vY * TIMESTEP), true);
     vY *= 0.5f;
   } else if (pause) {
     --pause;
@@ -209,7 +209,7 @@ void FSMGutterToTurret(const bool newState) {
   static float startY = 0.0f;
   if (newState) {
     progress = 0.0f;
-    startY = getScrollOffset();
+    startY = gameGetScrollOffset();
     //
     int32_t minY = 10000;
     for (uint32_t i = 0; i < MAX_PEGS; ++i) {
@@ -218,27 +218,27 @@ void FSMGutterToTurret(const bool newState) {
         minY = p->minY;
       }
     }
-    if (minY > (DEVICE_PIX_Y/2)) setMinimumY(minY - (DEVICE_PIX_Y/2));
-    pd->system->logToConsole("kGameFSM_GutterToTurret smallest y was %i, min y is now %i", minY, getMinimumY());
+    if (minY > (DEVICE_PIX_Y/2)) gameSetMinimumY(minY - (DEVICE_PIX_Y/2));
+    pd->system->logToConsole("kGameFSM_GutterToTurret smallest y was %i, min y is now %i", minY, gameGetMinimumY());
   }
-  const int16_t minimumY = getMinimumY();
+  const int16_t minimumY = gameGetMinimumY();
   // Take less time overall when we get lower down
   const float distance_mod = startY / (float)(startY - minimumY);
   //
-  commonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
+  FSMCommonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
   //
   progress += (TIMESTEP * END_SWEEP_SCALE * distance_mod);
   float easedProgress = getEasing(kEaseInOutSine, progress);
   easedProgress = (1.0f - easedProgress);
   const float targetPartial = minimumY + ((startY - minimumY) * easedProgress);
-  setScrollOffset(targetPartial, true);
+  gameSetScrollOffset(targetPartial, true);
   //
   const float popLevel = (startY + DEVICE_PIX_Y) * easedProgress;
   boardBurstPegs(popLevel);
   //
   // pd->system->logToConsole("end sweep active target %f, pop %f",target, popLevel);
   if (progress >= 1) {
-    setScrollOffset(minimumY, true);
+    gameSetScrollOffset(minimumY, true);
     return FSMDo(kGameFSM_AimMode);
   }
 }

@@ -11,8 +11,8 @@ void commonRenderBackgroundWaterfallWithAnim(const bool locked, const uint8_t of
 void setNumeralOffset(float no) { m_numeralOffset = no; }
 
 void commonRenderBackgroundWaterfallWithAnim(const bool locked, const uint8_t offY, uint16_t* timer) {
-  // Draw "previous" waterfall (will become current once resetPreviousWaterfall is called)
-  const uint16_t prevWf = getPreviousWaterfall();
+  // Draw "previous" waterfall (will become current once gameDoResetPreviousWaterfall is called)
+  const uint16_t prevWf = gameGetPreviousWaterfall();
   for (int i = offY; i < (offY+4); ++i) {
     pd->graphics->drawBitmap(getBitmapWfFg(prevWf, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
   }
@@ -27,7 +27,7 @@ void commonRenderBackgroundWaterfallWithAnim(const bool locked, const uint8_t of
       }
       pd->graphics->setStencilImage(NULL, 0);
       if (++(*timer) == STENCIL_WIPE_N) {
-        resetPreviousWaterfall();
+        gameDoResetPreviousWaterfall();
         *timer = 0;
       }
     } else {

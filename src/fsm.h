@@ -38,7 +38,7 @@ enum FSM_t {
   kNFSMModes
 };
 
-void FSMDo(enum FSM_t transitionTo);
+void FSMDo(const enum FSM_t transitionTo);
 
 enum FSM_t FSMUpdate(void);
 

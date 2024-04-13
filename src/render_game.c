@@ -32,7 +32,7 @@ void setBallTrace(const uint16_t i, const uint16_t x, const uint16_t y) {
 void resetBallTrace(void) {
   for (int i = 0; i < PREDICTION_TRACE_LEN * 2; ++i) {
     m_ballTraceX[i] = HALF_DEVICE_PIX_X;
-    m_ballTraceY[i] = getMinimumY() + TURRET_RADIUS;
+    m_ballTraceY[i] = gameGetMinimumY() + TURRET_RADIUS;
   }
 }
 
@@ -40,7 +40,7 @@ void renderGameBall(const int32_t fc) {
   if (!FSMGetBallInPlay()) {
     // render at dummy location
     pd->graphics->setDrawMode(kDrawModeInverted);
-    pd->graphics->drawBitmap(getBitmapBall(), DEVICE_PIX_X/2 - BALL_RADIUS, getMinimumY() + TURRET_RADIUS - BALL_RADIUS, kBitmapUnflipped);
+    pd->graphics->drawBitmap(getBitmapBall(), DEVICE_PIX_X/2 - BALL_RADIUS, gameGetMinimumY() + TURRET_RADIUS - BALL_RADIUS, kBitmapUnflipped);
     pd->graphics->setDrawMode(kDrawModeCopy);
     return;
   }
@@ -64,14 +64,14 @@ void renderGameBall(const int32_t fc) {
 void renderGamePoot(const enum FSM_t fsm) {
   if (fsm == kGameFSM_AimMode && m_ballPootRadius) {
     pd->graphics->setDrawMode(kDrawModeNXOR);
-    pd->graphics->drawBitmap(getBitmapAnimPoot(m_ballPootRadius), DEVICE_PIX_X/2 - TURRET_RADIUS, getMinimumY(), kBitmapUnflipped);
+    pd->graphics->drawBitmap(getBitmapAnimPoot(m_ballPootRadius), DEVICE_PIX_X/2 - TURRET_RADIUS, gameGetMinimumY(), kBitmapUnflipped);
     pd->graphics->setDrawMode(kDrawModeCopy);
   }
 }
 
 void renderGameTurret(void) {
-  const int16_t minY = getMinimumY();
-  const int16_t so = getScrollOffset();
+  const int16_t minY = gameGetMinimumY();
+  const int16_t so = gameGetScrollOffset();
   if (so - minY >= 2*TURRET_RADIUS) {
     return;
   }
@@ -120,8 +120,8 @@ void renderGameBoard(void) {
 void renderGameBackground(void) {
   if (getScreenShotInProgress()) { return; }
 
-  const int32_t parallax = getParalaxFactorFar(); // Note: float -> int here
-  const int32_t so = ((int32_t) getScrollOffset()) - UI_OFFSET_TOP - parallax;
+  const int32_t parallax = gameGetParalaxFactorFar(); // Note: float -> int here
+  const int32_t so = ((int32_t) gameGetScrollOffset()) - UI_OFFSET_TOP - parallax;
   const uint32_t start = MAX(0, so / WF_DIVISION_PIX_Y);
   // pd->system->logToConsole("so is %i, rendering from %i to %i", so, start, start+5);
   uint8_t wf = 0;
@@ -139,21 +139,21 @@ void renderGameBackground(void) {
     if (bm) pd->graphics->drawBitmap(bm, 0, UI_OFFSET_TOP + (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
   }
 
-  const float minY = getMinimumY(); 
-  if (getScrollOffset() - minY < 0) {
+  const float minY = gameGetMinimumY(); 
+  if (gameGetScrollOffset() - minY < 0) {
     pd->graphics->fillRect(0, minY - TURRET_RADIUS - 60, DEVICE_PIX_X, 60, kColorBlack); // mask in case of over-scroll
     pd->graphics->drawBitmap(getInfoTopperBitmap(), 0, minY - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
   }
 
-  if (getScrollOffset() <= -TURRET_RADIUS) { // Note no parallax here
+  if (gameGetScrollOffset() <= -TURRET_RADIUS) { // Note no parallax here
     pd->graphics->drawBitmap(getLevelSplashBitmap(), 0, -DEVICE_PIX_Y - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
   }
 }
 
 void renderGameGutter(void) {
   const int32_t gutterY = WFALL_PIX_Y - ((WFALL_PIX_Y-DEVICE_PIX_Y) * PARALAX_NEAR);
-  const int32_t parallax = getParalaxFactorNear(); // Note: float -> int here
-  const int32_t so = getScrollOffset();
+  const int32_t parallax = gameGetParalaxFactorNear(); // Note: float -> int here
+  const int32_t so = gameGetScrollOffset();
 
   if (so > gutterY + parallax - DEVICE_PIX_Y && FSMGet() != kGameFSM_ScoresToTitle) {
     pd->graphics->drawBitmap(getBitmapWfPond(), 0, gutterY + parallax, kBitmapUnflipped);

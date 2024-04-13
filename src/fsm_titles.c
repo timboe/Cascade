@@ -6,11 +6,11 @@
 #include "io.h"
 #include "input.h"
 
-float commonCrankNumeral(float* progress);
+float FSMCommonCrankNumeral(float* progress);
 
-///
+/// ///
 
-float commonCrankNumeral(float* progress) {
+float FSMCommonCrankNumeral(float* progress) {
   float ret = 0.0f;
   *progress -= getCrankChanged() * CRANK_NUMBERSCROLL_MODIFIER;
   if      (getPressed(kButtonUp)) *progress += 10 * CRANK_NUMBERSCROLL_MODIFIER;
@@ -29,7 +29,7 @@ float commonCrankNumeral(float* progress) {
 
 void FSMDisplayTitles(const bool newState) {
   if (newState) { 
-    populateMenuTitles();
+    gamePopulateMenuTitles();
   }
   if (!pd->system->isCrankDocked()) { return FSMDo(kTitlesFSM_TitlesToChoosePlayer); }
 }
@@ -45,15 +45,15 @@ void FSMChoosePlayer(const bool newState) {
   static float progress = 0.0f;
   if (newState) {
     progress = 0.0f;
-    populateMenuTitlesPlayer();
+    gamePopulateMenuTitlesPlayer();
   }
-  const float status = commonCrankNumeral(&progress);
+  const float status = FSMCommonCrankNumeral(&progress);
   if      (status > 0) {
-    resetPreviousWaterfall();
+    gameDoResetPreviousWaterfall();
     doPreviousPlayer();
     goToNextUnplayedLevel();
   } else if (status < 0) {
-    resetPreviousWaterfall();
+    gameDoResetPreviousWaterfall();
     doNextPlayer();
     goToNextUnplayedLevel();
   }
@@ -65,7 +65,7 @@ void FSMChoosePlayerToChooseLevel(const bool newState) {
     timer = 0;
     setNumeralOffset(0.0f);
     updateLevelStatsBitmap();
-    resetPreviousWaterfall();
+    gameDoResetPreviousWaterfall();
   }
   FSMCommonScrollTo(DEVICE_PIX_Y * 2, (float)timer/TIME_TITLE_TRANSITION, kEaseInOutQuad);
   if (timer++ == TIME_TITLE_TRANSITION) { return FSMDo(kTitlesFSM_ChooseLevel); }
@@ -75,15 +75,15 @@ void FSMChooseLevel(const bool newState) {
   static float progress = 0.0f;
   if (newState) {
     progress = 0.0f;
-    populateMenuTitles();
+    gamePopulateMenuTitles();
   }
-  const float status = commonCrankNumeral(&progress);
+  const float status = FSMCommonCrankNumeral(&progress);
   if (status > 0) {
-    resetPreviousWaterfall(); // Ordering important
+    gameDoResetPreviousWaterfall(); // Ordering important
     doPreviousLevel();
     updateLevelStatsBitmap();
   } else if (status < 0) {
-    resetPreviousWaterfall();
+    gameDoResetPreviousWaterfall();
     doNextLevel();
     updateLevelStatsBitmap();
   }
@@ -113,7 +113,7 @@ void FSMChooseLevelToChoosePlayer(const bool newState) {
 void FSMChooseHole(const bool newState) {
   static float progress = 0.0f;
   if (newState) progress = 0.0f;
-  const float status = commonCrankNumeral(&progress);
+  const float status = FSMCommonCrankNumeral(&progress);
   if (status > 0) {
     doPreviousHole(); // Ordering important
     updateHoleStatsBitmap();
@@ -140,7 +140,7 @@ void FSMChooseHoleToChooseLevel(const bool newState) {
   if (newState) { 
     timer = 0;
     setNumeralOffset(0.0f);
-    resetPreviousWaterfall();
+    gameDoResetPreviousWaterfall();
   }
   FSMCommonScrollTo(DEVICE_PIX_Y * 2, (float)timer/TIME_TITLE_TRANSITION, kEaseInOutQuad);
   if (timer++ == TIME_TITLE_TRANSITION) { return FSMDo(kTitlesFSM_ChooseLevel); }

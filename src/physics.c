@@ -7,6 +7,7 @@
 #include "fsm.h"
 #include "peg.h"
 #include "board.h"
+#include "util.h"
 
 cpSpace* m_space;
 
@@ -28,19 +29,6 @@ int16_t m_predictionTrailY[PREDICTION_TRACE_LEN];
 
 /// ///
 
-uint8_t radToByte(float rad) { return (rad / M_2PIf) * 256.0f; }
-
-uint8_t angToByte(float ang) { return (ang / 360.0f) * 256.0f; }
-
-float angToRad(float ang) { return ang * (M_PIf / 180.0f); }
-
-float len(const float x1, const float x2, const float y1, const float y2) {
-  return sqrtf( len2(x1, x2, y1, y2) );
-}
-
-float len2(const float x1, const float x2, const float y1, const float y2) {
-  return powf(x1 - x2, 2) + powf(y1 - y2, 2);
-}
 
 int16_t* motionTrailX(uint8_t n) { return m_motionTrailX[n]; }
 
@@ -51,7 +39,7 @@ cpBody* getBall(uint8_t n) { return m_ball[n]; }
 cpSpace* getSpace(void) { return m_space; }
 
 void launchBall(float strength) {
-  const float angleRad = angToRad(getTurretBarrelAngle());
+  const float angleRad = angToRad(gameGetTurretBarrelAngle());
   cpBodyApplyImpulseAtLocalPoint(m_ball[0], cpv(POOT_STRENGTH * sinf(angleRad) * strength, POOT_STRENGTH * -cosf(angleRad) * strength), cpvzero);
   if (boardGetCurrentSpecial() == kPegSpecialBounce) {
     cpShapeSetElasticity(m_ballShape[0], ULTRA_BOUNCE);
@@ -139,12 +127,12 @@ uint8_t cpCollisionBeginFunc_ballPeg(cpArbiter* arb, struct cpSpace* space, cpDa
 
 void secondTryBall(void) {
   const cpVect pos = cpBodyGetPosition(m_ball[0]);
-  cpBodySetPosition(m_ball[0], cpv(pos.x, getMinimumY() + BALL_RADIUS));
+  cpBodySetPosition(m_ball[0], cpv(pos.x, gameGetMinimumY() + BALL_RADIUS));
 }
 
 void resetBall(uint8_t n) {
   int16_t yMod = (n == 1 ? 1024 : 0);
-  cpBodySetPosition(m_ball[n], cpv(HALF_DEVICE_PIX_X, getMinimumY() + TURRET_RADIUS - yMod));
+  cpBodySetPosition(m_ball[n], cpv(HALF_DEVICE_PIX_X, gameGetMinimumY() + TURRET_RADIUS - yMod));
   cpBodySetVelocity(m_ball[n], cpvzero);
   cpBodySetAngle(m_ball[n], 0);
   cpBodySetAngularVelocity(m_ball[n], 0);

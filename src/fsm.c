@@ -3,7 +3,7 @@
 
 enum FSM_t m_FSM = (enum FSM_t)0;
 
-///
+/// ///
 
 enum FSM_t FSMGet(void) { return m_FSM; }
 
@@ -12,7 +12,7 @@ enum FSM_t FSMUpdate(void) {
   return m_FSM;
 }
 
-void FSMDo(enum FSM_t transitionTo) {
+void FSMDo(const enum FSM_t transitionTo) {
   bool newState = (m_FSM != transitionTo);
   if (newState) { 
     m_FSM = transitionTo;
@@ -60,6 +60,6 @@ bool FSMGetBallInPlay(void) {
 
 
 void FSMCommonScrollTo(const int16_t destination, const float progress, const enum EasingFunction_t e) {
-  const float so = getScrollOffset();
-  setScrollOffset(so + (destination - so)*getEasing(e, progress), true);
+  const float so = gameGetScrollOffset();
+  gameSetScrollOffset(so + (destination - so)*getEasing(e, progress), true);
 }
