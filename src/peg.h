@@ -101,8 +101,6 @@ void addPegMotionPath(struct Peg_t* p, const int16_t x, const int16_t y);
 
 void pegMotionPathFinalise(struct Peg_t* p);
 
-void renderPeg(const struct Peg_t* p);
-
 void hitPeg(struct Peg_t* p);
 
 bool checkPopPeg(struct Peg_t* p, float y);

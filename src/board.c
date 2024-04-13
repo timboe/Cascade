@@ -34,13 +34,11 @@ void initBoard(void) {
 
 }
 
-struct Peg_t* pegFromPool(void) {
-  return &m_pegs[m_nPegs++];
-}
+struct Peg_t* pegFromPool(void) { return &m_pegs[m_nPegs++]; }
 
-struct Peg_t* getPeg(uint16_t i) {
-  return &m_pegs[i];
-}
+struct Peg_t* getPeg(const uint16_t i) { return &m_pegs[i]; }
+
+uint16_t getNPegs(void) { return m_nPegs; }
 
 void specialBurst(void) {
   const cpVect pos = cpBodyGetPosition(getBall(0));
@@ -180,11 +178,6 @@ void clearBoard(void) {
   m_requiredPegsInPlay = 0;
 }
 
-void renderBoard(void) {
-  for (int i = 0; i < m_nPegs; ++i) {
-    renderPeg(&m_pegs[i]);
-  }
-}
 
 void popBoard(float y) {
   for (int i = 0; i < m_nPegs; ++i) {

@@ -57,15 +57,15 @@ void randomiseBoard(void);
 
 void updateBoard(void);
 
-void renderBoard(void);
-
 void clearBoard(void);
 
 void popBoard(float y);
 
 bool popRandom(void);
 
-struct Peg_t* getPeg(uint16_t i);
+struct Peg_t* getPeg(const uint16_t i);
+
+uint16_t getNPegs(void);
 
 int16_t requiredPegsInPlay(void);
 

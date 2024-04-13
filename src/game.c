@@ -51,7 +51,7 @@ int gameLoop(void* _data) {
       updateBoard();
       updateSpace(m_frameCount, fsm);
     }
-    render(m_frameCount, gm, fsm);
+    render(m_frameCount, fsm, gm);
   }
 
   ++m_frameCount;
