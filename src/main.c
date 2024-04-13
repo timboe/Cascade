@@ -6,7 +6,7 @@
 #include "bitmap.h"
 #include "board.h"
 #include "sound.h"
-#include "ui.h"
+#include "fsm.h"
 #include "io.h"
 
 #ifdef _WINDLL
@@ -17,9 +17,7 @@ static void init(void) {
   initBoard();
   scanLevels(); // Expensive?
   initBitmap(); // Expensive - after scan level
-  initiUI();
   initSound();
-  initGame();
   initSpace();
 
   doFSM(kTitlesFSM_DisplayTitles);

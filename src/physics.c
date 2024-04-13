@@ -4,7 +4,7 @@
 #include "physics.h"
 #include "input.h"
 #include "render.h"
-#include "ui.h"
+#include "fsm.h"
 #include "peg.h"
 #include "board.h"
 

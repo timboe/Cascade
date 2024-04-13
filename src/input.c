@@ -2,7 +2,7 @@
 #include "bitmap.h"
 #include "render.h"
 #include "sound.h"
-#include "ui.h"
+#include "fsm.h"
 #include "io.h"
 #include "physics.h"
 #include "board.h"

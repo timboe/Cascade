@@ -7,37 +7,33 @@
 #include "pdxalloc.h"
 #include "constants.h"
 
-int gameLoop(void* _data);
+int gameLoop(void* data);
 
 int getFrameCount(void);
-
 void resetFrameCount(void);
 
-enum kFSM doFSM(enum kFSM transitionTo);
 
-enum kFSM getFSM(void);
-
-bool ballInPlay(void);
-
-void resetBallStuckCounter(void);
-
+void setTurretBarrelAngle(const float angle);
 float getTurretBarrelAngle(void);
 
 uint16_t getPreviousWaterfall(void);
-
 void resetPreviousWaterfall(void);
 
-uint16_t locToPix(uint16_t _loc);
+int16_t getMinimumY(void);
+void setMinimumY(int16_t y);
 
-uint16_t pixToLoc(uint16_t _pix);
+float getScrollOffset(void);
+void setScrollOffset(float set, const bool force);
+void modScrollVelocity(const float mod);
+float applyScrollEasing(void);
 
-void menuOptionsCallbackMenu(void*);
+float getParalaxFactorFar(void);
+float getParalaxFactorNear(void);
 
 void populateMenuGame(void);
+void populateMenuTitlesPlayer(void);
+void populateMenuTitles(void);
 
-void initGame(void);
+char* ftos(const float value, const int16_t size, char* dest);
 
-void reset(void);
-
-char* ftos(float _value, int16_t _size, char* _dest);
-
+void snprintf_c(char* buf, const uint8_t bufSize, const int n);

@@ -3,7 +3,7 @@
 #include "bitmap.h"
 #include "io.h"
 #include "input.h"
-#include "ui.h"
+#include "fsm.h"
 #include "physics.h"
 #include "board.h"
 #include "sshot.h"
@@ -75,7 +75,7 @@ void addTrauma(float amount) {
   m_sTraumaAngle = sinf(traumaAngle) * TRAUMA_AMPLIFICATION;
 }
 
-void render(int32_t fc, enum kFSM fsm) {
+void render(const int32_t fc, const enum kGameMode gm, const enum kFSM fsm) {
 
   if (true && m_decay > 0.0f) {
     m_decay -= TRAUMA_DECAY;
@@ -94,7 +94,7 @@ void render(int32_t fc, enum kFSM fsm) {
   pd->graphics->clear(kColorWhite);
   pd->graphics->setBackgroundColor(kColorBlack);
 
-  switch (getGameMode()) {
+  switch (gm) {
     case kTitles: renderTitles(fc, fsm); break;
     case kGameWindow: renderGameWindow(fc, fsm); break;
     default: break;
@@ -341,6 +341,8 @@ void renderTurret(void) {
   // pd->graphics->drawBitmap(getBitmapHeader(), 0, 0, kBitmapUnflipped);
   pd->graphics->drawBitmap(getBitmapTurretBody(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY,  kBitmapUnflipped);
   pd->graphics->drawBitmap(getBitmapTurretBarrel(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY, kBitmapUnflipped);
+
+
 }
 
 void renderTrajectory(void) {
@@ -439,7 +441,7 @@ void renderGameWindow(int32_t fc, enum kFSM fsm) {
   // DRAW GUTTER
   renderGutter();
 
-  renderDebug();
-
-
+  // Debug gutter line
+  pd->graphics->drawLine(0, WFALL_PIX_Y, DEVICE_PIX_X, WFALL_PIX_Y, 4, kColorBlack);
+  pd->graphics->drawLine(0, WFALL_PIX_Y, DEVICE_PIX_X, WFALL_PIX_Y, 2, kColorWhite);
 }

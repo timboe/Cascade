@@ -1,6 +1,6 @@
 #pragma once
 #include "game.h"
-#include "ui.h"
+#include "fsm.h"
 #include "chipmunk/chipmunk.h"
 
 void initSpace(void);
@@ -18,8 +18,6 @@ void setSecondBallInPlay(void);
 bool getSecondBallInPlay(void);
 
 // cpShape* getBallShape(void);
-
-void specialBurst(void);
 
 int16_t* motionTrailX(uint8_t n);
 
