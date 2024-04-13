@@ -14,7 +14,7 @@ __declspec(dllexport)
 #endif
 
 static void init(void) {
-  initBoard();
+  boardInit();
   scanLevels(); // Expensive?
   initBitmap(); // Expensive - after scan level
   initSound();

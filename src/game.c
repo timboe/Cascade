@@ -48,7 +48,7 @@ int gameLoop(void* _data) {
 
   if (!getSubFreeze()) {
     if (gm == kGameWindow) { // TODO eliminate me
-      updateBoard();
+      boardUpdate();
       updateSpace(m_frameCount, fsm);
     }
     render(m_frameCount, fsm, gm);

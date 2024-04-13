@@ -5,23 +5,23 @@ struct Peg_t m_pegs[MAX_PEGS];
 
 uint16_t m_nPegs = 0;
 
-uint16_t m_requiredPegsInPlay = 0;
+uint16_t m_boardGetRequiredPegsInPlay = 0;
 
 enum PegSpecial_t m_special = kPegSpecialNotSpecial;
 
 
 ///
 
-int16_t requiredPegsInPlay(void) {
-  return m_requiredPegsInPlay;
+int16_t boardGetRequiredPegsInPlay(void) {
+  return m_boardGetRequiredPegsInPlay;
 }
 
-void requiredPegHit(void) { --m_requiredPegsInPlay; }
+void boardDoRequiredPegHit(void) { --m_boardGetRequiredPegsInPlay; }
 
-void initBoard(void) {
+void boardInit(void) {
   memset(&m_pegs, 0, sizeof(struct Peg_t) * MAX_PEGS);
   for (int i = 0; i < MAX_PEGS; ++i) {
-    m_pegs[i].m_id = i;
+    m_pegs[i].id = i;
   }
 
   // TEMP
@@ -36,18 +36,18 @@ void initBoard(void) {
 
 struct Peg_t* pegFromPool(void) { return &m_pegs[m_nPegs++]; }
 
-struct Peg_t* getPeg(const uint16_t i) { return &m_pegs[i]; }
+struct Peg_t* boardGetPeg(const uint16_t i) { return &m_pegs[i]; }
 
-uint16_t getNPegs(void) { return m_nPegs; }
+uint16_t boardGetNPegs(void) { return m_nPegs; }
 
-void specialBurst(void) {
+void boardDoSpecialBurst(void) {
   const cpVect pos = cpBodyGetPosition(getBall(0));
   for (int i = 0; i < m_nPegs; ++i) {
-    struct Peg_t* p = getPeg(i);
-    if (p->m_state == kPegStateActive) {
-      const cpVect pegPos = cpv(p->m_x, p->m_y);
+    struct Peg_t* p = boardGetPeg(i);
+    if (p->state == kPegStateActive) {
+      const cpVect pegPos = cpv(p->x, p->y);
       if (cpvdist(pos, pegPos) < SPECIAL_BURST_RADIUS) {
-        hitPeg(p);
+        pegDoHit(p);
       }
     }
   }
@@ -62,16 +62,16 @@ void boardAddWheel(const struct EllipticLoader_t* ellipticLoader) {
     if (ellipticLoader->shapeOverride[i]) { shape = (enum PegShape_t) ellipticLoader->shapeOverride[i] - 1; }
     uint8_t size = ellipticLoader->size;
     if (ellipticLoader->sizeOverride[i]) { size = ellipticLoader->sizeOverride[i] - 1; }
-    initPeg(p, shape, ellipticLoader->x, ellipticLoader->y, ellipticLoader->angle, size);
-    setPegMotionSpeed(p, ellipticLoader->speed);
+    pegInit(p, shape, ellipticLoader->x, ellipticLoader->y, ellipticLoader->angle, size);
+    pegSetMotionSpeed(p, ellipticLoader->speed);
     const float angleOffset = (ellipticLoader->maxAngle / ellipticLoader->nPegs) * i;
-    setPegMotionOffset(p, angleOffset);
-    setPegMotionEasing(p, ellipticLoader->easing);
-    setPegMotionDoArcAngle(p, ellipticLoader->useArc);
-    setPegMotionEllipse(p, ellipticLoader->a, ellipticLoader->b);
+    pegSetMotionOffset(p, angleOffset);
+    pegSetMotionEasing(p, ellipticLoader->easing);
+    pegSetMotionDoArcAngle(p, ellipticLoader->useArc);
+    pegSetMotionEllipse(p, ellipticLoader->a, ellipticLoader->b);
     if (ellipticLoader->types[i] == kPegTypeRequired) {
-      ++m_requiredPegsInPlay;
-      setPegType(p, kPegTypeRequired);
+      ++m_boardGetRequiredPegsInPlay;
+      petSetType(p, kPegTypeRequired);
     }
   }
 }
@@ -83,18 +83,18 @@ void boardAddLinear(const struct LinearLoader_t* linearLoader) {
     if (linearLoader->shapeOverride[i]) { shape = (enum PegShape_t) linearLoader->shapeOverride[i] - 1; }
     uint8_t size = linearLoader->size;
     if (linearLoader->sizeOverride[i]) { size = linearLoader->sizeOverride[i] - 1; }
-    initPeg(p, shape, linearLoader->x, linearLoader->y, linearLoader->angle, size);
+    pegInit(p, shape, linearLoader->x, linearLoader->y, linearLoader->angle, size);
     const float angleOffset = (linearLoader->maxAngle / linearLoader->nPegs) * i;
-    setPegMotionSpeed(p, linearLoader->speed);
-    setPegMotionOffset(p, angleOffset);
-    setPegMotionEasing(p, linearLoader->easing);
-    setPegMotionDoArcAngle(p, linearLoader->useArc);
+    pegSetMotionSpeed(p, linearLoader->speed);
+    pegSetMotionOffset(p, angleOffset);
+    pegSetMotionEasing(p, linearLoader->easing);
+    pegSetMotionDoArcAngle(p, linearLoader->useArc);
     if (linearLoader->types[i] == kPegTypeRequired) {
-      ++m_requiredPegsInPlay;
-      setPegType(p, kPegTypeRequired);
+      ++m_boardGetRequiredPegsInPlay;
+      petSetType(p, kPegTypeRequired);
     }
     for (int j = 0; j < linearLoader->nLines; ++j) {
-       addPegMotionPath(p, linearLoader->pathX[j], linearLoader->pathY[j]);
+       pegAddMotionPath(p, linearLoader->pathX[j], linearLoader->pathY[j]);
     }
     pegMotionPathFinalise(p);
   }
@@ -102,17 +102,17 @@ void boardAddLinear(const struct LinearLoader_t* linearLoader) {
 
 struct Peg_t* boardAddStatic(const struct StaticLoader_t* staticLoader) {
   struct Peg_t* p = pegFromPool();
-  initPeg(p, staticLoader->shape, staticLoader->x, staticLoader->y, staticLoader->angle, staticLoader->size);
-  setPegMotionStatic(p);
+  pegInit(p, staticLoader->shape, staticLoader->x, staticLoader->y, staticLoader->angle, staticLoader->size);
+  pegSetMotionStatic(p);
   if (staticLoader->type == kPegTypeRequired) {
-    ++m_requiredPegsInPlay;
-    setPegType(p, kPegTypeRequired);
+    ++m_boardGetRequiredPegsInPlay;
+    petSetType(p, kPegTypeRequired);
   }
   return p;
 }
 
-void randomiseBoard(void) {
-  clearBoard();
+void boardRandomise(void) {
+  boardClear();
 
   const int maxStatic = 64;//rand() % 2 ? 16 : 64+32;
 
@@ -164,30 +164,30 @@ void randomiseBoard(void) {
 
 }
 
-void updateBoard(void) {
+void boardUpdate(void) {
   for (int i = 0; i < m_nPegs; ++i) {
-    updatePeg(&m_pegs[i]);
+    pegUpdate(&m_pegs[i]);
   }
 }
 
-void clearBoard(void) {
+void boardClear(void) {
   for (int i = 0; i < m_nPegs; ++i) {
-    clearPeg(&m_pegs[i]);
+    pegClear(&m_pegs[i]);
   }
   m_nPegs = 0;
-  m_requiredPegsInPlay = 0;
+  m_boardGetRequiredPegsInPlay = 0;
 }
 
 
-void popBoard(float y) {
+void boardBurstPegs(const float yLevel) {
   for (int i = 0; i < m_nPegs; ++i) {
-    checkPopPeg(&m_pegs[i], y);
+    pegCheckBurst(&m_pegs[i], yLevel);
   }
 }
 
-bool popRandom(void) {
+bool boardBurstRandomPeg(void) {
   for (int i = 0; i < m_nPegs; ++i) {
-    const bool popped = checkPopPeg(&m_pegs[i], 0);
+    const bool popped = pegCheckBurst(&m_pegs[i], 0);
     if (popped) {
       return true;
     }
@@ -195,10 +195,10 @@ bool popRandom(void) {
   return false;
 }
 
-enum PegSpecial_t getCurrentSpecial(void) {
+enum PegSpecial_t boardGetCurrentSpecial(void) {
   return m_special;
 }
 
-void clearSpecial(void) {
+void boardClearSpecial(void) {
   m_special = kPegSpecialNotSpecial;
 }

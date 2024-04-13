@@ -4,138 +4,138 @@
 #include "board.h"
 #include "sshot.h"
 
-void updateAngle(struct Peg_t* p, float angle);
+void pegUpdateAngle(struct Peg_t* p, float angle);
 
-void setPegBitmapCoordinates(struct Peg_t* p);
+void pegSetBitmapCoordinates(struct Peg_t* p);
 
 ///
 
-void initPeg(struct Peg_t* p, const enum PegShape_t s, const float x, const float y, const float a, const uint8_t size) {
-  if (p->m_cpBody) {
-    pd->system->error("Error initPeg called on an already initalised peg");
+void pegInit(struct Peg_t* p, const enum PegShape_t s, const float x, const float y, const float a, const uint8_t size) {
+  if (p->cpBody) {
+    pd->system->error("Error pegInit called on an already initalised peg");
     return;
   }
   if (size >= MAX_PEG_SIZE) {
-    pd->system->error("Error initPeg called with too large size %i", size);
+    pd->system->error("Error pegInit called with too large size %i", size);
     return;
   }
 
-  p->m_shape = s;
-  p->m_motion = kPegMotionStatic;
-  p->m_type = kPegTypeNormal;
-  p->m_state = kPegStateActive;
-  p->m_x = x;
-  p->m_y = y;
-  p->m_minY = y;
-  p->m_angle = a;
-  p->m_iAngle = radToByte(a);
-  p->m_speed = 1.0f;
-  p->m_size = size;
-  p->m_easing = EaseLinear;
+  p->shape = s;
+  p->motion = kPegMotionStatic;
+  p->type = kPegTypeNormal;
+  p->state = kPegStateActive;
+  p->x = x;
+  p->y = y;
+  p->minY = y;
+  p->angle = a;
+  p->iAngle = radToByte(a);
+  p->speed = 1.0f;
+  p->size = size;
+  p->easing = EaseLinear;
   const float scale = sizeToScale(size);
 
-  p->m_cpBody = cpBodyNewKinematic();
-  cpBodySetPosition(p->m_cpBody, cpv(x, y));
-  cpBodySetAngle(p->m_cpBody, a);
-  cpBodySetUserData(p->m_cpBody, (void*)p);
-  cpSpaceAddBody(getSpace(), p->m_cpBody);
+  p->cpBody = cpBodyNewKinematic();
+  cpBodySetPosition(p->cpBody, cpv(x, y));
+  cpBodySetAngle(p->cpBody, a);
+  cpBodySetUserData(p->cpBody, (void*)p);
+  cpSpaceAddBody(getSpace(), p->cpBody);
   
   if (s == kPegShapeBall) {
-    p->m_cpShape = cpCircleShapeNew(p->m_cpBody, BALL_RADIUS*scale, cpvzero);
-    p->m_radius = BALL_RADIUS*scale;
+    p->cpShape = cpCircleShapeNew(p->cpBody, BALL_RADIUS*scale, cpvzero);
+    p->radius = BALL_RADIUS*scale;
   } else if (s == kPegShapeRect) {
-    p->m_cpShape = cpBoxShapeNew(p->m_cpBody, BOX_WIDTH*scale, BOX_HEIGHT*scale, 0.0f);
-    p->m_radius = BOX_MAX*scale;
+    p->cpShape = cpBoxShapeNew(p->cpBody, BOX_WIDTH*scale, BOX_HEIGHT*scale, 0.0f);
+    p->radius = BOX_MAX*scale;
   } else {    
-    pd->system->error("Error initPeg called with unknown peg shape");
-    clearPeg(p);
+    pd->system->error("Error pegInit called with unknown peg shape");
+    pegClear(p);
     return;
   }
-  p->m_bitmap = getBitmapPeg(p); // Call after setting m_shape, m_iAngle and m_size
-  setPegBitmapCoordinates(p);
-  cpShapeSetCollisionType(p->m_cpShape, FLAG_PEG);
-  cpShapeSetFriction(p->m_cpShape, FRICTION);
-  cpShapeSetElasticity(p->m_cpShape, ELASTICITY);
-  cpSpaceAddShape(getSpace(), p->m_cpShape);
+  p->bitmap = getBitmapPeg(p); // Call after setting shape, iAngle and size
+  pegSetBitmapCoordinates(p);
+  cpShapeSetCollisionType(p->cpShape, FLAG_PEG);
+  cpShapeSetFriction(p->cpShape, FRICTION);
+  cpShapeSetElasticity(p->cpShape, ELASTICITY);
+  cpSpaceAddShape(getSpace(), p->cpShape);
 
-  addPegMotionPath(p, x, y); // Motion path location 0 always holds the origin coordinate
-  p->m_pathCurrent = 1; // This then pre-assumes addPegMotionPath will be called >0 times for kPegMotionPath
+  pegAddMotionPath(p, x, y); // Motion path location 0 always holds the origin coordinate
+  p->pathCurrent = 1; // This then pre-assumes pegAddMotionPath will be called >0 times for kPegMotionPath
 }
 
-void clearPeg(struct Peg_t* p) {
-  removePeg(p);
+void pegClear(struct Peg_t* p) {
+  pegRemove(p);
   memset(p, 0, sizeof(struct Peg_t));
 }
 
-void removePeg(struct Peg_t* p) {
-  if (p->m_cpBody) {
-    cpSpaceRemoveBody(getSpace(), p->m_cpBody);
-    cpBodyFree(p->m_cpBody);
-    p->m_cpBody = NULL;
+void pegRemove(struct Peg_t* p) {
+  if (p->cpBody) {
+    cpSpaceRemoveBody(getSpace(), p->cpBody);
+    cpBodyFree(p->cpBody);
+    p->cpBody = NULL;
   }
-  if (p->m_cpShape) {
-    cpSpaceRemoveShape(getSpace(), p->m_cpShape);
-    cpShapeFree(p->m_cpShape);
-    p->m_cpShape = NULL;
+  if (p->cpShape) {
+    cpSpaceRemoveShape(getSpace(), p->cpShape);
+    cpShapeFree(p->cpShape);
+    p->cpShape = NULL;
   }
 }
 
-void setPegType(struct Peg_t* p, enum PegType_t type) {
-  p->m_type = type;
-  p->m_bitmap = getBitmapPeg(p);
+void petSetType(struct Peg_t* p, const enum PegType_t type) {
+  p->type = type;
+  p->bitmap = getBitmapPeg(p);
 }
 
-void setPegBitmapCoordinates(struct Peg_t* p) {
-  p->m_xBitmap = p->m_x - p->m_radius;
-  p->m_yBitmap = p->m_y - p->m_radius;
+void pegSetBitmapCoordinates(struct Peg_t* p) {
+  p->xBitmap = p->x - p->radius;
+  p->yBitmap = p->y - p->radius;
 }
 
-void updateAngle(struct Peg_t* p, float angle) {
-  if (p->m_shape == kPegShapeBall) {
+void pegUpdateAngle(struct Peg_t* p, float angle) {
+  if (p->shape == kPegShapeBall) {
     return; // Time saving, the angle is irrelevent for circles
   }
-  p->m_angle = angle;
-  p->m_iAngle = radToByte(angle);
-  cpBodySetAngle(p->m_cpBody, angle);
-  p->m_bitmap = getBitmapPeg(p);
+  p->angle = angle;
+  p->iAngle = radToByte(angle);
+  cpBodySetAngle(p->cpBody, angle);
+  p->bitmap = getBitmapPeg(p);
 }
 
-void updatePeg(struct Peg_t* p) {
-  if (p->m_state == kPegStateRemoved) {
+void pegUpdate(struct Peg_t* p) {
+  if (p->state == kPegStateRemoved) {
     return;
   }
 
-  p->m_time += (TIMESTEP * p->m_speed);
-  if (p->m_time >= M_2PIf) { p->m_time -= M_2PIf; } // Keep this one bounded
+  p->time += (TIMESTEP * p->speed);
+  if (p->time >= M_2PIf) { p->time -= M_2PIf; } // Keep this one bounded
 
-  if (p->m_motion == kPegMotionStatic) {
+  if (p->motion == kPegMotionStatic) {
 
     return; // noop - and we can skip below too
 
-  } else if (p->m_motion == kPegMotionEllipse) {
+  } else if (p->motion == kPegMotionEllipse) {
 
-    const float easing = getEasing(p->m_easing, p->m_time / M_2PIf) * M_2PIf;
-    p->m_x = p->m_pathX[0] + (p->m_a * cosf(easing));
-    p->m_y = p->m_pathY[0] + (p->m_b * sinf(easing));
-    if (p->m_doArcAngle) {
-      updateAngle(p, easing + (M_PIf * 0.5f) ); // Offset to point inwards
+    const float easing = getEasing(p->easing, p->time / M_2PIf) * M_2PIf;
+    p->x = p->pathX[0] + (p->a * cosf(easing));
+    p->y = p->pathY[0] + (p->b * sinf(easing));
+    if (p->doArcAngle) {
+      pegUpdateAngle(p, easing + (M_PIf * 0.5f) ); // Offset to point inwards
     }
 
-  } else if (p->m_motion == kPegMotionPath) {
+  } else if (p->motion == kPegMotionPath) {
 
     uint8_t pathStep = 0;
     float stepLenFrac = 0;
-    float totLenFrac = (p->m_time / M_2PIf);
+    float totLenFrac = (p->time / M_2PIf);
     
     // TODO - this isn't great, no easing
-    if (p->m_doArcAngle) {
-      updateAngle(p, (totLenFrac * M_2PIf) + (M_PIf * 0.5f) ); // Offset to point inwards
+    if (p->doArcAngle) {
+      pegUpdateAngle(p, (totLenFrac * M_2PIf) + (M_PIf * 0.5f) ); // Offset to point inwards
     }
 
     // TODO - cache this for calls after the first
 
     while (true) {
-      stepLenFrac = p->m_pathLength[pathStep] / p->m_totPathLength;
+      stepLenFrac = p->pathLength[pathStep] / p->totPathLength;
       if (totLenFrac < stepLenFrac) {
         break;
       } else {
@@ -146,103 +146,103 @@ void updatePeg(struct Peg_t* p) {
 
     // totLenFrac is now 0-X, where X is this step's fraction of the total path length: stepLenFrac.
     // we want to scale this back into the range 0-1 and apply easing
-    const float lenFrac = getEasing(p->m_easing, totLenFrac / stepLenFrac);
+    const float lenFrac = getEasing(p->easing, totLenFrac / stepLenFrac);
 
 
     // and we scale the difference between the points by this value
-    const float dx = (p->m_pathX[pathStep+1] - p->m_pathX[pathStep]) * lenFrac;
-    const float dy = (p->m_pathY[pathStep+1] - p->m_pathY[pathStep]) * lenFrac;
+    const float dx = (p->pathX[pathStep+1] - p->pathX[pathStep]) * lenFrac;
+    const float dy = (p->pathY[pathStep+1] - p->pathY[pathStep]) * lenFrac;
 
-    p->m_x = p->m_pathX[pathStep] + dx;
-    p->m_y = p->m_pathY[pathStep] + dy;
+    p->x = p->pathX[pathStep] + dx;
+    p->y = p->pathY[pathStep] + dy;
 
   } else {
 
-    pd->system->error("Error updatePeg called with unknown peg motion");
+    pd->system->error("Error pegUpdate called with unknown peg motion");
 
   }
 
-  const cpVect pos = cpBodyGetPosition(p->m_cpBody);
-  cpBodySetVelocity(p->m_cpBody, cpv((p->m_x - pos.x)/TIMESTEP, (p->m_y - pos.y)/TIMESTEP));
-  // cpBodySetPosition(p->m_cpBody, cpv(p->m_x, p->m_y));
-  setPegBitmapCoordinates(p);
-  if (p->m_y < p->m_minY) { p->m_minY = p->m_y; }
+  const cpVect pos = cpBodyGetPosition(p->cpBody);
+  cpBodySetVelocity(p->cpBody, cpv((p->x - pos.x)/TIMESTEP, (p->y - pos.y)/TIMESTEP));
+  // cpBodySetPosition(p->cpBody, cpv(p->x, p->y));
+  pegSetBitmapCoordinates(p);
+  if (p->y < p->minY) { p->minY = p->y; }
 }
 
-void setPegMotionSpeed(struct Peg_t* p, const float s) { p->m_speed = s; }
+void pegSetMotionSpeed(struct Peg_t* p, const float s) { p->speed = s; }
 
-void setPegMotionEasing(struct Peg_t* p, const enum EasingFunction_t e) { p->m_easing = e; }
+void pegSetMotionEasing(struct Peg_t* p, const enum EasingFunction_t e) { p->easing = e; }
 
-void setPegMotionOffset(struct Peg_t* p, const float offset) { p->m_time = offset; }
+void pegSetMotionOffset(struct Peg_t* p, const float offset) { p->time = offset; }
 
 void emptyCpBodyVelocityFunc(cpBody* body, cpVect gravity, cpFloat damping, cpFloat dt) {}
 
 void emptyCpBodyPositionFunc(cpBody* body, cpFloat dt) {};
 
-void setPegMotionStatic(struct Peg_t* p) {
-  cpBodySetVelocityUpdateFunc(p->m_cpBody, emptyCpBodyVelocityFunc);
-  cpBodySetPositionUpdateFunc(p->m_cpBody, emptyCpBodyPositionFunc);
+void pegSetMotionStatic(struct Peg_t* p) {
+  cpBodySetVelocityUpdateFunc(p->cpBody, emptyCpBodyVelocityFunc);
+  cpBodySetPositionUpdateFunc(p->cpBody, emptyCpBodyPositionFunc);
 }
 
-void setPegMotionDoArcAngle(struct Peg_t* p, const bool doArcAngle) {
-  p->m_doArcAngle = doArcAngle;
+void pegSetMotionDoArcAngle(struct Peg_t* p, const bool doArcAngle) {
+  p->doArcAngle = doArcAngle;
 }
 
-void setPegMotionEllipse(struct Peg_t* p, const float a, const float b) {
-  p->m_a = a;
-  p->m_b = b;
-  p->m_motion = kPegMotionEllipse;
+void pegSetMotionEllipse(struct Peg_t* p, const float a, const float b) {
+  p->a = a;
+  p->b = b;
+  p->motion = kPegMotionEllipse;
 }
 
-void addPegMotionPath(struct Peg_t* p, const int16_t x, const int16_t y) {
-  if (p->m_pathSteps == MAX_LINEAR_PATH_SEGMENTS) {
-    pd->system->error("Error addPegMotionPath has reached the max of %i paths", MAX_LINEAR_PATH_SEGMENTS);
+void pegAddMotionPath(struct Peg_t* p, const int16_t x, const int16_t y) {
+  if (p->pathSteps == MAX_LINEAR_PATH_SEGMENTS) {
+    pd->system->error("Error pegAddMotionPath has reached the max of %i paths", MAX_LINEAR_PATH_SEGMENTS);
     return;
   }
-  p->m_pathX[p->m_pathSteps] = x;
-  p->m_pathY[p->m_pathSteps] = y;
-  if (p->m_pathSteps) {
-    const uint8_t cur = p->m_pathSteps;
+  p->pathX[p->pathSteps] = x;
+  p->pathY[p->pathSteps] = y;
+  if (p->pathSteps) {
+    const uint8_t cur = p->pathSteps;
     const uint8_t prv = cur - 1;
-    p->m_pathLength[prv] = len(p->m_pathX[cur], p->m_pathX[prv], p->m_pathY[cur], p->m_pathY[prv]);
-    p->m_totPathLength += p->m_pathLength[prv];
+    p->pathLength[prv] = len(p->pathX[cur], p->pathX[prv], p->pathY[cur], p->pathY[prv]);
+    p->totPathLength += p->pathLength[prv];
   }
-  p->m_pathSteps++;
+  p->pathSteps++;
 }
 
 void pegMotionPathFinalise(struct Peg_t* p) {
   // Close the loop
-  addPegMotionPath(p, p->m_pathX[0], p->m_pathY[0]);
-  p->m_motion = kPegMotionPath;
+  pegAddMotionPath(p, p->pathX[0], p->pathY[0]);
+  p->motion = kPegMotionPath;
 }
 
-void hitPeg(struct Peg_t* p) {
-  if (p->m_state == kPegStateActive && ballInPlay()) {
-    p->m_state = kPegStateHit;
+void pegDoHit(struct Peg_t* p) {
+  if (p->state == kPegStateActive && ballInPlay()) {
+    p->state = kPegStateHit;
     resetBallStuckCounter();
-    if (p->m_type == kPegTypeRequired) {
+    if (p->type == kPegTypeRequired) {
       addTrauma(TRAMA_REQUIRED_HIT);
       addFreeze(FREEZE_REQUIRED_HIT);
-      requiredPegHit();
+      boardDoRequiredPegHit();
     } else {
       addTrauma(TRAMA_PEG_HIT);
       addFreeze(FREEZE_PEG_HIT);
     }
-    const enum PegSpecial_t special = getCurrentSpecial();
+    const enum PegSpecial_t special = boardGetCurrentSpecial();
     if (special == kPegSpecialMultiball && !getSecondBallInPlay()) {
       setSecondBallInPlay();
     } else if (special == kPegSpecialBurst) {
-      clearSpecial(); // Do this first, it's going to recurse!
-      specialBurst();
+      boardClearSpecial(); // Do this first, it's going to recurse!
+      boardDoSpecialBurst();
     }
   }
   // pd->system->logToConsole("bam!");
 }
 
-bool checkPopPeg(struct Peg_t* p, float y) {
-  if (p->m_state == kPegStateHit && p->m_y >= y) {
-    p->m_state = kPegStateRemoved;
-    removePeg(p);
+bool pegCheckBurst(struct Peg_t* p, const float y) {
+  if (p->state == kPegStateHit && p->y >= y) {
+    p->state = kPegStateRemoved;
+    pegRemove(p);
     return true;
   }
   return false;

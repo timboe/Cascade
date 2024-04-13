@@ -67,8 +67,8 @@ void FSMDisplaySplash(const bool newState) {
     setScrollOffset(-DEVICE_PIX_Y - TURRET_RADIUS, true);
     updateScoreHistogramBitmap();
     populateMenuGame();
-    randomiseBoard(); // // TODO replace me
-    //clearBoard();
+    boardRandomise(); // // TODO replace me
+    //boardClear();
     //loadCurrentHole();
   }
   if (timer++ == TIME_DISPLAY_SPLASH) return doFSM(kGameFSM_SplashToStart);
@@ -110,7 +110,7 @@ void FSMAimMode(const bool newState) {
     resetBall(0);
     launchBall(progress);
     ++m_ballCount;
-    if (getCurrentSpecial() == kPegSpecialMultiball) { addSecondBall(); }
+    if (boardGetCurrentSpecial() == kPegSpecialMultiball) { addSecondBall(); }
     return doFSM(kGameFSM_BallInPlay);
   } else if (getPressed(kButtonA)) { // Arm
     timer++;
@@ -121,7 +121,7 @@ void FSMAimMode(const bool newState) {
 }
 
 void FSMBallInPlay(const bool newState) {
-  const enum PegSpecial_t special = getCurrentSpecial();
+  const enum PegSpecial_t special = boardGetCurrentSpecial();
   if (newState) { resetBallStuckCounter(); }
   //
   commonTurretScrollAndBounceBack(true);
@@ -154,11 +154,11 @@ void FSMBallStuck(const bool newState) {
   //
   bool popped = true;
   if (getFrameCount() % TIME_STUCK_POP == 0) {
-    popped = popRandom();
+    popped = boardBurstRandomPeg();
   }
   cpVect v = cpBodyGetVelocity(getBall(0));
   bool ballIsStuck = cpvlengthsq(v) < BALL_IS_STUCK;
-  if (getCurrentSpecial() == kPegSpecialMultiball) {
+  if (boardGetCurrentSpecial() == kPegSpecialMultiball) {
     v = cpBodyGetVelocity(getBall(1));
     ballIsStuck |= cpvlengthsq(v) < BALL_IS_STUCK;
   }
@@ -179,16 +179,16 @@ void FSMBallGutter(const bool newState) {
   // A little extra downward camera motion. Note: No more manual scroll accepted
   static float vY = 0.0;
   static uint16_t pause = 0;
-  const enum PegSpecial_t special = getCurrentSpecial();
+  const enum PegSpecial_t special = boardGetCurrentSpecial();
   if (newState) {
     if (special == kPegSpecialMultiball) {
       removeSecondBall();
     } else if (special == kPegSpecialSecondTry) {
       secondTryBall();
-      clearSpecial();
+      boardClearSpecial();
       return doFSM(kGameFSM_BallInPlay);
     }
-    clearSpecial();
+    boardClearSpecial();
     vY = cpBodyGetVelocity(getBall(0)).y;
     pause = TICK_FREQUENCY / 2;
   }
@@ -199,7 +199,7 @@ void FSMBallGutter(const bool newState) {
   } else if (pause) {
     --pause;
   } else {
-    if (requiredPegsInPlay()) { return doFSM(kGameFSM_GutterToTurret); }
+    if (boardGetRequiredPegsInPlay()) { return doFSM(kGameFSM_GutterToTurret); }
     else                      { return doFSM(kGameFSM_GutterToScores); }
   }
 }
@@ -213,9 +213,9 @@ void FSMGutterToTurret(const bool newState) {
     //
     int32_t minY = 10000;
     for (uint32_t i = 0; i < MAX_PEGS; ++i) {
-      const struct Peg_t* peg = getPeg(i);
-      if (peg->m_minY < minY && peg->m_state == kPegStateActive) {
-        minY = peg->m_minY;
+      const struct Peg_t* p = boardGetPeg(i);
+      if (p->minY < minY && p->state == kPegStateActive) {
+        minY = p->minY;
       }
     }
     if (minY > (DEVICE_PIX_Y/2)) setMinimumY(minY - (DEVICE_PIX_Y/2));
@@ -234,7 +234,7 @@ void FSMGutterToTurret(const bool newState) {
   setScrollOffset(targetPartial, true);
   //
   const float popLevel = (startY + DEVICE_PIX_Y) * easedProgress;
-  popBoard(popLevel);
+  boardBurstPegs(popLevel);
   //
   // pd->system->logToConsole("end sweep active target %f, pop %f",target, popLevel);
   if (progress >= 1) {

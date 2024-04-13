@@ -53,7 +53,7 @@ cpSpace* getSpace(void) { return m_space; }
 void launchBall(float strength) {
   const float angleRad = angToRad(getTurretBarrelAngle());
   cpBodyApplyImpulseAtLocalPoint(m_ball[0], cpv(POOT_STRENGTH * sinf(angleRad) * strength, POOT_STRENGTH * -cosf(angleRad) * strength), cpvzero);
-  if (getCurrentSpecial() == kPegSpecialBounce) {
+  if (boardGetCurrentSpecial() == kPegSpecialBounce) {
     cpShapeSetElasticity(m_ballShape[0], ULTRA_BOUNCE);
   }
 
@@ -130,8 +130,8 @@ uint8_t cpCollisionBeginFunc_ballPeg(cpArbiter* arb, struct cpSpace* space, cpDa
   cpBody* cpPeg;
   cpArbiterGetBodies(arb, &cpBall, &cpPeg);
   struct Peg_t* p = (struct Peg_t*) cpBodyGetUserData(cpPeg);
-  hitPeg(p);
-  if (getCurrentSpecial() == kPegSpecialPenetrate) {
+  pegDoHit(p);
+  if (boardGetCurrentSpecial() == kPegSpecialPenetrate) {
     return false;
   }
   return true;
@@ -157,7 +157,7 @@ void updateSpace(int32_t fc, enum kFSM fsm) {
   const cpVect pos = cpBodyGetPosition(m_ball[0]);
 
   if (fsm == kGameFSM_AimMode) {
-    const int i = (getCurrentSpecial() == kPegSpecialAim ? fc % (PREDICTION_TRACE_LEN*2) : fc % PREDICTION_TRACE_LEN);
+    const int i = (boardGetCurrentSpecial() == kPegSpecialAim ? fc % (PREDICTION_TRACE_LEN*2) : fc % PREDICTION_TRACE_LEN);
     if (i == 0) {
       resetBall(0);
       launchBall(1.0f);
@@ -168,7 +168,7 @@ void updateSpace(int32_t fc, enum kFSM fsm) {
   m_motionTrailX[0][fc % MOTION_TRAIL_LEN] = pos.x;
   m_motionTrailY[0][fc % MOTION_TRAIL_LEN] = pos.y;
 
-  if (getCurrentSpecial() == kPegSpecialAim) {
+  if (boardGetCurrentSpecial() == kPegSpecialAim) {
     const cpVect pos2 = cpBodyGetPosition(m_ball[1]);
     m_motionTrailX[1][fc % MOTION_TRAIL_LEN] = pos2.x;
     m_motionTrailY[1][fc % MOTION_TRAIL_LEN] = pos2.y;

@@ -179,9 +179,9 @@ LCDBitmap* getBitmapDither(void) { return m_ditherBitmap; }
 LCDBitmap* getBitmapPreview(uint16_t level, uint16_t hole) { return m_previewBitmap[level][hole]; }
 
 LCDBitmap* getBitmapPeg(const struct Peg_t* p) {
-  switch (p->m_shape) {
-    case kPegShapeBall: return m_ballBitmap[p->m_type == 0 ? 0 : 1][p->m_size];
-    case kPegShapeRect: return m_rectBitmap[p->m_type == 0 ? 0 : 1][p->m_size][p->m_iAngle % 128]; // Symmetry
+  switch (p->shape) {
+    case kPegShapeBall: return m_ballBitmap[p->type == 0 ? 0 : 1][p->size];
+    case kPegShapeRect: return m_rectBitmap[p->type == 0 ? 0 : 1][p->size][p->iAngle % 128]; // Symmetry
     default: return NULL;
   }
   return NULL;
