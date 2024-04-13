@@ -1,6 +1,6 @@
 #pragma once
 #include "game.h"
 
-void doScreenShot(void);
+void screenShotDo(void);
 
-bool getScreenShotInProgress(void);
+bool screenShotGetInProgress(void);

@@ -40,9 +40,9 @@ void ssWrite(void);
 
 /// ///
 
-bool getScreenShotInProgress(void) { return m_ssInProgress; }
+bool screenShotGetInProgress(void) { return m_ssInProgress; }
 
-void doScreenShot() {
+void screenShotDo() {
   if (!m_ssInProgress) { ssInit(); }
   if (m_doRender) { 
     ssRender();

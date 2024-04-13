@@ -35,8 +35,8 @@ void gameDoResetPreviousWaterfall(void) { m_previousWaterfall = IOGetWaterfallFo
 int gameLoop(void* _data) {
   pd->graphics->setBackgroundColor(kColorWhite); // TODO make me black
 
-  if (getScreenShotInProgress()) {
-    doScreenShot();
+  if (screenShotGetInProgress()) {
+    screenShotDo();
     ++m_frameCount;
     return 1;
   }

@@ -56,7 +56,7 @@ void inputHandleTitles(const enum FSM_t fsm, const uint32_t buttonPressed) {
 
 void inputHandleGame(const enum FSM_t fsm, const uint32_t buttonPressed) {
   if (kButtonB == buttonPressed && fsm == kGameFSM_AimMode) {
-    doScreenShot();
+    screenShotDo();
     FSMDo(kGameFSM_AimModeScrollToTop);
   } else if ((kButtonA == buttonPressed || kButtonDown == buttonPressed) && fsm == kGameFSM_ScoresAnimation) {
     FSMDo(kGameFSM_ScoresToSplash);

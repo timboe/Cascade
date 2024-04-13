@@ -15,60 +15,56 @@ const static LCDPattern kGreyPattern = {
   0b11001100,
   0b11001100};
 
-void initBitmap(void);
+void bitmapDoInit(void);
 
-void setRoobert10(void);
-void setRoobert24(void);
-void setGreatVibes24(void);
-void setGreatVibes109(void);
+void bitmapSetRoobert10(void);
+void bitmapSetRoobert24(void);
+void bitmapSetGreatVibes24(void);
+void bitmapSetGreatVibes109(void);
 
-LCDFont* getRoobert24(void);
-LCDFont* getRoobert10(void);
-LCDFont* getGreatVibes24(void);
-LCDFont* getGreatVibes109(void);
+LCDFont* bitmapGetRoobert24(void);
+LCDFont* bitmapGetRoobert10(void);
+LCDFont* bitmapGetGreatVibes24(void);
+LCDFont* bitmapGetGreatVibes109(void);
 
-LCDBitmap* getBitmapWfFg(uint8_t _wf, uint32_t _x, uint32_t _y);
-LCDBitmap* getBitmapWfFg_byidx(uint8_t _wf, uint32_t _idx);
-LCDBitmap* getBitmapWfBg(uint8_t wf);
-LCDBitmap* getBitmapWfPond(void);
+LCDBitmap* bitmapGetWfFg(const uint8_t wf, const uint32_t x, const uint32_t y);
+LCDBitmap* bitmapGetWfFg_byidx(const uint8_t wf, const uint32_t idx);
+LCDBitmap* bitmapGetWfBg(const uint8_t wf);
+LCDBitmap* bitmapGetWfPond(void);
 
-LCDBitmap* getBitmapUseTheCrank(void);
-LCDBitmap* getSpriteSplash(void);
-LCDBitmap* getTitleSelectedBitmap(void);
-LCDBitmap* getBitmapNumeral(int8_t n);
-LCDBitmap* getStencilWipe(int8_t n);
-LCDBitmap* getBitmapDither(void);
-LCDBitmap* getBitmapPreview(uint16_t level, uint16_t hole);
+LCDBitmap* bitmapGetUseTheCrank(void);
+LCDBitmap* bitmapGetTitleSplash(void);
+LCDBitmap* bitmapGetNumeral(const int8_t n);
+LCDBitmap* bitmapGetStencilWipe(const int8_t n);
+LCDBitmap* bitmapGetDither(void);
+LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole);
 
-LCDBitmap* getBitmapPlayer(void);
-LCDBitmap* getBitmapLevel(void);
-LCDBitmap* getBitmapLevelStats(void);
-LCDBitmap* getBitmapHole(void);
-LCDBitmap* getBitmapHoleStatsA(void);
-LCDBitmap* getBitmapHoleStatsB(void);
-LCDBitmap* getBitmapHoleCreator(void);
-LCDBitmap* getBitmapHoleTutorial(void);
+LCDBitmap* bitmapGetTitlePlayer(void);
+LCDBitmap* bitmapGetTitleLevel(void);
+LCDBitmap* bitmapGetTitleLevelStats(void);
+LCDBitmap* bitmapGetTitleHole(void);
+LCDBitmap* bitmapGetTitleHoleStatsA(void);
+LCDBitmap* bitmapGetTitleHoleStatsB(void);
+LCDBitmap* bitmapGetTitleHoleCreator(void);
+LCDBitmap* bitmapGetTitleHoleTutorial(void);
 
-LCDBitmap* getBitmapTurretBody(void);
-LCDBitmap* getBitmapTurretBarrel(void);
-LCDBitmap* getBitmapHeader(void); // not used
-LCDBitmap* getInfoTopperBitmap(void);
-LCDBitmap* getLevelSplashBitmap(void);
-LCDBitmap* IOGetScoreHistogram(void);
+LCDBitmap* bitmapGetTurretBody(void);
+LCDBitmap* bitmapGetTurretBarrel(void);
+LCDBitmap* bitmapGetGameInfoTopper(void);
+LCDBitmap* bitmapGetLevelSplash(void);
+LCDBitmap* BitmapGetScoreHistogram(void);
 
-LCDBitmap* getBitmapPeg(const struct Peg_t* p);
+LCDBitmap* bitmapGetPeg(const struct Peg_t* p);
+LCDBitmap* bitmapGetBall(void);
+LCDBitmap* bitmapGetBallFirePoot(const uint8_t i);
 
-LCDBitmap* getBitmapBall(void);
+void bitmapDoUpdateGameInfoTopper(void);
+void bitmapDoUpdateLevelSplash(void);
+void bitmapDoUpdateLevelStatsBitmap(void);
+void bitmapDoUpdateHoleStatsBitmap(void);
+void bitmapDoUpdateScoreHistogram(void);
 
-LCDBitmap* getBitmapAnimPoot(uint8_t i);
-
-void updateInfoTopperBitmap(void);
-void updateLevelSplashBitmap(void);
-void updateLevelStatsBitmap(void);
-void updateHoleStatsBitmap(void);
-void updateScoreHistogramBitmap(void);
-
-float sizeToScale(uint8_t size);
+float bitmapSizeToScale(const uint8_t size);
 
 #define WF_ID(X, Y) ((WFSHEET_SIZE_X * Y) + X)
 

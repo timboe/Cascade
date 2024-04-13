@@ -33,7 +33,7 @@ void pegDoInit(struct Peg_t* p, const enum PegShape_t s, const float x, const fl
   p->speed = 1.0f;
   p->size = size;
   p->easing = kEaseLinear;
-  const float scale = sizeToScale(size);
+  const float scale = bitmapSizeToScale(size);
 
   p->cpBody = cpBodyNewKinematic();
   cpBodySetPosition(p->cpBody, cpv(x, y));
@@ -52,7 +52,7 @@ void pegDoInit(struct Peg_t* p, const enum PegShape_t s, const float x, const fl
     pegDoClear(p);
     return;
   }
-  p->bitmap = getBitmapPeg(p); // Call after setting shape, iAngle and size
+  p->bitmap = bitmapGetPeg(p); // Call after setting shape, iAngle and size
   pegSetBitmapCoordinates(p);
   cpShapeSetCollisionType(p->cpShape, FLAG_PEG);
   cpShapeSetFriction(p->cpShape, FRICTION);
@@ -83,7 +83,7 @@ void pegDoRemove(struct Peg_t* p) {
 
 void petSetType(struct Peg_t* p, const enum PegType_t type) {
   p->type = type;
-  p->bitmap = getBitmapPeg(p);
+  p->bitmap = bitmapGetPeg(p);
 }
 
 void pegSetBitmapCoordinates(struct Peg_t* p) {
@@ -98,7 +98,7 @@ void pegDoUpdateAngle(struct Peg_t* p, float angle) {
   p->angle = angle;
   p->iAngle = radToByte(angle);
   cpBodySetAngle(p->cpBody, angle);
-  p->bitmap = getBitmapPeg(p);
+  p->bitmap = bitmapGetPeg(p);
 }
 
 void pegDoUpdate(struct Peg_t* p) {

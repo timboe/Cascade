@@ -16,7 +16,7 @@ __declspec(dllexport)
 static void init(void) {
   boardDoInit();
   IODoScanLevels(); // Expensive?
-  initBitmap(); // Expensive - after scan level
+  bitmapDoInit(); // Expensive - after scan level
   soundDoInit();
   physicsDoInitSpace();
 

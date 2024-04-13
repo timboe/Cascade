@@ -65,7 +65,7 @@ void FSMDisplaySplash(const bool newState) {
   if (newState) { 
     timer = 0;
     gameSetScrollOffset(-DEVICE_PIX_Y - TURRET_RADIUS, true);
-    updateScoreHistogramBitmap();
+    bitmapDoUpdateScoreHistogram();
     gameDoPopulateMenuGame();
     boardDoRandomise(); // // TODO replace me
     //boardDoClear();
@@ -307,8 +307,8 @@ void FSMScoresToSplash(const bool newState) {
     if (IOGetCurrentHole() == 0) {
       IODoNextLevel();
     }
-    updateLevelSplashBitmap();
-    updateInfoTopperBitmap();
+    bitmapDoUpdateLevelSplash();
+    bitmapDoUpdateGameInfoTopper();
     pd->system->logToConsole("kGameFSM_ScoresToSplash");
   }
   FSMDoCommonScrollTo(WFALL_PIX_Y + 2*DEVICE_PIX_Y, (float)timer/TIME_SCORE_TO_SPLASH, kEaseOutSine);

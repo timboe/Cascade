@@ -62,7 +62,7 @@ void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) 
 
   // Draw FPS indicator (dbg only)
   #ifdef DEV
-  if (ALWAYS_FPS && !getScreenShotInProgress()) {
+  if (ALWAYS_FPS && !screenShotGetInProgress()) {
     pd->system->drawFPS(0, 0);
   }
   #endif

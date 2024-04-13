@@ -40,7 +40,7 @@ void renderGameBall(const int32_t fc) {
   if (!FSMGetBallInPlay()) {
     // render at dummy location
     pd->graphics->setDrawMode(kDrawModeInverted);
-    pd->graphics->drawBitmap(getBitmapBall(), DEVICE_PIX_X/2 - BALL_RADIUS, gameGetMinimumY() + TURRET_RADIUS - BALL_RADIUS, kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetBall(), DEVICE_PIX_X/2 - BALL_RADIUS, gameGetMinimumY() + TURRET_RADIUS - BALL_RADIUS, kBitmapUnflipped);
     pd->graphics->setDrawMode(kDrawModeCopy);
     return;
   }
@@ -56,7 +56,7 @@ void renderGameBall(const int32_t fc) {
     }
     const cpVect pos = cpBodyGetPosition(ball);
     pd->graphics->setDrawMode(kDrawModeInverted);
-    pd->graphics->drawBitmap(getBitmapBall(), pos.x - BALL_RADIUS, pos.y - BALL_RADIUS, kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetBall(), pos.x - BALL_RADIUS, pos.y - BALL_RADIUS, kBitmapUnflipped);
     pd->graphics->setDrawMode(kDrawModeCopy);
   }
 }
@@ -64,7 +64,7 @@ void renderGameBall(const int32_t fc) {
 void renderGamePoot(const enum FSM_t fsm) {
   if (fsm == kGameFSM_AimMode && m_ballPootRadius) {
     pd->graphics->setDrawMode(kDrawModeNXOR);
-    pd->graphics->drawBitmap(getBitmapAnimPoot(m_ballPootRadius), DEVICE_PIX_X/2 - TURRET_RADIUS, gameGetMinimumY(), kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetBallFirePoot(m_ballPootRadius), DEVICE_PIX_X/2 - TURRET_RADIUS, gameGetMinimumY(), kBitmapUnflipped);
     pd->graphics->setDrawMode(kDrawModeCopy);
   }
 }
@@ -77,8 +77,8 @@ void renderGameTurret(void) {
   }
   pd->graphics->drawLine(0, minY+1, DEVICE_PIX_X, minY+1, 2, kColorWhite);
   // pd->graphics->drawBitmap(getBitmapHeader(), 0, 0, kBitmapUnflipped);
-  pd->graphics->drawBitmap(getBitmapTurretBody(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY,  kBitmapUnflipped);
-  pd->graphics->drawBitmap(getBitmapTurretBarrel(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY, kBitmapUnflipped);
+  pd->graphics->drawBitmap(bitmapGetTurretBody(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY,  kBitmapUnflipped);
+  pd->graphics->drawBitmap(bitmapGetTurretBarrel(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY, kBitmapUnflipped);
 
 
 }
@@ -104,7 +104,7 @@ void renderGameBoard(void) {
     }
     pd->graphics->drawBitmap(p->bitmap, p->xBitmap, p->yBitmap, kBitmapUnflipped);
     pd->graphics->setDrawMode(kDrawModeCopy);
-    // if (!FSMGetBallInPlay() && !getScreenShotInProgress()) {
+    // if (!FSMGetBallInPlay() && !screenShotGetInProgress()) {
     //   if (p->motion == kPegMotionEllipse) {
     //     pd->graphics->fillEllipse(p->pathX[0]-3, p->pathY[0]-3, 6, 6, 0.0f, 360.0f, kColorWhite);
     //     pd->graphics->fillEllipse(p->pathX[0]-2, p->pathY[0]-2, 4, 4, 0.0f, 360.0f, kColorBlack);
@@ -118,7 +118,7 @@ void renderGameBoard(void) {
 }
 
 void renderGameBackground(void) {
-  if (getScreenShotInProgress()) { return; }
+  if (screenShotGetInProgress()) { return; }
 
   const int32_t parallax = gameGetParalaxFactorFar(); // Note: float -> int here
   const int32_t so = ((int32_t) gameGetScrollOffset()) - UI_OFFSET_TOP - parallax;
@@ -132,21 +132,21 @@ void renderGameBackground(void) {
   // NOTE: Need to draw one extra background due to animation
   for (uint32_t i = start; i < start+6; ++i) {
     if (i >= (WFSHEET_SIZE_Y - 2)) break;
-    pd->graphics->drawBitmap(getBitmapWfBg(wf), WF_BG_OFFSET[wf], UI_OFFSET_TOP + (WF_DIVISION_PIX_Y * i) - wfOff + parallax, kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetWfBg(wf), WF_BG_OFFSET[wf], UI_OFFSET_TOP + (WF_DIVISION_PIX_Y * i) - wfOff + parallax, kBitmapUnflipped);
   }
   for (uint32_t i = start; i < start+5; ++i) {
-    LCDBitmap* bm = getBitmapWfFg(wf, 0, i);
+    LCDBitmap* bm = bitmapGetWfFg(wf, 0, i);
     if (bm) pd->graphics->drawBitmap(bm, 0, UI_OFFSET_TOP + (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
   }
 
   const float minY = gameGetMinimumY(); 
   if (gameGetScrollOffset() - minY < 0) {
     pd->graphics->fillRect(0, minY - TURRET_RADIUS - 60, DEVICE_PIX_X, 60, kColorBlack); // mask in case of over-scroll
-    pd->graphics->drawBitmap(getInfoTopperBitmap(), 0, minY - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
+    pd->graphics->drawBitmap(bitmapGetGameInfoTopper(), 0, minY - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
   }
 
   if (gameGetScrollOffset() <= -TURRET_RADIUS) { // Note no parallax here
-    pd->graphics->drawBitmap(getLevelSplashBitmap(), 0, -DEVICE_PIX_Y - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
+    pd->graphics->drawBitmap(bitmapGetLevelSplash(), 0, -DEVICE_PIX_Y - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
   }
 }
 
@@ -156,21 +156,21 @@ void renderGameGutter(void) {
   const int32_t so = gameGetScrollOffset();
 
   if (so > gutterY + parallax - DEVICE_PIX_Y && FSMGet() != kGameFSM_ScoresToTitle) {
-    pd->graphics->drawBitmap(getBitmapWfPond(), 0, gutterY + parallax, kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetWfPond(), 0, gutterY + parallax, kBitmapUnflipped);
     pd->graphics->drawRect(0, gutterY + parallax, DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
     pd->graphics->drawRect(1, gutterY + parallax + 1, DEVICE_PIX_X-2, DEVICE_PIX_Y-2, kColorBlack);
   }
   //Note no parallax here
   if (so > WFALL_PIX_Y) {
-    pd->graphics->drawBitmap(IOGetScoreHistogram(), 0, WFALL_PIX_Y + DEVICE_PIX_Y, kBitmapUnflipped);
+    pd->graphics->drawBitmap(BitmapGetScoreHistogram(), 0, WFALL_PIX_Y + DEVICE_PIX_Y, kBitmapUnflipped);
     for (int i = 0; i < m_ballFallN; ++i) {
-      pd->graphics->drawBitmap(getBitmapBall(),
+      pd->graphics->drawBitmap(bitmapGetBall(),
         BUF + BALL_RADIUS/2 + m_ballFallX*3*BALL_RADIUS,
         WFALL_PIX_Y + DEVICE_PIX_Y + m_ballFallY[i],
         kBitmapUnflipped);
     }
   }
   if (so > WFALL_PIX_Y + DEVICE_PIX_Y) {
-    pd->graphics->drawBitmap(getLevelSplashBitmap(), 0, WFALL_PIX_Y + (2*DEVICE_PIX_Y), kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetLevelSplash(), 0, WFALL_PIX_Y + (2*DEVICE_PIX_Y), kBitmapUnflipped);
   }
 }
