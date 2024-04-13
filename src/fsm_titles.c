@@ -43,7 +43,7 @@ void FSMDisplayTitles(const bool newState) {
 void FSMTitlesToChoosePlayer(const bool newState) {
   static int16_t timer = 0;
   if (newState) { timer = 0; }
-  FSMDoCommonScrollTo(DEVICE_PIX_Y, (float)timer/TIME_TITLE_TRANSITION, kEaseInOutQuad);
+  FSMDoCommonScrollTo(DEVICE_PIX_Y, (float)timer/TIME_TITLE_TRANSITION, EASE_TITLE_DOWNWARDS);
   if (timer++ == TIME_TITLE_TRANSITION) { return FSMDo(kTitlesFSM_ChoosePlayer); }
 }
 
@@ -73,7 +73,7 @@ void FSMChoosePlayerToChooseLevel(const bool newState) {
     bitmapDoUpdateLevelStatsBitmap();
     gameDoResetPreviousWaterfall();
   }
-  FSMDoCommonScrollTo(DEVICE_PIX_Y * 2, (float)timer/TIME_TITLE_TRANSITION, kEaseInOutQuad);
+  FSMDoCommonScrollTo(DEVICE_PIX_Y * 2, (float)timer/TIME_TITLE_TRANSITION, EASE_TITLE_DOWNWARDS);
   if (timer++ == TIME_TITLE_TRANSITION) { return FSMDo(kTitlesFSM_ChooseLevel); }
 }
 
@@ -102,7 +102,7 @@ void FSMChooseLevelToChooseHole(const bool newState) {
     renderSetNumeralOffset(0.0f);
     bitmapDoUpdateHoleStatsBitmap();
   }
-  FSMDoCommonScrollTo(DEVICE_PIX_Y * 3, (float)timer/TIME_TITLE_TRANSITION, kEaseInOutQuad);
+  FSMDoCommonScrollTo(DEVICE_PIX_Y * 3, (float)timer/TIME_TITLE_TRANSITION, EASE_TITLE_DOWNWARDS);
   if (timer++ == TIME_TITLE_TRANSITION) { return FSMDo(kTitlesFSM_ChooseHole); }
 }
 
@@ -112,7 +112,7 @@ void FSMChooseLevelToChoosePlayer(const bool newState) {
     timer = 0;
     renderSetNumeralOffset(0.0f);
   }
-  FSMDoCommonScrollTo(DEVICE_PIX_Y, (float)timer/TIME_TITLE_TRANSITION, kEaseInOutQuad);
+  FSMDoCommonScrollTo(DEVICE_PIX_Y, (float)timer/TIME_TITLE_TRANSITION, EASE_TITLE_UPWARDS);
   if (timer++ == TIME_TITLE_TRANSITION) { return FSMDo(kTitlesFSM_ChoosePlayer); }
 }
 
@@ -137,7 +137,7 @@ void FSMChooseHoleToSplash(const bool newState) {
     bitmapDoUpdateGameInfoTopper();
     bitmapDoUpdateLevelSplash(); 
   }
-  FSMDoCommonScrollTo(DEVICE_PIX_Y * 4, (float)timer/TIME_TITLE_TRANSITION, kEaseInOutQuad);
+  FSMDoCommonScrollTo(DEVICE_PIX_Y * 4, (float)timer/TIME_TITLE_TRANSITION, EASE_TITLE_DOWNWARDS);
   if (timer++ == TIME_TITLE_TRANSITION) { return FSMDo(kGameFSM_DisplaySplash); }
 }
 
@@ -148,6 +148,6 @@ void FSMChooseHoleToChooseLevel(const bool newState) {
     renderSetNumeralOffset(0.0f);
     gameDoResetPreviousWaterfall();
   }
-  FSMDoCommonScrollTo(DEVICE_PIX_Y * 2, (float)timer/TIME_TITLE_TRANSITION, kEaseInOutQuad);
+  FSMDoCommonScrollTo(DEVICE_PIX_Y * 2, (float)timer/TIME_TITLE_TRANSITION, EASE_TITLE_UPWARDS);
   if (timer++ == TIME_TITLE_TRANSITION) { return FSMDo(kTitlesFSM_ChooseLevel); }
 }

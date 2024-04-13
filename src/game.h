@@ -23,13 +23,18 @@ void gameSetMinimumY(int16_t y);
 int16_t gameGetMaximumY(void);
 void gameSetMaximumY(const int16_t y);
 
-float gameGetScrollOffset(void);
-void gameSetScrollOffset(float set, const bool force);
-void gameModScrollVelocity(const float mod);
-float gameDoApplyScrollEasing(void);
+float gameGetYOffset(void);
+void gameSetYOffset(float set, const bool force);
+void gameModYVelocity(const float mod);
+float gameDoApplyYEasing(void);
 
-float gameGetParalaxFactorFar(void);
-float gameGetParalaxFactorNear(void);
+void gameSetXOffset(const float set);
+float gameGetXOffset(void);
+
+float gameGetParalaxFactorFar(const bool hard);
+float gameGetParalaxFactorNear(const bool hard);
+
+float gameGetParalaxFactorNearForY(const bool hard, const float y);
 
 void gameDoPopulateMenuGame(void);
 void gameDoPopulateMenuTitlesPlayer(void);

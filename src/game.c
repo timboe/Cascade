@@ -18,7 +18,8 @@ uint16_t m_previousWaterfall = 0;
 int16_t m_minimumY = 0;
 int16_t m_maximumY = 0;
 
-float m_scrollOffset = 0;
+float m_xOffset = 0;
+float m_yOffset = 0;
 float m_vY = 0;
 
 /// ///
@@ -109,44 +110,47 @@ void gameDoPopulateMenuGame() {
   pd->system->addMenuItem("quit hole", menuOptionsCallbackQuitHole, NULL);
 }
 
-void gameModScrollVelocity(const float mod) { 
+void gameModYVelocity(const float mod) { 
   if (!mod) { return; }
   m_vY += mod;
 }
 
-float gameDoApplyScrollEasing(void) {
+float gameDoApplyYEasing(void) {
   m_vY *= SCREEN_FRIC;
-  m_scrollOffset += m_vY;
+  m_yOffset += m_vY;
 
-  const float soDiff = SCROLL_OFFSET_MAX - m_scrollOffset;
+  const float soDiff = SCROLL_OFFSET_MAX - m_yOffset;
   if (soDiff < 0) {
     const float toAdd = soDiff * SCREEN_BBACK;
-    if (toAdd > -0.1f) { m_scrollOffset = SCROLL_OFFSET_MAX; m_vY = 0; }
-    else               { m_scrollOffset += toAdd; }
-    // pd->system->logToConsole("BBACK active (BOTTOM) %i from %f to %f by adding %f", gameGetFrameCount(), m_scrollOffset, m_scrollOffset + (soDiff * SCREEN_BBACK), toAdd);
-  } else if (m_scrollOffset < m_minimumY) {
-    const float toAdd = ((m_scrollOffset - m_minimumY) * -SCREEN_BBACK);
-    // pd->system->logToConsole("BBACK active (top) %i from %f to %f by adding %f", gameGetFrameCount(), m_scrollOffset, m_scrollOffset + ((m_scrollOffset - m_minimumY) * -SCREEN_BBACK), toAdd);
-    if (toAdd < 0.1f) { m_scrollOffset = m_minimumY; m_vY = 0; }
-    else              { m_scrollOffset += toAdd; }
+    if (toAdd > -0.1f) { m_yOffset = SCROLL_OFFSET_MAX; m_vY = 0; }
+    else               { m_yOffset += toAdd; }
+    // pd->system->logToConsole("BBACK active (BOTTOM) %i from %f to %f by adding %f", gameGetFrameCount(), m_yOffset, m_yOffset + (soDiff * SCREEN_BBACK), toAdd);
+  } else if (m_yOffset < m_minimumY) {
+    const float toAdd = ((m_yOffset - m_minimumY) * -SCREEN_BBACK);
+    // pd->system->logToConsole("BBACK active (top) %i from %f to %f by adding %f", gameGetFrameCount(), m_yOffset, m_yOffset + ((m_yOffset - m_minimumY) * -SCREEN_BBACK), toAdd);
+    if (toAdd < 0.1f) { m_yOffset = m_minimumY; m_vY = 0; }
+    else              { m_yOffset += toAdd; }
   }
 
   return m_vY;
 }
 
-float gameGetScrollOffset(void) { return m_scrollOffset; }
+float gameGetYOffset(void) { return m_yOffset; }
 
-void gameSetScrollOffset(float set, const bool force) {
+void gameSetYOffset(float set, const bool force) {
   if (force) {
-    m_scrollOffset = set;
+    m_yOffset = set;
     return;
   }
 
   if (set < m_minimumY) set = m_minimumY;
-  float diff = set - m_scrollOffset;
-  m_scrollOffset += diff * SCREEN_EASING;
-  // pd->system->logToConsole("req %f, set %f", set, m_scrollOffset);
+  float diff = set - m_yOffset;
+  m_yOffset += diff * SCREEN_EASING;
+  // pd->system->logToConsole("req %f, set %f", set, m_yOffset);
 }
+
+void gameSetXOffset(const float set) { m_xOffset = set; }
+float gameGetXOffset(void) { return m_xOffset; }
 
 int16_t gameGetMinimumY(void) { return m_minimumY; }
 void gameSetMinimumY(int16_t y) { 
@@ -159,6 +163,7 @@ void gameSetMinimumY(int16_t y) {
 int16_t gameGetMaximumY(void) { return m_maximumY; }
 void gameSetMaximimY(const int16_t y) { m_maximumY = y; }
 
-float gameGetParalaxFactorNear(void) { return m_scrollOffset * PARALAX_NEAR; }
-float gameGetParalaxFactorFar(void) { return m_scrollOffset * PARALAX_FAR; }
+float gameGetParalaxFactorNearForY(const bool hard, const float y) { return y * (hard ? PARALLAX_HARD_NEAR : PARALLAX_GENTLE_NEAR); }
 
+float gameGetParalaxFactorNear(const bool hard) { return m_yOffset * (hard ? PARALLAX_HARD_NEAR : PARALLAX_GENTLE_NEAR); }
+float gameGetParalaxFactorFar(const bool hard) { return m_yOffset * (hard ? PARALLAX_HARD_FAR : PARALLAX_GENTLE_FAR); }

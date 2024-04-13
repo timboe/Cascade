@@ -9,7 +9,28 @@ void pegDoUpdateAngle(struct Peg_t* p, float angle);
 
 void pegSetBitmapCoordinates(struct Peg_t* p);
 
+void pegDoAddBody(struct Peg_t* p);
+
+void pegDoAddedShape(struct Peg_t* p);
+
 ///   
+
+void pegDoAddBody(struct Peg_t* p) {
+  p->cpBody = cpBodyNewKinematic();
+  cpBodySetPosition(p->cpBody, cpv(p->x, p->y));
+  cpBodySetAngle(p->cpBody, p->a);
+  cpBodySetUserData(p->cpBody, (void*)p);
+  cpSpaceAddBody(physicsGetSpace(), p->cpBody);
+}
+
+void pegDoAddedShape(struct Peg_t* p) {
+  p->bitmap = bitmapGetPeg(p); // Call after setting shape, iAngle, size and tyoe
+  pegSetBitmapCoordinates(p);
+  cpShapeSetCollisionType(p->cpShape, FLAG_PEG);
+  cpShapeSetFriction(p->cpShape, FRICTION);
+  cpShapeSetElasticity(p->cpShape, ELASTICITY);
+  cpSpaceAddShape(physicsGetSpace(), p->cpShape);
+}
 
 void pegDoInit(struct Peg_t* p, const enum PegShape_t s, const float x, const float y, const float a, const uint8_t size) {
   if (p->cpBody) {
@@ -35,12 +56,7 @@ void pegDoInit(struct Peg_t* p, const enum PegShape_t s, const float x, const fl
   p->easing = kEaseLinear;
   const float scale = bitmapSizeToScale(size);
 
-  p->cpBody = cpBodyNewKinematic();
-  cpBodySetPosition(p->cpBody, cpv(x, y));
-  cpBodySetAngle(p->cpBody, a);
-  cpBodySetUserData(p->cpBody, (void*)p);
-  cpSpaceAddBody(physicsGetSpace(), p->cpBody);
-  
+  pegDoAddBody(p);
   if (s == kPegShapeBall) {
     p->cpShape = cpCircleShapeNew(p->cpBody, BALL_RADIUS*scale, cpvzero);
     p->radius = BALL_RADIUS*scale;
@@ -52,12 +68,8 @@ void pegDoInit(struct Peg_t* p, const enum PegShape_t s, const float x, const fl
     pegDoClear(p);
     return;
   }
-  p->bitmap = bitmapGetPeg(p); // Call after setting shape, iAngle and size
-  pegSetBitmapCoordinates(p);
-  cpShapeSetCollisionType(p->cpShape, FLAG_PEG);
-  cpShapeSetFriction(p->cpShape, FRICTION);
-  cpShapeSetElasticity(p->cpShape, ELASTICITY);
-  cpSpaceAddShape(physicsGetSpace(), p->cpShape);
+  pegDoAddedShape(p);
+  pegDoUpdateAngle(p, p->angle);
 
   pegAddMotionPath(p, x, y); // Motion path location 0 always holds the origin coordinate
   p->pathCurrent = 1; // This then pre-assumes pegAddMotionPath will be called >0 times for kPegMotionPath
@@ -81,9 +93,27 @@ void pegDoRemove(struct Peg_t* p) {
   }
 }
 
-void petSetType(struct Peg_t* p, const enum PegType_t type) {
+void pegSetType(struct Peg_t* p, const enum PegType_t type) {
+  if (type == kPegTypeNormal) { return; }
   p->type = type;
-  p->bitmap = bitmapGetPeg(p);
+  if (type == kPegTypeSpecial) {
+    pegDoRemove(p); // Update physics object
+    pegDoAddBody(p);
+    p->shape = kPegShapeHex;
+    cpVect verts[6];
+    const float angleAdvance = M_2PIf / 6.0f;
+    const float scale = bitmapSizeToScale(p->size);
+    for (uint8_t p = 0; p < 6; ++p) {
+      const float angle = (angleAdvance * p) + degToRad(30);
+      verts[p].x = (HEX_WIDTH/2) * scale * sinf(angle);
+      verts[p].y = (HEX_WIDTH/2) * scale * cosf(angle);
+    }
+    p->cpShape = cpPolyShapeNew(p->cpBody, 6, verts, cpTransformIdentity, 0.0f);
+    p->radius = HEX_MAX*scale;
+    pegDoAddedShape(p);
+  } else {
+    p->bitmap = bitmapGetPeg(p);
+  }
 }
 
 void pegSetBitmapCoordinates(struct Peg_t* p) {
@@ -222,13 +252,18 @@ void pegDoHit(struct Peg_t* p) {
     p->state = kPegStateHit;
     FSMDoResetBallStuckCounter();
     if (p->type == kPegTypeRequired) {
-      renderAddTrauma(TRAMA_REQUIRED_HIT);
+      renderAddTrauma(TRAUMA_REQUIRED_HIT);
       renderAddFreeze(FREEZE_REQUIRED_HIT);
       boardDoRequiredPegHit();
+    } else if (p->type == kPegTypeSpecial) {
+      renderAddTrauma(TRAUMA_SPECIAL_HIT);
+      renderAddFreeze(FREEZE_SPECIAL_HIT);
+      boardDoAddSpecial(false);
     } else {
-      renderAddTrauma(TRAMA_PEG_HIT);
+      renderAddTrauma(TRAUMA_PEG_HIT);
       renderAddFreeze(FREEZE_PEG_HIT);
     }
+    //
     const enum PegSpecial_t special = boardGetCurrentSpecial();
     if (special == kPegSpecialMultiball && !physicsGetSecondBallInPlay()) {
       physicsSetSecondBallInPlay();

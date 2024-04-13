@@ -5,7 +5,8 @@
 
 enum PegShape_t {
   kPegShapeRect,
-  kPegShapeBall
+  kPegShapeBall,
+  kPegShapeHex
 };
 
 enum PegMotion_t {
@@ -34,7 +35,8 @@ enum PegSpecial_t {
   kPegSpecialBurst,
   kPegSpecialMultiball,
   kPegSpecialBounce,
-  kPegSpecialPenetrate
+  kPegSpecialPenetrate,
+  kNPegSpecial
 }; // magnets?
 
 struct Peg_t {
@@ -83,7 +85,7 @@ void pegDoRemove(struct Peg_t* p);
 
 void pegDoUpdate(struct Peg_t* p);
 
-void petSetType(struct Peg_t* p, const enum PegType_t type);
+void pegSetType(struct Peg_t* p, const enum PegType_t type);
 
 void pegSetMotionSpeed(struct Peg_t* p, const float s);
 

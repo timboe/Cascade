@@ -13,10 +13,14 @@ float m_cTraumaAngle = 0.0f, m_sTraumaAngle;
 
 uint16_t m_freeze = 0;
 
+uint8_t m_renderScale = 1;
+
 void renderTitles(void);
 void renderGame(const int32_t fc, const enum FSM_t fsm);
 
 /// ///
+
+void renderSetScale(const uint8_t scale) { m_renderScale = scale; }
 
 void renderAddFreeze(const uint16_t amount) { m_freeze += amount; }
 
@@ -45,11 +49,12 @@ void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) 
     pd->display->setOffset(0, 0);
   }
 
-  const float offX = 0.0f;
-  const float offY = -gameGetScrollOffset();
+  const float offX = -gameGetXOffset();
+  const float offY = -gameGetYOffset();
 
   pd->graphics->setDrawMode(kDrawModeCopy);
   pd->graphics->setDrawOffset(offX, offY);
+  pd->display->setScale(m_renderScale);
 
   pd->graphics->clear(kColorWhite);
   pd->graphics->setBackgroundColor(kColorBlack);
@@ -69,7 +74,7 @@ void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) 
 }
 
 void renderTitles(void) {
-  const int32_t so = gameGetScrollOffset();
+  const int32_t so = gameGetYOffset();
 
   // INTRO SPLASH
   if (so < DEVICE_PIX_Y) { renderTitlesSplash(); }

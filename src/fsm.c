@@ -60,6 +60,6 @@ bool FSMGetBallInPlay(void) {
 
 
 void FSMDoCommonScrollTo(const int16_t destination, const float progress, const enum EasingFunction_t e) {
-  const float so = gameGetScrollOffset();
-  gameSetScrollOffset(so + (destination - so)*getEasing(e, progress), true);
+  const float so = gameGetYOffset();
+  gameSetYOffset(so + (destination - so)*getEasing(e, progress), true);
 }

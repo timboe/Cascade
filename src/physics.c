@@ -18,6 +18,8 @@ bool m_secondBallInPlay = false;
 
 cpCollisionHandler* m_colliderHandle;
 
+float m_timestep = TIMESTEP;
+
 uint8_t cpCollisionBeginFunc_ballPeg(cpArbiter* arb, struct cpSpace* space, cpDataPointer data);
 
 int16_t m_physicsGetMotionTrailX[2][MOTION_TRAIL_LEN];
@@ -29,6 +31,8 @@ int16_t m_predictionTrailY[PREDICTION_TRACE_LEN];
 
 /// ///
 
+void physicsSetTimestepMultiplier(const float tsm) { m_timestep = TIMESTEP * tsm; }
+float physicsGetTimestepMultiplier(void) { return m_timestep; }
 
 int16_t* physicsGetMotionTrailX(const uint8_t n) { return m_physicsGetMotionTrailX[n]; }
 int16_t* physicsGetMotionTrailY(const uint8_t n) { return m_physicsGetMotionTrailY[n]; }
@@ -38,7 +42,7 @@ cpBody* physicsGetBall(const uint8_t n) { return m_ball[n]; }
 cpSpace* physicsGetSpace(void) { return m_space; }
 
 void physicsDoLaunchBall(const float strength) {
-  const float angleRad = angToRad(gameGetTurretBarrelAngle());
+  const float angleRad = degToRad(gameGetTurretBarrelAngle());
   cpBodyApplyImpulseAtLocalPoint(m_ball[0], cpv(POOT_STRENGTH * sinf(angleRad) * strength, POOT_STRENGTH * -cosf(angleRad) * strength), cpvzero);
   if (boardGetCurrentSpecial() == kPegSpecialBounce) {
     cpShapeSetElasticity(m_ballShape[0], ULTRA_BOUNCE);
@@ -67,9 +71,9 @@ void physicsDoInit(void) {
   physicsDoResetBall(0);
 
   cpBody* walls = cpSpaceGetStaticBody(m_space);
-  cpShape* top   = cpSegmentShapeNew(walls, cpv(0,            UI_OFFSET_TOP), cpv(DEVICE_PIX_X, UI_OFFSET_TOP),  3.0f);
-  cpShape* left  = cpSegmentShapeNew(walls, cpv(0,            UI_OFFSET_TOP), cpv(0,            PHYSWALL_PIX_Y), 3.0f);
-  cpShape* right = cpSegmentShapeNew(walls, cpv(DEVICE_PIX_X, UI_OFFSET_TOP), cpv(DEVICE_PIX_X, PHYSWALL_PIX_Y), 3.0f);
+  cpShape* top   = cpSegmentShapeNew(walls, cpv(0,            0), cpv(DEVICE_PIX_X, 0),  3.0f);
+  cpShape* left  = cpSegmentShapeNew(walls, cpv(0,            0), cpv(0,            PHYSWALL_PIX_Y), 3.0f);
+  cpShape* right = cpSegmentShapeNew(walls, cpv(DEVICE_PIX_X, 0), cpv(DEVICE_PIX_X, PHYSWALL_PIX_Y), 3.0f);
   cpShapeSetCollisionType(top, FLAG_WALL);
   cpShapeSetCollisionType(left, FLAG_WALL);
   cpShapeSetCollisionType(right, FLAG_WALL);
@@ -138,7 +142,7 @@ void physicsDoResetBall(uint8_t n) {
 }
 
 void physicsDoUpdate(const int32_t fc, const enum FSM_t fsm) {
-  cpSpaceStep(m_space, TIMESTEP);
+  cpSpaceStep(m_space, m_timestep);
   
   const cpVect pos = cpBodyGetPosition(m_ball[0]);
 
