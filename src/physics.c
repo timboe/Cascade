@@ -20,8 +20,8 @@ cpCollisionHandler* m_colliderHandle;
 
 uint8_t cpCollisionBeginFunc_ballPeg(cpArbiter* arb, struct cpSpace* space, cpDataPointer data);
 
-int16_t m_motionTrailX[2][MOTION_TRAIL_LEN];
-int16_t m_motionTrailY[2][MOTION_TRAIL_LEN];
+int16_t m_physicsGetMotionTrailX[2][MOTION_TRAIL_LEN];
+int16_t m_physicsGetMotionTrailY[2][MOTION_TRAIL_LEN];
 
 int16_t m_predictionTrailX[PREDICTION_TRACE_LEN];
 int16_t m_predictionTrailY[PREDICTION_TRACE_LEN];
@@ -30,24 +30,22 @@ int16_t m_predictionTrailY[PREDICTION_TRACE_LEN];
 /// ///
 
 
-int16_t* motionTrailX(uint8_t n) { return m_motionTrailX[n]; }
+int16_t* physicsGetMotionTrailX(const uint8_t n) { return m_physicsGetMotionTrailX[n]; }
+int16_t* physicsGetMotionTrailY(const uint8_t n) { return m_physicsGetMotionTrailY[n]; }
 
-int16_t* motionTrailY(uint8_t n) { return m_motionTrailY[n]; }
+cpBody* physicsGetBall(const uint8_t n) { return m_ball[n]; }
 
-cpBody* getBall(uint8_t n) { return m_ball[n]; }
+cpSpace* physicsGetSpace(void) { return m_space; }
 
-cpSpace* getSpace(void) { return m_space; }
-
-void launchBall(float strength) {
+void physicsDoLaunchBall(const float strength) {
   const float angleRad = angToRad(gameGetTurretBarrelAngle());
   cpBodyApplyImpulseAtLocalPoint(m_ball[0], cpv(POOT_STRENGTH * sinf(angleRad) * strength, POOT_STRENGTH * -cosf(angleRad) * strength), cpvzero);
   if (boardGetCurrentSpecial() == kPegSpecialBounce) {
     cpShapeSetElasticity(m_ballShape[0], ULTRA_BOUNCE);
   }
-
 }
 
-void initSpace(void) {
+void physicsDoInitSpace(void) {
   m_space = cpSpaceNew();
   cpSpaceSetIterations(m_space, 10);
   cpSpaceSetGravity(m_space, G);
@@ -66,7 +64,7 @@ void initSpace(void) {
   }
   cpSpaceAddShape(m_space, m_ballShape[0]);
   cpSpaceAddBody(m_space, m_ball[0]);
-  resetBall(0);
+  physicsDoResetBall(0);
 
   cpBody* walls = cpSpaceGetStaticBody(m_space);
   cpShape* top   = cpSegmentShapeNew(walls, cpv(0,            UI_OFFSET_TOP), cpv(DEVICE_PIX_X, UI_OFFSET_TOP),  3.0f);
@@ -89,19 +87,19 @@ void initSpace(void) {
   m_colliderHandle->beginFunc = cpCollisionBeginFunc_ballPeg;
 }
 
-void addSecondBall(void) {
+void physicsDoAddSecondBall(void) {
   cpSpaceAddShape(m_space, m_ballShape[1]);
   cpSpaceAddBody(m_space, m_ball[1]);
-  resetBall(1);
+  physicsDoResetBall(1);
   m_secondBallInPlay = false;
 }
 
-void removeSecondBall(void) {
+void physicsDoRemoveSecondBall(void) {
   cpSpaceRemoveShape(m_space, m_ballShape[1]);
   cpSpaceRemoveBody(m_space, m_ball[1]);
 }
 
-void setSecondBallInPlay(void) {
+void physicsSetSecondBallInPlay(void) {
   m_secondBallInPlay = true;
   const cpVect pos = cpBodyGetPosition(m_ball[0]);
   const cpVect vel = cpBodyGetVelocity(m_ball[0]);
@@ -109,7 +107,7 @@ void setSecondBallInPlay(void) {
   cpBodySetVelocity(m_ball[1], cpv(vel.y, vel.x));
 }
 
-bool getSecondBallInPlay(void) {
+bool physicsGetSecondBallInPlay(void) {
   return m_secondBallInPlay;
 }
 
@@ -125,12 +123,12 @@ uint8_t cpCollisionBeginFunc_ballPeg(cpArbiter* arb, struct cpSpace* space, cpDa
   return true;
 }
 
-void secondTryBall(void) {
+void physicsDoSecondTryBall(void) {
   const cpVect pos = cpBodyGetPosition(m_ball[0]);
   cpBodySetPosition(m_ball[0], cpv(pos.x, gameGetMinimumY() + BALL_RADIUS));
 }
 
-void resetBall(uint8_t n) {
+void physicsDoResetBall(uint8_t n) {
   int16_t yMod = (n == 1 ? 1024 : 0);
   cpBodySetPosition(m_ball[n], cpv(HALF_DEVICE_PIX_X, gameGetMinimumY() + TURRET_RADIUS - yMod));
   cpBodySetVelocity(m_ball[n], cpvzero);
@@ -139,7 +137,7 @@ void resetBall(uint8_t n) {
   cpShapeSetElasticity(m_ballShape[n], ELASTICITY);
 }
 
-void updateSpace(int32_t fc, enum FSM_t fsm) {
+void physicsDoUpdateSpace(const int32_t fc, const enum FSM_t fsm) {
   cpSpaceStep(m_space, TIMESTEP);
   
   const cpVect pos = cpBodyGetPosition(m_ball[0]);
@@ -147,21 +145,21 @@ void updateSpace(int32_t fc, enum FSM_t fsm) {
   if (fsm == kGameFSM_AimMode) {
     const int i = (boardGetCurrentSpecial() == kPegSpecialAim ? fc % (PREDICTION_TRACE_LEN*2) : fc % PREDICTION_TRACE_LEN);
     if (i == 0) {
-      resetBall(0);
-      launchBall(1.0f);
+      physicsDoResetBall(0);
+      physicsDoLaunchBall(1.0f);
     }
-    setBallTrace(i, pos.x, pos.y);
+    renderSetBallTrace(i, pos.x, pos.y);
   }
 
-  m_motionTrailX[0][fc % MOTION_TRAIL_LEN] = pos.x;
-  m_motionTrailY[0][fc % MOTION_TRAIL_LEN] = pos.y;
+  m_physicsGetMotionTrailX[0][fc % MOTION_TRAIL_LEN] = pos.x;
+  m_physicsGetMotionTrailY[0][fc % MOTION_TRAIL_LEN] = pos.y;
 
   if (boardGetCurrentSpecial() == kPegSpecialAim) {
     const cpVect pos2 = cpBodyGetPosition(m_ball[1]);
-    m_motionTrailX[1][fc % MOTION_TRAIL_LEN] = pos2.x;
-    m_motionTrailY[1][fc % MOTION_TRAIL_LEN] = pos2.y;
+    m_physicsGetMotionTrailX[1][fc % MOTION_TRAIL_LEN] = pos2.x;
+    m_physicsGetMotionTrailY[1][fc % MOTION_TRAIL_LEN] = pos2.y;
 
-    if (!m_secondBallInPlay) { resetBall(1); }
+    if (!m_secondBallInPlay) { physicsDoResetBall(1); }
   }
 
 }

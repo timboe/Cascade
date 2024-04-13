@@ -57,7 +57,7 @@ void doScreenShot() {
 void ssInit(void) {
   pd->system->logToConsole("ssInit frame %i", gameGetFrameCount());
   char filePath[128];
-  snprintf(filePath, 128, "level_%i_hole_%i.bmp", getCurrentLevel()+1, getCurrentHole()+1);
+  snprintf(filePath, 128, "level_%i_hole_%i.bmp", IOGetCurrentLevel()+1, IOGetCurrentHole()+1);
   m_imageFile = pd->file->open(filePath, kFileWrite);
  
   m_imageBitmap = pd->graphics->newBitmap(DEVICE_PIX_X, WFALL_PIX_Y, kColorWhite);
@@ -79,7 +79,7 @@ void ssRender(void) {
   pd->system->logToConsole("ssRender, y=%i frame %i", m_yOffset, gameGetFrameCount());
   gameSetScrollOffset(DEVICE_PIX_Y * m_yOffset, true);
   pd->graphics->setDrawOffset(0, -DEVICE_PIX_Y * m_yOffset);
-  render(gameGetFrameCount(), FSMGetGameMode(), FSMGet());
+  renderDo(gameGetFrameCount(), FSMGetGameMode(), FSMGet());
   m_doRender = false;
 }
 

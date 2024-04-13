@@ -112,13 +112,13 @@ void updateLevelSplashBitmap(void) {
   pd->graphics->clearBitmap(m_levelSplashBitmap, kColorBlack);
   pd->graphics->pushContext(m_levelSplashBitmap);
   char text[128];
-  snprintf(text, 128, "%i~%i", (int)getCurrentLevel() + 1, (int)getCurrentHole() + 1);
+  snprintf(text, 128, "%i~%i", (int)IOGetCurrentLevel() + 1, (int)IOGetCurrentHole() + 1);
   const int32_t w1 = pd->graphics->getTextWidth(getGreatVibes109(), text, 128, kUTF8Encoding, 0);
   setGreatVibes109();
   pd->graphics->setDrawMode(kDrawModeFillBlack);
   drawOutlineText(text, 128, DEVICE_PIX_X/2 - w1/2, 0, 4);
   //
-  snprintf(text, 128, "PAR %i", (int)getCurrentHolePar());
+  snprintf(text, 128, "PAR %i", (int)IOGetCurrentHolePar());
   const int32_t w2 = pd->graphics->getTextWidth(getRoobert24(), text, 128, kUTF8Encoding, 0);
   setRoobert24();
   pd->graphics->setDrawMode(kDrawModeFillWhite);
@@ -130,7 +130,7 @@ void updateInfoTopperBitmap(void) {
   pd->graphics->clearBitmap(m_infoTopperBitmap, kColorBlack);
   pd->graphics->pushContext(m_infoTopperBitmap);
   char text[128];
-  snprintf(text, 128, "%i~%i", (int)getCurrentLevel(), (int)getCurrentHole());
+  snprintf(text, 128, "%i~%i", (int)IOGetCurrentLevel(), (int)IOGetCurrentHole());
   setGreatVibes24();
   pd->graphics->setDrawMode(kDrawModeFillWhite);
   pd->graphics->drawText(text, 128, kUTF8Encoding, 0, 8);
@@ -233,7 +233,7 @@ float sizeToScale(uint8_t size) {
   return 1.0f;
 }
 
-LCDBitmap* getScoreHistogram(void) { return m_scoreHistogram; }
+LCDBitmap* IOGetScoreHistogram(void) { return m_scoreHistogram; }
 
 void drawRotatedRect(float x, float y, float w2, float h2, uint8_t iAngle, bool grey) {
     const float angleRad = (M_PIf / 128.0f) * iAngle;
@@ -274,11 +274,11 @@ void updateScoreHistogramBitmap(void) {
   int16_t balls[MAX_HOLES] = {0};
   int16_t par[MAX_HOLES] = {0};
   for (int hole = 0; hole < MAX_HOLES;  ++hole) {
-    balls[hole] = getScore(getCurrentLevel(), hole);
-    par[hole] = getPar(getCurrentLevel(), hole);
+    balls[hole] = IOGetScore(IOGetCurrentLevel(), hole);
+    par[hole] = IOGetPar(IOGetCurrentLevel(), hole);
   }
   // This will be animated in instead
-  balls[getCurrentHole()] = 0;
+  balls[IOGetCurrentHole()] = 0;
 
   for (int i = 0; i < MAX_HOLES;  ++i) {
     pd->graphics->fillRect(
@@ -322,14 +322,14 @@ void updateLevelStatsBitmap(void) {
   char text[128];
   uint16_t score = 0;
   uint16_t par = 0;
-  getLevelStatistics(getCurrentLevel(), &score, &par);
+  IOGetLevelStatistics(IOGetCurrentLevel(), &score, &par);
   if (!score && !par) {
     // This means that the player hasn't finished any of the level yet
     uint16_t holes = 0;
     uint16_t played = 0;
     for (int h = 0; h < MAX_HOLES; ++h) {
-      if (getPar(getCurrentLevel(), h)) { holes++; }
-      if (getScore(getCurrentLevel(), h)) { played++; }
+      if (IOGetPar(IOGetCurrentLevel(), h)) { holes++; }
+      if (IOGetScore(IOGetCurrentLevel(), h)) { played++; }
     }
     if (holes == 1) { snprintf(text, 128, "%i OF 1 HOLE", (int)played); }
     else { snprintf(text, 128, "%i OF %i HOLES", (int)played, (int)holes); }
@@ -354,7 +354,7 @@ void updateLevelStatsBitmap(void) {
 void updateHoleStatsBitmap(void) {
   uint16_t score = 0;
   uint16_t par = 0;
-  getHoleStatistics(getCurrentLevel(), getCurrentHole(), &score, &par);
+  IOGetHoleStatistics(IOGetCurrentLevel(), IOGetCurrentHole(), &score, &par);
   setRoobert24();
   char text[128];
   snprintf(text, 128, "PAR %i", par);
@@ -414,7 +414,7 @@ void initBitmap() {
 
   for (int l = 0; l < MAX_LEVELS; ++l) {
     for (int h = 0; h < MAX_HOLES; ++h) {
-      if (!getPar(l,h)) { continue; } // No level
+      if (!IOGetPar(l,h)) { continue; } // No level
       snprintf(text, 128, "images/holes/level_%i_hole_%i.png", l+1, h+1);
       m_previewBitmap[l][h] = loadImageAtPath(text);
     }

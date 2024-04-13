@@ -57,33 +57,45 @@ uint16_t m_level_par[MAX_LEVELS][MAX_HOLES] = {0};
 uint16_t m_level_foreground[MAX_LEVELS][MAX_HOLES] = {0};
 uint16_t m_level_background[MAX_LEVELS][MAX_HOLES] = {0};
 
-int doRead(void* userdata, uint8_t* buf, int bufsize);
+int IODoRead(void* userdata, uint8_t* buf, int bufsize);
 
-void doWrite(void* userdata, const char* str, int len);
+void IODoWrite(void* userdata, const char* str, int len);
 
-void decodeError(json_decoder* jd, const char* error, int linenum);
+void IODecodeError(json_decoder* jd, const char* error, int linenum);
 
+///
+
+int IOShouldDecodeScan(json_decoder* jd, const char* key);
+
+void IODidDecodeScan(json_decoder* jd, const char* key, json_value value);
+
+///
+
+void IOWillDecodeLevel(json_decoder* jd, const char* key, json_value_type type);
+
+void IODidDecodeLevel(json_decoder* jd, const char* key, json_value value);
+
+void* IOFinishDecodeLevel(json_decoder* jd, const char* key, json_value_type type);
 
 /// ///
 
-uint16_t getWaterfallBackground(uint16_t level, uint16_t hole) { return m_level_background[level][hole];}
+uint16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole) { return m_level_background[level][hole];}
+uint16_t IOGetWaterfallForeground(const uint16_t level, const uint16_t hole) { return m_level_foreground[level][hole]; }
 
-uint16_t getWaterfallForeground(uint16_t level, uint16_t hole) { return m_level_foreground[level][hole]; }
+uint16_t IOGetCurrentPlayer(void) { return m_player; }
 
-uint16_t getCurrentPlayer(void) { return m_player; }
-
-void doPreviousPlayer(void) {
+void IODoPreviousPlayer(void) {
   if (!m_player) { m_player = MAX_PLAYERS - 1; }
   else --m_player;
   pd->system->logToConsole("Now player %i", (int)m_player);
 }
 
-void doNextPlayer(void) {
+void IODoNextPlayer(void) {
   m_player = (m_player + 1) % MAX_PLAYERS;
   pd->system->logToConsole("Now player %i", (int)m_player);
 }
 
-void resetPlayerSave(uint16_t player) {
+void IOResetPlayerSave(const uint16_t player) {
   for (int l = 0; l < MAX_LEVELS; ++l) {
     for (int h = 0; h < MAX_HOLES; ++h) {
       m_player_score[player][l][h] = 0; 
@@ -91,9 +103,9 @@ void resetPlayerSave(uint16_t player) {
   }
 }
 
-uint16_t getCurrentLevel(void) { return m_level; }
+uint16_t IOGetCurrentLevel(void) { return m_level; }
 
-uint16_t getPreviousLevel(void) {
+uint16_t IOGetPreviousLevel(void) {
   int16_t level = m_level;
   while (true) {
     if (--level < 0) { level += MAX_LEVELS; }
@@ -102,7 +114,7 @@ uint16_t getPreviousLevel(void) {
   return 0;
 }
 
-uint16_t getNextLevel(void) {
+uint16_t IOGetNextLevel(void) {
   int16_t level = m_level;
   while (true) {
     level = (level + 1) % MAX_LEVELS;
@@ -111,7 +123,7 @@ uint16_t getNextLevel(void) {
   return 0;
 }
 
-uint16_t getPreviousHole(void) {
+uint16_t IOGetPreviousHole(void) {
   int16_t hole = m_hole;
   while (true) {
     if (--hole < 0) { hole += MAX_HOLES; }
@@ -120,39 +132,39 @@ uint16_t getPreviousHole(void) {
   return 0;
 }
 
-uint16_t getNextHole(void) {
+uint16_t IOGetNextHole(void) {
   int16_t hole = (m_hole + 1) % MAX_HOLES;
   if (m_level_par[m_level][hole]) return hole;
   return 0;
 }
 
-void doPreviousLevel(void) { 
-  m_level = getPreviousLevel();
+void IODoPreviousLevel(void) { 
+  m_level = IOGetPreviousLevel();
   pd->system->logToConsole("Now level %i", (int)m_level);
 }
 
-void doNextLevel(void) {
-  m_level = getNextLevel();
+void IODoNextLevel(void) {
+  m_level = IOGetNextLevel();
   pd->system->logToConsole("Now level %i", (int)m_level);
 }
 
-void doPreviousHole(void) { 
-  m_hole = getPreviousHole();
+void IODoPreviousHole(void) { 
+  m_hole = IOGetPreviousHole();
   pd->system->logToConsole("Now hole %i", (int)m_hole);
 }
 
-void doNextHole(void) {
-  m_hole = getNextHole();
+void IODoNextHole(void) {
+  m_hole = IOGetNextHole();
   pd->system->logToConsole("Now hole %i", (int)m_hole);
 }
 
-void setHoleScore(uint16_t score) {
+void IOSetCurrentHoleScore(const uint16_t score) {
   if (score && score < m_player_score[m_player][m_level][m_hole]) {
     m_player_score[m_player][m_level][m_hole] = score;
   }
 }
 
-void goToNextUnplayedLevel(void) {
+void IODoGoToNextUnplayedLevel(void) {
   bool found = false;
   // Find highest played level number
   for (int l = MAX_LEVELS-1; l >= 0; --l) {
@@ -167,9 +179,9 @@ void goToNextUnplayedLevel(void) {
     if (found) { break; }
   }
   if (found) {
-    doNextHole();
+    IODoNextHole();
     if (m_hole == 0) {
-      doNextLevel();
+      IODoNextLevel();
     }
   } else {
     m_level = 0;
@@ -179,7 +191,7 @@ void goToNextUnplayedLevel(void) {
   }
 }
 
-void getLevelStatistics(uint16_t level, uint16_t* score, uint16_t* par) {
+void IOGetLevelStatistics(const uint16_t level, uint16_t* score, uint16_t* par) {
   for (int h = 0; h < MAX_HOLES; ++h) {
     if (m_level_par[level][h] == 0) { // h-1 was the last hole in this level
       return;
@@ -194,44 +206,44 @@ void getLevelStatistics(uint16_t level, uint16_t* score, uint16_t* par) {
   }
 }
 
-void getHoleStatistics(uint16_t level, uint16_t hole, uint16_t* score, uint16_t* par) {
+void IOGetHoleStatistics(uint16_t level, uint16_t hole, uint16_t* score, uint16_t* par) {
   *par = m_level_par[level][hole];
   *score = m_player_score[m_player][level][hole];
 }
 
-uint16_t getCurrentHole(void) { return m_hole; }
+uint16_t IOGetCurrentHole(void) { return m_hole; }
 
-uint16_t getPar(uint16_t level, uint16_t hole) { return m_level_par[level][hole]; }
+uint16_t IOGetPar(const uint16_t level, const uint16_t hole) { return m_level_par[level][hole]; }
 
-uint16_t getScore(uint16_t level, uint16_t hole) { return m_player_score[m_player][level][hole]; }
+uint16_t IOGetScore(const uint16_t level, const uint16_t hole) { return m_player_score[m_player][level][hole]; }
 
-uint16_t getCurrentHolePar(void) { return getPar(m_level, m_hole); }
+uint16_t IOGetCurrentHolePar(void) { return IOGetPar(m_level, m_hole); }
 
-uint16_t getCurrentHoleScore(void) { return getScore(m_level, m_hole); }
+uint16_t IOGetCurrentHoleScore(void) { return IOGetScore(m_level, m_hole); }
 
+///
 
-int doRead(void* userdata, uint8_t* buf, int bufsize) {
+int IODoRead(void* userdata, uint8_t* buf, int bufsize) {
   return pd->file->read((SDFile*)userdata, buf, bufsize);
 }
 
-void doWrite(void* userdata, const char* str, int len) {
+void IODoWrite(void* userdata, const char* str, int len) {
   pd->file->write((SDFile*)userdata, str, len);
 }
 
-void decodeError(json_decoder* jd, const char* error, int linenum) {
+void IODecodeError(json_decoder* jd, const char* error, int linenum) {
   pd->system->logToConsole("decode error line %i: %s", linenum, error);
   FSMDo(kTitlesFSM_DisplayTitles);
 }
 
-
 ///
 
-int shouldDecodeScan(json_decoder* jd, const char* key) {
+int IOShouldDecodeScan(json_decoder* jd, const char* key) {
   return (! strcmp(key, "body") == 0); // Decode everything in the header
 }
 
-void didDecodeScan(json_decoder* jd, const char* key, json_value value) {
-  pd->system->logToConsole("didDecodeScan deode %s", key);
+void IODidDecodeScan(json_decoder* jd, const char* key, json_value value) {
+  pd->system->logToConsole("IODidDecodeScan deode %s", key);
   if (strcmp(key, "par") == 0) {
     m_level_par[m_level][m_hole] = json_intValue(value);
     pd->system->logToConsole("m_level_par[%i][%i] = %i", m_level, m_hole, m_level_par[m_level][m_hole]);
@@ -242,13 +254,13 @@ void didDecodeScan(json_decoder* jd, const char* key, json_value value) {
     m_level_background[m_level][m_hole] = json_intValue(value);
     pd->system->logToConsole("m_level_background[%i][%i] = %i", m_level, m_hole, m_level_background[m_level][m_hole]);
   } else if (strcmp(key, "level") == 0 && json_intValue(value)-1 != m_level) {
-    pd->system->error("didDecodeScan LEVEL MISSMATCH %i %i", json_intValue(value)-1, (int)m_level);
+    pd->system->error("IODidDecodeScan LEVEL MISSMATCH %i %i", json_intValue(value)-1, (int)m_level);
   } else if (strcmp(key, "hole") == 0 && json_intValue(value)-1 != m_hole) {
-    pd->system->error("didDecodeScan HOLE MISSMATCH %i %i", json_intValue(value)-1, (int)m_hole);
+    pd->system->error("IODidDecodeScan HOLE MISSMATCH %i %i", json_intValue(value)-1, (int)m_hole);
   }
 }
 
-void scanLevels() {
+void IODoScanLevels() {
   char filePath[128];
   for (int32_t l = 0; l < MAX_LEVELS; ++l) {
     m_level = l;
@@ -268,11 +280,11 @@ void scanLevels() {
         break;
       }
       static json_decoder jd = {
-        .decodeError = decodeError,
-        .didDecodeTableValue = didDecodeScan,
-        .shouldDecodeTableValueForKey = shouldDecodeScan
+        .decodeError = IODecodeError,
+        .didDecodeTableValue = IODidDecodeScan,
+        .shouldDecodeTableValueForKey = IOShouldDecodeScan
       };
-      pd->json->decode(&jd, (json_reader){ .read = doRead, .userdata = file }, NULL);
+      pd->json->decode(&jd, (json_reader){ .read = IODoRead, .userdata = file }, NULL);
       int status = pd->file->close(file);
     }
     // if (abort) { break; }
@@ -298,16 +310,16 @@ void scanLevels() {
 
 ////
 
-void willDecode(json_decoder* jd, const char* key, json_value_type type) {
+void IOWillDecodeLevel(json_decoder* jd, const char* key, json_value_type type) {
 
   if (strcmp(key, m_nameStatic) == 0) {
-    pd->system->logToConsole("willDecode %s", m_nameStatic);
+    pd->system->logToConsole("IOWillDecodeLevel %s", m_nameStatic);
     m_decodeType = kDecodeStatic;
     return;
   }
 
   if (strcmp(key, m_nameElliptic) == 0) {
-    pd->system->logToConsole("willDecode %s", m_nameElliptic);
+    pd->system->logToConsole("IOWillDecodeLevel %s", m_nameElliptic);
     m_decodeType = kDecodeElliptic;
     m_pegContainerID = 0;
     snprintf(m_namePegContainer, 128, "PegContainer%i", (int)m_pegContainerID+1);
@@ -315,7 +327,7 @@ void willDecode(json_decoder* jd, const char* key, json_value_type type) {
   }
 
   if (strcmp(key, m_nameLinear) == 0) {
-    pd->system->logToConsole("willDecode %s", m_nameLinear);
+    pd->system->logToConsole("IOWillDecodeLevel %s", m_nameLinear);
     m_decodeType = kDecodeLinear;
     m_pegContainerID = 0;
     snprintf(m_namePegContainer, 128, "PegContainer%i", (int)m_pegContainerID+1);
@@ -325,12 +337,9 @@ void willDecode(json_decoder* jd, const char* key, json_value_type type) {
   }
 
   // pd->system->logToConsole("WILL DECODE %s looking for %s, diff is %i ", key, m_nameElliptic, strcmp(key, m_nameElliptic));
-
-
 }
 
-
-void didDecode(json_decoder* jd, const char* key, json_value value) {
+void IODidDecodeLevel(json_decoder* jd, const char* key, json_value value) {
 
   if (strcmp(key, "shape") == 0) {
     switch (m_decodeType) {
@@ -459,42 +468,41 @@ void didDecode(json_decoder* jd, const char* key, json_value value) {
 }
 
 
-void* finishDecode(json_decoder* jd, const char* key, json_value_type type) {
-
+void* IOFinishDecodeLevel(json_decoder* jd, const char* key, json_value_type type) {
 
   if (strcmp(key, m_nameStatic) == 0) {
-    boardAddStatic(&m_static);
-    pd->system->logToConsole("finishDecode %s", m_nameStatic);
+    boardDoAddStatic(&m_static);
+    pd->system->logToConsole("IOFinishDecodeLevel %s", m_nameStatic);
     m_staticID++;
     snprintf(m_nameStatic, 128, "StaticControl%i", (int)m_staticID+1);
     return NULL;
   }
 
   if (strcmp(key, m_nameElliptic) == 0) {
-    boardAddWheel(&m_elliptic);
-    pd->system->logToConsole("finishDecode %s", m_nameElliptic);
+    boardDoAddWheel(&m_elliptic);
+    pd->system->logToConsole("IOFinishDecodeLevel %s", m_nameElliptic);
     m_ellipticID++;
     snprintf(m_nameElliptic, 128, "EllipticControl%i", (int)m_ellipticID+1);
     return NULL;
   }
 
   if (strcmp(key, m_nameLinear) == 0) {
-    boardAddLinear(&m_linear);
-    pd->system->logToConsole("finishDecode %s", m_nameLinear);
+    boardDoAddLinear(&m_linear);
+    pd->system->logToConsole("IOFinishDecodeLevel %s", m_nameLinear);
     m_linearID++;
     snprintf(m_nameLinear, 128, "LinearControl%i", (int)m_linearID+1);
     return NULL;
   }
 
   if (strcmp(key, m_namePegContainer) == 0) {
-    pd->system->logToConsole("finishDecode %s", m_namePegContainer);
+    pd->system->logToConsole("IOFinishDecodeLevel %s", m_namePegContainer);
     m_pegContainerID++;
     snprintf(m_namePegContainer, 128, "PegContainer%i", (int)m_pegContainerID+1);
     return NULL;
   }
 
   if (strcmp(key, m_nameLineContainer) == 0) {
-    pd->system->logToConsole("finishDecode %s", m_nameLineContainer);
+    pd->system->logToConsole("IOFinishDecodeLevel %s", m_nameLineContainer);
     m_lineContainerID++;
     snprintf(m_nameLineContainer, 128, "LineContainer%i", (int)m_lineContainerID+1);
     return NULL;
@@ -506,7 +514,7 @@ void* finishDecode(json_decoder* jd, const char* key, json_value_type type) {
   return NULL;
 }
 
-void loadCurrentHole() {
+void IODoLoadCurrentHole() {
   char filePath[128];
   snprintf(filePath, 128, "holes/level_%i_hole_%i.json", (int)m_level+1, (int)m_hole+1);
   SDFile* file = pd->file->open(filePath, kFileRead);
@@ -516,15 +524,15 @@ void loadCurrentHole() {
     SDFile* file = pd->file->open(filePath, kFileReadData);
   }
   if (!file) {
-    pd->system->error("loadCurrentHole CANNOT FIND LEVEL %i %i", (int)m_level+1, (int)m_hole+1);
+    pd->system->error("IODoLoadCurrentHole CANNOT FIND LEVEL %i %i", (int)m_level+1, (int)m_hole+1);
     FSMDo(kTitlesFSM_DisplayTitles);
     return;
   }
   static json_decoder jd = {
-    .decodeError = decodeError,
-    .willDecodeSublist = willDecode,
-    .didDecodeTableValue = didDecode,
-    .didDecodeSublist = finishDecode
+    .decodeError = IODecodeError,
+    .willDecodeSublist = IOWillDecodeLevel,
+    .didDecodeTableValue = IODidDecodeLevel,
+    .didDecodeSublist = IOFinishDecodeLevel
   };
 
   m_staticID = 0;
@@ -534,14 +542,14 @@ void loadCurrentHole() {
   m_linearID = 0;
   snprintf(m_nameLinear, 128, "LinearControl%i", (int)m_linearID+1);
 
-  pd->json->decode(&jd, (json_reader){ .read = doRead, .userdata = file }, NULL);
+  pd->json->decode(&jd, (json_reader){ .read = IODoRead, .userdata = file }, NULL);
   int status = pd->file->close(file);
 
 }
 
 ///
 
-void doSave() {
+void IODoSave() {
   char filePath[128];
   snprintf(filePath, 128, SAVE_FORMAT_1_NAME);
   SDFile* file = pd->file->open(filePath, kFileWrite);
@@ -551,4 +559,3 @@ void doSave() {
 }
 
 ///
-

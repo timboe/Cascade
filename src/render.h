@@ -2,25 +2,25 @@
 #include "game.h"
 #include "fsm.h"
 
-void render(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm);
+void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm);
 
-void addTrauma(const float amount);
+void renderAddTrauma(const float amount);
 
-void addFreeze(const uint16_t amount);
+void renderAddFreeze(const uint16_t amount);
 
-bool getSubFreeze(void);
+bool renderGetSubFreeze(void);
 
-void setBallTrace(const uint16_t i, const uint16_t x, const uint16_t y);
+void renderSetBallTrace(const uint16_t i, const uint16_t x, const uint16_t y);
 
-void setBallPootCircle(const uint16_t radius);
+void renderSetBallPootCircle(const uint16_t radius);
 
-void setBallFallN(const uint16_t n);
-void setBallFallX(const uint16_t x);
-void setBallFallY(const uint16_t ball, const float y);
+void renderSetBallFallN(const uint16_t n);
+void renderSetBallFallX(const uint16_t x);
+void renderSetBallFallY(const uint16_t ball, const float y);
 
-void setNumeralOffset(const float no);
+void renderSetNumeralOffset(const float no);
 
-void resetBallTrace(void);
+void renderDoResetBallTrace(void);
 
 void renderTitlesSplash(void);
 void renderTitlesPlayerSelect(const bool locked);

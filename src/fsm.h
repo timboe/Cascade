@@ -50,7 +50,7 @@ bool FSMGetBallInPlay(void);
 
 void FSMDoResetBallStuckCounter(void);
 
-void FSMCommonScrollTo(const int16_t destination, const float progress, const enum EasingFunction_t e);
+void FSMDoCommonScrollTo(const int16_t destination, const float progress, const enum EasingFunction_t e);
 
 void FSMDisplayTitles(const bool newState);
 void FSMTitlesToChoosePlayer(const bool newState);

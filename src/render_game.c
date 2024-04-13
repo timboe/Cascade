@@ -17,19 +17,19 @@ uint8_t m_ballTraces = 0;
 
 /// ///
 
-void setBallPootCircle(const uint16_t radius) { m_ballPootRadius = radius; }
+void renderSetBallPootCircle(const uint16_t radius) { m_ballPootRadius = radius; }
 
-void setBallFallN(const uint16_t n) { m_ballFallN = n; }
-void setBallFallX(const uint16_t x) { m_ballFallX = x; }
-void setBallFallY(const uint16_t ball, const float y) { m_ballFallY[ball] = y; }
+void renderSetBallFallN(const uint16_t n) { m_ballFallN = n; }
+void renderSetBallFallX(const uint16_t x) { m_ballFallX = x; }
+void renderSetBallFallY(const uint16_t ball, const float y) { m_ballFallY[ball] = y; }
 
-void setBallTrace(const uint16_t i, const uint16_t x, const uint16_t y) {
+void renderSetBallTrace(const uint16_t i, const uint16_t x, const uint16_t y) {
   m_ballTraceX[i] = x;
   m_ballTraceY[i] = y;
   m_ballTraces = i;
 }
 
-void resetBallTrace(void) {
+void renderDoResetBallTrace(void) {
   for (int i = 0; i < PREDICTION_TRACE_LEN * 2; ++i) {
     m_ballTraceX[i] = HALF_DEVICE_PIX_X;
     m_ballTraceY[i] = gameGetMinimumY() + TURRET_RADIUS;
@@ -45,10 +45,10 @@ void renderGameBall(const int32_t fc) {
     return;
   }
   for (int i = 0; i < 2; ++i) {
-    if (i == 1 && !getSecondBallInPlay()) { continue; }
-    cpBody* ball = getBall(i);
-    int16_t* trailX = motionTrailX(i);
-    int16_t* trailY = motionTrailY(i);
+    if (i == 1 && !physicsGetSecondBallInPlay()) { continue; }
+    cpBody* ball = physicsGetBall(i);
+    int16_t* trailX = physicsGetMotionTrailX(i);
+    int16_t* trailY = physicsGetMotionTrailY(i);
     uint8_t size = BALL_RADIUS;
     for (int32_t i = fc; i > fc - MOTION_TRAIL_LEN; --i) {
       pd->graphics->fillEllipse(trailX[i%MOTION_TRAIL_LEN] - size, trailY[i%MOTION_TRAIL_LEN] - size, 2*size, 2*size, 0.0f, 360.0f, kColorWhite);
@@ -162,7 +162,7 @@ void renderGameGutter(void) {
   }
   //Note no parallax here
   if (so > WFALL_PIX_Y) {
-    pd->graphics->drawBitmap(getScoreHistogram(), 0, WFALL_PIX_Y + DEVICE_PIX_Y, kBitmapUnflipped);
+    pd->graphics->drawBitmap(IOGetScoreHistogram(), 0, WFALL_PIX_Y + DEVICE_PIX_Y, kBitmapUnflipped);
     for (int i = 0; i < m_ballFallN; ++i) {
       pd->graphics->drawBitmap(getBitmapBall(),
         BUF + BALL_RADIUS/2 + m_ballFallX*3*BALL_RADIUS,

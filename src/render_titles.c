@@ -8,7 +8,7 @@ void commonRenderBackgroundWaterfallWithAnim(const bool locked, const uint8_t of
 
 /// ///
 
-void setNumeralOffset(float no) { m_numeralOffset = no; }
+void renderSetNumeralOffset(float no) { m_numeralOffset = no; }
 
 void commonRenderBackgroundWaterfallWithAnim(const bool locked, const uint8_t offY, uint16_t* timer) {
   // Draw "previous" waterfall (will become current once gameDoResetPreviousWaterfall is called)
@@ -18,7 +18,7 @@ void commonRenderBackgroundWaterfallWithAnim(const bool locked, const uint8_t of
   }
 
   // Animate in new waterfall
-  const uint16_t currentWf = getWaterfallForeground(getCurrentLevel(), 0);
+  const uint16_t currentWf = IOGetWaterfallForeground(IOGetCurrentLevel(), 0);
   if (currentWf != prevWf) {
     if (locked) {
       pd->graphics->setStencilImage(getStencilWipe(*timer), 0);
@@ -59,7 +59,7 @@ void renderTitlesPlayerSelect(const bool locked) {
   commonRenderBackgroundWaterfallWithAnim(locked, 4, &newWaterfallTimer);
 
   uint8_t digit[3];
-  digit[1] = getCurrentPlayer();
+  digit[1] = IOGetCurrentPlayer();
   digit[0] = digit[1] == 0 ? MAX_PLAYERS-1 : digit[1]-1;
   digit[2] = (digit[1] + 1) % MAX_PLAYERS;
   for (int i = 0; i < 3; ++i) { digit[i]++; }
@@ -89,12 +89,12 @@ void renderTitlesLevelSelect(const bool locked) {
   uint8_t digit0[3];
   uint8_t digit1[3];
   // +1 is because we display levels 0-98 as 1-99
-  digit0[0] = (getPreviousLevel() + 1) / 10;
-  digit1[0] = (getPreviousLevel() + 1) % 10;
-  digit0[1] = (getCurrentLevel() + 1) / 10;
-  digit1[1] = (getCurrentLevel() + 1) % 10;
-  digit0[2] = (getNextLevel() + 1) / 10;
-  digit1[2] = (getNextLevel() + 1) % 10;
+  digit0[0] = (IOGetPreviousLevel() + 1) / 10;
+  digit1[0] = (IOGetPreviousLevel() + 1) % 10;
+  digit0[1] = (IOGetCurrentLevel() + 1) / 10;
+  digit1[1] = (IOGetCurrentLevel() + 1) % 10;
+  digit0[2] = (IOGetNextLevel() + 1) / 10;
+  digit1[2] = (IOGetNextLevel() + 1) % 10;
   float offY = (NUMERAL_PIX_Y / 2) * m_numeralOffset;
 
   pd->graphics->drawBitmap(getBitmapLevel(), DEVICE_PIX_X - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF, kBitmapUnflipped);
@@ -125,12 +125,12 @@ void renderTitlesLevelSelect(const bool locked) {
 }
 
 void renderTitlesHoleSelect(const bool locked) {
- const uint16_t currentWf = getWaterfallForeground(getCurrentLevel(), 0);
+ const uint16_t currentWf = IOGetWaterfallForeground(IOGetCurrentLevel(), 0);
   for (int i = 12; i < 16; ++i) {
     pd->graphics->drawBitmap(getBitmapWfFg(currentWf, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
   }
 
-  LCDBitmap* bm = getBitmapPreview(getCurrentLevel(), getCurrentHole());
+  LCDBitmap* bm = getBitmapPreview(IOGetCurrentLevel(), IOGetCurrentHole());
   static uint16_t offset = 0;
   if (!locked && bm) {
     pd->graphics->setDrawMode(kDrawModeInverted);
@@ -152,13 +152,13 @@ void renderTitlesHoleSelect(const bool locked) {
   uint8_t digit[3];
   LCDBitmap* digitBm[3];
   // +1 is because we display levels 0-98 as 1-99
-  digit[0] = (getPreviousHole() + 1);
-  digit[1] = (getCurrentHole() + 1);
-  digit[2] = (getNextHole() + 1);
+  digit[0] = (IOGetPreviousHole() + 1);
+  digit[1] = (IOGetCurrentHole() + 1);
+  digit[2] = (IOGetNextHole() + 1);
   digitBm[0] = getBitmapNumeral(digit[0]);
   digitBm[1] = getBitmapNumeral(digit[1]);
   digitBm[2] = getBitmapNumeral(digit[2]);
-  if (getCurrentLevel() == 0) {
+  if (IOGetCurrentLevel() == 0) {
     for (int i = 0; i < 3; ++i) {
       if (digit[i] == 1) { // Remmber we have already +1 for display
         digitBm[i] = getBitmapHoleTutorial();

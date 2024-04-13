@@ -54,7 +54,7 @@ LCDBitmap* getBitmapTurretBarrel(void);
 LCDBitmap* getBitmapHeader(void); // not used
 LCDBitmap* getInfoTopperBitmap(void);
 LCDBitmap* getLevelSplashBitmap(void);
-LCDBitmap* getScoreHistogram(void);
+LCDBitmap* IOGetScoreHistogram(void);
 
 LCDBitmap* getBitmapPeg(const struct Peg_t* p);
 

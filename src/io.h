@@ -1,56 +1,46 @@
 #pragma once
 #include "game.h"
 
-void scanLevels(void);
+void IODoScanLevels(void);
 
-void loadCurrentHole(void);
+void IODoLoadCurrentHole(void);
 
-void doSave(void);
+void IODoSave(void);
 
-void resetPlayerSave(uint16_t player);
+void IOResetPlayerSave(const uint16_t player);
 
-uint16_t getWaterfallBackground(uint16_t level, uint16_t hole);
+uint16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole);
+uint16_t IOGetWaterfallForeground(const uint16_t level, const uint16_t hole);
 
-uint16_t getWaterfallForeground(uint16_t level, uint16_t hole);
+uint16_t IOGetCurrentPlayer(void);
 
-uint16_t getCurrentPlayer(void);
+void IODoPreviousPlayer(void);
+void IODoNextPlayer(void);
 
-void doPreviousPlayer(void);
+uint16_t IOGetCurrentLevel(void);
+uint16_t IOGetPreviousLevel(void);
+uint16_t IOGetNextLevel(void);
 
-void doNextPlayer(void);
+void IODoPreviousLevel(void);
+void IODoNextLevel(void);
+void IODoGoToNextUnplayedLevel(void);
 
-uint16_t getCurrentLevel(void);
+uint16_t IOGetCurrentHole(void);
+uint16_t IOGetPreviousHole(void);
+uint16_t IOGetNextHole(void);
 
-uint16_t getPreviousLevel(void);
+void IOGetLevelStatistics(const uint16_t level, uint16_t* score, uint16_t* par);
+void IOGetHoleStatistics(const uint16_t level, uint16_t hole, uint16_t* score, uint16_t* par);
 
-uint16_t getNextLevel(void);
+void IODoPreviousHole(void);
+void IODoNextHole(void);
 
-void doPreviousLevel(void);
+void IOSetCurrentHoleScore(const uint16_t score);
 
-void doNextLevel(void);
+uint16_t IOGetPar(const uint16_t level, const uint16_t hole);
 
-void goToNextUnplayedLevel(void);
+uint16_t IOGetCurrentHolePar(void);
 
-uint16_t getCurrentHole(void);
+uint16_t IOGetScore(uint16_t level, uint16_t hole);
 
-uint16_t getPreviousHole(void);
-
-uint16_t getNextHole(void);
-
-void getLevelStatistics(uint16_t level, uint16_t* score, uint16_t* par);
-
-void getHoleStatistics(uint16_t level, uint16_t hole, uint16_t* score, uint16_t* par);
-
-void doPreviousHole(void);
-
-void doNextHole(void);
-
-void setHoleScore(uint16_t score);
-
-uint16_t getPar(uint16_t level, uint16_t hole);
-
-uint16_t getCurrentHolePar(void);
-
-uint16_t getScore(uint16_t level, uint16_t hole);
-
-uint16_t getCurrentHoleScore(void);
+uint16_t IOGetCurrentHoleScore(void);

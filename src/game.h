@@ -10,8 +10,7 @@
 int gameLoop(void* data);
 
 int gameGetFrameCount(void);
-void gameResetFrameCount(void);
-
+void gameDoResetFrameCount(void);
 
 void gameSetTurretBarrelAngle(const float angle);
 float gameGetTurretBarrelAngle(void);
@@ -32,6 +31,6 @@ float gameDoApplyScrollEasing(void);
 float gameGetParalaxFactorFar(void);
 float gameGetParalaxFactorNear(void);
 
-void gamePopulateMenuGame(void);
-void gamePopulateMenuTitlesPlayer(void);
-void gamePopulateMenuTitles(void);
+void gameDoPopulateMenuGame(void);
+void gameDoPopulateMenuTitlesPlayer(void);
+void gameDoPopulateMenuTitles(void);

@@ -6,6 +6,8 @@ PlaydateAPI* pd = NULL;
 
 static void (*pdxlogf)(const char*, ...);
 
+/// ///
+
 void setPDPtr(PlaydateAPI* p) {
 	pd = p;
 	pdxlogf = p->system->logToConsole;

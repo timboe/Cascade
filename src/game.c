@@ -24,13 +24,13 @@ float m_vY = 0;
 /// ///
 
 int gameGetFrameCount() { return m_frameCount; }
-void gameResetFrameCount(void) { m_frameCount = 0; }
+void gameDoResetFrameCount(void) { m_frameCount = 0; }
 
 void gameSetTurretBarrelAngle(const float angle) { m_turretBarrelAngle = angle; }
 float gameGetTurretBarrelAngle(void) { return m_turretBarrelAngle; }
 
 uint16_t gameGetPreviousWaterfall(void) { return m_previousWaterfall; }
-void gameDoResetPreviousWaterfall(void) { m_previousWaterfall = getWaterfallForeground(getCurrentLevel(), 0); }
+void gameDoResetPreviousWaterfall(void) { m_previousWaterfall = IOGetWaterfallForeground(IOGetCurrentLevel(), 0); }
 
 int gameLoop(void* _data) {
   pd->graphics->setBackgroundColor(kColorWhite); // TODO make me black
@@ -44,14 +44,14 @@ int gameLoop(void* _data) {
   const enum FSM_t fsm = FSMUpdate();
   const enum GameMode_t gm = FSMGetGameMode();
 
-  clickHandlerReplacement();
+  inputDoHandle(fsm, gm);
 
-  if (!getSubFreeze()) {
+  if (!renderGetSubFreeze()) {
     if (gm == kGameWindow) { // TODO eliminate me
-      boardUpdate();
-      updateSpace(m_frameCount, fsm);
+      boardDoUpdate();
+      physicsDoUpdateSpace(m_frameCount, fsm);
     }
-    render(m_frameCount, fsm, gm);
+    renderDo(m_frameCount, fsm, gm);
   }
 
   ++m_frameCount;
@@ -60,7 +60,7 @@ int gameLoop(void* _data) {
 
 void menuOptionsCallbackResetSave(void* toReset) {
   pdxlog("menuOptionsCallbackResetSave");
-  resetPlayerSave(*(uint16_t*)toReset);
+  IOResetPlayerSave(*(uint16_t*)toReset);
 }
 
 void menuOptionsCallbackQuitHole(void* _unused) {
@@ -72,34 +72,34 @@ void menuOptionsCallbackAudio(void* userData) {
   int value = pd->system->getMenuItemValue((PDMenuItem*)userData);
   // if (value == 0) {
   //   music(true);
-  //   sfx(true);
+  //   soundDoSfx(true);
   // } else if (value == 1) {
   //   music(true);
-  //   sfx(false);
+  //   soundDoSfx(false);
   // } else if (value == 2) {
   //   music(false);
-  //   sfx(true);
+  //   soundDoSfx(true);
   // } else {
   //   music(false);
-  //   sfx(false);
+  //   soundDoSfx(false);
   // }
 }
 
-void gamePopulateMenuTitlesPlayer(void) {
+void gameDoPopulateMenuTitlesPlayer(void) {
   pd->system->removeAllMenuItems();
   pd->system->addMenuItem("reset slot 1", menuOptionsCallbackResetSave, (void*)0);
   pd->system->addMenuItem("reset slot 2", menuOptionsCallbackResetSave, (void*)1);
   pd->system->addMenuItem("reset slot 3", menuOptionsCallbackResetSave, (void*)2);
 }
 
-void gamePopulateMenuTitles(void) {
+void gameDoPopulateMenuTitles(void) {
   pd->system->removeAllMenuItems();
   static const char* options[] = {"Music+SFX", "Music", "SFX", "None"};
   PDMenuItem* menu = pd->system->addOptionsMenuItem("audio", options, 4, menuOptionsCallbackAudio, NULL);
   pd->system->setMenuItemUserdata(menu, (void*) menu); // User data is a pointer to the menu itself
 }
 
-void gamePopulateMenuGame() {
+void gameDoPopulateMenuGame() {
   pd->system->removeAllMenuItems();
   static const char* options[] = {"Music+SFX", "Music", "SFX", "None"};
   PDMenuItem* menu = pd->system->addOptionsMenuItem("audio", options, 4, menuOptionsCallbackAudio, NULL);

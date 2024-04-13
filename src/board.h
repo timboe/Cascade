@@ -51,20 +51,19 @@ struct LinearLoader_t {
   int16_t pathY[MAX_LINEAR_PATH_SEGMENTS];
 };
 
-void boardInit(void);
+void boardDoInit(void);
 
-void boardRandomise(void);
+void boardDoRandomise(void);
 
-void boardUpdate(void);
+void boardDoUpdate(void);
 
-void boardClear(void);
+void boardDoClear(void);
 
-void boardBurstPegs(const float yLevel);
-bool boardBurstRandomPeg(void);
-
-struct Peg_t* boardGetPeg(const uint16_t i);
+void boardDoBurstPegs(const float yLevel);
+bool boardDoBurstRandomPeg(void);
 
 uint16_t boardGetNPegs(void);
+struct Peg_t* boardGetPeg(const uint16_t i);
 
 int16_t boardGetRequiredPegsInPlay(void);
 
@@ -73,8 +72,8 @@ void boardDoRequiredPegHit(void);
 void boardDoSpecialBurst(void);
 
 enum PegSpecial_t boardGetCurrentSpecial(void);
-void boardClearSpecial(void);
+void boardDoClearSpecial(void);
 
-struct Peg_t* boardAddStatic(const struct StaticLoader_t* staticLoader);
-void boardAddLinear(const struct LinearLoader_t* linearLoader);
-void boardAddWheel(const struct EllipticLoader_t* ellipticLoader);
+struct Peg_t* boardDoAddStatic(const struct StaticLoader_t* staticLoader);
+void boardDoAddLinear(const struct LinearLoader_t* linearLoader);
+void boardDoAddWheel(const struct EllipticLoader_t* ellipticLoader);

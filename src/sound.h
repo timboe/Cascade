@@ -5,20 +5,12 @@ enum SfxSample {
  kNSFX
 };
 
-#define N_FOOTSTEPS 6
+void soundDoInit(void);
 
-void initSound(void);
+void musicDoInit(void);
 
-void updateMusic(bool _isTitle);
+void soundDoUpdate(void);
 
-void updateMusicVol(void);
+void soundDoChooseMusic(const int8_t id);
 
-void updateSfx(void);
-
-void pauseMusic(void);
-
-void chooseMusic(int8_t _id);
-
-void resumeMusic(void);
-
-void sfx(enum SfxSample _sample);
+void soundDoSfx(const enum SfxSample sample);

@@ -59,7 +59,7 @@ bool FSMGetBallInPlay(void) {
 }
 
 
-void FSMCommonScrollTo(const int16_t destination, const float progress, const enum EasingFunction_t e) {
+void FSMDoCommonScrollTo(const int16_t destination, const float progress, const enum EasingFunction_t e) {
   const float so = gameGetScrollOffset();
   gameSetScrollOffset(so + (destination - so)*getEasing(e, progress), true);
 }

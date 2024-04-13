@@ -1,16 +1,11 @@
 #pragma once
 #include "game.h"
+#include "fsm.h"
 
-void gameClickConfigHandler(uint32_t _buttonPressed);
+void inputDoHandle(const enum FSM_t fsm, const enum GameMode_t gm);
 
-void clickHandlerReplacement(void);
+bool inputGetPressed(const PDButtons b);
+bool inputGetPressedAny(void);
 
-bool getPressed(PDButtons b);
-
-float getCrankAngle(void);
-
-float getCrankChanged(void);
-
-bool getPressedAny(void);
-
-bool bPressed(void);
+float inputGetCrankAngle(void);
+float inputGetCrankChanged(void);

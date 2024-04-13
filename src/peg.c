@@ -5,19 +5,19 @@
 #include "sshot.h"
 #include "util.h"
 
-void pegUpdateAngle(struct Peg_t* p, float angle);
+void pegDoUpdateAngle(struct Peg_t* p, float angle);
 
 void pegSetBitmapCoordinates(struct Peg_t* p);
 
-///
+///   
 
-void pegInit(struct Peg_t* p, const enum PegShape_t s, const float x, const float y, const float a, const uint8_t size) {
+void pegDoInit(struct Peg_t* p, const enum PegShape_t s, const float x, const float y, const float a, const uint8_t size) {
   if (p->cpBody) {
-    pd->system->error("Error pegInit called on an already initalised peg");
+    pd->system->error("Error pegDoInit called on an already initalised peg");
     return;
   }
   if (size >= MAX_PEG_SIZE) {
-    pd->system->error("Error pegInit called with too large size %i", size);
+    pd->system->error("Error pegDoInit called with too large size %i", size);
     return;
   }
 
@@ -39,7 +39,7 @@ void pegInit(struct Peg_t* p, const enum PegShape_t s, const float x, const floa
   cpBodySetPosition(p->cpBody, cpv(x, y));
   cpBodySetAngle(p->cpBody, a);
   cpBodySetUserData(p->cpBody, (void*)p);
-  cpSpaceAddBody(getSpace(), p->cpBody);
+  cpSpaceAddBody(physicsGetSpace(), p->cpBody);
   
   if (s == kPegShapeBall) {
     p->cpShape = cpCircleShapeNew(p->cpBody, BALL_RADIUS*scale, cpvzero);
@@ -48,8 +48,8 @@ void pegInit(struct Peg_t* p, const enum PegShape_t s, const float x, const floa
     p->cpShape = cpBoxShapeNew(p->cpBody, BOX_WIDTH*scale, BOX_HEIGHT*scale, 0.0f);
     p->radius = BOX_MAX*scale;
   } else {    
-    pd->system->error("Error pegInit called with unknown peg shape");
-    pegClear(p);
+    pd->system->error("Error pegDoInit called with unknown peg shape");
+    pegDoClear(p);
     return;
   }
   p->bitmap = getBitmapPeg(p); // Call after setting shape, iAngle and size
@@ -57,25 +57,25 @@ void pegInit(struct Peg_t* p, const enum PegShape_t s, const float x, const floa
   cpShapeSetCollisionType(p->cpShape, FLAG_PEG);
   cpShapeSetFriction(p->cpShape, FRICTION);
   cpShapeSetElasticity(p->cpShape, ELASTICITY);
-  cpSpaceAddShape(getSpace(), p->cpShape);
+  cpSpaceAddShape(physicsGetSpace(), p->cpShape);
 
   pegAddMotionPath(p, x, y); // Motion path location 0 always holds the origin coordinate
   p->pathCurrent = 1; // This then pre-assumes pegAddMotionPath will be called >0 times for kPegMotionPath
 }
 
-void pegClear(struct Peg_t* p) {
-  pegRemove(p);
+void pegDoClear(struct Peg_t* p) {
+  pegDoRemove(p);
   memset(p, 0, sizeof(struct Peg_t));
 }
 
-void pegRemove(struct Peg_t* p) {
+void pegDoRemove(struct Peg_t* p) {
   if (p->cpBody) {
-    cpSpaceRemoveBody(getSpace(), p->cpBody);
+    cpSpaceRemoveBody(physicsGetSpace(), p->cpBody);
     cpBodyFree(p->cpBody);
     p->cpBody = NULL;
   }
   if (p->cpShape) {
-    cpSpaceRemoveShape(getSpace(), p->cpShape);
+    cpSpaceRemoveShape(physicsGetSpace(), p->cpShape);
     cpShapeFree(p->cpShape);
     p->cpShape = NULL;
   }
@@ -91,7 +91,7 @@ void pegSetBitmapCoordinates(struct Peg_t* p) {
   p->yBitmap = p->y - p->radius;
 }
 
-void pegUpdateAngle(struct Peg_t* p, float angle) {
+void pegDoUpdateAngle(struct Peg_t* p, float angle) {
   if (p->shape == kPegShapeBall) {
     return; // Time saving, the angle is irrelevent for circles
   }
@@ -101,7 +101,7 @@ void pegUpdateAngle(struct Peg_t* p, float angle) {
   p->bitmap = getBitmapPeg(p);
 }
 
-void pegUpdate(struct Peg_t* p) {
+void pegDoUpdate(struct Peg_t* p) {
   if (p->state == kPegStateRemoved) {
     return;
   }
@@ -119,7 +119,7 @@ void pegUpdate(struct Peg_t* p) {
     p->x = p->pathX[0] + (p->a * cosf(easing));
     p->y = p->pathY[0] + (p->b * sinf(easing));
     if (p->doArcAngle) {
-      pegUpdateAngle(p, easing + (M_PIf * 0.5f) ); // Offset to point inwards
+      pegDoUpdateAngle(p, easing + (M_PIf * 0.5f) ); // Offset to point inwards
     }
 
   } else if (p->motion == kPegMotionPath) {
@@ -130,7 +130,7 @@ void pegUpdate(struct Peg_t* p) {
     
     // TODO - this isn't great, no easing
     if (p->doArcAngle) {
-      pegUpdateAngle(p, (totLenFrac * M_2PIf) + (M_PIf * 0.5f) ); // Offset to point inwards
+      pegDoUpdateAngle(p, (totLenFrac * M_2PIf) + (M_PIf * 0.5f) ); // Offset to point inwards
     }
 
     // TODO - cache this for calls after the first
@@ -159,7 +159,7 @@ void pegUpdate(struct Peg_t* p) {
 
   } else {
 
-    pd->system->error("Error pegUpdate called with unknown peg motion");
+    pd->system->error("Error pegDoUpdate called with unknown peg motion");
 
   }
 
@@ -211,7 +211,7 @@ void pegAddMotionPath(struct Peg_t* p, const int16_t x, const int16_t y) {
   p->pathSteps++;
 }
 
-void pegMotionPathFinalise(struct Peg_t* p) {
+void pegDoMotionPathFinalise(struct Peg_t* p) {
   // Close the loop
   pegAddMotionPath(p, p->pathX[0], p->pathY[0]);
   p->motion = kPegMotionPath;
@@ -222,28 +222,28 @@ void pegDoHit(struct Peg_t* p) {
     p->state = kPegStateHit;
     FSMDoResetBallStuckCounter();
     if (p->type == kPegTypeRequired) {
-      addTrauma(TRAMA_REQUIRED_HIT);
-      addFreeze(FREEZE_REQUIRED_HIT);
+      renderAddTrauma(TRAMA_REQUIRED_HIT);
+      renderAddFreeze(FREEZE_REQUIRED_HIT);
       boardDoRequiredPegHit();
     } else {
-      addTrauma(TRAMA_PEG_HIT);
-      addFreeze(FREEZE_PEG_HIT);
+      renderAddTrauma(TRAMA_PEG_HIT);
+      renderAddFreeze(FREEZE_PEG_HIT);
     }
     const enum PegSpecial_t special = boardGetCurrentSpecial();
-    if (special == kPegSpecialMultiball && !getSecondBallInPlay()) {
-      setSecondBallInPlay();
+    if (special == kPegSpecialMultiball && !physicsGetSecondBallInPlay()) {
+      physicsSetSecondBallInPlay();
     } else if (special == kPegSpecialBurst) {
-      boardClearSpecial(); // Do this first, it's going to recurse!
+      boardDoClearSpecial(); // Do this first, it's going to recurse!
       boardDoSpecialBurst();
     }
   }
   // pd->system->logToConsole("bam!");
 }
 
-bool pegCheckBurst(struct Peg_t* p, const float y) {
+bool pegDoCheckBurst(struct Peg_t* p, const float y) {
   if (p->state == kPegStateHit && p->y >= y) {
     p->state = kPegStateRemoved;
-    pegRemove(p);
+    pegDoRemove(p);
     return true;
   }
   return false;

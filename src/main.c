@@ -14,60 +14,53 @@ __declspec(dllexport)
 #endif
 
 static void init(void) {
-  boardInit();
-  scanLevels(); // Expensive?
+  boardDoInit();
+  IODoScanLevels(); // Expensive?
   initBitmap(); // Expensive - after scan level
-  initSound();
-  initSpace();
+  soundDoInit();
+  physicsDoInitSpace();
 
   FSMDo(kTitlesFSM_DisplayTitles);
 }
 
-static void deinit(void) {
-}
-
-int eventHandler(PlaydateAPI* playdate, PDSystemEvent event, uint32_t arg) {
+int eventHandler(PlaydateAPI* pd, PDSystemEvent event, uint32_t arg) {
   switch (event) {
     case kEventInit:;
       pdxlog("EH: init");
-      setPDPtr(playdate);
+      setPDPtr(pd);
       init();
-      playdate->display->setRefreshRate(TICK_FREQUENCY);
-      playdate->system->setUpdateCallback(gameLoop, NULL);
+      pd->display->setRefreshRate(TICK_FREQUENCY);
+      pd->system->setUpdateCallback(gameLoop, NULL);
       break;
     case kEventTerminate:; case kEventLock:; case kEventLowPower:;
       pdxlog("EH: terminate/lock/low-p");
-      doSave();
-      if (event == kEventTerminate) {
-        deinit();
-      }
+      IODoSave();
       break;
     case kEventUnlock:;
       pdxlog("EH: unlock");
       break;
     case kEventPause:;
       pdxlog("EH: pause");
-      //playdate->system->setMenuImage(getPauseImage(), 0); // TODO
+      //pd->system->setMenuImage(getPauseImage(), 0); // TODO
       break;
     case kEventResume:;
       pdxlog("EH: resume");
       break;
     case kEventKeyPressed:;
       #ifdef DEV
-      playdate->system->logToConsole("EH: pressed %i", arg);
+      pd->system->logToConsole("EH: pressed %i", arg);
       #endif
       break;
     case kEventKeyReleased:;
       #ifdef DEV
-      playdate->system->logToConsole("EH: released %i", arg);
+      pd->system->logToConsole("EH: released %i", arg);
       #endif
       break;
     default:
       #ifdef DEV
-      playdate->system->logToConsole("EH: unknown event %i with arg %i", event, arg);
+      pd->system->logToConsole("EH: unknown event %i with arg %i", event, arg);
       #endif
       break;
   }
-  
   return 0;
 }

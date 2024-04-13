@@ -3,30 +3,26 @@
 #include "fsm.h"
 #include "chipmunk/chipmunk.h"
 
-void initSpace(void);
+void physicsDoInitSpace(void);
 
-void updateSpace(int32_t frameCount, enum FSM_t fsm);
+void physicsDoUpdateSpace(const int32_t fc, const enum FSM_t fsm);
 
-cpBody* getBall(uint8_t n);
+cpBody* physicsGetBall(const uint8_t n);
 
-void addSecondBall(void);
+cpSpace* physicsGetSpace(void);
 
-void removeSecondBall(void);
+void physicsDoAddSecondBall(void);
+void physicsDoRemoveSecondBall(void);
 
-void setSecondBallInPlay(void);
+void physicsSetSecondBallInPlay(void);
+bool physicsGetSecondBallInPlay(void);
 
-bool getSecondBallInPlay(void);
+int16_t* physicsGetMotionTrailX(const uint8_t n);
+int16_t* physicsGetMotionTrailY(const uint8_t n);
 
-// cpShape* getBallShape(void);
+void physicsDoLaunchBall(const float strength);
 
-int16_t* motionTrailX(uint8_t n);
+void physicsDoResetBall(uint8_t n);
 
-int16_t* motionTrailY(uint8_t n);
+void physicsDoSecondTryBall(void);
 
-void launchBall(float strength);
-
-void resetBall(uint8_t n);
-
-void secondTryBall(void);
-
-cpSpace* getSpace(void);

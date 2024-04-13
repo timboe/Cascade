@@ -23,7 +23,7 @@ static PlaydateAPI* pd = NULL;
 
 static cpSpace *SPACE;
 static LCDBitmap* BG_BITMAP;
-void initSpace(void) {
+void physicsDoInitSpace(void) {
   SPACE = cpSpaceNew();
   cpSpaceSetIterations(SPACE, 20);
   cpSpaceSetGravity(SPACE, cpv(0.0, 400.0));
@@ -55,7 +55,7 @@ void initSpace(void) {
   // cpShapeSetFriction(shape, 1.0f);
 }
 
-void updateSpace(void) {
+void physicsDoUpdateSpace(void) {
   cpSpaceStep(SPACE, TIMESTEP);
 }
 
@@ -304,10 +304,10 @@ update(__attribute__ ((unused)) void* ud)
   pd->graphics->clear(kColorWhite);        
 
 
-  float crankAngle = pd->system->getCrankAngle();
+  float crankAngle = pd->system->inputGetCrankAngle();
   updateCranker((crankAngle / 360.0f) * (float)M_PIf * 2.0f);
 
-  updateSpace();
+  physicsDoUpdateSpace();
 
   drawSpace();
   drawDrum();
@@ -331,7 +331,7 @@ eventHandler(PlaydateAPI* playdate, PDSystemEvent event, __attribute__ ((unused)
 
     // font = pd->graphics->loadFont("/System/Fonts/Asheville-Sans-14-Bold.pft", NULL);
 
-    initSpace();
+    physicsDoInitSpace();
     initCranker();
     initDrum();
     connectCranker();

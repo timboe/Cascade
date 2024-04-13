@@ -75,13 +75,13 @@ struct Peg_t {
 
 };
 
-void pegInit(struct Peg_t* p, const enum PegShape_t s, const float x, const float y, const float a, const uint8_t size);
+void pegDoInit(struct Peg_t* p, const enum PegShape_t s, const float x, const float y, const float a, const uint8_t size);
 
-void pegClear(struct Peg_t* p);
+void pegDoClear(struct Peg_t* p);
 
-void pegRemove(struct Peg_t* p);
+void pegDoRemove(struct Peg_t* p);
 
-void pegUpdate(struct Peg_t* p);
+void pegDoUpdate(struct Peg_t* p);
 
 void petSetType(struct Peg_t* p, const enum PegType_t type);
 
@@ -99,8 +99,8 @@ void pegSetMotionStatic(struct Peg_t* p);
 
 void pegAddMotionPath(struct Peg_t* p, const int16_t x, const int16_t y);
 
-void pegMotionPathFinalise(struct Peg_t* p);
+void pegDoMotionPathFinalise(struct Peg_t* p);
 
 void pegDoHit(struct Peg_t* p);
 
-bool pegCheckBurst(struct Peg_t* p, const float y);
+bool pegDoCheckBurst(struct Peg_t* p, const float y);

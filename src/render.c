@@ -18,16 +18,16 @@ void renderGame(const int32_t fc, const enum FSM_t fsm);
 
 /// ///
 
-void addFreeze(const uint16_t amount) { m_freeze += amount; }
+void renderAddFreeze(const uint16_t amount) { m_freeze += amount; }
 
-bool getSubFreeze(void) {
+bool renderGetSubFreeze(void) {
   if (m_freeze) {
     return m_freeze--;
   }
   return false;
 }
 
-void addTrauma(const float amount) {
+void renderAddTrauma(const float amount) {
   m_trauma += amount;
   m_trauma *= -1;
   m_decay = amount;
@@ -36,7 +36,7 @@ void addTrauma(const float amount) {
   m_sTraumaAngle = sinf(traumaAngle) * TRAUMA_AMPLIFICATION;
 }
 
-void render(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) {
+void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) {
   if (!pd->system->getReduceFlashing() && m_decay > 0.0f) {
     m_decay -= TRAUMA_DECAY;
     m_trauma += (m_trauma > 0 ? -m_decay : m_decay);
