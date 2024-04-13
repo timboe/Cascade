@@ -9,6 +9,7 @@ uint16_t m_requiredPegsInPlay = 0;
 
 enum PegSpecial_t m_special = kPegSpecialNotSpecial;
 
+
 ///
 
 int16_t requiredPegsInPlay(void) {
