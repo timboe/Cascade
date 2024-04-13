@@ -1,18 +1,18 @@
 #include "game.h"
 #include "fsm.h"
 
-enum kFSM m_FSM = (enum kFSM)0;
+enum FSM_t m_FSM = (enum FSM_t)0;
 
 ///
 
-enum kFSM getFSM(void) { return m_FSM; }
+enum FSM_t FSMGet(void) { return m_FSM; }
 
-enum kFSM updateFSM(void) { 
-  doFSM(m_FSM);
+enum FSM_t FSMUpdate(void) { 
+  FSMDo(m_FSM);
   return m_FSM;
 }
 
-void doFSM(enum kFSM transitionTo) {
+void FSMDo(enum FSM_t transitionTo) {
   bool newState = (m_FSM != transitionTo);
   if (newState) { 
     m_FSM = transitionTo;
@@ -50,16 +50,16 @@ void doFSM(enum kFSM transitionTo) {
   }
 }
 
-enum kGameMode getGameMode(void) { 
+enum GameMode_t FSMGetGameMode(void) { 
   return (m_FSM < kFSM_SPLIT_TitlesGame ? kTitles : kGameWindow);
 }
 
-bool ballInPlay(void) {
+bool FSMGetBallInPlay(void) {
   return (m_FSM >= kGameFSM_BallInPlay && m_FSM <= kGameFSM_BallGutter);
 }
 
 
-void commonScrollTo(const int16_t destination, const float progress, const enum EasingFunction_t e) {
+void FSMCommonScrollTo(const int16_t destination, const float progress, const enum EasingFunction_t e) {
   const float so = getScrollOffset();
   setScrollOffset(so + (destination - so)*getEasing(e, progress), true);
 }

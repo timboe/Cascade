@@ -31,7 +31,7 @@ void pegInit(struct Peg_t* p, const enum PegShape_t s, const float x, const floa
   p->iAngle = radToByte(a);
   p->speed = 1.0f;
   p->size = size;
-  p->easing = EaseLinear;
+  p->easing = kEaseLinear;
   const float scale = sizeToScale(size);
 
   p->cpBody = cpBodyNewKinematic();
@@ -217,9 +217,9 @@ void pegMotionPathFinalise(struct Peg_t* p) {
 }
 
 void pegDoHit(struct Peg_t* p) {
-  if (p->state == kPegStateActive && ballInPlay()) {
+  if (p->state == kPegStateActive && FSMGetBallInPlay()) {
     p->state = kPegStateHit;
-    resetBallStuckCounter();
+    FSMDoResetBallStuckCounter();
     if (p->type == kPegTypeRequired) {
       addTrauma(TRAMA_REQUIRED_HIT);
       addFreeze(FREEZE_REQUIRED_HIT);

@@ -20,7 +20,7 @@ static void init(void) {
   initSound();
   initSpace();
 
-  doFSM(kTitlesFSM_DisplayTitles);
+  FSMDo(kTitlesFSM_DisplayTitles);
 }
 
 static void deinit(void) {

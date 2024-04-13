@@ -37,7 +37,7 @@ void resetBallTrace(void) {
 }
 
 void renderGameBall(const int32_t fc) {
-  if (!ballInPlay()) {
+  if (!FSMGetBallInPlay()) {
     // render at dummy location
     pd->graphics->setDrawMode(kDrawModeInverted);
     pd->graphics->drawBitmap(getBitmapBall(), DEVICE_PIX_X/2 - BALL_RADIUS, getMinimumY() + TURRET_RADIUS - BALL_RADIUS, kBitmapUnflipped);
@@ -61,7 +61,7 @@ void renderGameBall(const int32_t fc) {
   }
 }
 
-void renderGamePoot(const enum kFSM fsm) {
+void renderGamePoot(const enum FSM_t fsm) {
   if (fsm == kGameFSM_AimMode && m_ballPootRadius) {
     pd->graphics->setDrawMode(kDrawModeNXOR);
     pd->graphics->drawBitmap(getBitmapAnimPoot(m_ballPootRadius), DEVICE_PIX_X/2 - TURRET_RADIUS, getMinimumY(), kBitmapUnflipped);
@@ -84,7 +84,7 @@ void renderGameTurret(void) {
 }
 
 void renderGameTrajectory(void) {
-  if (getFSM() != kGameFSM_AimMode) {
+  if (FSMGet() != kGameFSM_AimMode) {
     return;
   }
   for (int i = 2; i < m_ballTraces; ++i) {
@@ -104,7 +104,7 @@ void renderGameBoard(void) {
     }
     pd->graphics->drawBitmap(p->bitmap, p->xBitmap, p->yBitmap, kBitmapUnflipped);
     pd->graphics->setDrawMode(kDrawModeCopy);
-    // if (!ballInPlay() && !getScreenShotInProgress()) {
+    // if (!FSMGetBallInPlay() && !getScreenShotInProgress()) {
     //   if (p->motion == kPegMotionEllipse) {
     //     pd->graphics->fillEllipse(p->pathX[0]-3, p->pathY[0]-3, 6, 6, 0.0f, 360.0f, kColorWhite);
     //     pd->graphics->fillEllipse(p->pathX[0]-2, p->pathY[0]-2, 4, 4, 0.0f, 360.0f, kColorBlack);
@@ -155,7 +155,7 @@ void renderGameGutter(void) {
   const int32_t parallax = getParalaxFactorNear(); // Note: float -> int here
   const int32_t so = getScrollOffset();
 
-  if (so > gutterY + parallax - DEVICE_PIX_Y && getFSM() != kGameFSM_ScoresToTitle) {
+  if (so > gutterY + parallax - DEVICE_PIX_Y && FSMGet() != kGameFSM_ScoresToTitle) {
     pd->graphics->drawBitmap(getBitmapWfPond(), 0, gutterY + parallax, kBitmapUnflipped);
     pd->graphics->drawRect(0, gutterY + parallax, DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
     pd->graphics->drawRect(1, gutterY + parallax + 1, DEVICE_PIX_X-2, DEVICE_PIX_Y-2, kColorBlack);

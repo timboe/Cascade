@@ -14,7 +14,7 @@ float m_cTraumaAngle = 0.0f, m_sTraumaAngle;
 uint16_t m_freeze = 0;
 
 void renderTitles(void);
-void renderGame(const int32_t fc, const enum kFSM fsm);
+void renderGame(const int32_t fc, const enum FSM_t fsm);
 
 /// ///
 
@@ -36,7 +36,7 @@ void addTrauma(const float amount) {
   m_sTraumaAngle = sinf(traumaAngle) * TRAUMA_AMPLIFICATION;
 }
 
-void render(const int32_t fc, const enum kFSM fsm, const enum kGameMode gm) {
+void render(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) {
   if (!pd->system->getReduceFlashing() && m_decay > 0.0f) {
     m_decay -= TRAUMA_DECAY;
     m_trauma += (m_trauma > 0 ? -m_decay : m_decay);
@@ -89,7 +89,7 @@ void renderTitles(void) {
 
 
 
-void renderGame(int32_t fc, enum kFSM fsm) {
+void renderGame(int32_t fc, enum FSM_t fsm) {
   // DRAW BACKGROUND
   renderGameBackground();
 

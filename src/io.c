@@ -219,7 +219,7 @@ void doWrite(void* userdata, const char* str, int len) {
 
 void decodeError(json_decoder* jd, const char* error, int linenum) {
   pd->system->logToConsole("decode error line %i: %s", linenum, error);
-  doFSM(kTitlesFSM_DisplayTitles);
+  FSMDo(kTitlesFSM_DisplayTitles);
 }
 
 
@@ -516,7 +516,7 @@ void loadCurrentHole() {
   }
   if (!file) {
     pd->system->error("loadCurrentHole CANNOT FIND LEVEL %i %i", (int)m_level+1, (int)m_hole+1);
-    doFSM(kTitlesFSM_DisplayTitles);
+    FSMDo(kTitlesFSM_DisplayTitles);
     return;
   }
   static json_decoder jd = {

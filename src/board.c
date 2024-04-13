@@ -157,7 +157,7 @@ void boardRandomise(void) {
   //     y[leg] = y[leg-1] - 64 + rand() % 128;
   //   }
   //   const enum PegShape_t s = (rand() % 2 ? kPegShapeBall : kPegShapeRect);
-  //   const enum EasingFunction_t e = (enum EasingFunction_t) rand() % NEasingFunctions;
+  //   const enum EasingFunction_t e = (enum EasingFunction_t) rand() % kNEasingFunctions;
   //   const float speed = 0.1f * ((rand() % 10) + 1); 
   //   boardAddPath(PEGS_PER_PATH, M_2PIf, s, e, x, y, speed);    
   // }

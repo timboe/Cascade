@@ -79,7 +79,7 @@ void ssRender(void) {
   pd->system->logToConsole("ssRender, y=%i frame %i", m_yOffset, getFrameCount());
   setScrollOffset(DEVICE_PIX_Y * m_yOffset, true);
   pd->graphics->setDrawOffset(0, -DEVICE_PIX_Y * m_yOffset);
-  render(getFrameCount(), getGameMode(), getFSM());
+  render(getFrameCount(), FSMGetGameMode(), FSMGet());
   m_doRender = false;
 }
 

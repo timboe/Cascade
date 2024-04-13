@@ -5,7 +5,7 @@
 
 void initSpace(void);
 
-void updateSpace(int32_t frameCount, enum kFSM fsm);
+void updateSpace(int32_t frameCount, enum FSM_t fsm);
 
 cpBody* getBall(uint8_t n);
 

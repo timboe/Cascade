@@ -41,8 +41,8 @@ int gameLoop(void* _data) {
     return 1;
   }
 
-  const enum kFSM fsm = updateFSM();
-  const enum kGameMode gm = getGameMode();
+  const enum FSM_t fsm = FSMUpdate();
+  const enum GameMode_t gm = FSMGetGameMode();
 
   clickHandlerReplacement();
 

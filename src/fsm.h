@@ -2,13 +2,13 @@
 #include "game.h"
 #include "easing.h"
 
-enum kGameMode {
+enum GameMode_t {
   kTitles, 
   kGameWindow,
   kNGameModes
 };
 
-enum kFSM {
+enum FSM_t {
   kFSM_INITIAL,
   kTitlesFSM_DisplayTitles,
   kTitlesFSM_TitlesToChoosePlayer,
@@ -38,19 +38,19 @@ enum kFSM {
   kNFSMModes
 };
 
-void doFSM(enum kFSM transitionTo);
+void FSMDo(enum FSM_t transitionTo);
 
-enum kFSM updateFSM(void);
+enum FSM_t FSMUpdate(void);
 
-enum kFSM getFSM(void);
+enum FSM_t FSMGet(void);
 
-enum kGameMode getGameMode(void);
+enum GameMode_t FSMGetGameMode(void);
 
-bool ballInPlay(void);
+bool FSMGetBallInPlay(void);
 
-void resetBallStuckCounter(void);
+void FSMDoResetBallStuckCounter(void);
 
-void commonScrollTo(const int16_t destination, const float progress, const enum EasingFunction_t e);
+void FSMCommonScrollTo(const int16_t destination, const float progress, const enum EasingFunction_t e);
 
 void FSMDisplayTitles(const bool newState);
 void FSMTitlesToChoosePlayer(const bool newState);

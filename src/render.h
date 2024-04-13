@@ -2,7 +2,7 @@
 #include "game.h"
 #include "fsm.h"
 
-void render(const int32_t fc, const enum kFSM fsm, const enum kGameMode gm);
+void render(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm);
 
 void addTrauma(const float amount);
 
@@ -29,7 +29,7 @@ void renderTitlesHoleSelect(const bool locked);
 void renderTitlesTransitionLevelSplash(void);
 
 void renderGameBall(const int32_t fc);
-void renderGamePoot(const enum kFSM fsm);
+void renderGamePoot(const enum FSM_t fsm);
 void renderGameTurret(void);
 void renderGameTrajectory(void);
 void renderGameBoard(void);

@@ -151,7 +151,7 @@ void resetBall(uint8_t n) {
   cpShapeSetElasticity(m_ballShape[n], ELASTICITY);
 }
 
-void updateSpace(int32_t fc, enum kFSM fsm) {
+void updateSpace(int32_t fc, enum FSM_t fsm) {
   cpSpaceStep(m_space, TIMESTEP);
   
   const cpVect pos = cpBodyGetPosition(m_ball[0]);

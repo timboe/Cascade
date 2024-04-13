@@ -28,7 +28,7 @@ float getCrankAngle(void) { return m_crankAngle; }
 float getCrankChanged(void) { return m_crankChanged; }
 
 void gameClickConfigHandler(uint32_t buttonPressed) {
-  switch (getGameMode()) {
+  switch (FSMGetGameMode()) {
     case kTitles: return clickHandleTitles(buttonPressed);
     case kGameWindow: return clickHandleGameWindow(buttonPressed);
     case kNGameModes: break;
@@ -36,39 +36,39 @@ void gameClickConfigHandler(uint32_t buttonPressed) {
 }
 
 void clickHandleTitles(uint32_t buttonPressed) {
-  if (getFSM() == kTitlesFSM_DisplayTitles) { // Any button
-    doFSM(kTitlesFSM_TitlesToChoosePlayer);
+  if (FSMGet() == kTitlesFSM_DisplayTitles) { // Any button
+    FSMDo(kTitlesFSM_TitlesToChoosePlayer);
     return;
   }
   if (kButtonA == buttonPressed) {
-    switch (getFSM()) {
-      case kTitlesFSM_ChoosePlayer: doFSM(kTitlesFSM_ChoosePlayerToChooseLevel); return;
-      case kTitlesFSM_ChooseLevel: doFSM(kTitlesFSM_ChooseLevelToChooseHole); return;
-      case kTitlesFSM_ChooseHole: doFSM(kTitlesFSM_ChooseHoleToSplash); return;
+    switch (FSMGet()) {
+      case kTitlesFSM_ChoosePlayer: FSMDo(kTitlesFSM_ChoosePlayerToChooseLevel); return;
+      case kTitlesFSM_ChooseLevel: FSMDo(kTitlesFSM_ChooseLevelToChooseHole); return;
+      case kTitlesFSM_ChooseHole: FSMDo(kTitlesFSM_ChooseHoleToSplash); return;
       default: break;
     }
   } else if (kButtonB == buttonPressed) {
-    switch (getFSM()) {
-      case kTitlesFSM_ChooseLevel: doFSM(kTitlesFSM_ChooseLevelToChoosePlayer); return;
-      case kTitlesFSM_ChooseHole: doFSM(kTitlesFSM_ChooseHoleToChooseLevel); return;
+    switch (FSMGet()) {
+      case kTitlesFSM_ChooseLevel: FSMDo(kTitlesFSM_ChooseLevelToChoosePlayer); return;
+      case kTitlesFSM_ChooseHole: FSMDo(kTitlesFSM_ChooseHoleToChooseLevel); return;
       default: break;
     }
   }
 }
 
 void clickHandleGameWindow(uint32_t buttonPressed) {
-  if (kButtonB == buttonPressed  && getFSM() == kGameFSM_AimMode) {
+  if (kButtonB == buttonPressed  && FSMGet() == kGameFSM_AimMode) {
     doScreenShot();
-    doFSM(kGameFSM_AimModeScrollToTop);
-  } else if ((kButtonA == buttonPressed || kButtonDown == buttonPressed) && getFSM() == kGameFSM_ScoresAnimation) {
-    doFSM(kGameFSM_ScoresToSplash);
-  } else if ((kButtonB == buttonPressed || kButtonUp == buttonPressed) && getFSM() == kGameFSM_ScoresAnimation) {
-    doFSM(kGameFSM_ScoresToTitle);
+    FSMDo(kGameFSM_AimModeScrollToTop);
+  } else if ((kButtonA == buttonPressed || kButtonDown == buttonPressed) && FSMGet() == kGameFSM_ScoresAnimation) {
+    FSMDo(kGameFSM_ScoresToSplash);
+  } else if ((kButtonB == buttonPressed || kButtonUp == buttonPressed) && FSMGet() == kGameFSM_ScoresAnimation) {
+    FSMDo(kGameFSM_ScoresToTitle);
   }
 }
 
 void clickHandlerReplacement() {
-  enum kGameMode gm = getGameMode();
+  enum GameMode_t gm = FSMGetGameMode();
   PDButtons current, pushed, released = 0;
   pd->system->getButtonState(&m_current, &pushed, &released);
 
