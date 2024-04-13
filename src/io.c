@@ -7,6 +7,7 @@
 #include "board.h"
 #include "physics.h"
 #include "util.h"
+#include "bitmap.h"
 
 ///
 
@@ -46,6 +47,8 @@ uint16_t m_lineContainerID = 0;
 
 ///
 
+uint16_t m_preloading = 0;
+
 uint16_t m_player = 0;
 uint16_t m_level = 0;
 uint16_t m_hole = 0;
@@ -63,6 +66,8 @@ void IODoWrite(void* userdata, const char* str, int len);
 
 void IODecodeError(json_decoder* jd, const char* error, int linenum);
 
+void IODoScanLevels(void);
+
 ///
 
 int IOShouldDecodeScan(json_decoder* jd, const char* key);
@@ -78,6 +83,36 @@ void IODidDecodeLevel(json_decoder* jd, const char* key, json_value value);
 void* IOFinishDecodeLevel(json_decoder* jd, const char* key, json_value_type type);
 
 /// ///
+
+bool IOGetIsPreloading(void) { return m_preloading != PRELOADING_STEPS; }
+
+float IOGetPreloadingProgress(void) {
+  return m_preloading / (float)PRELOADING_STEPS;
+}
+
+void IODoUpdatePreloading(void) {
+  if (!IOGetIsPreloading()) { return; }
+
+  switch (m_preloading) {
+    case 0: IODoScanLevels(); break;
+    case 1: bitmapDoPreloadA(); break;
+    case 2: bitmapDoPreloadB(); break;
+    case 3: bitmapDoPreloadC(); break;
+    case 4: bitmapDoPreloadD(); break;
+    case 5: bitmapDoPreloadE(); break;
+    case 6: bitmapDoPreloadF(); break;
+    case 7: bitmapDoPreloadG(0); break;
+    case 8: bitmapDoPreloadG(1); break;
+    case 9: bitmapDoPreloadG(2); break;
+    case 10: bitmapDoPreloadG(3); break; 
+    case 11: bitmapDoPreloadG(4); break; // MAX_PEG_SIZE
+    case 12: bitmapDoPreloadH(); break;
+    case 13: bitmapDoPreloadI(); break;
+    case 14: bitmapDoPreloadJ(); break;
+  }
+
+  ++m_preloading;
+}
 
 uint16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole) { return m_level_background[level][hole];}
 uint16_t IOGetWaterfallForeground(const uint16_t level, const uint16_t hole) { return m_level_foreground[level][hole]; }
@@ -220,6 +255,8 @@ uint16_t IOGetScore(const uint16_t level, const uint16_t hole) { return m_player
 uint16_t IOGetCurrentHolePar(void) { return IOGetPar(m_level, m_hole); }
 
 uint16_t IOGetCurrentHoleScore(void) { return IOGetScore(m_level, m_hole); }
+
+const char* IOGetCurrentHoleCreator(void) { return "ZZZZZ"; } // TODO
 
 ///
 

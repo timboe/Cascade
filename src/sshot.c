@@ -60,7 +60,7 @@ void ssInit(void) {
   snprintf(filePath, 128, "level_%i_hole_%i.bmp", IOGetCurrentLevel()+1, IOGetCurrentHole()+1);
   m_imageFile = pd->file->open(filePath, kFileWrite);
  
-  m_imageBitmap = pd->graphics->newBitmap(DEVICE_PIX_X, WFALL_PIX_Y, kColorWhite);
+  m_imageBitmap = pd->graphics->newBitmap(DEVICE_PIX_X, WF_PIX_Y, kColorWhite);
 
   m_pixIndex = 0;
   m_pixWidth = 0;

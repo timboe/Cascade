@@ -1,7 +1,9 @@
 #pragma once
 #include "game.h"
 
-void IODoScanLevels(void);
+bool IOGetIsPreloading(void);
+float IOGetPreloadingProgress(void);
+void IODoUpdatePreloading(void);
 
 void IODoLoadCurrentHole(void);
 
@@ -44,3 +46,5 @@ uint16_t IOGetCurrentHolePar(void);
 uint16_t IOGetScore(uint16_t level, uint16_t hole);
 
 uint16_t IOGetCurrentHoleScore(void);
+
+const char* IOGetCurrentHoleCreator(void);

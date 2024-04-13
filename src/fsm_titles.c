@@ -11,11 +11,15 @@ float FSMCommonCrankNumeral(float* progress);
 /// ///
 
 float FSMCommonCrankNumeral(float* progress) {
+  static uint16_t crankNotMoved = 0;
+  const float cc = inputGetCrankChanged();
   float ret = 0.0f;
-  *progress -= inputGetCrankChanged() * CRANK_NUMBERSCROLL_MODIFIER;
+  *progress -= cc * CRANK_NUMBERSCROLL_MODIFIER;
   if      (inputGetPressed(kButtonUp)) *progress += 10 * CRANK_NUMBERSCROLL_MODIFIER;
-  else if (inputGetPressed(kButtonDown)) *progress -=  10 * CRANK_NUMBERSCROLL_MODIFIER;    
-  *progress *= 0.99f;
+  else if (inputGetPressed(kButtonDown)) *progress -=  10 * CRANK_NUMBERSCROLL_MODIFIER;
+  if (fabsf(cc) < 1.0f) { ++crankNotMoved; }
+  else { crankNotMoved = 0; }
+  if (crankNotMoved > TICK_FREQUENCY/4) { *progress *= 0.9f; }
   if (*progress >= 1.0f) {
     *progress -= 2.0f;
     ret = 1.0f;
@@ -31,7 +35,9 @@ void FSMDisplayTitles(const bool newState) {
   if (newState) { 
     gameDoPopulateMenuTitles();
   }
-  if (!pd->system->isCrankDocked()) { return FSMDo(kTitlesFSM_TitlesToChoosePlayer); }
+  if (!pd->system->isCrankDocked() && !IOGetIsPreloading()) {
+    return FSMDo(kTitlesFSM_TitlesToChoosePlayer);
+  }
 }
 
 void FSMTitlesToChoosePlayer(const bool newState) {

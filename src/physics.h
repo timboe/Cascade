@@ -3,9 +3,9 @@
 #include "fsm.h"
 #include "chipmunk/chipmunk.h"
 
-void physicsDoInitSpace(void);
+void physicsDoInit(void);
 
-void physicsDoUpdateSpace(const int32_t fc, const enum FSM_t fsm);
+void physicsDoUpdate(const int32_t fc, const enum FSM_t fsm);
 
 cpBody* physicsGetBall(const uint8_t n);
 

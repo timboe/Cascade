@@ -66,5 +66,16 @@ void bitmapDoUpdateScoreHistogram(void);
 
 float bitmapSizeToScale(const uint8_t size);
 
+void bitmapDoPreloadA(void);
+void bitmapDoPreloadB(void);
+void bitmapDoPreloadC(void);
+void bitmapDoPreloadD(void);
+void bitmapDoPreloadE(void);
+void bitmapDoPreloadF(void);
+void bitmapDoPreloadG(const uint8_t size);
+void bitmapDoPreloadH(void);
+void bitmapDoPreloadI(void);
+void bitmapDoPreloadJ(void);
+
 #define WF_ID(X, Y) ((WFSHEET_SIZE_X * Y) + X)
 

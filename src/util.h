@@ -1,5 +1,6 @@
 #include "game.h"
 
+// Float to string
 char* ftos(const float value, const int16_t size, char* dest);
 
 void snprintf_c(char* buf, const uint8_t bufSize, const int n);

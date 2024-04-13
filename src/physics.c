@@ -45,7 +45,7 @@ void physicsDoLaunchBall(const float strength) {
   }
 }
 
-void physicsDoInitSpace(void) {
+void physicsDoInit(void) {
   m_space = cpSpaceNew();
   cpSpaceSetIterations(m_space, 10);
   cpSpaceSetGravity(m_space, G);
@@ -56,7 +56,7 @@ void physicsDoInitSpace(void) {
   const float moment = cpMomentForCircle(BALL_MASS, 0.0f, BALL_RADIUS, cpvzero);
   for (int i = 0; i < 2; ++i) {
     m_ball[i] = cpBodyNew(BALL_MASS, moment);
-    cpBodySetPosition(m_ball[i], cpv(0, WFALL_PIX_Y*2));
+    cpBodySetPosition(m_ball[i], cpv(0, WF_PIX_Y*2));
     m_ballShape[i] = cpCircleShapeNew(m_ball[i], BALL_RADIUS, cpvzero);
     cpShapeSetFriction(m_ballShape[i], 0.0f);
     cpShapeSetElasticity(m_ballShape[i], ELASTICITY);
@@ -137,7 +137,7 @@ void physicsDoResetBall(uint8_t n) {
   cpShapeSetElasticity(m_ballShape[n], ELASTICITY);
 }
 
-void physicsDoUpdateSpace(const int32_t fc, const enum FSM_t fsm) {
+void physicsDoUpdate(const int32_t fc, const enum FSM_t fsm) {
   cpSpaceStep(m_space, TIMESTEP);
   
   const cpVect pos = cpBodyGetPosition(m_ball[0]);

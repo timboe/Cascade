@@ -41,6 +41,8 @@ int gameLoop(void* _data) {
     return 1;
   }
 
+  IODoUpdatePreloading();
+
   const enum FSM_t fsm = FSMUpdate();
   const enum GameMode_t gm = FSMGetGameMode();
 
@@ -49,7 +51,7 @@ int gameLoop(void* _data) {
   if (!renderGetSubFreeze()) {
     if (gm == kGameWindow) { // TODO eliminate me
       boardDoUpdate();
-      physicsDoUpdateSpace(m_frameCount, fsm);
+      physicsDoUpdate(m_frameCount, fsm);
     }
     renderDo(m_frameCount, fsm, gm);
   }
@@ -148,8 +150,8 @@ void gameSetScrollOffset(float set, const bool force) {
 
 int16_t gameGetMinimumY(void) { return m_minimumY; }
 void gameSetMinimumY(int16_t y) { 
-  if (y > WFALL_PIX_Y - DEVICE_PIX_Y) {
-    y = WFALL_PIX_Y - DEVICE_PIX_Y; // This is as low as we are allowed to go
+  if (y > WF_PIX_Y - DEVICE_PIX_Y) {
+    y = WF_PIX_Y - DEVICE_PIX_Y; // This is as low as we are allowed to go
   }
   m_minimumY = y;
 }

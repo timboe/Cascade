@@ -112,6 +112,6 @@ void renderGame(int32_t fc, enum FSM_t fsm) {
   renderGameGutter();
 
   // Debug gutter line
-  pd->graphics->drawLine(0, WFALL_PIX_Y, DEVICE_PIX_X, WFALL_PIX_Y, 4, kColorBlack);
-  pd->graphics->drawLine(0, WFALL_PIX_Y, DEVICE_PIX_X, WFALL_PIX_Y, 2, kColorWhite);
+  pd->graphics->drawLine(0, WF_PIX_Y, DEVICE_PIX_X, WF_PIX_Y, 4, kColorBlack);
+  pd->graphics->drawLine(0, WF_PIX_Y, DEVICE_PIX_X, WF_PIX_Y, 2, kColorWhite);
 }

@@ -34,7 +34,7 @@ void inputHandlerClick(const enum FSM_t fsm, const enum GameMode_t gm, const uin
 }
 
 void inputHandleTitles(const enum FSM_t fsm, const uint32_t buttonPressed) {
-  if (fsm == kTitlesFSM_DisplayTitles) { // Any button
+  if (fsm == kTitlesFSM_DisplayTitles && !IOGetIsPreloading()) { // Any button
     FSMDo(kTitlesFSM_TitlesToChoosePlayer);
     return;
   }

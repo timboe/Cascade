@@ -18,7 +18,6 @@
 #define TURRET_ANGLE_MIN 15.0f
 #define TURRET_ANGLE_MAX (360.0f - TURRET_ANGLE_MIN)
 
-
 #define DEVICE_PIX_X 400
 #define DEVICE_PIX_Y 240
 
@@ -27,13 +26,13 @@
 
 #define WFALL_HEIGHT 4
 
-#define WFALL_PIX_X DEVICE_PIX_X
-#define WFALL_PIX_Y (DEVICE_PIX_Y*WFALL_HEIGHT)
+#define WF_PIX_X DEVICE_PIX_X
+#define WF_PIX_Y (DEVICE_PIX_Y*WFALL_HEIGHT)
 
 #define WF_DIVISION_PIX_Y 60
 
 #define WFSHEET_SIZE_X 1
-#define WFSHEET_SIZE_Y (WFALL_PIX_Y/WF_DIVISION_PIX_Y)
+#define WFSHEET_SIZE_Y (WF_PIX_Y/WF_DIVISION_PIX_Y)
 
 #define NUMERAL_PIX_X 128
 #define NUMERAL_PIX_Y 160
@@ -82,14 +81,12 @@
 
 /////////////
 
-#define N_WATERFALLS 2
+#define N_WF 2
 
 // Trying without this
 #define UI_OFFSET_TOP 0
 
-#define SCROLL_OFFSET_MAX (WFALL_PIX_Y - ((3*DEVICE_PIX_Y)/4))
-
-
+#define SCROLL_OFFSET_MAX (WF_PIX_Y - ((3*DEVICE_PIX_Y)/4))
 
 #define N_MUSIC_TRACKS 5
 
@@ -100,7 +97,7 @@
 #define M_2PIf 6.28318530718f
 
 // How many pixels down the side do we have to prevent the ball from bouncing out off
-#define PHYSWALL_PIX_Y (WFALL_PIX_Y + UI_OFFSET_TOP)
+#define PHYSWALL_PIX_Y (WF_PIX_Y + UI_OFFSET_TOP)
 
 #define BALL_RADIUS 8.0f
 #define BALL_MASS 1.0f
@@ -166,3 +163,5 @@
 #define MAX_HOLES 9
 
 #define VERSION "v0.1"
+
+#define PRELOADING_STEPS 15

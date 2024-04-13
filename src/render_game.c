@@ -151,7 +151,7 @@ void renderGameBackground(void) {
 }
 
 void renderGameGutter(void) {
-  const int32_t gutterY = WFALL_PIX_Y - ((WFALL_PIX_Y-DEVICE_PIX_Y) * PARALAX_NEAR);
+  const int32_t gutterY = WF_PIX_Y - ((WF_PIX_Y-DEVICE_PIX_Y) * PARALAX_NEAR);
   const int32_t parallax = gameGetParalaxFactorNear(); // Note: float -> int here
   const int32_t so = gameGetScrollOffset();
 
@@ -161,16 +161,16 @@ void renderGameGutter(void) {
     pd->graphics->drawRect(1, gutterY + parallax + 1, DEVICE_PIX_X-2, DEVICE_PIX_Y-2, kColorBlack);
   }
   //Note no parallax here
-  if (so > WFALL_PIX_Y) {
-    pd->graphics->drawBitmap(BitmapGetScoreHistogram(), 0, WFALL_PIX_Y + DEVICE_PIX_Y, kBitmapUnflipped);
+  if (so > WF_PIX_Y) {
+    pd->graphics->drawBitmap(BitmapGetScoreHistogram(), 0, WF_PIX_Y + DEVICE_PIX_Y, kBitmapUnflipped);
     for (int i = 0; i < m_ballFallN; ++i) {
       pd->graphics->drawBitmap(bitmapGetBall(),
         BUF + BALL_RADIUS/2 + m_ballFallX*3*BALL_RADIUS,
-        WFALL_PIX_Y + DEVICE_PIX_Y + m_ballFallY[i],
+        WF_PIX_Y + DEVICE_PIX_Y + m_ballFallY[i],
         kBitmapUnflipped);
     }
   }
-  if (so > WFALL_PIX_Y + DEVICE_PIX_Y) {
-    pd->graphics->drawBitmap(bitmapGetLevelSplash(), 0, WFALL_PIX_Y + (2*DEVICE_PIX_Y), kBitmapUnflipped);
+  if (so > WF_PIX_Y + DEVICE_PIX_Y) {
+    pd->graphics->drawBitmap(bitmapGetLevelSplash(), 0, WF_PIX_Y + (2*DEVICE_PIX_Y), kBitmapUnflipped);
   }
 }

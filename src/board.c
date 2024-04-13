@@ -5,17 +5,17 @@ struct Peg_t m_pegs[MAX_PEGS];
 
 uint16_t m_nPegs = 0;
 
-uint16_t m_boardGetRequiredPegsInPlay = 0;
+uint16_t m_requiredPegsInPlay = 0;
 
 enum PegSpecial_t m_special = kPegSpecialNotSpecial;
 
 /// ///
 
 int16_t boardGetRequiredPegsInPlay(void) {
-  return m_boardGetRequiredPegsInPlay;
+  return m_requiredPegsInPlay;
 }
 
-void boardDoRequiredPegHit(void) { --m_boardGetRequiredPegsInPlay; }
+void boardDoRequiredPegHit(void) { --m_requiredPegsInPlay; }
 
 void boardDoInit(void) {
   memset(&m_pegs, 0, sizeof(struct Peg_t) * MAX_PEGS);
@@ -24,11 +24,6 @@ void boardDoInit(void) {
   }
 
   // TEMP
-  int i = rand() % 3;
-  if (i == 0) m_special = kPegSpecialAim;
-  else if (i == 1) m_special = kPegSpecialSecondTry;
-  else m_special = kPegSpecialBounce;
-
   m_special = kPegSpecialPenetrate;
 
 }
@@ -69,7 +64,7 @@ void boardDoAddWheel(const struct EllipticLoader_t* ellipticLoader) {
     pegSetMotionDoArcAngle(p, ellipticLoader->useArc);
     pegSetMotionEllipse(p, ellipticLoader->a, ellipticLoader->b);
     if (ellipticLoader->types[i] == kPegTypeRequired) {
-      ++m_boardGetRequiredPegsInPlay;
+      ++m_requiredPegsInPlay;
       petSetType(p, kPegTypeRequired);
     }
   }
@@ -89,7 +84,7 @@ void boardDoAddLinear(const struct LinearLoader_t* linearLoader) {
     pegSetMotionEasing(p, linearLoader->easing);
     pegSetMotionDoArcAngle(p, linearLoader->useArc);
     if (linearLoader->types[i] == kPegTypeRequired) {
-      ++m_boardGetRequiredPegsInPlay;
+      ++m_requiredPegsInPlay;
       petSetType(p, kPegTypeRequired);
     }
     for (int j = 0; j < linearLoader->nLines; ++j) {
@@ -104,7 +99,7 @@ struct Peg_t* boardDoAddStatic(const struct StaticLoader_t* staticLoader) {
   pegDoInit(p, staticLoader->shape, staticLoader->x, staticLoader->y, staticLoader->angle, staticLoader->size);
   pegSetMotionStatic(p);
   if (staticLoader->type == kPegTypeRequired) {
-    ++m_boardGetRequiredPegsInPlay;
+    ++m_requiredPegsInPlay;
     petSetType(p, kPegTypeRequired);
   }
   return p;
@@ -117,8 +112,8 @@ void boardDoRandomise(void) {
 
   for (int i = 0; i < maxStatic; ++i) {
     struct StaticLoader_t staticLoader;
-    staticLoader.x = rand() % WFALL_PIX_X;
-    staticLoader.y = (rand() % WFALL_PIX_Y) + TURRET_RADIUS;
+    staticLoader.x = rand() % WF_PIX_X;
+    staticLoader.y = (rand() % WF_PIX_Y) + TURRET_RADIUS;
     staticLoader.angle = (M_2PIf / 256.0f) * (rand() % 256);
     staticLoader.shape = (rand() % 2 ? kPegShapeBall : kPegShapeRect);
     staticLoader.size = rand() % MAX_PEG_SIZE;
@@ -133,8 +128,8 @@ void boardDoRandomise(void) {
   // #define PEGS_PER_WHEEL 8
   // #define WHEELS 4
   // for (int wheelStep = 0; wheelStep < WHEELS; ++wheelStep) {
-  //   const int16_t x = rand() % WFALL_PIX_X;
-  //   const int16_t y = (rand() % WFALL_PIX_Y) + TURRET_RADIUS;
+  //   const int16_t x = rand() % WF_PIX_X;
+  //   const int16_t y = (rand() % WF_PIX_Y) + TURRET_RADIUS;
   //   const float a = 64 + rand() % 32;
   //   const float b = 64 + rand() % 32;
   //   const enum PegShape_t s = (rand() % 2 ? kPegShapeBall : kPegShapeRect);
@@ -148,8 +143,8 @@ void boardDoRandomise(void) {
   // for (int pathStep = 0; pathStep < PATHS; ++pathStep) {
   //   int16_t x[MAX_LINEAR_PATH_SEGMENTS] = {0};
   //   int16_t y[MAX_LINEAR_PATH_SEGMENTS] = {0};
-  //   x[0] = rand() % WFALL_PIX_X;
-  //   y[0] = (rand() % WFALL_PIX_Y) + TURRET_RADIUS;
+  //   x[0] = rand() % WF_PIX_X;
+  //   y[0] = (rand() % WF_PIX_Y) + TURRET_RADIUS;
   //   const uint8_t pathLegs = 1 + rand() % (MAX_LINEAR_PATH_SEGMENTS/2);
   //   for (int leg = 1; leg <= pathLegs; ++leg) {
   //     x[leg] = x[leg-1] - 64 + rand() % 128;
@@ -174,7 +169,7 @@ void boardDoClear(void) {
     pegDoClear(&m_pegs[i]);
   }
   m_nPegs = 0;
-  m_boardGetRequiredPegsInPlay = 0;
+  m_requiredPegsInPlay = 0;
 }
 
 

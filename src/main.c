@@ -15,11 +15,9 @@ __declspec(dllexport)
 
 static void init(void) {
   boardDoInit();
-  IODoScanLevels(); // Expensive?
-  bitmapDoInit(); // Expensive - after scan level
+  bitmapDoInit();
   soundDoInit();
-  physicsDoInitSpace();
-
+  physicsDoInit();
   FSMDo(kTitlesFSM_DisplayTitles);
 }
 

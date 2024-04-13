@@ -48,8 +48,20 @@ void renderTitlesSplash(void) {
   pd->graphics->drawText("Tim Martin, 2024", 32, kUTF8Encoding, 8, 4);
   pd->graphics->setDrawMode(kDrawModeCopy);
   pd->graphics->drawBitmap(bitmapGetTitleSplash(), 0, 0, kBitmapUnflipped);
-  if (pd->system->isCrankDocked()) { 
-    pd->graphics->drawBitmap(bitmapGetUseTheCrank(), DEVICE_PIX_X - 88, DEVICE_PIX_Y - 51 - 16, kBitmapUnflipped);
+
+  if (IOGetIsPreloading()) {
+
+    const float progress = IOGetPreloadingProgress();
+    const uint16_t x2 = (DEVICE_PIX_X/4) + (DEVICE_PIX_X/2)*progress; 
+    const uint8_t loadingBarWidth = 32;
+    pd->graphics->setLineCapStyle(kLineCapStyleRound);
+    pd->graphics->drawLine(DEVICE_PIX_X/4, (4*DEVICE_PIX_Y)/5, (3*DEVICE_PIX_X)/4, (4*DEVICE_PIX_Y)/5, loadingBarWidth, kColorBlack);
+    pd->graphics->drawLine(DEVICE_PIX_X/4, (4*DEVICE_PIX_Y)/5, x2, (4*DEVICE_PIX_Y)/5, loadingBarWidth/2, kColorWhite);
+
+  } else {
+    if (pd->system->isCrankDocked()) { 
+      pd->graphics->drawBitmap(bitmapGetUseTheCrank(), DEVICE_PIX_X - 88, DEVICE_PIX_Y - 51 - 16, kBitmapUnflipped);
+    }
   }
 }
 

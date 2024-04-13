@@ -129,10 +129,10 @@ void FSMBallInPlay(const bool newState) {
   const float y1 = cpBodyGetPosition(physicsGetBall(0)).y;
   const float y2 = (special == kPegSpecialMultiball ? cpBodyGetPosition(physicsGetBall(1)).y : 0);
   float y = MAX(y1, y2);
-  if (special == kPegSpecialMultiball && physicsGetSecondBallInPlay() && y >= WFALL_PIX_Y + BALL_RADIUS) { y = MIN(y1,y2); }
+  if (special == kPegSpecialMultiball && physicsGetSecondBallInPlay() && y >= WF_PIX_Y + BALL_RADIUS) { y = MIN(y1,y2); }
   gameSetScrollOffset(y - HALF_DEVICE_PIX_Y, false);
   //
-  if (y > WFALL_PIX_Y + BALL_RADIUS) {
+  if (y > WF_PIX_Y + BALL_RADIUS) {
     return FSMDo(kGameFSM_BallGutter);
   } 
   //
@@ -246,7 +246,7 @@ void FSMGutterToTurret(const bool newState) {
 void FSMGutterToScores(const bool newState) {
   static int16_t timer = 0;
   if (newState) { timer = 0; }
-  FSMDoCommonScrollTo(WFALL_PIX_Y + DEVICE_PIX_Y, (float)timer/TIME_GUTTER_TO_SCORE, kEaseOutSine);
+  FSMDoCommonScrollTo(WF_PIX_Y + DEVICE_PIX_Y, (float)timer/TIME_GUTTER_TO_SCORE, kEaseOutSine);
   if (timer++ == TIME_GUTTER_TO_SCORE) {
     renderSetBallFallN(0);
     return FSMDo(kGameFSM_ScoresAnimation);
@@ -295,7 +295,7 @@ void FSMScoresAnimation(const bool newState) {
 void FSMScoresToTitle(const bool newState) {
   static int16_t timer = 0;
   if (newState) { timer = 0; }
-  FSMDoCommonScrollTo(WFALL_PIX_Y, (float)timer/TIME_SCORE_TO_TITLE, kEaseInSine);
+  FSMDoCommonScrollTo(WF_PIX_Y, (float)timer/TIME_SCORE_TO_TITLE, kEaseInSine);
   if (timer++ == TIME_SCORE_TO_TITLE) { return FSMDo(kTitlesFSM_DisplayTitles); }
 }
 
@@ -311,7 +311,7 @@ void FSMScoresToSplash(const bool newState) {
     bitmapDoUpdateGameInfoTopper();
     pd->system->logToConsole("kGameFSM_ScoresToSplash");
   }
-  FSMDoCommonScrollTo(WFALL_PIX_Y + 2*DEVICE_PIX_Y, (float)timer/TIME_SCORE_TO_SPLASH, kEaseOutSine);
+  FSMDoCommonScrollTo(WF_PIX_Y + 2*DEVICE_PIX_Y, (float)timer/TIME_SCORE_TO_SPLASH, kEaseOutSine);
   if (timer++ == TIME_SCORE_TO_SPLASH) { return FSMDo(kGameFSM_DisplaySplash); }
 }
 
