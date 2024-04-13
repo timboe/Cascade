@@ -5,7 +5,7 @@
 SDFile* m_imageFile;
 LCDBitmap* m_imageBitmap;
 
-int32_t m_yOffset = 0;
+int32_t m_yOffsetSS = 0;
 bool m_ssInProgress = false;
 bool m_doRender = true;
 
@@ -48,7 +48,7 @@ void screenShotDo() {
     ssRender();
   } else { 
     ssEncode();
-    if (++m_yOffset == WFALL_HEIGHT) { 
+    if (++m_yOffsetSS == WFALL_HEIGHT) { 
       ssWrite();
     }
   }
@@ -68,7 +68,7 @@ void ssInit(void) {
   m_pixRowBytes = 0;
   m_pixData = NULL;
 
-  m_yOffset = 0;
+  m_yOffsetSS = 0;
   m_ssInProgress = true;
   m_doRender = true;
 
@@ -76,18 +76,18 @@ void ssInit(void) {
 }
 
 void ssRender(void) {
-  pd->system->logToConsole("ssRender, y=%i frame %i", m_yOffset, gameGetFrameCount());
-  gameSetScrollOffset(DEVICE_PIX_Y * m_yOffset, true);
-  pd->graphics->setDrawOffset(0, -DEVICE_PIX_Y * m_yOffset);
+  pd->system->logToConsole("ssRender, y=%i frame %i", m_yOffsetSS, gameGetFrameCount());
+  gameSetYOffset(DEVICE_PIX_Y * m_yOffsetSS, true);
+  pd->graphics->setDrawOffset(0, -DEVICE_PIX_Y * m_yOffsetSS);
   renderDo(gameGetFrameCount(), FSMGetGameMode(), FSMGet());
   m_doRender = false;
 }
 
 void ssEncode(void) {
-  pd->system->logToConsole("ssEncode, y=%i frame %i", m_yOffset, gameGetFrameCount());
+  pd->system->logToConsole("ssEncode, y=%i frame %i", m_yOffsetSS, gameGetFrameCount());
   LCDBitmap* frame = pd->graphics->getDisplayBufferBitmap(); // Not owned
   pd->graphics->pushContext(m_imageBitmap);
-  pd->graphics->drawBitmap(frame, 0, DEVICE_PIX_Y * m_yOffset, kBitmapUnflipped);
+  pd->graphics->drawBitmap(frame, 0, DEVICE_PIX_Y * m_yOffsetSS, kBitmapUnflipped);
   pd->graphics->popContext();
   m_doRender = true;
 }

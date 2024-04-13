@@ -10,6 +10,8 @@ void renderAddFreeze(const uint16_t amount);
 
 bool renderGetSubFreeze(void);
 
+void renderSetScale(const uint8_t scale);
+
 void renderSetBallTrace(const uint16_t i, const uint16_t x, const uint16_t y);
 
 void renderSetBallPootCircle(const uint16_t radius);

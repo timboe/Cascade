@@ -71,7 +71,7 @@ void renderGamePoot(const enum FSM_t fsm) {
 
 void renderGameTurret(void) {
   const int16_t minY = gameGetMinimumY();
-  const int16_t so = gameGetScrollOffset();
+  const int16_t so = gameGetYOffset();
   if (so - minY >= 2*TURRET_RADIUS) {
     return;
   }
@@ -120,40 +120,40 @@ void renderGameBoard(void) {
 void renderGameBackground(void) {
   if (screenShotGetInProgress()) { return; }
 
-  const int32_t parallax = gameGetParalaxFactorFar(); // Note: float -> int here
-  const int32_t so = ((int32_t) gameGetScrollOffset()) - UI_OFFSET_TOP - parallax;
+  const int32_t parallax = gameGetParalaxFactorFar(false); // Note: float -> int here. Hard=false
+  const int32_t so = ((int32_t) gameGetYOffset()) - parallax;
   const uint32_t start = MAX(0, so / WF_DIVISION_PIX_Y);
   // pd->system->logToConsole("so is %i, rendering from %i to %i", so, start, start+5);
   uint8_t wf = 0;
-  static uint8_t wfOffC = 0;
-  int8_t wfOff = 59 - (wfOffC % 60); 
+  static float wfOffC = 0;
+  int16_t wfOff = 59 - ((int)wfOffC % 60); 
   //pd->system->logToConsole("off %i", wfOff);
-  wfOffC += 2;
+  wfOffC += WF_VELOCITY * physicsGetTimestepMultiplier();
   // NOTE: Need to draw one extra background due to animation
   for (uint32_t i = start; i < start+6; ++i) {
     if (i >= (WFSHEET_SIZE_Y - 2)) break;
-    pd->graphics->drawBitmap(bitmapGetWfBg(wf), WF_BG_OFFSET[wf], UI_OFFSET_TOP + (WF_DIVISION_PIX_Y * i) - wfOff + parallax, kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetWfBg(wf), WF_BG_OFFSET[wf], (WF_DIVISION_PIX_Y * i) - wfOff + parallax, kBitmapUnflipped);
   }
   for (uint32_t i = start; i < start+5; ++i) {
     LCDBitmap* bm = bitmapGetWfFg(wf, 0, i);
-    if (bm) pd->graphics->drawBitmap(bm, 0, UI_OFFSET_TOP + (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
+    if (bm) pd->graphics->drawBitmap(bm, 0, (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
   }
 
   const float minY = gameGetMinimumY(); 
-  if (gameGetScrollOffset() - minY < 0) {
+  if (gameGetYOffset() - minY < 0) {
     pd->graphics->fillRect(0, minY - TURRET_RADIUS - 60, DEVICE_PIX_X, 60, kColorBlack); // mask in case of over-scroll
     pd->graphics->drawBitmap(bitmapGetGameInfoTopper(), 0, minY - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
   }
 
-  if (gameGetScrollOffset() <= -TURRET_RADIUS) { // Note no parallax here
+  if (gameGetYOffset() <= -TURRET_RADIUS) { // Note no parallax here
     pd->graphics->drawBitmap(bitmapGetLevelSplash(), 0, -DEVICE_PIX_Y - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
   }
 }
 
 void renderGameGutter(void) {
-  const int32_t gutterY = WF_PIX_Y - ((WF_PIX_Y-DEVICE_PIX_Y) * PARALAX_NEAR);
-  const int32_t parallax = gameGetParalaxFactorNear(); // Note: float -> int here
-  const int32_t so = gameGetScrollOffset();
+  const int32_t gutterY = WF_PIX_Y - ((WF_PIX_Y-DEVICE_PIX_Y) * PARALLAX_GENTLE_NEAR);
+  const int32_t parallax = gameGetParalaxFactorNear(false); // Note: float -> int here. Hard = false
+  const int32_t so = gameGetYOffset();
 
   if (so > gutterY + parallax - DEVICE_PIX_Y && FSMGet() != kGameFSM_ScoresToTitle) {
     pd->graphics->drawBitmap(bitmapGetWfPond(), 0, gutterY + parallax, kBitmapUnflipped);

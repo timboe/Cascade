@@ -93,23 +93,38 @@ float IOGetPreloadingProgress(void) {
 void IODoUpdatePreloading(void) {
   if (!IOGetIsPreloading()) { return; }
 
+  const uint32_t before = pd->system->getCurrentTimeMilliseconds();
   switch (m_preloading) {
     case 0: IODoScanLevels(); break;
     case 1: bitmapDoPreloadA(); break;
-    case 2: bitmapDoPreloadB(); break;
-    case 3: bitmapDoPreloadC(); break;
-    case 4: bitmapDoPreloadD(); break;
-    case 5: bitmapDoPreloadE(); break;
-    case 6: bitmapDoPreloadF(); break;
-    case 7: bitmapDoPreloadG(0); break;
-    case 8: bitmapDoPreloadG(1); break;
-    case 9: bitmapDoPreloadG(2); break;
-    case 10: bitmapDoPreloadG(3); break; 
-    case 11: bitmapDoPreloadG(4); break; // MAX_PEG_SIZE
-    case 12: bitmapDoPreloadH(); break;
-    case 13: bitmapDoPreloadI(); break;
-    case 14: bitmapDoPreloadJ(); break;
+    case 2: bitmapDoPreloadB(0); break;
+    case 3: bitmapDoPreloadB(1); break;
+    case 4: bitmapDoPreloadB(2); break;
+    case 5: bitmapDoPreloadB(3); break;
+    case 6: bitmapDoPreloadB(4); break;
+    case 7: bitmapDoPreloadB(5); break;
+    case 8: bitmapDoPreloadB(6); break;
+    case 9: bitmapDoPreloadB(7); break; // TURRET_LAUNCH_FRAMES
+    case 10: bitmapDoPreloadC(); break;
+    case 11: bitmapDoPreloadD(); break;
+    case 12: bitmapDoPreloadE(); break;
+    case 13: bitmapDoPreloadF(); break;
+    case 14: bitmapDoPreloadG(0); break;
+    case 15: bitmapDoPreloadG(1); break;
+    case 16: bitmapDoPreloadG(2); break;
+    case 17: bitmapDoPreloadG(3); break; 
+    case 18: bitmapDoPreloadG(4); break; // MAX_PEG_SIZE
+    case 19: bitmapDoPreloadH(0); break;
+    case 20: bitmapDoPreloadH(1); break;
+    case 21: bitmapDoPreloadH(2); break;
+    case 22: bitmapDoPreloadH(3); break; 
+    case 23: bitmapDoPreloadH(4); break; // MAX_PEG_SIZE
+    case 24: bitmapDoPreloadI(); break;
+    case 25: bitmapDoPreloadJ(); break;
+    case 26: bitmapDoPreloadK(); break;
   }
+  const uint32_t after = pd->system->getCurrentTimeMilliseconds();
+  pd->system->logToConsole("Preload %i took %i ms", (int)m_preloading, (int)(after - before));
 
   ++m_preloading;
 }
@@ -440,17 +455,17 @@ void IODidDecodeLevel(json_decoder* jd, const char* key, json_value value) {
 
   if (strcmp(key, "angle") == 0) {
     switch (m_decodeType) {
-      case kDecodeStatic: m_static.angle = angToRad(json_intValue(value)); return;
-      case kDecodeElliptic: m_elliptic.angle = angToRad(json_intValue(value)); return;
-      case kDecodeLinear: m_linear.angle = angToRad(json_intValue(value)); return;
+      case kDecodeStatic: m_static.angle = degToRad(json_intValue(value)); return;
+      case kDecodeElliptic: m_elliptic.angle = degToRad(json_intValue(value)); return;
+      case kDecodeLinear: m_linear.angle = degToRad(json_intValue(value)); return;
     }
   }
 
   if (strcmp(key, "arc") == 0) {
     switch (m_decodeType) {
       case kDecodeStatic: return;
-      case kDecodeElliptic: m_elliptic.maxAngle = angToRad(json_intValue(value)); return;
-      case kDecodeLinear: m_linear.maxAngle = angToRad(json_intValue(value)); return;
+      case kDecodeElliptic: m_elliptic.maxAngle = degToRad(json_intValue(value)); return;
+      case kDecodeLinear: m_linear.maxAngle = degToRad(json_intValue(value)); return;
     }
   }
 

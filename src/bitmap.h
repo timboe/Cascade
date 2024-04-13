@@ -4,17 +4,6 @@
 
 const static uint8_t WF_BG_OFFSET[] = {194};
 
-const static LCDPattern kGreyPattern = {
-  0,0,0,0,0,0,0,0,
-  0b11001100,
-  0b11001100,
-  0b11001100,
-  0b11001100,
-  0b11001100,
-  0b11001100,
-  0b11001100,
-  0b11001100};
-
 void bitmapDoInit(void);
 
 void bitmapSetRoobert10(void);
@@ -67,15 +56,17 @@ void bitmapDoUpdateScoreHistogram(void);
 float bitmapSizeToScale(const uint8_t size);
 
 void bitmapDoPreloadA(void);
-void bitmapDoPreloadB(void);
+void bitmapDoPreloadB(const uint8_t anim);
 void bitmapDoPreloadC(void);
 void bitmapDoPreloadD(void);
 void bitmapDoPreloadE(void);
 void bitmapDoPreloadF(void);
 void bitmapDoPreloadG(const uint8_t size);
-void bitmapDoPreloadH(void);
+void bitmapDoPreloadH(const uint8_t size);
 void bitmapDoPreloadI(void);
 void bitmapDoPreloadJ(void);
+void bitmapDoPreloadK(void);
+
 
 #define WF_ID(X, Y) ((WFSHEET_SIZE_X * Y) + X)
 

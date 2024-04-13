@@ -50,14 +50,11 @@ void renderTitlesSplash(void) {
   pd->graphics->drawBitmap(bitmapGetTitleSplash(), 0, 0, kBitmapUnflipped);
 
   if (IOGetIsPreloading()) {
-
     const float progress = IOGetPreloadingProgress();
     const uint16_t x2 = (DEVICE_PIX_X/4) + (DEVICE_PIX_X/2)*progress; 
-    const uint8_t loadingBarWidth = 32;
     pd->graphics->setLineCapStyle(kLineCapStyleRound);
-    pd->graphics->drawLine(DEVICE_PIX_X/4, (4*DEVICE_PIX_Y)/5, (3*DEVICE_PIX_X)/4, (4*DEVICE_PIX_Y)/5, loadingBarWidth, kColorBlack);
-    pd->graphics->drawLine(DEVICE_PIX_X/4, (4*DEVICE_PIX_Y)/5, x2, (4*DEVICE_PIX_Y)/5, loadingBarWidth/2, kColorWhite);
-
+    pd->graphics->drawLine(DEVICE_PIX_X/4, (4*DEVICE_PIX_Y)/5, (3*DEVICE_PIX_X)/4, (4*DEVICE_PIX_Y)/5, TITLETEXT_HEIGHT, kColorBlack);
+    pd->graphics->drawLine(DEVICE_PIX_X/4, (4*DEVICE_PIX_Y)/5, x2, (4*DEVICE_PIX_Y)/5, TITLETEXT_HEIGHT/2, kColorWhite);
   } else {
     if (pd->system->isCrankDocked()) { 
       pd->graphics->drawBitmap(bitmapGetUseTheCrank(), DEVICE_PIX_X - 88, DEVICE_PIX_Y - 51 - 16, kBitmapUnflipped);
@@ -69,6 +66,7 @@ void renderTitlesPlayerSelect(const bool locked) {
   static uint16_t newWaterfallTimer = 0;
   if (!locked) newWaterfallTimer = 0;
   commonRenderBackgroundWaterfallWithAnim(locked, 4, &newWaterfallTimer);
+  const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y); // Hard = true
 
   uint8_t digit[3];
   digit[1] = IOGetCurrentPlayer();
@@ -77,10 +75,10 @@ void renderTitlesPlayerSelect(const bool locked) {
   for (int i = 0; i < 3; ++i) { digit[i]++; }
   const float offY = (NUMERAL_PIX_Y / 2) * m_numeralOffset;
 
-  pd->graphics->drawBitmap(bitmapGetTitlePlayer(), NUMERAL_BUF - 32, DEVICE_PIX_Y + 40, kBitmapUnflipped);
+  pd->graphics->drawBitmap(bitmapGetTitlePlayer(), NUMERAL_BUF - TITLETEXT_HEIGHT, DEVICE_PIX_Y + NUMERAL_BUF + parallax, kBitmapUnflipped);
   if (!locked) {
     pd->graphics->drawBitmap(bitmapGetNumeral(digit[1]),
-      NUMERAL_BUF, DEVICE_PIX_Y + NUMERAL_BUF, kBitmapUnflipped);
+      NUMERAL_BUF, DEVICE_PIX_Y + NUMERAL_BUF + parallax, kBitmapUnflipped);
   } else {
     pd->graphics->setScreenClipRect(NUMERAL_BUF, NUMERAL_BUF, NUMERAL_PIX_X, NUMERAL_PIX_Y);
     pd->graphics->drawBitmap(bitmapGetNumeral(digit[0]),
@@ -97,6 +95,7 @@ void renderTitlesLevelSelect(const bool locked) {
   static uint16_t newWaterfallTimer = 0;
   if (!locked) newWaterfallTimer = 0;
   commonRenderBackgroundWaterfallWithAnim(locked, 8, &newWaterfallTimer);
+  const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y*2); // Hard = true
 
   uint8_t digit0[3];
   uint8_t digit1[3];
@@ -109,13 +108,13 @@ void renderTitlesLevelSelect(const bool locked) {
   digit1[2] = (IOGetNextLevel() + 1) % 10;
   float offY = (NUMERAL_PIX_Y / 2) * m_numeralOffset;
 
-  pd->graphics->drawBitmap(bitmapGetTitleLevel(), DEVICE_PIX_X - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF, kBitmapUnflipped);
-  pd->graphics->drawBitmap(bitmapGetTitleLevelStats(), DEVICE_PIX_X - (2*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF + NUMERAL_PIX_Y, kBitmapUnflipped);
+  pd->graphics->drawBitmap(bitmapGetTitleLevel(), DEVICE_PIX_X - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF + parallax, kBitmapUnflipped);
+  pd->graphics->drawBitmap(bitmapGetTitleLevelStats(), DEVICE_PIX_X - (2*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF + NUMERAL_PIX_Y + parallax, kBitmapUnflipped);
   if (!locked) {
     pd->graphics->drawBitmap(bitmapGetNumeral(digit0[1]),
-      DEVICE_PIX_X - (2*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF, kBitmapUnflipped);
+      DEVICE_PIX_X - (2*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF + parallax, kBitmapUnflipped);
     pd->graphics->drawBitmap(bitmapGetNumeral(digit1[1]),
-      DEVICE_PIX_X - (1*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF, kBitmapUnflipped);
+      DEVICE_PIX_X - (1*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF + parallax, kBitmapUnflipped);
   } else {
     pd->graphics->setScreenClipRect(DEVICE_PIX_X - (NUMERAL_PIX_X*2) - NUMERAL_BUF, NUMERAL_BUF, NUMERAL_PIX_X*2, NUMERAL_PIX_Y);
     pd->graphics->drawBitmap(bitmapGetNumeral(digit1[0]),
@@ -141,12 +140,14 @@ void renderTitlesHoleSelect(const bool locked) {
   for (int i = 12; i < 16; ++i) {
     pd->graphics->drawBitmap(bitmapGetWfFg(currentWf, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
   }
+  const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y*3); // Hard = true
+
 
   LCDBitmap* bm = bitmapGetLevelPreview(IOGetCurrentLevel(), IOGetCurrentHole());
   static uint16_t offset = 0;
   if (!locked && bm) {
     pd->graphics->setDrawMode(kDrawModeInverted);
-    pd->graphics->drawBitmap(bm, DEVICE_PIX_X - 200, DEVICE_PIX_Y*3, kBitmapUnflipped);
+    pd->graphics->drawBitmap(bm, DEVICE_PIX_X - 200, DEVICE_PIX_Y*3 + parallax, kBitmapUnflipped);
     pd->graphics->setDrawMode(kDrawModeCopy);
     offset = 0;
   } else if (bm) {
@@ -179,13 +180,13 @@ void renderTitlesHoleSelect(const bool locked) {
   } 
   const float offY = (NUMERAL_PIX_Y / 2) * m_numeralOffset;
 
-  pd->graphics->drawBitmap(bitmapGetTitleHole(), NUMERAL_BUF - 32, (DEVICE_PIX_Y*3) + NUMERAL_BUF, kBitmapUnflipped);
-  pd->graphics->drawBitmap(bitmapGetTitleHoleStatsA(), NUMERAL_BUF, (DEVICE_PIX_Y*3) + NUMERAL_BUF - 32, kBitmapUnflipped);
+  pd->graphics->drawBitmap(bitmapGetTitleHole(), NUMERAL_BUF - TITLETEXT_HEIGHT, (DEVICE_PIX_Y*3) + NUMERAL_BUF + parallax, kBitmapUnflipped);
+  pd->graphics->drawBitmap(bitmapGetTitleHoleStatsA(), NUMERAL_BUF, (DEVICE_PIX_Y*3) + NUMERAL_BUF - TITLETEXT_HEIGHT + parallax, kBitmapUnflipped);
   // Note this one is extra wide
-  pd->graphics->drawBitmap(bitmapGetTitleHoleStatsB(), 0, (DEVICE_PIX_Y*3) + NUMERAL_BUF + NUMERAL_PIX_Y, kBitmapUnflipped);
+  pd->graphics->drawBitmap(bitmapGetTitleHoleStatsB(), 0, (DEVICE_PIX_Y*3) + NUMERAL_BUF + NUMERAL_PIX_Y + parallax, kBitmapUnflipped);
   if (!locked) {
     pd->graphics->drawBitmap(digitBm[1],
-      NUMERAL_BUF, (DEVICE_PIX_Y*3) + NUMERAL_BUF, kBitmapUnflipped);
+      NUMERAL_BUF, (DEVICE_PIX_Y*3) + NUMERAL_BUF + parallax, kBitmapUnflipped);
   } else {
     pd->graphics->setScreenClipRect(NUMERAL_BUF, NUMERAL_BUF, NUMERAL_PIX_X, NUMERAL_PIX_Y);
     pd->graphics->drawBitmap(digitBm[0],
@@ -199,5 +200,6 @@ void renderTitlesHoleSelect(const bool locked) {
 }
 
 void renderTitlesTransitionLevelSplash(void) {
-  pd->graphics->drawBitmap(bitmapGetLevelSplash(), 0, DEVICE_PIX_Y*4, kBitmapUnflipped);
+  const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y*4); // Hard = true
+  pd->graphics->drawBitmap(bitmapGetLevelSplash(), 0, DEVICE_PIX_Y*4 + parallax, kBitmapUnflipped);
 }

@@ -17,6 +17,7 @@
 #define TURRET_RADIUS 32
 #define TURRET_ANGLE_MIN 15.0f
 #define TURRET_ANGLE_MAX (360.0f - TURRET_ANGLE_MIN)
+#define TURRET_LAUNCH_FRAMES 8
 
 #define DEVICE_PIX_X 400
 #define DEVICE_PIX_Y 240
@@ -38,14 +39,18 @@
 #define NUMERAL_PIX_Y 160
 #define NUMERAL_BUF 40
 
+#define TITLETEXT_HEIGHT 32
+
 #define STENCIL_WIPE_N 30
 
 #define SPECIAL_BURST_RADIUS 128
 
+#define FINAL_PEG_SLOWMO_RADIUS 128
+
 // TIMINGS
 
 #define TIME_TITLE_TRANSITION (TICK_FREQUENCY/2)
-#define TIME_DISPLAY_SPLASH (TICK_FREQUENCY/2)
+#define TIME_DISPLAY_SPLASH (TICK_FREQUENCY/4)
 #define TIME_SPLASH_TO_GAME (TICK_FREQUENCY/2)
 #define TIME_AIM_SCROLL_TO_TOP (TICK_FREQUENCY/2)
 #define TIME_FIRE_BALL ((9*TICK_FREQUENCY)/10)
@@ -60,12 +65,17 @@
 #define TRAUMA_DECAY 0.05f;
 #define TRAUMA_AMPLIFICATION 4
 
-#define TRAMA_REQUIRED_HIT 1.0f
+#define TRAUMA_SPECIAL_HIT 1.5f
+#define FREEZE_SPECIAL_HIT (TICK_FREQUENCY / 10)
+
+#define TRAUMA_REQUIRED_HIT 1.0f
 #define FREEZE_REQUIRED_HIT (TICK_FREQUENCY / 10)
 
-#define TRAMA_PEG_HIT (TRAMA_REQUIRED_HIT/2.0f)
+#define TRAUMA_PEG_HIT (TRAUMA_REQUIRED_HIT/2.0f)
 #define FREEZE_PEG_HIT (FREEZE_REQUIRED_HIT/2)
 
+#define EASE_TITLE_DOWNWARDS kEaseInOutQuad
+#define EASE_TITLE_UPWARDS kEaseInOutQuad
 
 // PEGS
 
@@ -79,12 +89,9 @@
 
 #define MAX_PEGS_ON_PATH 32
 
-/////////////
+/// ///
 
 #define N_WF 2
-
-// Trying without this
-#define UI_OFFSET_TOP 0
 
 #define SCROLL_OFFSET_MAX (WF_PIX_Y - ((3*DEVICE_PIX_Y)/4))
 
@@ -97,7 +104,7 @@
 #define M_2PIf 6.28318530718f
 
 // How many pixels down the side do we have to prevent the ball from bouncing out off
-#define PHYSWALL_PIX_Y (WF_PIX_Y + UI_OFFSET_TOP)
+#define PHYSWALL_PIX_Y WF_PIX_Y
 
 #define BALL_RADIUS 8.0f
 #define BALL_MASS 1.0f
@@ -109,6 +116,9 @@
 #define BOX_HEIGHT 12.5f
 #define BOX_MAX (MAX(BOX_WIDTH, BOX_HEIGHT) * SQRT_HALF)
 
+#define HEX_WIDTH 22.5f
+#define HEX_MAX (HEX_WIDTH * SQRT_HALF)
+
 #define TIMESTEP (1.0f / TICK_FREQUENCY)
 #define ELASTICITY 0.8f 
 #define ULTRA_BOUNCE 1.1f
@@ -116,6 +126,8 @@
 #define G cpv(0.0f, 256.0f)
 
 #define POOT_STRENGTH 300.0f
+
+#define WF_VELOCITY 2.0f
 
 // Velocity squared under which the ball is considered stuck
 #define BALL_IS_STUCK 100.0f
@@ -144,8 +156,11 @@
 #define END_SWEEP_SCALE 0.25f
 
 // PARALAX
-#define PARALAX_FAR 0.1f;
-#define PARALAX_NEAR -0.1f
+#define PARALLAX_GENTLE_FAR 0.1f
+#define PARALLAX_GENTLE_NEAR (0.0f - PARALLAX_GENTLE_FAR)
+
+#define PARALLAX_HARD_FAR 0.5f
+#define PARALLAX_HARD_NEAR (0.0f - PARALLAX_HARD_FAR)
 
 // MARGIN BUFFERING
 #define BUF 16
@@ -164,4 +179,4 @@
 
 #define VERSION "v0.1"
 
-#define PRELOADING_STEPS 15
+#define PRELOADING_STEPS 27
