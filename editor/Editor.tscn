@@ -1,9 +1,10 @@
-[gd_scene load_steps=17 format=3 uid="uid://cmuubbicvggs5"]
+[gd_scene load_steps=19 format=3 uid="uid://cmuubbicvggs5"]
 
 [ext_resource type="Script" path="res://RenderScene.gd" id="1_1f7cp"]
 [ext_resource type="Theme" uid="uid://mvm1lqkscosr" path="res://editor/theme/aestro.tres" id="1_3tosr"]
 [ext_resource type="StyleBox" uid="uid://cgsvf1qt0q4uy" path="res://background_style_box_flat.tres" id="2_gthnx"]
 [ext_resource type="Texture2D" uid="uid://b645rphiris4n" path="res://turretBody.png" id="3_u03i0"]
+[ext_resource type="Script" path="res://InputParser.gd" id="4_f0pyn"]
 [ext_resource type="Script" path="res://Save.gd" id="5_n4mgq"]
 [ext_resource type="Script" path="res://Load.gd" id="6_81yac"]
 
@@ -15,6 +16,15 @@ height = 960
 noise = SubResource("FastNoiseLite_mxqya")
 
 [sub_resource type="GDScript" id="GDScript_pob6t"]
+script/source = "extends LineEdit
+
+func _on_text_changed(new_text):
+	var caret_pos = self.caret_column
+	self.text = new_text.to_upper()
+	self.caret_column = caret_pos
+"
+
+[sub_resource type="GDScript" id="GDScript_m17f8"]
 script/source = "extends LineEdit
 
 func _on_text_changed(new_text):
@@ -48,7 +58,7 @@ func _on_value_changed(newValue):
 script/source = "extends HSlider
 
 func _on_value_changed(newValue):
-	$\"../HeightLabel\".text = \"Height: \" + str(newValue)
+	$\"../HeightLabel\".text = \"Waterfall Height: \" + str(newValue)
 	$%Render.queue_redraw()
 	get_tree().call_group(\"y_sensitive\", \"new_max_y\", newValue)
 "
@@ -75,8 +85,8 @@ func _on_pressed():
 	if (newPos.x >= 400 - 16):
 		newPos.x = 16
 		newPos.y += 16
-	$%RightVBox.add_child(instance)
-	$%Render.queue_redraw()
+	%RightVBox.add_child(instance)
+	%Render.queue_redraw()
 "
 
 [sub_resource type="GDScript" id="GDScript_qd471"]
@@ -190,6 +200,11 @@ texture = ExtResource("3_u03i0")
 unique_name_in_owner = true
 script = ExtResource("1_1f7cp")
 
+[node name="InputParser" type="Node2D" parent="HBox/LeftScroll/Control"]
+unique_name_in_owner = true
+visible = false
+script = ExtResource("4_f0pyn")
+
 [node name="RightScroll" type="ScrollContainer" parent="HBox"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -226,20 +241,33 @@ columns = 2
 [node name="AuthorLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Author:"
+text = "Hole Author:"
 horizontal_alignment = 2
 
 [node name="Author" type="LineEdit" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-max_length = 15
+max_length = 6
 script = SubResource("GDScript_pob6t")
+
+[node name="NameLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Hole Name:"
+horizontal_alignment = 2
+
+[node name="Name" type="LineEdit" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_length = 8
+script = SubResource("GDScript_m17f8")
 
 [node name="LevelLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "World: 1
+text = "Level: 1
 "
 horizontal_alignment = 2
 
@@ -257,7 +285,7 @@ script = SubResource("GDScript_vi753")
 [node name="HoleLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Level: 1"
+text = "Hole: 1"
 horizontal_alignment = 2
 
 [node name="HoleSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
@@ -291,7 +319,7 @@ script = SubResource("GDScript_lhfae")
 [node name="HeightLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Height: 960"
+text = "Waterfall Height: 960"
 horizontal_alignment = 2
 
 [node name="HeightSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
@@ -300,7 +328,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 min_value = 240.0
 max_value = 960.0
-step = 60.0
+step = 10.0
 value = 960.0
 rounded = true
 tick_count = 12
@@ -388,6 +416,7 @@ size_flags_horizontal = 3
 text = "PEGS"
 
 [connection signal="text_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/Author" to="HBox/RightScroll/Margin/RightVBox/Grid/Author" method="_on_text_changed"]
+[connection signal="text_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/Name" to="HBox/RightScroll/Margin/RightVBox/Grid/Name" method="_on_text_changed"]
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/LevelSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/LevelSlider" method="_on_value_changed"]
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/HoleSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/HoleSlider" method="_on_value_changed"]
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/ParSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/ParSlider" method="_on_value_changed"]

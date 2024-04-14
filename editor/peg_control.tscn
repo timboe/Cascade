@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://4jairl80n3qw"]
+[gd_scene load_steps=6 format=3 uid="uid://4jairl80n3qw"]
 
 [ext_resource type="Script" path="res://MenuButtonScript.tres.gd" id="1_dtm3l"]
 
@@ -28,8 +28,31 @@ func _on_value_changed(_value):
 	rend.do_update()
 "
 
+[sub_resource type="GDScript" id="GDScript_rv25i"]
+script/source = "extends Button
+
+@onready var add_static = $/root/RootControl.find_child(\"AddStatic\")
+
+func _on_pressed():
+	add_static._on_pressed()
+	var new_static = $/root/RootControl.find_child(\"StaticControl\" + str(add_static.static_count), true, false)
+	new_static.find_child(\"CheckRect\", true, false).button_pressed = $\"../../Grid1/CheckRect\".button_pressed
+	new_static.find_child(\"XText\", true, false).value = $\"../XText\".value + 16
+	new_static.find_child(\"YText\", true, false).value = $\"../YText\".value + 16
+	new_static.find_child(\"SizeText\", true, false).selected = $\"../SizeText\".selected
+	new_static.find_child(\"AngleText\", true, false).value = $\"../AngleText\".value
+	new_static.find_child(\"TypeText\", true, false).selected = $\"../TypeText\".selected
+"
+
+[sub_resource type="GDScript" id="GDScript_mj66t"]
+script/source = "extends Button
+
+func _on_pressed():
+	get_parent().get_parent().get_parent().get_parent().queue_free()
+"
+
 [node name="PegControl" type="Panel" groups=["pegs", "static_pegs"]]
-custom_minimum_size = Vector2(100, 200)
+custom_minimum_size = Vector2(100, 235)
 
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -155,6 +178,26 @@ popup/item_2/text = "Special"
 popup/item_2/id = 2
 script = ExtResource("1_dtm3l")
 
+[node name="Dummy" type="Label" parent="Margin/VBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+
+[node name="Dummy2" type="Label" parent="Margin/VBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+
+[node name="CloneLabel" type="Label" parent="Margin/VBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+
+[node name="Clone" type="Button" parent="Margin/VBox/Grid2"]
+layout_mode = 2
+text = "Clone"
+script = SubResource("GDScript_rv25i")
+
 [node name="RemoveLabel" type="Label" parent="Margin/VBox/Grid2"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -163,6 +206,7 @@ horizontal_alignment = 2
 [node name="Remove" type="Button" parent="Margin/VBox/Grid2"]
 layout_mode = 2
 text = "Remove"
+script = SubResource("GDScript_mj66t")
 
 [connection signal="tree_exited" from="." to="Margin/VBox/Grid1/CheckCirc" method="_on_pressed"]
 [connection signal="pressed" from="Margin/VBox/Grid1/CheckCirc" to="Margin/VBox/Grid1/CheckCirc" method="_on_pressed"]
@@ -172,4 +216,5 @@ text = "Remove"
 [connection signal="pressed" from="Margin/VBox/Grid2/SizeText" to="Margin/VBox/Grid2/SizeText" method="_on_pressed"]
 [connection signal="value_changed" from="Margin/VBox/Grid2/AngleText" to="Margin/VBox/Grid2/YText" method="_on_value_changed"]
 [connection signal="pressed" from="Margin/VBox/Grid2/TypeText" to="Margin/VBox/Grid2/TypeText" method="_on_pressed"]
-[connection signal="pressed" from="Margin/VBox/Grid2/Remove" to="." method="queue_free"]
+[connection signal="pressed" from="Margin/VBox/Grid2/Clone" to="Margin/VBox/Grid2/Clone" method="_on_pressed"]
+[connection signal="pressed" from="Margin/VBox/Grid2/Remove" to="Margin/VBox/Grid2/Remove" method="_on_pressed"]

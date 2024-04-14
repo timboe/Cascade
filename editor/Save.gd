@@ -20,7 +20,7 @@ func _on_file_dialog_confirmed():
 func _on_file_dialog_canceled():
 	print("SAVE Cancelled")
 
-func pack_static(static_peg : Control) -> Array:
+func pack_static(static_peg : Control) -> Dictionary:
 	var peg_name : String = static_peg.name
 	var payload : Dictionary
 	payload["shape"] = 1 if static_peg.find_child("CheckCirc").button_pressed else 0
@@ -29,9 +29,9 @@ func pack_static(static_peg : Control) -> Array:
 	payload["angle"] = static_peg.find_child("AngleText").value
 	payload["size"] = static_peg.find_child("SizeText").selected
 	payload["type"] = static_peg.find_child("TypeText").selected
-	return [peg_name, payload]
+	return payload
 	
-func pack_elliptic(elliptic_path : Control) -> Array:
+func pack_elliptic(elliptic_path : Control) -> Dictionary:
 	var peg_name : String = elliptic_path.name
 	var payload : Dictionary
 	payload["shape"] = 1 if elliptic_path.find_child("CheckCirc").button_pressed else 0
@@ -52,9 +52,9 @@ func pack_elliptic(elliptic_path : Control) -> Array:
 		peg_payload["size_override"] = peg_container.find_child("SizeButton").selected
 		peg_payload["type"] = peg_container.find_child("TypeButton").selected
 		payload[peg_container.name] = peg_payload
-	return [peg_name, payload]
+	return payload
 
-func pack_linear(linear_path : Control) -> Array:
+func pack_linear(linear_path : Control) -> Dictionary:
 	var peg_name : String = linear_path.name
 	var payload : Dictionary
 	payload["shape"] = 1 if linear_path.find_child("CheckCirc").button_pressed else 0
@@ -80,40 +80,45 @@ func pack_linear(linear_path : Control) -> Array:
 		line_payload["lc_x"] = payload["x"] + line_container.find_child("XOffText").value
 		line_payload["lc_y"] = payload["y"] + line_container.find_child("YOffText").value
 		payload[line_container.name] = line_payload
-	return [peg_name, payload]
+	return payload
 
 func pack_save() -> Dictionary:
 	var save_game : Dictionary
 	var header : Dictionary
 	header["save_format"] = 1
-	header["author"] = $"../Author".text
-	header["level"] = $"../LevelSlider".value
-	header["hole"] = $"../HoleSlider".value
-	header["par"] = $"../ParSlider".value
-	header["foreground"] = $"../Foreground".selected
-	header["background"] = $"../Background".selected
+	header["name"] = %Name.text
+	header["author"] = %Author.text
+	header["level"] = %LevelSlider.value
+	header["hole"] = %HoleSlider.value
+	header["par"] = %ParSlider.value
+	header["foreground"] = %Foreground.selected
+	header["background"] = %Background.selected
 	
 	var static_pegs = get_tree().get_nodes_in_group("static_pegs")
 	var elliptic_paths = get_tree().get_nodes_in_group("elliptic_pegs")
 	var line_paths = get_tree().get_nodes_in_group("line_pegs")
 	
-	header["n_static"] = len(static_pegs)
-	header["n_elliptic"] = len(elliptic_paths)
-	header["n_linear"] = len(line_paths)
-	
 	save_game["header"] = header
 	
 	var body : Dictionary
+	var counter = 0
 	for static_peg in static_pegs:
-		var packed : Array = pack_static(static_peg)
-		body[packed[0]] = packed[1]
+		body["StaticControl"+str(counter+1)] = pack_static(static_peg)
+		counter += 1
+	header["n_static"] = counter
+	
+	counter = 0
 	for elliptic_path in elliptic_paths:
-		var packed : Array = pack_elliptic(elliptic_path)
-		body[packed[0]] = packed[1]
+		body["EllipticControl"+str(counter+1)] = pack_elliptic(elliptic_path)
+		counter += 1
+	header["n_elliptic"] = counter
+		
+	counter = 0
 	for linear_path in line_paths:
-		var packed : Array = pack_linear(linear_path)
-		body[packed[0]] = packed[1]
-		
+		body["LinearControl"+str(counter+1)] = pack_linear(linear_path)
+		counter += 1
+	header["n_linear"] = counter
+	
 	save_game["body"] = body
-		
+
 	return save_game

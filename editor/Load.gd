@@ -87,38 +87,39 @@ func reset_level() -> void:
 func restore_save(save_game : Dictionary) -> void:
 	reset_level()
 	
-	$%Author.text = save_game["header"]["author"] 
-	$%LevelSlider.value = save_game["header"]["level"] 
-	$%HoleSlider.value = save_game["header"]["hole"]
-	$%ParSlider.value = save_game["header"]["par"]
-	$%Foreground.selected = save_game["header"]["foreground"]
-	$%Background.selected = save_game["header"]["background"]
+	%Name.text = save_game["header"]["name"] 
+	%Author.text = save_game["header"]["author"] 
+	%LevelSlider.value = save_game["header"]["level"] 
+	%HoleSlider.value = save_game["header"]["hole"]
+	%ParSlider.value = save_game["header"]["par"]
+	%Foreground.selected = save_game["header"]["foreground"]
+	%Background.selected = save_game["header"]["background"]
 		
-	$%LevelSlider._on_value_changed($%LevelSlider.value)
-	$%HoleSlider._on_value_changed($%HoleSlider.value)
-	$%ParSlider._on_value_changed($%ParSlider.value)
+	%LevelSlider._on_value_changed(%LevelSlider.value)
+	%HoleSlider._on_value_changed(%HoleSlider.value)
+	%ParSlider._on_value_changed(%ParSlider.value)
 	
 	var static_pegs : int = save_game["header"]["n_static"]
 	var elliptic_paths : int = save_game["header"]["n_elliptic"]
 	var linear_paths : int = save_game["header"]["n_linear"]
 	
-	$%AddStatic.reset_count()
+	%AddStatic.reset_count()
 	for i in range(1, static_pegs+1):
-		$%AddStatic._on_pressed()
+		%AddStatic._on_pressed()
 		var static_name = "StaticControl" + str(i)
-		var static_instance = $%RightVBox.find_child(static_name, true, false)
+		var static_instance = %RightVBox.find_child(static_name, true, false)
 		populate_static(save_game["body"][static_name], static_instance)
 		
-	$%AddElliptic.reset_count()
+	%AddElliptic.reset_count()
 	for i in range(1, elliptic_paths+1):
-		$%AddElliptic._on_pressed()
+		%AddElliptic._on_pressed()
 		var elliptic_name = "EllipticControl" + str(i)
-		var elliptic_instance = $%RightVBox.find_child(elliptic_name, true, false)
+		var elliptic_instance = %RightVBox.find_child(elliptic_name, true, false)
 		populate_elliptic(save_game["body"][elliptic_name], elliptic_instance)
 		
-	$%AddLinear.reset_count()
+	%AddLinear.reset_count()
 	for i in range(1, linear_paths+1):
-		$%AddLinear._on_pressed()
+		%AddLinear._on_pressed()
 		var linear_name = "LinearControl" + str(i)
-		var linear_instance = $%RightVBox.find_child(linear_name, true, false)
+		var linear_instance = %RightVBox.find_child(linear_name, true, false)
 		populate_linear(save_game["body"][linear_name], linear_instance)

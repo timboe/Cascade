@@ -32,7 +32,7 @@ func _on_value_changed(_value):
 "
 
 [node name="LineControl" type="Panel" groups=["line_pegs", "pegs"]]
-custom_minimum_size = Vector2(100, 385)
+custom_minimum_size = Vector2(100, 470)
 
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1
