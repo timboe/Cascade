@@ -72,6 +72,8 @@ LCDBitmap* m_ballBitmap[2][MAX_PEG_SIZE];
 LCDBitmap* m_rectBitmap[2][MAX_PEG_SIZE][128];
 LCDBitmap* m_hexBitmap[MAX_PEG_SIZE][128];
 
+LCDBitmap* m_starBitmap[2][128];
+
 LCDBitmap* m_wfPond;
 LCDBitmap* m_wfBg[N_WF];
 LCDBitmapTable* m_sheetWfFg[N_WF];
@@ -216,6 +218,8 @@ LCDBitmap* bitmapGetTitleHoleTutorial(void) { return m_holeTutorialBitmap; }
 
 LCDBitmap* bitmapGetDither(void) { return m_ditherBitmap; }
 
+LCDBitmap* bitmapGetStar(const uint8_t type, const uint8_t angle) { return m_starBitmap[type][angle % 128]; }
+
 LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int16_t offset) { 
   offset = offset % (DEVICE_PIX_Y*2);
   pd->graphics->pushContext(m_previewBitmapWindow);
@@ -270,11 +274,10 @@ LCDFont* bitmapGetGreatVibes109(void) { return m_fontGreatvibes109; }
 
 float bitmapSizeToScale(uint8_t size) {
   switch (size) {
-    case 0: return 1.0f;
-    case 1: return 1.25f;
-    case 2: return 1.50f;
-    case 3: return 1.75f;
-    case 4: return 2.0f;
+    case 0: return 1.25f;
+    case 1: return 1.50f;
+    case 2: return 1.75f;
+    case 3: return 2.0f;
     default: pd->system->error("Error bitmapSizeToScale called with unknown size %i", size);
   }
   return 1.0f;
@@ -478,6 +481,8 @@ void bitmapDoPreloadA(void) {
   m_wfPond = bitmapDoLoadImageAtPath("images/falls_pond");
   m_cardBitmap = bitmapDoLoadImageAtPath("images/card");
   m_turretBody = bitmapDoLoadImageAtPath("images/turretBody");
+  m_starBitmap[0][0] = bitmapDoLoadImageAtPath("images/star0");
+  m_starBitmap[1][0] = bitmapDoLoadImageAtPath("images/star1");
 
   m_turretBarrelTabel = bitmapDoLoadImageTableAtPath("images/turretBarrel");
   m_waterSplashTable = bitmapDoLoadImageTableAtPath("images/splash");
@@ -502,7 +507,7 @@ void bitmapDoPreloadA(void) {
 void bitmapDoPreloadB(const uint8_t anim) { // TURRET_LAUNCH_FRAMES
   m_turretBarrel[anim][0] = pd->graphics->getTableBitmap(m_turretBarrelTabel, anim);
   for (int32_t a = 1; a < 256; ++a) {
-    const float angle = (365.0f / 256.0f) * a;
+    const float angle = (360.0f / 256.0f) * a;
     m_turretBarrel[anim][a] = pd->graphics->newBitmap(TURRET_RADIUS*2, TURRET_RADIUS*2, kColorClear);
     pd->graphics->pushContext(m_turretBarrel[anim][a]);
     pd->graphics->setDrawMode(kDrawModeCopy);
@@ -663,6 +668,16 @@ void bitmapDoPreloadK(void) {
     pd->graphics->drawBitmap(bitmapGetDither(), 0, -WF_DIVISION_PIX_Y + (stencilStep * i), kBitmapFlippedY);
     pd->graphics->setDrawMode(kDrawModeCopy);
     pd->graphics->fillRect(0, -WF_DIVISION_PIX_Y, DEVICE_PIX_X, (stencilStep * i), kColorWhite);
+    pd->graphics->popContext();
+  }
+}
+
+void bitmapDoPreloadL(const uint8_t star) {
+  for (int a = 1; a < 128; ++a) {
+    m_starBitmap[star][a] = pd->graphics->newBitmap(STAR_WIDTH, STAR_WIDTH, kColorClear);
+    const float angle = (360.0f / 128.0f) * a;
+    pd->graphics->pushContext(m_starBitmap[star][a]);
+    pd->graphics->drawRotatedBitmap(m_starBitmap[star][0], STAR_WIDTH/2, STAR_WIDTH/2, angle, 0.5f, 0.5f, 1.0f, 1.0f);
     pd->graphics->popContext();
   }
 }

@@ -57,6 +57,7 @@ struct Peg_t {
   enum PegMotion_t motion;
   enum PegType_t type;
   enum PegState_t state;
+  bool queueRemove;
 
   // Motion
   float time;

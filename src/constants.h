@@ -50,6 +50,8 @@
 #define POND_SPLASH_WIDTH 128
 #define POND_SPLASH_HEIGHT 82
 
+#define STAR_WIDTH 48
+
 // TIMINGS
 
 #define TIME_TITLE_TRANSITION (TICK_FREQUENCY/2)
@@ -88,9 +90,11 @@
 
 #define MAX_LINEAR_PATH_SEGMENTS 64 
 
-#define MAX_PEG_SIZE 5
+#define MAX_PEG_SIZE 4
 
 #define MAX_PEGS_ON_PATH 32
+
+#define MAX_STARS 32
 
 /// ///
 
@@ -130,6 +134,8 @@
 #define G cpv(0.0f, 256.0f)
 
 #define POOT_STRENGTH 300.0f
+
+#define STAR_STRENGTH 86.0f
 
 #define WF_VELOCITY 2.0f
 

@@ -101,6 +101,7 @@ void physicsDoAddSecondBall(void) {
 void physicsDoRemoveSecondBall(void) {
   cpSpaceRemoveShape(m_space, m_ballShape[1]);
   cpSpaceRemoveBody(m_space, m_ball[1]);
+  m_secondBallInPlay = false;
 }
 
 void physicsSetSecondBallInPlay(void) {

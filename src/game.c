@@ -11,7 +11,7 @@
 #include "sshot.h"
 
 int32_t m_frameCount = 0;
-float m_turretBarrelAngle = 179.0f;
+float m_turretBarrelAngle = 180.0f;
 
 uint16_t m_previousWaterfall = 0;
 

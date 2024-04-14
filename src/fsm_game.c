@@ -95,6 +95,7 @@ void FSMDisplaySplash(const bool newState) {
   static uint16_t timer = 0;
   if (newState) { 
     timer = 0;
+    renderDoResetStars();
     gameSetYOffset(-DEVICE_PIX_Y - TURRET_RADIUS, true);
     bitmapDoUpdateScoreHistogram();
     gameDoPopulateMenuGame();
@@ -251,9 +252,17 @@ void FSMCloseUp(const bool newState) {
 void FSMWinningToast(const bool newState) {
   // TODO
   const enum PegSpecial_t special = boardGetCurrentSpecial();
+  if (newState) {
+    renderDoResetStars();
+  }
 
   const float tsm = physicsGetTimestepMultiplier();
   if (tsm < 1.0f) { physicsSetTimestepMultiplier(tsm + 0.005f);  }
+
+  int fc = gameGetFrameCount();
+  if (fc % (TICK_FREQUENCY/5) == 0) { renderDoAddStar(0); }
+  fc += (TICK_FREQUENCY/10);
+  if (physicsGetSecondBallInPlay() && fc % (TICK_FREQUENCY/5) == 0) { renderDoAddStar(1); }
 
   const bool guttered = FSMCommonFocusOnLowestBallInPlay(special);
   if (guttered) { 

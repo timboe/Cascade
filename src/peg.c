@@ -54,6 +54,7 @@ void pegDoInit(struct Peg_t* p, const enum PegShape_t s, const float x, const fl
   p->speed = 1.0f;
   p->size = size;
   p->easing = kEaseLinear;
+  p->queueRemove = false;
   const float scale = bitmapSizeToScale(size);
 
   pegDoAddBody(p);
@@ -81,6 +82,7 @@ void pegDoClear(struct Peg_t* p) {
 }
 
 void pegDoRemove(struct Peg_t* p) {
+  p->queueRemove = false;
   if (p->cpBody) {
     cpSpaceRemoveBody(physicsGetSpace(), p->cpBody);
     cpBodyFree(p->cpBody);
@@ -132,6 +134,10 @@ void pegDoUpdateAngle(struct Peg_t* p, float angle) {
 }
 
 void pegDoUpdate(struct Peg_t* p) {
+  if (p->queueRemove) {
+    p->state = kPegStateRemoved;
+    pegDoRemove(p);
+  }
   if (p->state == kPegStateRemoved) {
     return;
   }
@@ -273,7 +279,7 @@ void pegDoHit(struct Peg_t* p) {
     }
   }
   if (p->state == kPegStateHit && FSMGet() == kGameFSM_WinningToast) {
-    pegDoRemove(p);
+    p->queueRemove = true; // Can't remove in the middle of a physics callback
   }
   // pd->system->logToConsole("bam!");
 }

@@ -114,10 +114,16 @@ void boardDoRandomise(void) {
     staticLoader.shape = (rand() % 2 ? kPegShapeBall : kPegShapeRect);
     staticLoader.size = rand() % MAX_PEG_SIZE;
     // staticLoader.size = 4;
-    staticLoader.type = (i < 1 ? kPegTypeRequired : kPegTypeNormal);
+    staticLoader.type = (i < 0 ? kPegTypeRequired : kPegTypeNormal);
     staticLoader.type = (i >= 4 && i < 6 ? kPegTypeSpecial : staticLoader.type);
     boardDoAddStatic(&staticLoader);
   }
+
+  struct StaticLoader_t staticLoader = {0};
+  staticLoader.x = WF_PIX_X/2;
+  staticLoader.y = DEVICE_PIX_Y/2;
+  staticLoader.type = kPegTypeRequired;
+  boardDoAddStatic(&staticLoader);  
 
   // return;
   // if (maxStatic == 16) return;

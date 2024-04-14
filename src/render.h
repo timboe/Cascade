@@ -19,6 +19,9 @@ void renderSetBallPootCircle(const uint16_t radius);
 void renderDoTriggerSplash(const uint8_t ball, const int16_t x);
 void renderDoResetTriggerSplash(void);
 
+void renderDoAddStar(const uint8_t ball);
+void renderDoResetStars(void);
+
 void renderSetBallFallN(const uint16_t n);
 void renderSetBallFallX(const uint16_t x);
 void renderSetBallFallY(const uint16_t ball, const float y);
