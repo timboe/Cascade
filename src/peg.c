@@ -264,7 +264,8 @@ void pegDoHit(struct Peg_t* p) {
     } else if (p->type == kPegTypeSpecial) {
       renderAddTrauma(TRAUMA_SPECIAL_HIT);
       renderAddFreeze(FREEZE_SPECIAL_HIT);
-      boardDoAddSpecial(false);
+      const enum PegSpecial_t special = boardDoAddSpecial(false); // activate = false
+      renderDoAddSpecial(p->cpBody, special);
     } else {
       renderAddTrauma(TRAUMA_PEG_HIT);
       renderAddFreeze(FREEZE_PEG_HIT);
@@ -273,9 +274,12 @@ void pegDoHit(struct Peg_t* p) {
     const enum PegSpecial_t special = boardGetCurrentSpecial();
     if (special == kPegSpecialMultiball && !physicsGetSecondBallInPlay()) {
       physicsSetSecondBallInPlay();
-    } else if (special == kPegSpecialBurst) {
+    } else if (special == kPegSpecialBlast) {
+      pd->system->logToConsole("BLAST");
       boardDoClearSpecial(); // Do this first, it's going to recurse!
-      boardDoSpecialBurst();
+      boardDoSpecialBlast();
+      renderAddTrauma(TRAUMA_BLAST_HIT);
+      renderDoAddBlast(p->cpBody);
     }
   }
   if (p->state == kPegStateHit && FSMGet() == kGameFSM_WinningToast) {
@@ -291,4 +295,17 @@ bool pegDoCheckBurst(struct Peg_t* p, const float y) {
     return true;
   }
   return false;
+}
+
+const char* pegGetSpecialTxt(const uint8_t s) {
+  switch (s) {
+    case kPegSpecialAim: return "AIMSHOT";
+    case kPegSpecialSecondTry: return "SECONDSHOT";
+    case kPegSpecialBlast: return "BLASTBALL";
+    case kPegSpecialMultiball: return "MULTIBALL";
+    case kPegSpecialBounce: return "ELASTIBALL";
+    case kPegSpecialPenetrate: return "GHOSTBALL";
+    default: break;
+  }
+  return "";
 }

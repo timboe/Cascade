@@ -74,10 +74,14 @@ LCDBitmap* m_hexBitmap[MAX_PEG_SIZE][128];
 
 LCDBitmap* m_starBitmap[2][128];
 
+LCDBitmap* m_specialTextBitmap[(uint8_t)kNPegSpecial];
+
 LCDBitmap* m_wfPond;
 LCDBitmap* m_wfBg[N_WF];
 LCDBitmapTable* m_sheetWfFg[N_WF];
 LCDBitmapTable* m_waterSplashTable;
+
+LCDBitmapTable* m_blastTable;
 
 LCDFont* m_fontRoobert24;
 LCDFont* m_fontRoobert10;
@@ -200,6 +204,10 @@ LCDBitmap* bitmapGetWfFg_byidx(const uint8_t wf, const uint32_t idx) {
   return pd->graphics->getTableBitmap(m_sheetWfFg[wf], idx);
 }
 
+LCDBitmap* bitmapGetBlast(const uint8_t id) {
+  return pd->graphics->getTableBitmap(m_blastTable, id);
+}
+
 LCDBitmap* bitmapGetTitlePlayer(void) { return m_playerBitmap; }
 
 LCDBitmap* bitmapGetTitleLevel(void) { return m_levelBitmap; }
@@ -255,6 +263,8 @@ LCDBitmap* bitmapGetLevelSplash(void) { return m_levelSplashBitmap; }
 LCDBitmap* bitmapGetTurretBarrel(void) {
   return m_turretBarrel[(gameGetFrameCount() % 32) / 4][ angToByte(gameGetTurretBarrelAngle()) ];
 }
+
+LCDBitmap* bitmapGetSpecial(const enum PegSpecial_t special) { return m_specialTextBitmap[(uint8_t)special]; }
 
 void bitmapSetRoobert10(void) { pd->graphics->setFont(m_fontRoobert10); }
 
@@ -486,6 +496,7 @@ void bitmapDoPreloadA(void) {
 
   m_turretBarrelTabel = bitmapDoLoadImageTableAtPath("images/turretBarrel");
   m_waterSplashTable = bitmapDoLoadImageTableAtPath("images/splash");
+  m_blastTable = bitmapDoLoadImageTableAtPath("images/blast");
 
   m_fontRoobert24 = bitmapDoLoadFontAtPath("fonts/Roobert-24-Medium");
   m_fontRoobert10 = bitmapDoLoadFontAtPath("fonts/Roobert-10-Bold");
@@ -609,6 +620,18 @@ void bitmapDoPreloadI(void) {
 
 void bitmapDoPreloadJ(void) {
   char text[128];
+
+  for (int s = 0; s < kNPegSpecial; ++s) {
+    m_specialTextBitmap[s] = pd->graphics->newBitmap(SPECIAL_TEXT_WIDTH, TITLETEXT_HEIGHT, kColorClear);
+    pd->graphics->pushContext(m_specialTextBitmap[s]);
+    bitmapSetRoobert24();
+    const int32_t w0 = pd->graphics->getTextWidth(bitmapGetRoobert24(), pegGetSpecialTxt(s), 128, kUTF8Encoding, 0);
+    pd->graphics->setDrawMode(kDrawModeFillBlack);
+    bitmapDoDrawOutlineText(pegGetSpecialTxt(s), 128, NUMERAL_PIX_Y/2 - w0/2, 0, 2);
+    pd->graphics->popContext();
+  }
+
+  //
 
   LCDBitmap* tempBitmap = pd->graphics->newBitmap(NUMERAL_PIX_Y, TITLETEXT_HEIGHT, kColorClear);
   pd->graphics->pushContext(tempBitmap);

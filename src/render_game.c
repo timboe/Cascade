@@ -22,16 +22,33 @@ cpVect m_starVel[MAX_STARS];
 uint8_t m_starAng[MAX_STARS];
 int8_t m_starType[MAX_STARS] = {-1};
 
+cpVect m_blastPos = cpvzero;
+uint8_t m_blastFrame;
+
+cpVect m_specialPos = cpvzero;
+uint8_t m_specialOffset = 0;
+enum PegSpecial_t m_specialType;
+
 /// ///
+
+void renderDoAddSpecial(cpBody* body, const enum PegSpecial_t special) {
+  m_specialPos = cpBodyGetPosition(body);
+  m_specialOffset = 0;
+  m_specialType = special;
+}
+
+void renderDoAddBlast(cpBody* body) {
+  m_blastPos = cpBodyGetPosition(body);
+  m_blastFrame = 0;
+}
 
 void renderDoAddStar(const uint8_t ball) {
   for (int s = 0; s < MAX_STARS; ++s) {
     if (m_starType[s] != -1) { continue; }
     cpBody* cpBall = physicsGetBall(ball);
-    cpVect ballPos = cpBodyGetPosition(cpBall);
     const float ang =  (rand() % 180) * M_PIf;
     m_starType[s] = rand() % 2;
-    m_starPos[s] = ballPos;
+    m_starPos[s] = cpBodyGetPosition(cpBall);
     m_starVel[s] = cpvadd( cpBodyGetVelocity(cpBall), cpv(STAR_STRENGTH * cosf(ang), -STAR_STRENGTH * sinf(ang) * 2) );
     m_starVel[s] = cpvmult( m_starVel[s], TIMESTEP );
     m_starAng[s] = rand() % 128;
@@ -146,7 +163,7 @@ void renderGameTrajectory(void) {
   }
 }
 
-void renderGameBoard(void) {
+void renderGameBoard(const int32_t fc) {
   for (int i = 0; i < boardGetNPegs(); ++i) {
     const struct Peg_t* p = boardGetPeg(i);
     if (p->state == kPegStateRemoved) {
@@ -167,6 +184,31 @@ void renderGameBoard(void) {
     //   }
     // }
   }
+
+  if (m_specialPos.x) {
+    m_specialOffset++;
+    if (m_specialOffset == TICK_FREQUENCY) {
+      m_specialPos = cpvzero;
+    } else {
+      pd->graphics->setDrawMode(kDrawModeNXOR); // kDrawModeNXOR
+      pd->graphics->drawBitmap(bitmapGetSpecial(m_specialType),
+        m_specialPos.x - SPECIAL_TEXT_WIDTH/2,
+        m_specialPos.y - TITLETEXT_HEIGHT - m_specialOffset, kBitmapUnflipped);
+      pd->graphics->setDrawMode(kDrawModeCopy);
+    }
+  }
+
+  if (m_blastPos.x) {
+    m_blastFrame++;
+    if (m_blastFrame / 4 == 9) {
+      m_blastPos = cpvzero;
+    } else {
+      pd->graphics->setDrawMode(kDrawModeCopy); // kDrawModeNXOR
+      pd->graphics->drawBitmap(bitmapGetBlast(m_blastFrame / 4), m_blastPos.x - BLAST_RADIUS, m_blastPos.y - BLAST_RADIUS, kBitmapUnflipped);
+      pd->graphics->setDrawMode(kDrawModeCopy);
+    }
+  }
+
 }
 
 void renderGameBackground(void) {

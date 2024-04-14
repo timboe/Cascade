@@ -23,6 +23,8 @@ void boardDoInit(void) {
   for (int i = 0; i < MAX_PEGS; ++i) {
     m_pegs[i].id = i;
   }
+
+  // m_special = kPegSpecialBlast;
 }
 
 struct Peg_t* pegFromPool(void) { return &m_pegs[m_nPegs++]; }
@@ -31,13 +33,13 @@ struct Peg_t* boardGetPeg(const uint16_t i) { return &m_pegs[i]; }
 
 uint16_t boardGetNPegs(void) { return m_nPegs; }
 
-void boardDoSpecialBurst(void) {
+void boardDoSpecialBlast(void) {
   const cpVect pos = cpBodyGetPosition(physicsGetBall(0));
   for (int i = 0; i < m_nPegs; ++i) {
     struct Peg_t* p = boardGetPeg(i);
     if (p->state == kPegStateActive) {
       const cpVect pegPos = cpv(p->x, p->y);
-      if (cpvdist(pos, pegPos) < SPECIAL_BURST_RADIUS) {
+      if (cpvdist(pos, pegPos) < BLAST_RADIUS) {
         pegDoHit(p);
       }
     }
@@ -121,9 +123,15 @@ void boardDoRandomise(void) {
 
   struct StaticLoader_t staticLoader = {0};
   staticLoader.x = WF_PIX_X/2;
-  staticLoader.y = DEVICE_PIX_Y/2;
+  staticLoader.y = DEVICE_PIX_Y;
   staticLoader.type = kPegTypeRequired;
   boardDoAddStatic(&staticLoader);  
+
+  struct StaticLoader_t staticLoader2 = {0};
+  staticLoader2.x = WF_PIX_X/4;
+  staticLoader2.y = DEVICE_PIX_Y/2;
+  staticLoader2.type = kPegTypeSpecial;
+  boardDoAddStatic(&staticLoader2);  
 
   // return;
   // if (maxStatic == 16) return;
@@ -220,7 +228,7 @@ void boardDoClearSpecial(void) {
   m_special = kPegSpecialNotSpecial;
 }
 
-void boardDoAddSpecial(const bool activate) {
+enum PegSpecial_t boardDoAddSpecial(const bool activate) {
   static uint8_t counter = 0;
   static enum PegSpecial_t toActivate = kPegSpecialNotSpecial;
 
@@ -229,6 +237,7 @@ void boardDoAddSpecial(const bool activate) {
     if (counter) {
       m_special = toActivate;
       --counter;
+      pd->system->logToConsole("activated %s, %i left", pegGetSpecialTxt(m_special), counter);
     }
 
   } else {
@@ -237,4 +246,6 @@ void boardDoAddSpecial(const bool activate) {
     ++counter;
 
   }
+
+  return toActivate;
 }

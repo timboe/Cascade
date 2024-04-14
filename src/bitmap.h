@@ -50,6 +50,10 @@ LCDBitmap* bitmapGetBallFirePoot(const uint8_t i);
 
 LCDBitmap* bitmapGetStar(const uint8_t type, const uint8_t angle);
 
+LCDBitmap* bitmapGetBlast(const uint8_t id);
+
+LCDBitmap* bitmapGetSpecial(const enum PegSpecial_t special);
+
 void bitmapDoUpdateGameInfoTopper(void);
 void bitmapDoUpdateLevelSplash(void);
 void bitmapDoUpdateLevelStatsBitmap(void);

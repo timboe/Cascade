@@ -32,7 +32,7 @@ enum PegSpecial_t {
   kPegSpecialNotSpecial,
   kPegSpecialAim,
   kPegSpecialSecondTry,
-  kPegSpecialBurst,
+  kPegSpecialBlast,
   kPegSpecialMultiball,
   kPegSpecialBounce,
   kPegSpecialPenetrate,
@@ -107,3 +107,5 @@ void pegDoMotionPathFinalise(struct Peg_t* p);
 void pegDoHit(struct Peg_t* p);
 
 bool pegDoCheckBurst(struct Peg_t* p, const float y);
+
+const char* pegGetSpecialTxt(const uint8_t s);

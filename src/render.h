@@ -1,6 +1,8 @@
 #pragma once
 #include "game.h"
 #include "fsm.h"
+#include "physics.h"
+#include "peg.h"
 
 void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm);
 
@@ -22,6 +24,10 @@ void renderDoResetTriggerSplash(void);
 void renderDoAddStar(const uint8_t ball);
 void renderDoResetStars(void);
 
+void renderDoAddBlast(cpBody* body);
+
+void renderDoAddSpecial(cpBody* body, const enum PegSpecial_t special);
+
 void renderSetBallFallN(const uint16_t n);
 void renderSetBallFallX(const uint16_t x);
 void renderSetBallFallY(const uint16_t ball, const float y);
@@ -40,6 +46,6 @@ void renderGameBall(const int32_t fc);
 void renderGamePoot(const enum FSM_t fsm);
 void renderGameTurret(void);
 void renderGameTrajectory(void);
-void renderGameBoard(void);
+void renderGameBoard(const int32_t fc);
 void renderGameBackground(void);
 void renderGameGutter(void);
