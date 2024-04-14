@@ -11,11 +11,25 @@ uint16_t m_ballFallN = 0;
 uint16_t m_ballFallX = 0;
 float m_ballFallY[32] = {0};
 
-uint16_t m_ballTraceX[PREDICTION_TRACE_LEN * 2];
+uint16_t m_ballTraceX[PREDICTION_TRACE_LEN * 2]; //x2 for the special aim ability
 uint16_t m_ballTraceY[PREDICTION_TRACE_LEN * 2];
 uint8_t m_ballTraces = 0;
 
+int16_t m_ballSplashPos[MAX_BALLS];
+uint16_t m_ballSplashTimer[MAX_BALLS];
+
 /// ///
+
+void renderDoTriggerSplash(const uint8_t ball, const int16_t x) {
+  if (!m_ballSplashTimer[ball]) {
+    m_ballSplashPos[ball] = x - POND_SPLASH_WIDTH/2;
+    m_ballSplashTimer[ball] = 1;
+  }
+}
+
+void renderDoResetTriggerSplash(void) {
+  for (int i = 0; i < MAX_BALLS; ++i) { m_ballSplashTimer[i] = 0; }
+}
 
 void renderSetBallPootCircle(const uint16_t radius) { m_ballPootRadius = radius; }
 
@@ -44,7 +58,7 @@ void renderGameBall(const int32_t fc) {
     pd->graphics->setDrawMode(kDrawModeCopy);
     return;
   }
-  for (int i = 0; i < 2; ++i) {
+  for (int i = 0; i < MAX_BALLS; ++i) {
     if (i == 1 && !physicsGetSecondBallInPlay()) { continue; }
     cpBody* ball = physicsGetBall(i);
     int16_t* trailX = physicsGetMotionTrailX(i);
@@ -151,15 +165,30 @@ void renderGameBackground(void) {
 }
 
 void renderGameGutter(void) {
-  const int32_t gutterY = WF_PIX_Y - ((WF_PIX_Y-DEVICE_PIX_Y) * PARALLAX_GENTLE_NEAR);
-  const int32_t parallax = gameGetParalaxFactorNear(false); // Note: float -> int here. Hard = false
+  const int32_t gutterY = WF_PIX_Y;
+  const float pfn = gameGetParalaxFactorNear(true);
+  const int32_t parallaxPond = pfn - gameGetParalaxFactorNearForY(true, WF_PIX_Y - DEVICE_PIX_Y); // Note: float -> int here. Hard = true
   const int32_t so = gameGetYOffset();
 
-  if (so > gutterY + parallax - DEVICE_PIX_Y && FSMGet() != kGameFSM_ScoresToTitle) {
-    pd->graphics->drawBitmap(bitmapGetWfPond(), 0, gutterY + parallax, kBitmapUnflipped);
-    pd->graphics->drawRect(0, gutterY + parallax, DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
-    pd->graphics->drawRect(1, gutterY + parallax + 1, DEVICE_PIX_X-2, DEVICE_PIX_Y-2, kColorBlack);
+  if (so > gutterY + parallaxPond - DEVICE_PIX_Y && FSMGet() != kGameFSM_ScoresToTitle) {
+    pd->graphics->drawBitmap(bitmapGetWfPond(), 0, gutterY + parallaxPond, kBitmapUnflipped);
+    pd->graphics->drawRect(0, gutterY, DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
+    pd->graphics->drawRect(1, gutterY + 1, DEVICE_PIX_X-2, DEVICE_PIX_Y-2, kColorBlack);
   }
+
+  for (int i = 0; i < MAX_BALLS; ++i) {
+    if (m_ballSplashTimer[i]) {
+      uint8_t frame = m_ballSplashTimer[i] / 4;
+      if (frame == 9)  frame = 7; // repete
+      if (frame == 10) frame = 6; // repete
+      if (frame >= 9) continue;
+      pd->graphics->setDrawMode(kDrawModeNXOR);
+      pd->graphics->drawBitmap(bitmapGetWaterSplash(frame), m_ballSplashPos[i], gutterY + parallaxPond, kBitmapUnflipped);
+      pd->graphics->setDrawMode(kDrawModeCopy);
+      ++m_ballSplashTimer[i];
+    }
+  }
+
   //Note no parallax here
   if (so > WF_PIX_Y) {
     pd->graphics->drawBitmap(BitmapGetScoreHistogram(), 0, WF_PIX_Y + DEVICE_PIX_Y, kBitmapUnflipped);
@@ -170,6 +199,7 @@ void renderGameGutter(void) {
         kBitmapUnflipped);
     }
   }
+
   if (so > WF_PIX_Y + DEVICE_PIX_Y) {
     pd->graphics->drawBitmap(bitmapGetLevelSplash(), 0, WF_PIX_Y + (2*DEVICE_PIX_Y), kBitmapUnflipped);
   }

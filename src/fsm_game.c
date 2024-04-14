@@ -16,11 +16,41 @@ cpVect m_finalRequiredPos; // Position of the final required ped on the board
 
 void FSMCommonTurretScrollAndBounceBack(const bool allowScroll);
 
+bool FSMCommonFocusOnLowestBallInPlay(const enum PegSpecial_t special);
+
 /// ///
 
 void FSMDoResetBallStuckCounter(void) { 
   m_ballStuckCounter[0] = 0;
   m_ballStuckCounter[1] = 0;
+}
+
+bool FSMCommonFocusOnLowestBallInPlay(const enum PegSpecial_t special) {
+  // Allow scrolling
+  FSMCommonTurretScrollAndBounceBack(true);
+  // But with strong focus on ball
+  cpVect ballPos[2];
+  ballPos[0] = cpBodyGetPosition(physicsGetBall(0));
+  ballPos[1] = cpBodyGetPosition(physicsGetBall(1));
+  const float y1 = ballPos[0].y;
+  const float y2 = (special == kPegSpecialMultiball ? ballPos[1].y : 0);
+  float y = MAX(y1, y2);
+  if (special == kPegSpecialMultiball && physicsGetSecondBallInPlay() && y >= WF_PIX_Y + BALL_RADIUS) { 
+    uint8_t whichBall = 0;
+    if (y == ballPos[1].y) { whichBall = 1; }
+    renderDoTriggerSplash(whichBall, ballPos[whichBall].x);
+    //    
+    y = MIN(y1,y2);
+  }
+  gameSetYOffset(y - HALF_DEVICE_PIX_Y, false);
+  // Return true if no balls in play
+  const bool gutterd = (y > WF_PIX_Y + BALL_RADIUS);
+  if (gutterd) {
+    uint8_t whichBall = 0;
+    if (y == ballPos[1].y) { whichBall = 1; }
+    renderDoTriggerSplash(whichBall, ballPos[whichBall].x);
+  }
+  return gutterd;
 }
 
 void FSMCommonTurretScrollAndBounceBack(const bool allowScroll) {
@@ -60,7 +90,6 @@ void FSMCommonTurretScrollAndBounceBack(const bool allowScroll) {
   else if (angle < TURRET_ANGLE_MIN) { angle = TURRET_ANGLE_MIN; }
   gameSetTurretBarrelAngle(angle);
 }
-
 
 void FSMDisplaySplash(const bool newState) {
   static uint16_t timer = 0;
@@ -103,8 +132,10 @@ void FSMAimMode(const bool newState) {
   if (newState) {
     renderDoResetBallTrace();
     gameDoResetFrameCount();
+    renderDoResetTriggerSplash();
     timer = 0;
   }
+  //
   FSMCommonTurretScrollAndBounceBack(true);
   //
   float progress = getEasing(kEaseOutQuart, (float)timer/TIME_FIRE_BALL);
@@ -129,21 +160,11 @@ void FSMBallInPlay(const bool newState) {
     m_finalRequiredPos.x = 0;
     m_finalRequiredPos.y = 0;
   }
-  // Scrolling
-  FSMCommonTurretScrollAndBounceBack(true);
-  // Ball to focus on
-  cpVect ballPos[2];
-  ballPos[0] = cpBodyGetPosition(physicsGetBall(0));
-  ballPos[1] = cpBodyGetPosition(physicsGetBall(1));
-  const float y1 = ballPos[0].y;
-  const float y2 = (special == kPegSpecialMultiball ? ballPos[1].y : 0);
-  float y = MAX(y1, y2);
-  if (special == kPegSpecialMultiball && physicsGetSecondBallInPlay() && y >= WF_PIX_Y + BALL_RADIUS) { y = MIN(y1,y2); }
-  gameSetYOffset(y - HALF_DEVICE_PIX_Y, false);
-  // Ball guttered -> to gutter
-  if (y > WF_PIX_Y + BALL_RADIUS) { return FSMDo(kGameFSM_BallGutter); } 
+  // Focus on ball, check gutter
+  const bool guttered = FSMCommonFocusOnLowestBallInPlay(special);
+  if (guttered) { return FSMDo(kGameFSM_BallGutter); }
   // Ball stuck -> to stuck
-  for (int i = 0; i < 2; ++i) {
+  for (int i = 0; i < MAX_BALLS; ++i) {
     if (i == 1 && special != kPegSpecialMultiball) { break; }
     const cpVect v = cpBodyGetVelocity(physicsGetBall(i));
     if (cpvlengthsq(v) < BALL_IS_STUCK) {
@@ -166,9 +187,10 @@ void FSMBallInPlay(const bool newState) {
       }
     }
     // Check for distance to final peg
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < MAX_BALLS; ++i) {
       if (i == 1 && special != kPegSpecialMultiball) { break; }
-      if (cpvdist(m_finalRequiredPos, ballPos[i]) < FINAL_PEG_SLOWMO_RADIUS)  { return FSMDo(kGameFSM_CloseUp); }
+      cpVect ballPos = cpBodyGetPosition(physicsGetBall(i));
+      if (cpvdist(m_finalRequiredPos, ballPos) < FINAL_PEG_SLOWMO_RADIUS)  { return FSMDo(kGameFSM_CloseUp); }
     }
   }
 }
@@ -195,7 +217,7 @@ void FSMCloseUp(const bool newState) {
   const enum PegSpecial_t special = boardGetCurrentSpecial();
   if (newState) {
     renderSetScale(2);
-    physicsSetTimestepMultiplier(0.1f);
+    physicsSetTimestepMultiplier(0.2f);
   }
 
   cpVect ballPos[2];
@@ -203,7 +225,7 @@ void FSMCloseUp(const bool newState) {
   ballPos[1] = cpBodyGetPosition(physicsGetBall(1));
 
   int8_t whichBall = -1;
-  for (int i = 0; i < 2; ++i) {
+  for (int i = 0; i < MAX_BALLS; ++i) {
     if (i == 1 && special != kPegSpecialMultiball) { break; }
     if (cpvdist(m_finalRequiredPos, ballPos[i]) < FINAL_PEG_SLOWMO_RADIUS) {
       whichBall = i;
@@ -213,20 +235,32 @@ void FSMCloseUp(const bool newState) {
 
   if (whichBall == -1 || !boardGetRequiredPegsInPlay()) {
     renderSetScale(1);
-    physicsSetTimestepMultiplier(1.0f);
     gameSetXOffset(0);
-    if (whichBall == -1) { return FSMDo(kGameFSM_BallInPlay); }
-    else                 { return FSMDo(kGameFSM_WinningToast); }
+    if (whichBall == -1) {
+      physicsSetTimestepMultiplier(1.0f);
+      return FSMDo(kGameFSM_BallInPlay);
+    } else {
+      return FSMDo(kGameFSM_WinningToast);
+    }
   }
 
-  gameSetXOffset( ballPos[whichBall].x - (HALF_DEVICE_PIX_X/2) );
-  gameSetYOffset( ballPos[whichBall].y - (HALF_DEVICE_PIX_Y/2), true );
+  gameSetXOffset( roundf(ballPos[whichBall].x) - (HALF_DEVICE_PIX_X/2) );
+  gameSetYOffset( roundf(ballPos[whichBall].y) - (HALF_DEVICE_PIX_Y/2), true );
 }
 
 void FSMWinningToast(const bool newState) {
   // TODO
+  const enum PegSpecial_t special = boardGetCurrentSpecial();
 
-  return FSMDo(kGameFSM_BallInPlay);
+  const float tsm = physicsGetTimestepMultiplier();
+  if (tsm < 1.0f) { physicsSetTimestepMultiplier(tsm + 0.005f);  }
+
+  const bool guttered = FSMCommonFocusOnLowestBallInPlay(special);
+  if (guttered) { 
+    physicsSetTimestepMultiplier(1.0f);
+    return FSMDo(kGameFSM_BallGutter);
+  }
+
 }
 
 void FSMBallGutter(const bool newState) {
@@ -240,6 +274,7 @@ void FSMBallGutter(const bool newState) {
     } else if (special == kPegSpecialSecondTry) {
       physicsDoSecondTryBall();
       boardDoClearSpecial();
+      gameSetYOffset(gameGetMinimumY(), true);
       return FSMDo(kGameFSM_BallInPlay);
     }
     boardDoClearSpecial();
@@ -254,7 +289,7 @@ void FSMBallGutter(const bool newState) {
     --pause;
   } else {
     if (boardGetRequiredPegsInPlay()) { return FSMDo(kGameFSM_GutterToTurret); }
-    else                      { return FSMDo(kGameFSM_GutterToScores); }
+    else                              { return FSMDo(kGameFSM_GutterToScores); }
   }
 }
 

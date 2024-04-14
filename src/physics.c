@@ -32,7 +32,7 @@ int16_t m_predictionTrailY[PREDICTION_TRACE_LEN];
 /// ///
 
 void physicsSetTimestepMultiplier(const float tsm) { m_timestep = TIMESTEP * tsm; }
-float physicsGetTimestepMultiplier(void) { return m_timestep; }
+float physicsGetTimestepMultiplier(void) { return m_timestep / TIMESTEP; }
 
 int16_t* physicsGetMotionTrailX(const uint8_t n) { return m_physicsGetMotionTrailX[n]; }
 int16_t* physicsGetMotionTrailY(const uint8_t n) { return m_physicsGetMotionTrailY[n]; }
@@ -58,7 +58,7 @@ void physicsDoInit(void) {
 
   // Ball
   const float moment = cpMomentForCircle(BALL_MASS, 0.0f, BALL_RADIUS, cpvzero);
-  for (int i = 0; i < 2; ++i) {
+  for (int i = 0; i < MAX_BALLS; ++i) {
     m_ball[i] = cpBodyNew(BALL_MASS, moment);
     cpBodySetPosition(m_ball[i], cpv(0, WF_PIX_Y*2));
     m_ballShape[i] = cpCircleShapeNew(m_ball[i], BALL_RADIUS, cpvzero);
@@ -129,7 +129,9 @@ uint8_t cpCollisionBeginFunc_ballPeg(cpArbiter* arb, struct cpSpace* space, cpDa
 
 void physicsDoSecondTryBall(void) {
   const cpVect pos = cpBodyGetPosition(m_ball[0]);
+  const cpVect vel = cpBodyGetVelocity(m_ball[0]);
   cpBodySetPosition(m_ball[0], cpv(pos.x, gameGetMinimumY() + BALL_RADIUS));
+  cpBodySetVelocity(m_ball[0], cpv(vel.x, vel.y / 2.0f));
 }
 
 void physicsDoResetBall(uint8_t n) {
@@ -142,6 +144,7 @@ void physicsDoResetBall(uint8_t n) {
 }
 
 void physicsDoUpdate(const int32_t fc, const enum FSM_t fsm) {
+  // TODO https://chipmunk-physics.net/forum/viewtopic.php?t=3032
   cpSpaceStep(m_space, m_timestep);
   
   const cpVect pos = cpBodyGetPosition(m_ball[0]);

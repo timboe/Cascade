@@ -15,10 +15,18 @@ float FSMCommonCrankNumeral(float* progress) {
   const float cc = inputGetCrankChanged();
   float ret = 0.0f;
   *progress -= cc * CRANK_NUMBERSCROLL_MODIFIER;
-  if      (inputGetPressed(kButtonUp)) *progress += 10 * CRANK_NUMBERSCROLL_MODIFIER;
-  else if (inputGetPressed(kButtonDown)) *progress -=  10 * CRANK_NUMBERSCROLL_MODIFIER;
+  //
+  if (inputGetPressed(kButtonUp)) {
+    *progress += 10 * CRANK_NUMBERSCROLL_MODIFIER;
+    crankNotMoved = 0;
+  } else if (inputGetPressed(kButtonDown)) {
+    *progress -=  10 * CRANK_NUMBERSCROLL_MODIFIER;
+    crankNotMoved = 0;
+  }
+  //
   if (fabsf(cc) < 1.0f) { ++crankNotMoved; }
   else { crankNotMoved = 0; }
+  //
   if (crankNotMoved > TICK_FREQUENCY/4) { *progress *= 0.9f; }
   if (*progress >= 1.0f) {
     *progress -= 2.0f;

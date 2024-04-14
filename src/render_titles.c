@@ -142,22 +142,10 @@ void renderTitlesHoleSelect(const bool locked) {
   }
   const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y*3); // Hard = true
 
-
-  LCDBitmap* bm = bitmapGetLevelPreview(IOGetCurrentLevel(), IOGetCurrentHole());
   static uint16_t offset = 0;
-  if (!locked && bm) {
-    pd->graphics->setDrawMode(kDrawModeInverted);
-    pd->graphics->drawBitmap(bm, DEVICE_PIX_X - 200, DEVICE_PIX_Y*3 + parallax, kBitmapUnflipped);
-    pd->graphics->setDrawMode(kDrawModeCopy);
-    offset = 0;
-  } else if (bm) {
-    pd->graphics->setDrawMode(kDrawModeInverted);
-    pd->graphics->drawBitmap(bm, HALF_DEVICE_PIX_X, DEVICE_PIX_Y*3 - offset, kBitmapUnflipped);
-    pd->graphics->drawBitmap(bm, HALF_DEVICE_PIX_X, DEVICE_PIX_Y*3 - offset + (DEVICE_PIX_Y*2), kBitmapUnflipped);
-    pd->graphics->setDrawMode(kDrawModeCopy);
-    offset += 2;
-    if (offset >= DEVICE_PIX_Y*2) { offset -= DEVICE_PIX_Y*2; }
-  }
+  LCDBitmap* bm = bitmapGetLevelPreview(IOGetCurrentLevel(), IOGetCurrentHole(), offset);
+  offset += 2;
+  if (bm) { pd->graphics->drawBitmap(bm, DEVICE_PIX_X - 200, DEVICE_PIX_Y*3 + parallax, kBitmapUnflipped); }
 
   pd->graphics->drawBitmap(bitmapGetDither(), 0, (WF_DIVISION_PIX_Y * 15), kBitmapUnflipped);
   pd->graphics->drawBitmap(bitmapGetTitleHoleCreator(), HALF_DEVICE_PIX_X, (DEVICE_PIX_Y * 4) - NUMERAL_BUF, kBitmapUnflipped);

@@ -49,6 +49,7 @@ LCDBitmap* m_useTheCrankBitmap;
 LCDBitmap* m_ditherBitmap;
 
 LCDBitmap* m_previewBitmap[MAX_LEVELS][MAX_HOLES] = {0};
+LCDBitmap* m_previewBitmapWindow;
 
 LCDBitmap* m_stencilWipeBitmap[STENCIL_WIPE_N];
 
@@ -74,6 +75,7 @@ LCDBitmap* m_hexBitmap[MAX_PEG_SIZE][128];
 LCDBitmap* m_wfPond;
 LCDBitmap* m_wfBg[N_WF];
 LCDBitmapTable* m_sheetWfFg[N_WF];
+LCDBitmapTable* m_waterSplashTable;
 
 LCDFont* m_fontRoobert24;
 LCDFont* m_fontRoobert10;
@@ -184,6 +186,10 @@ LCDBitmap* bitmapGetWfPond(void) { return m_wfPond; }
 
 LCDBitmap* bitmapGetWfBg(const uint8_t wf) { return m_wfBg[wf]; }
 
+LCDBitmap* bitmapGetWaterSplash(const uint8_t id) { 
+  return pd->graphics->getTableBitmap(m_waterSplashTable, id);
+}
+
 LCDBitmap* bitmapGetWfFg(const uint8_t wf, const uint32_t x, const uint32_t y) {
   return bitmapGetWfFg_byidx(wf, WF_ID(x, y));
 }
@@ -210,7 +216,15 @@ LCDBitmap* bitmapGetTitleHoleTutorial(void) { return m_holeTutorialBitmap; }
 
 LCDBitmap* bitmapGetDither(void) { return m_ditherBitmap; }
 
-LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole) { return m_previewBitmap[level][hole]; }
+LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int16_t offset) { 
+  offset = offset % (DEVICE_PIX_Y*2);
+  pd->graphics->pushContext(m_previewBitmapWindow);
+  pd->graphics->setDrawMode(kDrawModeInverted);
+  pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, offset, kBitmapUnflipped);
+  pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, offset - (DEVICE_PIX_Y*2), kBitmapUnflipped);
+  pd->graphics->popContext();
+  return m_previewBitmapWindow;
+}
 
 LCDBitmap* bitmapGetPeg(const struct Peg_t* p) {
   switch (p->shape) {
@@ -466,6 +480,7 @@ void bitmapDoPreloadA(void) {
   m_turretBody = bitmapDoLoadImageAtPath("images/turretBody");
 
   m_turretBarrelTabel = bitmapDoLoadImageTableAtPath("images/turretBarrel");
+  m_waterSplashTable = bitmapDoLoadImageTableAtPath("images/splash");
 
   m_fontRoobert24 = bitmapDoLoadFontAtPath("fonts/Roobert-24-Medium");
   m_fontRoobert10 = bitmapDoLoadFontAtPath("fonts/Roobert-10-Bold");
@@ -516,6 +531,7 @@ void bitmapDoPreloadD(void) {
 }
 
 void bitmapDoPreloadE(void) {
+  m_previewBitmapWindow = pd->graphics->newBitmap(HALF_DEVICE_PIX_X, DEVICE_PIX_Y, kColorClear);
   char text[128];
   for (int l = 0; l < MAX_LEVELS; ++l) {
     for (int h = 0; h < MAX_HOLES; ++h) {

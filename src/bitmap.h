@@ -20,13 +20,14 @@ LCDBitmap* bitmapGetWfFg(const uint8_t wf, const uint32_t x, const uint32_t y);
 LCDBitmap* bitmapGetWfFg_byidx(const uint8_t wf, const uint32_t idx);
 LCDBitmap* bitmapGetWfBg(const uint8_t wf);
 LCDBitmap* bitmapGetWfPond(void);
+LCDBitmap* bitmapGetWaterSplash(const uint8_t id);
 
 LCDBitmap* bitmapGetUseTheCrank(void);
 LCDBitmap* bitmapGetTitleSplash(void);
 LCDBitmap* bitmapGetNumeral(const int8_t n);
 LCDBitmap* bitmapGetStencilWipe(const int8_t n);
 LCDBitmap* bitmapGetDither(void);
-LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole);
+LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int16_t offset);
 
 LCDBitmap* bitmapGetTitlePlayer(void);
 LCDBitmap* bitmapGetTitleLevel(void);

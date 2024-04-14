@@ -272,6 +272,9 @@ void pegDoHit(struct Peg_t* p) {
       boardDoSpecialBurst();
     }
   }
+  if (p->state == kPegStateHit && FSMGet() == kGameFSM_WinningToast) {
+    pegDoRemove(p);
+  }
   // pd->system->logToConsole("bam!");
 }
 

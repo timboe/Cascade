@@ -114,7 +114,7 @@ void boardDoRandomise(void) {
     staticLoader.shape = (rand() % 2 ? kPegShapeBall : kPegShapeRect);
     staticLoader.size = rand() % MAX_PEG_SIZE;
     // staticLoader.size = 4;
-    staticLoader.type = (i < 4 ? kPegTypeRequired : kPegTypeNormal);
+    staticLoader.type = (i < 1 ? kPegTypeRequired : kPegTypeNormal);
     staticLoader.type = (i >= 4 && i < 6 ? kPegTypeSpecial : staticLoader.type);
     boardDoAddStatic(&staticLoader);
   }
@@ -145,7 +145,7 @@ void boardDoRandomise(void) {
     }
     boardDoAddWheel(&ellipticLoader);
   }
-
+ 
   // #define PEGS_PER_PATH 8
   // #define PATHS 1
   // for (int pathStep = 0; pathStep < PATHS; ++pathStep) {
