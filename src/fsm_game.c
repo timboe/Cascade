@@ -99,9 +99,9 @@ void FSMDisplaySplash(const bool newState) {
     gameSetYOffset(-DEVICE_PIX_Y - TURRET_RADIUS, true);
     bitmapDoUpdateScoreHistogram();
     gameDoPopulateMenuGame();
-    boardDoRandomise(); // // TODO replace me
-    //boardDoClear();
-    //IODoLoadCurrentHole();
+    // boardDoRandomise(); // // TODO replace me
+    boardDoClear();
+    IODoLoadCurrentHole();
   }
   if (timer++ == TIME_DISPLAY_SPLASH) return FSMDo(kGameFSM_SplashToStart);
 }
