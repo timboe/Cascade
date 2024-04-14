@@ -4,7 +4,6 @@
 #include "io.h"
 #include "input.h"
 #include "fsm.h"
-#include "physics.h"
 #include "board.h"
 #include "sshot.h"
 
@@ -22,7 +21,10 @@ void renderGame(const int32_t fc, const enum FSM_t fsm);
 
 void renderSetScale(const uint8_t scale) { m_renderScale = scale; }
 
-void renderAddFreeze(const uint16_t amount) { m_freeze += amount; }
+void renderAddFreeze(const uint16_t amount) { 
+  m_freeze += amount;
+  if (m_freeze > TICK_FREQUENCY/5) { m_freeze = TICK_FREQUENCY/5; }
+}
 
 bool renderGetSubFreeze(void) {
   if (m_freeze) {
@@ -108,7 +110,7 @@ void renderGame(int32_t fc, enum FSM_t fsm) {
   renderGamePoot(fsm);
 
   // DRAW PEGS
-  renderGameBoard();
+  renderGameBoard(fc);
 
   // DRAW TRAJECTORY
   renderGameTrajectory();

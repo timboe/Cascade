@@ -112,16 +112,16 @@ void IODoUpdatePreloading(void) {
     case 14: bitmapDoPreloadG(0); break;
     case 15: bitmapDoPreloadG(1); break;
     case 16: bitmapDoPreloadG(2); break;
-    case 17: bitmapDoPreloadG(3); break; 
-    case 18: bitmapDoPreloadG(4); break; // MAX_PEG_SIZE
-    case 19: bitmapDoPreloadH(0); break;
-    case 20: bitmapDoPreloadH(1); break;
-    case 21: bitmapDoPreloadH(2); break;
-    case 22: bitmapDoPreloadH(3); break; 
-    case 23: bitmapDoPreloadH(4); break; // MAX_PEG_SIZE
-    case 24: bitmapDoPreloadI(); break;
-    case 25: bitmapDoPreloadJ(); break;
-    case 26: bitmapDoPreloadK(); break;
+    case 17: bitmapDoPreloadG(3); break; // MAX_PEG_SIZE
+    case 18: bitmapDoPreloadH(0); break;
+    case 19: bitmapDoPreloadH(1); break;
+    case 20: bitmapDoPreloadH(2); break;
+    case 21: bitmapDoPreloadH(3); break; // MAX_PEG_SIZE
+    case 22: bitmapDoPreloadI(); break;
+    case 23: bitmapDoPreloadJ(); break;
+    case 24: bitmapDoPreloadK(); break;
+    case 25: bitmapDoPreloadL(0); break;
+    case 26: bitmapDoPreloadL(1); break;
   }
   const uint32_t after = pd->system->getCurrentTimeMilliseconds();
   pd->system->logToConsole("Preload %i took %i ms", (int)m_preloading, (int)(after - before));

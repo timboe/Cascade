@@ -60,7 +60,7 @@ void FSMCommonTurretScrollAndBounceBack(const bool allowScroll) {
   else if (inputGetPressed(kButtonDown)) diffY =  SCREEN_ACC;
   gameModYVelocity(diffY);
   // Crank based
-  static float angle = 179.0f;
+  static float angle = 180.0f;
   static bool topLock = true;
   static float revDetection = 180.0f;
   // Backup: non-crank
@@ -95,6 +95,7 @@ void FSMDisplaySplash(const bool newState) {
   static uint16_t timer = 0;
   if (newState) { 
     timer = 0;
+    renderDoResetStars();
     gameSetYOffset(-DEVICE_PIX_Y - TURRET_RADIUS, true);
     bitmapDoUpdateScoreHistogram();
     gameDoPopulateMenuGame();
@@ -251,9 +252,17 @@ void FSMCloseUp(const bool newState) {
 void FSMWinningToast(const bool newState) {
   // TODO
   const enum PegSpecial_t special = boardGetCurrentSpecial();
+  if (newState) {
+    renderDoResetStars();
+  }
 
   const float tsm = physicsGetTimestepMultiplier();
   if (tsm < 1.0f) { physicsSetTimestepMultiplier(tsm + 0.005f);  }
+
+  int fc = gameGetFrameCount();
+  if (fc % (TICK_FREQUENCY/5) == 0) { renderDoAddStar(0); }
+  fc += (TICK_FREQUENCY/10);
+  if (physicsGetSecondBallInPlay() && fc % (TICK_FREQUENCY/5) == 0) { renderDoAddStar(1); }
 
   const bool guttered = FSMCommonFocusOnLowestBallInPlay(special);
   if (guttered) { 
@@ -310,7 +319,7 @@ void FSMGutterToTurret(const bool newState) {
     if (minY > (DEVICE_PIX_Y/2)) gameSetMinimumY(minY - (DEVICE_PIX_Y/2));
     pd->system->logToConsole("kGameFSM_GutterToTurret smallest y was %i, min y is now %i", minY, gameGetMinimumY());
     //
-    boardDoAddSpecial(true);
+    boardDoAddSpecial(true); // Activate
   }
   const int16_t minimumY = gameGetMinimumY();
   // Take less time overall when we get lower down

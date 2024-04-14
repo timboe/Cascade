@@ -54,6 +54,7 @@ void pegDoInit(struct Peg_t* p, const enum PegShape_t s, const float x, const fl
   p->speed = 1.0f;
   p->size = size;
   p->easing = kEaseLinear;
+  p->queueRemove = false;
   const float scale = bitmapSizeToScale(size);
 
   pegDoAddBody(p);
@@ -81,6 +82,7 @@ void pegDoClear(struct Peg_t* p) {
 }
 
 void pegDoRemove(struct Peg_t* p) {
+  p->queueRemove = false;
   if (p->cpBody) {
     cpSpaceRemoveBody(physicsGetSpace(), p->cpBody);
     cpBodyFree(p->cpBody);
@@ -132,6 +134,10 @@ void pegDoUpdateAngle(struct Peg_t* p, float angle) {
 }
 
 void pegDoUpdate(struct Peg_t* p) {
+  if (p->queueRemove) {
+    p->state = kPegStateRemoved;
+    pegDoRemove(p);
+  }
   if (p->state == kPegStateRemoved) {
     return;
   }
@@ -258,7 +264,8 @@ void pegDoHit(struct Peg_t* p) {
     } else if (p->type == kPegTypeSpecial) {
       renderAddTrauma(TRAUMA_SPECIAL_HIT);
       renderAddFreeze(FREEZE_SPECIAL_HIT);
-      boardDoAddSpecial(false);
+      const enum PegSpecial_t special = boardDoAddSpecial(false); // activate = false
+      renderDoAddSpecial(p->cpBody, special);
     } else {
       renderAddTrauma(TRAUMA_PEG_HIT);
       renderAddFreeze(FREEZE_PEG_HIT);
@@ -267,13 +274,16 @@ void pegDoHit(struct Peg_t* p) {
     const enum PegSpecial_t special = boardGetCurrentSpecial();
     if (special == kPegSpecialMultiball && !physicsGetSecondBallInPlay()) {
       physicsSetSecondBallInPlay();
-    } else if (special == kPegSpecialBurst) {
+    } else if (special == kPegSpecialBlast) {
+      pd->system->logToConsole("BLAST");
       boardDoClearSpecial(); // Do this first, it's going to recurse!
-      boardDoSpecialBurst();
+      boardDoSpecialBlast();
+      renderAddTrauma(TRAUMA_BLAST_HIT);
+      renderDoAddBlast(p->cpBody);
     }
   }
   if (p->state == kPegStateHit && FSMGet() == kGameFSM_WinningToast) {
-    pegDoRemove(p);
+    p->queueRemove = true; // Can't remove in the middle of a physics callback
   }
   // pd->system->logToConsole("bam!");
 }
@@ -285,4 +295,17 @@ bool pegDoCheckBurst(struct Peg_t* p, const float y) {
     return true;
   }
   return false;
+}
+
+const char* pegGetSpecialTxt(const uint8_t s) {
+  switch (s) {
+    case kPegSpecialAim: return "AIMSHOT";
+    case kPegSpecialSecondTry: return "SECONDSHOT";
+    case kPegSpecialBlast: return "BLASTBALL";
+    case kPegSpecialMultiball: return "MULTIBALL";
+    case kPegSpecialBounce: return "ELASTIBALL";
+    case kPegSpecialPenetrate: return "GHOSTBALL";
+    default: break;
+  }
+  return "";
 }

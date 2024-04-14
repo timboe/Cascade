@@ -72,10 +72,16 @@ LCDBitmap* m_ballBitmap[2][MAX_PEG_SIZE];
 LCDBitmap* m_rectBitmap[2][MAX_PEG_SIZE][128];
 LCDBitmap* m_hexBitmap[MAX_PEG_SIZE][128];
 
+LCDBitmap* m_starBitmap[2][128];
+
+LCDBitmap* m_specialTextBitmap[(uint8_t)kNPegSpecial];
+
 LCDBitmap* m_wfPond;
 LCDBitmap* m_wfBg[N_WF];
 LCDBitmapTable* m_sheetWfFg[N_WF];
 LCDBitmapTable* m_waterSplashTable;
+
+LCDBitmapTable* m_blastTable;
 
 LCDFont* m_fontRoobert24;
 LCDFont* m_fontRoobert10;
@@ -198,6 +204,10 @@ LCDBitmap* bitmapGetWfFg_byidx(const uint8_t wf, const uint32_t idx) {
   return pd->graphics->getTableBitmap(m_sheetWfFg[wf], idx);
 }
 
+LCDBitmap* bitmapGetBlast(const uint8_t id) {
+  return pd->graphics->getTableBitmap(m_blastTable, id);
+}
+
 LCDBitmap* bitmapGetTitlePlayer(void) { return m_playerBitmap; }
 
 LCDBitmap* bitmapGetTitleLevel(void) { return m_levelBitmap; }
@@ -215,6 +225,8 @@ LCDBitmap* bitmapGetTitleHoleCreator(void) { return m_holeCreatorBitmap; }
 LCDBitmap* bitmapGetTitleHoleTutorial(void) { return m_holeTutorialBitmap; }
 
 LCDBitmap* bitmapGetDither(void) { return m_ditherBitmap; }
+
+LCDBitmap* bitmapGetStar(const uint8_t type, const uint8_t angle) { return m_starBitmap[type][angle % 128]; }
 
 LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int16_t offset) { 
   offset = offset % (DEVICE_PIX_Y*2);
@@ -252,6 +264,8 @@ LCDBitmap* bitmapGetTurretBarrel(void) {
   return m_turretBarrel[(gameGetFrameCount() % 32) / 4][ angToByte(gameGetTurretBarrelAngle()) ];
 }
 
+LCDBitmap* bitmapGetSpecial(const enum PegSpecial_t special) { return m_specialTextBitmap[(uint8_t)special]; }
+
 void bitmapSetRoobert10(void) { pd->graphics->setFont(m_fontRoobert10); }
 
 void bitmapSetRoobert24(void) { pd->graphics->setFont(m_fontRoobert24); }
@@ -270,11 +284,10 @@ LCDFont* bitmapGetGreatVibes109(void) { return m_fontGreatvibes109; }
 
 float bitmapSizeToScale(uint8_t size) {
   switch (size) {
-    case 0: return 1.0f;
-    case 1: return 1.25f;
-    case 2: return 1.50f;
-    case 3: return 1.75f;
-    case 4: return 2.0f;
+    case 0: return 1.25f;
+    case 1: return 1.50f;
+    case 2: return 1.75f;
+    case 3: return 2.0f;
     default: pd->system->error("Error bitmapSizeToScale called with unknown size %i", size);
   }
   return 1.0f;
@@ -478,9 +491,12 @@ void bitmapDoPreloadA(void) {
   m_wfPond = bitmapDoLoadImageAtPath("images/falls_pond");
   m_cardBitmap = bitmapDoLoadImageAtPath("images/card");
   m_turretBody = bitmapDoLoadImageAtPath("images/turretBody");
+  m_starBitmap[0][0] = bitmapDoLoadImageAtPath("images/star0");
+  m_starBitmap[1][0] = bitmapDoLoadImageAtPath("images/star1");
 
   m_turretBarrelTabel = bitmapDoLoadImageTableAtPath("images/turretBarrel");
   m_waterSplashTable = bitmapDoLoadImageTableAtPath("images/splash");
+  m_blastTable = bitmapDoLoadImageTableAtPath("images/blast");
 
   m_fontRoobert24 = bitmapDoLoadFontAtPath("fonts/Roobert-24-Medium");
   m_fontRoobert10 = bitmapDoLoadFontAtPath("fonts/Roobert-10-Bold");
@@ -502,7 +518,7 @@ void bitmapDoPreloadA(void) {
 void bitmapDoPreloadB(const uint8_t anim) { // TURRET_LAUNCH_FRAMES
   m_turretBarrel[anim][0] = pd->graphics->getTableBitmap(m_turretBarrelTabel, anim);
   for (int32_t a = 1; a < 256; ++a) {
-    const float angle = (365.0f / 256.0f) * a;
+    const float angle = (360.0f / 256.0f) * a;
     m_turretBarrel[anim][a] = pd->graphics->newBitmap(TURRET_RADIUS*2, TURRET_RADIUS*2, kColorClear);
     pd->graphics->pushContext(m_turretBarrel[anim][a]);
     pd->graphics->setDrawMode(kDrawModeCopy);
@@ -605,6 +621,18 @@ void bitmapDoPreloadI(void) {
 void bitmapDoPreloadJ(void) {
   char text[128];
 
+  for (int s = 0; s < kNPegSpecial; ++s) {
+    m_specialTextBitmap[s] = pd->graphics->newBitmap(SPECIAL_TEXT_WIDTH, TITLETEXT_HEIGHT, kColorClear);
+    pd->graphics->pushContext(m_specialTextBitmap[s]);
+    bitmapSetRoobert24();
+    const int32_t w0 = pd->graphics->getTextWidth(bitmapGetRoobert24(), pegGetSpecialTxt(s), 128, kUTF8Encoding, 0);
+    pd->graphics->setDrawMode(kDrawModeFillBlack);
+    bitmapDoDrawOutlineText(pegGetSpecialTxt(s), 128, NUMERAL_PIX_Y/2 - w0/2, 0, 2);
+    pd->graphics->popContext();
+  }
+
+  //
+
   LCDBitmap* tempBitmap = pd->graphics->newBitmap(NUMERAL_PIX_Y, TITLETEXT_HEIGHT, kColorClear);
   pd->graphics->pushContext(tempBitmap);
   bitmapSetRoobert24();
@@ -663,6 +691,16 @@ void bitmapDoPreloadK(void) {
     pd->graphics->drawBitmap(bitmapGetDither(), 0, -WF_DIVISION_PIX_Y + (stencilStep * i), kBitmapFlippedY);
     pd->graphics->setDrawMode(kDrawModeCopy);
     pd->graphics->fillRect(0, -WF_DIVISION_PIX_Y, DEVICE_PIX_X, (stencilStep * i), kColorWhite);
+    pd->graphics->popContext();
+  }
+}
+
+void bitmapDoPreloadL(const uint8_t star) {
+  for (int a = 1; a < 128; ++a) {
+    m_starBitmap[star][a] = pd->graphics->newBitmap(STAR_WIDTH, STAR_WIDTH, kColorClear);
+    const float angle = (360.0f / 128.0f) * a;
+    pd->graphics->pushContext(m_starBitmap[star][a]);
+    pd->graphics->drawRotatedBitmap(m_starBitmap[star][0], STAR_WIDTH/2, STAR_WIDTH/2, angle, 0.5f, 0.5f, 1.0f, 1.0f);
     pd->graphics->popContext();
   }
 }

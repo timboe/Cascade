@@ -11,14 +11,54 @@ uint16_t m_ballFallN = 0;
 uint16_t m_ballFallX = 0;
 float m_ballFallY[32] = {0};
 
-uint16_t m_ballTraceX[PREDICTION_TRACE_LEN * 2]; //x2 for the special aim ability
-uint16_t m_ballTraceY[PREDICTION_TRACE_LEN * 2];
+cpVect m_ballTrace[PREDICTION_TRACE_LEN * 2]; //x2 for the special aim ability
 uint8_t m_ballTraces = 0;
 
 int16_t m_ballSplashPos[MAX_BALLS];
 uint16_t m_ballSplashTimer[MAX_BALLS];
 
+cpVect m_starPos[MAX_STARS];
+cpVect m_starVel[MAX_STARS];
+uint8_t m_starAng[MAX_STARS];
+int8_t m_starType[MAX_STARS] = {-1};
+
+cpVect m_blastPos = cpvzero;
+uint8_t m_blastFrame;
+
+cpVect m_specialPos = cpvzero;
+uint8_t m_specialOffset = 0;
+enum PegSpecial_t m_specialType;
+
 /// ///
+
+void renderDoAddSpecial(cpBody* body, const enum PegSpecial_t special) {
+  m_specialPos = cpBodyGetPosition(body);
+  m_specialOffset = 0;
+  m_specialType = special;
+}
+
+void renderDoAddBlast(cpBody* body) {
+  m_blastPos = cpBodyGetPosition(body);
+  m_blastFrame = 0;
+}
+
+void renderDoAddStar(const uint8_t ball) {
+  for (int s = 0; s < MAX_STARS; ++s) {
+    if (m_starType[s] != -1) { continue; }
+    cpBody* cpBall = physicsGetBall(ball);
+    const float ang =  (rand() % 180) * M_PIf;
+    m_starType[s] = rand() % 2;
+    m_starPos[s] = cpBodyGetPosition(cpBall);
+    m_starVel[s] = cpvadd( cpBodyGetVelocity(cpBall), cpv(STAR_STRENGTH * cosf(ang), -STAR_STRENGTH * sinf(ang) * 2) );
+    m_starVel[s] = cpvmult( m_starVel[s], TIMESTEP );
+    m_starAng[s] = rand() % 128;
+    return;
+  }
+}
+
+void renderDoResetStars(void) {
+  for (int s = 0; s < MAX_STARS; ++s) { m_starType[s] = -1; }
+}
 
 void renderDoTriggerSplash(const uint8_t ball, const int16_t x) {
   if (!m_ballSplashTimer[ball]) {
@@ -38,19 +78,34 @@ void renderSetBallFallX(const uint16_t x) { m_ballFallX = x; }
 void renderSetBallFallY(const uint16_t ball, const float y) { m_ballFallY[ball] = y; }
 
 void renderSetBallTrace(const uint16_t i, const uint16_t x, const uint16_t y) {
-  m_ballTraceX[i] = x;
-  m_ballTraceY[i] = y;
+  m_ballTrace[i].x = x;
+  m_ballTrace[i].y = y;
   m_ballTraces = i;
 }
 
 void renderDoResetBallTrace(void) {
   for (int i = 0; i < PREDICTION_TRACE_LEN * 2; ++i) {
-    m_ballTraceX[i] = HALF_DEVICE_PIX_X;
-    m_ballTraceY[i] = gameGetMinimumY() + TURRET_RADIUS;
+    m_ballTrace[i].x = HALF_DEVICE_PIX_X;
+    m_ballTrace[i].y = gameGetMinimumY() + TURRET_RADIUS;
   }
 }
 
 void renderGameBall(const int32_t fc) {
+  // Start out by rendering any end of level effects
+  const enum FSM_t fsm = FSMGet();
+  if (fsm >= kGameFSM_WinningToast && fsm <= kGameFSM_GutterToScores) {
+    for (int s = 0; s < MAX_STARS; ++s) {
+      if (m_starType[s] == -1) { continue; }
+      m_starPos[s] = cpvadd( m_starPos[s], m_starVel[s] );
+      m_starVel[s].y += 0.01f; 
+      m_starAng[s] += 3;
+      pd->graphics->setDrawMode(kDrawModeNXOR);
+      pd->graphics->drawBitmap(bitmapGetStar(m_starType[s], m_starAng[s]), m_starPos[s].x - STAR_WIDTH/2, m_starPos[s].y - STAR_WIDTH/2, kBitmapUnflipped);
+      pd->graphics->setDrawMode(kDrawModeCopy);
+      if (m_starAng[s] > 250) { m_starType[s] = -1; }
+    }
+  }
+
   if (!FSMGetBallInPlay()) {
     // render at dummy location
     pd->graphics->setDrawMode(kDrawModeInverted);
@@ -58,6 +113,7 @@ void renderGameBall(const int32_t fc) {
     pd->graphics->setDrawMode(kDrawModeCopy);
     return;
   }
+
   for (int i = 0; i < MAX_BALLS; ++i) {
     if (i == 1 && !physicsGetSecondBallInPlay()) { continue; }
     cpBody* ball = physicsGetBall(i);
@@ -102,13 +158,12 @@ void renderGameTrajectory(void) {
     return;
   }
   for (int i = 2; i < m_ballTraces; ++i) {
-    // pd->system->logToConsole("%i is %i %i to %i %i", i, m_ballTraceX[i], m_ballTraceY[i], m_ballTraceX[i-i], m_ballTraceY[i-1]);
-    pd->graphics->drawLine(m_ballTraceX[i], m_ballTraceY[i], m_ballTraceX[i-1], m_ballTraceY[i-1], 4, kColorWhite);
-    pd->graphics->drawLine(m_ballTraceX[i], m_ballTraceY[i], m_ballTraceX[i-1], m_ballTraceY[i-1], 2, kColorBlack);
+    pd->graphics->drawLine(m_ballTrace[i].x, m_ballTrace[i].y, m_ballTrace[i-1].x, m_ballTrace[i-1].y, 4, kColorWhite);
+    pd->graphics->drawLine(m_ballTrace[i].x, m_ballTrace[i].y, m_ballTrace[i-1].x, m_ballTrace[i-1].y, 2, kColorBlack);
   }
 }
 
-void renderGameBoard(void) {
+void renderGameBoard(const int32_t fc) {
   for (int i = 0; i < boardGetNPegs(); ++i) {
     const struct Peg_t* p = boardGetPeg(i);
     if (p->state == kPegStateRemoved) {
@@ -129,6 +184,31 @@ void renderGameBoard(void) {
     //   }
     // }
   }
+
+  if (m_specialPos.x) {
+    m_specialOffset++;
+    if (m_specialOffset == TICK_FREQUENCY) {
+      m_specialPos = cpvzero;
+    } else {
+      pd->graphics->setDrawMode(kDrawModeNXOR); // kDrawModeNXOR
+      pd->graphics->drawBitmap(bitmapGetSpecial(m_specialType),
+        m_specialPos.x - SPECIAL_TEXT_WIDTH/2,
+        m_specialPos.y - TITLETEXT_HEIGHT - m_specialOffset, kBitmapUnflipped);
+      pd->graphics->setDrawMode(kDrawModeCopy);
+    }
+  }
+
+  if (m_blastPos.x) {
+    m_blastFrame++;
+    if (m_blastFrame / 4 == 9) {
+      m_blastPos = cpvzero;
+    } else {
+      pd->graphics->setDrawMode(kDrawModeCopy); // kDrawModeNXOR
+      pd->graphics->drawBitmap(bitmapGetBlast(m_blastFrame / 4), m_blastPos.x - BLAST_RADIUS, m_blastPos.y - BLAST_RADIUS, kBitmapUnflipped);
+      pd->graphics->setDrawMode(kDrawModeCopy);
+    }
+  }
+
 }
 
 void renderGameBackground(void) {

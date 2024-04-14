@@ -43,12 +43,16 @@
 
 #define STENCIL_WIPE_N 30
 
-#define SPECIAL_BURST_RADIUS 128
+#define BLAST_RADIUS 128
 
-#define FINAL_PEG_SLOWMO_RADIUS 128
+#define FINAL_PEG_SLOWMO_RADIUS 64
 
 #define POND_SPLASH_WIDTH 128
 #define POND_SPLASH_HEIGHT 82
+
+#define STAR_WIDTH 48
+
+#define SPECIAL_TEXT_WIDTH 192
 
 // TIMINGS
 
@@ -77,6 +81,8 @@
 #define TRAUMA_PEG_HIT (TRAUMA_REQUIRED_HIT/2.0f)
 #define FREEZE_PEG_HIT (FREEZE_REQUIRED_HIT/2)
 
+#define TRAUMA_BLAST_HIT 3.0f
+
 #define EASE_TITLE_DOWNWARDS kEaseInOutQuad
 #define EASE_TITLE_UPWARDS kEaseInOutQuad
 
@@ -88,9 +94,11 @@
 
 #define MAX_LINEAR_PATH_SEGMENTS 64 
 
-#define MAX_PEG_SIZE 5
+#define MAX_PEG_SIZE 4
 
 #define MAX_PEGS_ON_PATH 32
+
+#define MAX_STARS 32
 
 /// ///
 
@@ -130,6 +138,8 @@
 #define G cpv(0.0f, 256.0f)
 
 #define POOT_STRENGTH 300.0f
+
+#define STAR_STRENGTH 86.0f
 
 #define WF_VELOCITY 2.0f
 

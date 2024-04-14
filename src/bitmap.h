@@ -48,6 +48,12 @@ LCDBitmap* bitmapGetPeg(const struct Peg_t* p);
 LCDBitmap* bitmapGetBall(void);
 LCDBitmap* bitmapGetBallFirePoot(const uint8_t i);
 
+LCDBitmap* bitmapGetStar(const uint8_t type, const uint8_t angle);
+
+LCDBitmap* bitmapGetBlast(const uint8_t id);
+
+LCDBitmap* bitmapGetSpecial(const enum PegSpecial_t special);
+
 void bitmapDoUpdateGameInfoTopper(void);
 void bitmapDoUpdateLevelSplash(void);
 void bitmapDoUpdateLevelStatsBitmap(void);
@@ -67,6 +73,7 @@ void bitmapDoPreloadH(const uint8_t size);
 void bitmapDoPreloadI(void);
 void bitmapDoPreloadJ(void);
 void bitmapDoPreloadK(void);
+void bitmapDoPreloadL(const uint8_t star);
 
 
 #define WF_ID(X, Y) ((WFSHEET_SIZE_X * Y) + X)
