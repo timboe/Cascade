@@ -83,6 +83,16 @@ func reset_level() -> void:
 		peg.name = "temp" + str(i)
 		peg.queue_free()
 		i += 1
+	%Name.text = ""
+	%Author.text = ""
+	%LevelSlider.value = 1
+	%HoleSlider.value = 1
+	%ParSlider.value = 3
+	%Foreground.selected = 0
+	%Background.selected = 0
+	%SpecialButton.selected = 0
+	%HeightSlider.value = 960
+	%EditorSnap.value = 4
 
 func restore_save(save_game : Dictionary) -> void:
 	reset_level()

@@ -311,7 +311,7 @@ script = SubResource("GDScript_scs8v")
 [node name="ParLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Hole Par: 1"
+text = "Hole Par: 3"
 horizontal_alignment = 2
 
 [node name="ParSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
@@ -381,7 +381,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 min_value = 1.0
 max_value = 30.0
-value = 5.0
+value = 4.0
 rounded = true
 tick_count = 15
 script = SubResource("GDScript_4ako0")
@@ -449,6 +449,13 @@ file_mode = 0
 access = 2
 filters = PackedStringArray("*.json")
 
+[node name="Dummy" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+
+[node name="Reset" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+text = "Reset"
+
 [node name="HSeparator" type="HSeparator" parent="HBox/RightScroll/Margin/RightVBox"]
 layout_mode = 2
 
@@ -496,6 +503,7 @@ text = "PEGS"
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Load" to="HBox/RightScroll/Margin/RightVBox/Grid/Load" method="_on_pressed"]
 [connection signal="canceled" from="HBox/RightScroll/Margin/RightVBox/Grid/Load/FileDialog" to="HBox/RightScroll/Margin/RightVBox/Grid/Load" method="_on_file_dialog_canceled"]
 [connection signal="confirmed" from="HBox/RightScroll/Margin/RightVBox/Grid/Load/FileDialog" to="HBox/RightScroll/Margin/RightVBox/Grid/Load" method="_on_file_dialog_confirmed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Reset" to="HBox/RightScroll/Margin/RightVBox/Grid/Load" method="reset_level"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddStatic" to="HBox/RightScroll/Margin/RightVBox/AddStatic" method="_on_pressed"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddElliptic" to="HBox/RightScroll/Margin/RightVBox/AddElliptic" method="_on_pressed"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddLinear" to="HBox/RightScroll/Margin/RightVBox/AddLinear" method="_on_pressed"]
