@@ -206,8 +206,8 @@ void drawCranker(void) {
 #define CIRCLE_COUNT 10
 static float CIRCLE_RADIUS = 15.0;
 static float CIRCLE_MASS = 1.0;
-static float BOX_WIDTH = 45.0;
-static float BOX_HEIGHT = 25.0;
+static float BOX_HALF_WIDTH = 45.0;
+static float BOX_HALF_HEIGHT = 25.0;
 static float BOX_MASS = 3.0;
 
 static cpBody* CIRCLE_BODIES[CIRCLE_COUNT];
@@ -231,14 +231,14 @@ void initDebris(void) {
   }
 
   for (int i = 0; i < BOX_COUNT; i++) {
-    float moment = cpMomentForBox(BOX_MASS, BOX_WIDTH, BOX_HEIGHT);
+    float moment = cpMomentForBox(BOX_MASS, BOX_HALF_WIDTH, BOX_HALF_HEIGHT);
     body = cpBodyNew(BOX_MASS, moment);
     float angle = (i * M_PIf * 2.0f) / BOX_COUNT;
     float x = DRUM_X + (DRUM_RADIUS * 0.3f) * cosf(angle);
     float y = DRUM_Y + (DRUM_RADIUS * 0.3f) * sinf(angle);
     cpBodySetPosition(body, cpv(x, y));
     cpSpaceAddBody(SPACE, body);
-    shape = cpBoxShapeNew(body, BOX_WIDTH, BOX_HEIGHT, 0.0f);
+    shape = cpBoxShapeNew(body, BOX_HALF_WIDTH, BOX_HALF_HEIGHT, 0.0f);
       cpShapeSetFriction(shape, 0.5f);
     cpSpaceAddShape(SPACE, shape);
     BOX_BODIES[i] = body;
@@ -268,10 +268,10 @@ void drawDebris(void) {
 
   }
 
-  cpVect p1 = cpv(-BOX_WIDTH / 2.0f, -BOX_HEIGHT / 2.0f);
-  cpVect p2 = cpv(-BOX_WIDTH / 2.0f, BOX_HEIGHT / 2.0f);
-  cpVect p3 = cpv(BOX_WIDTH / 2.0f, BOX_HEIGHT / 2.0f);
-  cpVect p4 = cpv(BOX_WIDTH / 2.0f, -BOX_HEIGHT / 2.0f);
+  cpVect p1 = cpv(-BOX_HALF_WIDTH / 2.0f, -BOX_HALF_HEIGHT / 2.0f);
+  cpVect p2 = cpv(-BOX_HALF_WIDTH / 2.0f, BOX_HALF_HEIGHT / 2.0f);
+  cpVect p3 = cpv(BOX_HALF_WIDTH / 2.0f, BOX_HALF_HEIGHT / 2.0f);
+  cpVect p4 = cpv(BOX_HALF_WIDTH / 2.0f, -BOX_HALF_HEIGHT / 2.0f);
   for (int i = 0; i < BOX_COUNT; i++) {
     body = BOX_BODIES[i];
     cpVect center = cpBodyGetPosition(body);

@@ -34,13 +34,37 @@ uint16_t gameGetPreviousWaterfall(void) { return m_previousWaterfall; }
 void gameDoResetPreviousWaterfall(void) { m_previousWaterfall = IOGetWaterfallForeground(IOGetCurrentLevel(), 0); }
 
 int gameLoop(void* _data) {
-  pd->graphics->setBackgroundColor(kColorWhite); // TODO make me black
+  pd->graphics->setBackgroundColor(kColorBlack);
 
+#ifdef TAKE_SCREENSHOTS
   if (screenShotGetInProgress()) {
     screenShotDo();
     ++m_frameCount;
     return 1;
   }
+
+  static bool doingScreenshots = true;
+  if (doingScreenshots && !IOGetIsPreloading()) {
+    static bool first = true; // Don't increment the level on the first call
+    if (first) { 
+      first = false;
+    } else {
+      IODoNextHoleWithLevelWrap();
+      if (IOGetCurrentHole() == 0 && IOGetCurrentLevel() == 0) {
+        doingScreenshots = false;
+        FSMDo(kTitlesFSM_DisplayTitles); // Reset
+        gameSetYOffset(0, true);
+        return 1;
+      }
+    } 
+    inputSetCrankAngle(180.0f);
+    FSMDo(kGameFSM_DisplaySplash); // To load the level
+    FSMDo(kGameFSM_AimMode); // To be rendering the level
+    boardDoUpdate(); // To have called update at least once on elliptic and line peg paths
+    screenShotInit();
+    return 1;
+  }
+#endif
 
   IODoUpdatePreloading();
 
@@ -62,13 +86,15 @@ int gameLoop(void* _data) {
 }
 
 void menuOptionsCallbackResetSave(void* toReset) {
-  pdxlog("menuOptionsCallbackResetSave");
-  IOResetPlayerSave(*(uint16_t*)toReset);
+  pd->system->logToConsole("menuOptionsCallbackResetSave %i", (uintptr_t)toReset);
+  IOResetPlayerSave((uintptr_t)toReset);
 }
 
 void menuOptionsCallbackQuitHole(void* _unused) {
-  pdxlog("menuOptionsCallbackQuitHole");
-  // TODO
+  pd->system->logToConsole("menuOptionsCallbackQuitHole");
+  // TODO - insert a fade out or wipe here?
+  gameSetYOffset(DEVICE_PIX_Y*3, true);
+  FSMDo(kTitlesFSM_ChooseHole);
 }
 
 void menuOptionsCallbackAudio(void* userData) {
@@ -119,10 +145,11 @@ float gameDoApplyYEasing(void) {
   m_vY *= SCREEN_FRIC;
   m_yOffset += m_vY;
 
-  const float soDiff = SCROLL_OFFSET_MAX - m_yOffset;
+  const float scrollOffsetMax = IOGetCurrentHoleHeight() - DEVICE_PIX_Y + TURRET_RADIUS;
+  const float soDiff = scrollOffsetMax - m_yOffset;
   if (soDiff < 0) {
     const float toAdd = soDiff * SCREEN_BBACK;
-    if (toAdd > -0.1f) { m_yOffset = SCROLL_OFFSET_MAX; m_vY = 0; }
+    if (toAdd > -0.1f) { m_yOffset = scrollOffsetMax; m_vY = 0; }
     else               { m_yOffset += toAdd; }
     // pd->system->logToConsole("BBACK active (BOTTOM) %i from %f to %f by adding %f", gameGetFrameCount(), m_yOffset, m_yOffset + (soDiff * SCREEN_BBACK), toAdd);
   } else if (m_yOffset < m_minimumY) {
@@ -154,14 +181,11 @@ float gameGetXOffset(void) { return m_xOffset; }
 
 int16_t gameGetMinimumY(void) { return m_minimumY; }
 void gameSetMinimumY(int16_t y) { 
-  if (y > WF_PIX_Y - DEVICE_PIX_Y) {
-    y = WF_PIX_Y - DEVICE_PIX_Y; // This is as low as we are allowed to go
+  if (y > IOGetCurrentHoleHeight() - DEVICE_PIX_Y) {
+    y = IOGetCurrentHoleHeight() - DEVICE_PIX_Y; // This is as low as we are allowed to go
   }
   m_minimumY = y;
 }
-
-int16_t gameGetMaximumY(void) { return m_maximumY; }
-void gameSetMaximimY(const int16_t y) { m_maximumY = y; }
 
 float gameGetParalaxFactorNearForY(const bool hard, const float y) { return y * (hard ? PARALLAX_HARD_NEAR : PARALLAX_GENTLE_NEAR); }
 

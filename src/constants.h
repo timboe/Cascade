@@ -1,9 +1,7 @@
 
 #define DEV 1
 
-//#define DEMO
-
-//#define TITLE_LOGO_ONLY
+#define TAKE_SCREENSHOTS 1
 
 #define ALWAYS_FPS true
 
@@ -25,15 +23,12 @@
 #define HALF_DEVICE_PIX_X (DEVICE_PIX_X/2)
 #define HALF_DEVICE_PIX_Y (DEVICE_PIX_Y/2)
 
-#define WFALL_HEIGHT 4
-
-#define WF_PIX_X DEVICE_PIX_X
-#define WF_PIX_Y (DEVICE_PIX_Y*WFALL_HEIGHT)
+#define WF_MAX_HEIGHT 4
 
 #define WF_DIVISION_PIX_Y 60
 
 #define WFSHEET_SIZE_X 1
-#define WFSHEET_SIZE_Y (WF_PIX_Y/WF_DIVISION_PIX_Y)
+#define WFSHEET_SIZE_Y ((DEVICE_PIX_Y*WF_MAX_HEIGHT)/WF_DIVISION_PIX_Y)
 
 #define NUMERAL_PIX_X 128
 #define NUMERAL_PIX_Y 160
@@ -52,7 +47,7 @@
 
 #define STAR_WIDTH 48
 
-#define SPECIAL_TEXT_WIDTH 192
+#define SPECIAL_TEXT_WIDTH 256
 
 // TIMINGS
 
@@ -88,8 +83,6 @@
 
 // PEGS
 
-#define N_OBST 64
-
 #define MAX_PEGS 256
 
 #define MAX_LINEAR_PATH_SEGMENTS 64 
@@ -104,8 +97,6 @@
 
 #define N_WF 2
 
-#define SCROLL_OFFSET_MAX (WF_PIX_Y - DEVICE_PIX_Y + TURRET_RADIUS)
-
 #define N_MUSIC_TRACKS 5
 
 // PHYSICS 
@@ -115,7 +106,7 @@
 #define M_2PIf 6.28318530718f
 
 // How many pixels down the side do we have to prevent the ball from bouncing out off
-#define PHYSWALL_PIX_Y WF_PIX_Y
+#define PHYSWALL_PIX_Y (DEVICE_PIX_Y * WF_MAX_HEIGHT)
 
 #define BALL_RADIUS 8.0f
 #define BALL_MASS 1.0f
@@ -124,9 +115,9 @@
 
 #define PREDICTION_TRACE_LEN 32
 
-#define BOX_WIDTH 22.5f
-#define BOX_HEIGHT 12.5f
-#define BOX_MAX (MAX(BOX_WIDTH, BOX_HEIGHT) * SQRT_HALF)
+#define BOX_HALF_WIDTH 22.5f
+#define BOX_HALF_HEIGHT 12.5f
+#define BOX_HALF_MAX (MAX(BOX_HALF_WIDTH, BOX_HALF_HEIGHT) * SQRT_HALF)
 
 #define HEX_WIDTH 22.5f
 #define HEX_MAX (HEX_WIDTH * SQRT_HALF)
@@ -139,7 +130,7 @@
 
 #define POOT_STRENGTH 300.0f
 
-#define STAR_STRENGTH 86.0f
+#define STAR_STRENGTH 128.0f
 
 #define WF_VELOCITY 2.0f
 

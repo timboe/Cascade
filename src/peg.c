@@ -62,8 +62,8 @@ void pegDoInit(struct Peg_t* p, const enum PegShape_t s, const float x, const fl
     p->cpShape = cpCircleShapeNew(p->cpBody, BALL_RADIUS*scale, cpvzero);
     p->radius = BALL_RADIUS*scale;
   } else if (s == kPegShapeRect) {
-    p->cpShape = cpBoxShapeNew(p->cpBody, BOX_WIDTH*scale, BOX_HEIGHT*scale, 0.0f);
-    p->radius = BOX_MAX*scale;
+    p->cpShape = cpBoxShapeNew(p->cpBody, BOX_HALF_WIDTH*scale, BOX_HALF_HEIGHT*scale, 0.0f);
+    p->radius = BOX_HALF_MAX*scale;
   } else {    
     pd->system->error("Error pegDoInit called with unknown peg shape");
     pegDoClear(p);

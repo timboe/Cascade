@@ -68,18 +68,22 @@ void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) 
   }
 
   // Draw FPS indicator (dbg only)
-  #ifdef DEV
-  if (ALWAYS_FPS && !screenShotGetInProgress()) {
+#ifdef DEV
+  bool screenShotVeto = false;
+#ifdef TAKE_SCREENSHOTS
+  screenShotVeto = screenShotGetInProgress();
+#endif // TAKE_SCREENSHOTS
+  if (ALWAYS_FPS && !screenShotVeto) {
     pd->system->drawFPS(0, 0);
   }
-  #endif
+#endif // DEV
 }
 
 void renderTitles(void) {
   const int32_t so = gameGetYOffset();
 
   // INTRO SPLASH
-  if (so < DEVICE_PIX_Y) { renderTitlesSplash(); }
+  if (so < DEVICE_PIX_Y) { renderTitlesHeader(); }
 
   // PLAYER SELECT
   if (so > 0 && so <= DEVICE_PIX_Y*2 ) { renderTitlesPlayerSelect(so == DEVICE_PIX_Y); }
@@ -90,24 +94,21 @@ void renderTitles(void) {
   // HOLE SELECT
   if (so > DEVICE_PIX_Y*2 && so <= DEVICE_PIX_Y*4) { renderTitlesHoleSelect(so == 3*DEVICE_PIX_Y); }
 
+  // HOLE SELECT
+  if (so > DEVICE_PIX_Y*3 && so <= DEVICE_PIX_Y*5) { renderTitlesWfPond(); }
+
   // TRANSITION LEVEL SPLASH
-  if (so > DEVICE_PIX_Y*3) { renderTitlesTransitionLevelSplash(); }
+  if (so > DEVICE_PIX_Y*4) { renderTitlesTransitionLevelSplash(); }
 }
 
 
 
-void renderGame(int32_t fc, enum FSM_t fsm) {
+void renderGame(const int32_t fc, const enum FSM_t fsm) {
   // DRAW BACKGROUND
   renderGameBackground();
 
   // DRAW TURRET & TOP DECORATION
   renderGameTurret();
-
-  // DRAW BALL
-  renderGameBall(fc);
-
-  // DRAW POOT CIRCLE
-  renderGamePoot(fsm);
 
   // DRAW PEGS
   renderGameBoard(fc);
@@ -118,7 +119,17 @@ void renderGame(int32_t fc, enum FSM_t fsm) {
   // DRAW GUTTER
   renderGameGutter();
 
+  // DRAW BALL
+  renderGameBall(fc);
+
+  if (IOGetIsTutorial()) { renderGameTutorial(fc, fsm); }
+
+  // DRAW POOT CIRCLE
+  renderGamePoot(fsm);
+
+#ifdef DEV
   // Debug gutter line
-  pd->graphics->drawLine(0, WF_PIX_Y, DEVICE_PIX_X, WF_PIX_Y, 4, kColorBlack);
-  pd->graphics->drawLine(0, WF_PIX_Y, DEVICE_PIX_X, WF_PIX_Y, 2, kColorWhite);
+  pd->graphics->drawLine(0, IOGetCurrentHoleHeight(), DEVICE_PIX_X, IOGetCurrentHoleHeight(), 4, kColorBlack);
+  pd->graphics->drawLine(0, IOGetCurrentHoleHeight(), DEVICE_PIX_X, IOGetCurrentHoleHeight(), 2, kColorWhite);
+#endif
 }

@@ -23,11 +23,14 @@ LCDBitmap* bitmapGetWfPond(void);
 LCDBitmap* bitmapGetWaterSplash(const uint8_t id);
 
 LCDBitmap* bitmapGetUseTheCrank(void);
-LCDBitmap* bitmapGetTitleSplash(void);
+LCDBitmap* bitmapGetTitleHeaderImage(void);
 LCDBitmap* bitmapGetNumeral(const int8_t n);
 LCDBitmap* bitmapGetStencilWipe(const int8_t n);
 LCDBitmap* bitmapGetDither(void);
 LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int16_t offset);
+
+LCDBitmap* bitmapGetTutorialCrank(const uint8_t id);
+LCDBitmap* bitmapGetTutorialButton(const uint8_t id);
 
 LCDBitmap* bitmapGetTitlePlayer(void);
 LCDBitmap* bitmapGetTitleLevel(void);
@@ -35,18 +38,19 @@ LCDBitmap* bitmapGetTitleLevelStats(void);
 LCDBitmap* bitmapGetTitleHole(void);
 LCDBitmap* bitmapGetTitleHoleStatsA(void);
 LCDBitmap* bitmapGetTitleHoleStatsB(void);
-LCDBitmap* bitmapGetTitleHoleCreator(void);
+LCDBitmap* bitmapGetTitleHoleAuthor(void);
+LCDBitmap* bitmapGetTitleHoleName(void);
 LCDBitmap* bitmapGetTitleHoleTutorial(void);
 
 LCDBitmap* bitmapGetTurretBody(void);
 LCDBitmap* bitmapGetTurretBarrel(void);
 LCDBitmap* bitmapGetGameInfoTopper(void);
-LCDBitmap* bitmapGetLevelSplash(void);
+LCDBitmap* bitmapGetLevelTitle(void);
 LCDBitmap* BitmapGetScoreHistogram(void);
 
 LCDBitmap* bitmapGetPeg(const struct Peg_t* p);
-LCDBitmap* bitmapGetBall(void);
-LCDBitmap* bitmapGetBallFirePoot(const uint8_t i);
+LCDBitmap* bitmapGetMarble(void);
+LCDBitmap* bitmapGetMarbleFirePoot(const uint8_t i);
 
 LCDBitmap* bitmapGetStar(const uint8_t type, const uint8_t angle);
 
@@ -55,7 +59,7 @@ LCDBitmap* bitmapGetBlast(const uint8_t id);
 LCDBitmap* bitmapGetSpecial(const enum PegSpecial_t special);
 
 void bitmapDoUpdateGameInfoTopper(void);
-void bitmapDoUpdateLevelSplash(void);
+void bitmapDoUpdateLevelTitle(void);
 void bitmapDoUpdateLevelStatsBitmap(void);
 void bitmapDoUpdateHoleStatsBitmap(void);
 void bitmapDoUpdateScoreHistogram(void);

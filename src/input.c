@@ -22,6 +22,7 @@ void inputHandlerClick(const enum FSM_t fsm, const enum GameMode_t gm, uint32_t 
 bool inputGetPressed(const PDButtons b) { return m_current & b; }
 bool inputGetPressedAny(void) { return m_current; }
 
+void inputSetCrankAngle(const float ca) { m_crankAngle = ca; }
 float inputGetCrankAngle(void) { return m_crankAngle; }
 float inputGetCrankChanged(void) { return m_crankChanged; }
 
@@ -55,13 +56,12 @@ void inputHandleTitles(const enum FSM_t fsm, const uint32_t buttonPressed) {
 }
 
 void inputHandleGame(const enum FSM_t fsm, const uint32_t buttonPressed) {
-  if (kButtonB == buttonPressed && fsm == kGameFSM_AimMode) {
-    screenShotDo();
+  if (kButtonB == buttonPressed && (fsm == kGameFSM_AimMode || fsm == kGameFSM_TutorialScrollUp)) {
     FSMDo(kGameFSM_AimModeScrollToTop);
   } else if ((kButtonA == buttonPressed || kButtonDown == buttonPressed) && fsm == kGameFSM_ScoresAnimation) {
     FSMDo(kGameFSM_ScoresToSplash);
   } else if ((kButtonB == buttonPressed || kButtonUp == buttonPressed) && fsm == kGameFSM_ScoresAnimation) {
-    FSMDo(kGameFSM_ScoresToTitle);
+    FSMDo(kGameFSM_ScoresToChooseHole);
   }
 }
 

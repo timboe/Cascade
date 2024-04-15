@@ -20,8 +20,6 @@ void gameDoResetPreviousWaterfall(void);
 
 int16_t gameGetMinimumY(void);
 void gameSetMinimumY(int16_t y);
-int16_t gameGetMaximumY(void);
-void gameSetMaximumY(const int16_t y);
 
 float gameGetYOffset(void);
 void gameSetYOffset(float set, const bool force);

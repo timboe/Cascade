@@ -60,7 +60,7 @@ void physicsDoInit(void) {
   const float moment = cpMomentForCircle(BALL_MASS, 0.0f, BALL_RADIUS, cpvzero);
   for (int i = 0; i < MAX_BALLS; ++i) {
     m_ball[i] = cpBodyNew(BALL_MASS, moment);
-    cpBodySetPosition(m_ball[i], cpv(0, WF_PIX_Y*2));
+    cpBodySetPosition(m_ball[i], cpv(0, DEVICE_PIX_Y*10));
     m_ballShape[i] = cpCircleShapeNew(m_ball[i], BALL_RADIUS, cpvzero);
     cpShapeSetFriction(m_ballShape[i], 0.0f);
     cpShapeSetElasticity(m_ballShape[i], ELASTICITY);

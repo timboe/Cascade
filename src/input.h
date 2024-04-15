@@ -8,4 +8,5 @@ bool inputGetPressed(const PDButtons b);
 bool inputGetPressedAny(void);
 
 float inputGetCrankAngle(void);
+void inputSetCrankAngle(const float ca);
 float inputGetCrankChanged(void);

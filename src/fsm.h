@@ -23,6 +23,11 @@ enum FSM_t {
   kFSM_SPLIT_TitlesGame,
   kGameFSM_DisplaySplash,
   kGameFSM_SplashToStart,
+  kGameFSM_TutorialScrollDown,
+  kGameFSM_TutorialScrollUp,
+  kGameFSM_TutorialFireMarble,
+  kGameFSM_TutorialGetSpecial,
+  kGameFSM_TutorialGetRequired,
   kGameFSM_AimMode,
   kGameFSM_AimModeScrollToTop,
   kGameFSM_BallInPlay,
@@ -33,7 +38,7 @@ enum FSM_t {
   kGameFSM_GutterToTurret,
   kGameFSM_GutterToScores,
   kGameFSM_ScoresAnimation,
-  kGameFSM_ScoresToTitle,
+  kGameFSM_ScoresToChooseHole,
   kGameFSM_ScoresToSplash,
   kNFSMModes
 };
@@ -65,8 +70,13 @@ void FSMChooseHoleToChooseLevel(const bool newState);
 
 void FSMDisplaySplash(const bool newState);
 void FSMSplashToStart(const bool newState);
-void FSMAimModeScrollToTop(const bool newState);
+void FSMTutorialScrollDown(const bool newState);
+void FSMTutorialScrollUp(const bool newState);
+void FSMTutorialFireMarble(const bool newState);
+void FSMTutorialGetSpecial(const bool newState);
+void FSMTutorialGetRequired(const bool newState);
 void FSMAimMode(const bool newState);
+void FSMAimModeScrollToTop(const bool newState);
 void FSMBallInPlay(const bool newState);
 void FSMBallStuck(const bool newState);
 void FSMCloseUp(const bool newState);
@@ -75,5 +85,5 @@ void FSMBallGutter(const bool newState);
 void FSMGutterToTurret(const bool newState);
 void FSMGutterToScores(const bool newState);
 void FSMScoresAnimation(const bool newState);
-void FSMScoresToTitle(const bool newState);
+void FSMScoresToChooseHole(const bool newState);
 void FSMScoresToSplash(const bool newState);
