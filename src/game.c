@@ -55,9 +55,9 @@ int gameLoop(void* _data) {
       physicsDoUpdate(m_frameCount, fsm);
     }
     renderDo(m_frameCount, fsm, gm);
+    ++m_frameCount;
   }
 
-  ++m_frameCount;
   return 1;
 }
 
