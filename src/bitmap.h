@@ -35,7 +35,8 @@ LCDBitmap* bitmapGetTitleLevelStats(void);
 LCDBitmap* bitmapGetTitleHole(void);
 LCDBitmap* bitmapGetTitleHoleStatsA(void);
 LCDBitmap* bitmapGetTitleHoleStatsB(void);
-LCDBitmap* bitmapGetTitleHoleCreator(void);
+LCDBitmap* bitmapGetTitleHoleAuthor(void);
+LCDBitmap* bitmapGetTitleHoleName(void);
 LCDBitmap* bitmapGetTitleHoleTutorial(void);
 
 LCDBitmap* bitmapGetTurretBody(void);

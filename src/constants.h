@@ -52,7 +52,7 @@
 
 #define STAR_WIDTH 48
 
-#define SPECIAL_TEXT_WIDTH 192
+#define SPECIAL_TEXT_WIDTH 256
 
 // TIMINGS
 

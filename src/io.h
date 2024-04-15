@@ -41,10 +41,17 @@ void IOSetCurrentHoleScore(const uint16_t score);
 
 uint16_t IOGetPar(const uint16_t level, const uint16_t hole);
 
+uint16_t IOGetScore(uint16_t level, uint16_t hole);
+
 uint16_t IOGetCurrentHolePar(void);
 
-uint16_t IOGetScore(uint16_t level, uint16_t hole);
+enum PegSpecial_t IOGetCurrentHoleSpecial(void);
+
+uint16_t IOGetCurrentHoleHeight(void);
 
 uint16_t IOGetCurrentHoleScore(void);
 
-const char* IOGetCurrentHoleCreator(void);
+const char* IOGetCurrentHoleAuthor(void);
+
+const char* IOGetCurrentHoleName(void);
+

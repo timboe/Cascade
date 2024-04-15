@@ -41,7 +41,8 @@ LCDBitmap* m_levelBitmap;
 LCDBitmap* m_levelStatsBitmap;
 LCDBitmap* m_holeBitmap;
 LCDBitmap* m_holeStatsBitmap[2];
-LCDBitmap* m_holeCreatorBitmap;
+LCDBitmap* m_holeAuthorBitmap;
+LCDBitmap* m_holeNameBitmap;
 LCDBitmap* m_holeTutorialBitmap;
 
 LCDBitmap* m_useTheCrankBitmap;
@@ -220,7 +221,9 @@ LCDBitmap* bitmapGetTitleHoleStatsA(void) { return m_holeStatsBitmap[0]; }
 
 LCDBitmap* bitmapGetTitleHoleStatsB(void) { return m_holeStatsBitmap[1]; }
 
-LCDBitmap* bitmapGetTitleHoleCreator(void) { return m_holeCreatorBitmap; }
+LCDBitmap* bitmapGetTitleHoleAuthor(void) { return m_holeAuthorBitmap; }
+
+LCDBitmap* bitmapGetTitleHoleName(void) { return m_holeNameBitmap; }
 
 LCDBitmap* bitmapGetTitleHoleTutorial(void) { return m_holeTutorialBitmap; }
 
@@ -470,15 +473,27 @@ void bitmapDoUpdateHoleStatsBitmap(void) {
     pd->graphics->popContext();
   }
 
-  pd->graphics->clearBitmap(m_holeCreatorBitmap, kColorClear);
-  const char* creator = IOGetCurrentHoleCreator();
-  if (strlen(creator)) {
-    pd->graphics->pushContext(m_holeCreatorBitmap);
+  pd->graphics->clearBitmap(m_holeAuthorBitmap, kColorClear);
+  const char* author = IOGetCurrentHoleAuthor();
+  if (strlen(author)) {
+    pd->graphics->pushContext(m_holeAuthorBitmap);
     bitmapSetRoobert24();
-    snprintf(text, 128, "BY %s", creator);
+    snprintf(text, 128, "BY %s", author);
     const int32_t w3 = pd->graphics->getTextWidth(bitmapGetRoobert24(), text, 128, kUTF8Encoding, 0);
     pd->graphics->setDrawMode(kDrawModeFillBlack);
     bitmapDoDrawOutlineText(text, 128, HALF_DEVICE_PIX_X/2 - w3/2, 0, 2);
+    pd->graphics->popContext();
+  }
+
+  pd->graphics->clearBitmap(m_holeNameBitmap, kColorClear);
+  const char* name = IOGetCurrentHoleName();
+  if (strlen(name)) {
+    pd->graphics->pushContext(m_holeNameBitmap);
+    bitmapSetRoobert24();
+    snprintf(text, 128, "%s", name);
+    const int32_t w4 = pd->graphics->getTextWidth(bitmapGetRoobert24(), text, 128, kUTF8Encoding, 0);
+    pd->graphics->setDrawMode(kDrawModeFillBlack);
+    bitmapDoDrawOutlineText(text, 128, HALF_DEVICE_PIX_X/2 - w4/2, 0, 2);
     pd->graphics->popContext();
   }
 }
@@ -512,7 +527,8 @@ void bitmapDoPreloadA(void) {
 
   m_holeStatsBitmap[0] = pd->graphics->newBitmap(NUMERAL_PIX_X, TITLETEXT_HEIGHT, kColorClear);
   m_holeStatsBitmap[1] = pd->graphics->newBitmap(NUMERAL_PIX_X + (2*NUMERAL_BUF), TITLETEXT_HEIGHT, kColorClear);
-  m_holeCreatorBitmap = pd->graphics->newBitmap(HALF_DEVICE_PIX_X, TITLETEXT_HEIGHT, kColorClear);
+  m_holeAuthorBitmap = pd->graphics->newBitmap(HALF_DEVICE_PIX_X, TITLETEXT_HEIGHT, kColorClear);
+  m_holeNameBitmap = pd->graphics->newBitmap(HALF_DEVICE_PIX_X, TITLETEXT_HEIGHT, kColorClear);
 }
 
 void bitmapDoPreloadB(const uint8_t anim) { // TURRET_LAUNCH_FRAMES

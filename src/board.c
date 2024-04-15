@@ -1,6 +1,7 @@
 #include "board.h"
 #include "easing.h"
 #include "util.h"
+#include "io.h"
 
 struct Peg_t m_pegs[MAX_PEGS];
 
@@ -23,8 +24,7 @@ void boardDoInit(void) {
   for (int i = 0; i < MAX_PEGS; ++i) {
     m_pegs[i].id = i;
   }
-
-  // m_special = kPegSpecialBlast;
+  // m_special = kPegSpecialBlast; // TESTING
 }
 
 struct Peg_t* pegFromPool(void) { return &m_pegs[m_nPegs++]; }
@@ -242,7 +242,12 @@ enum PegSpecial_t boardDoAddSpecial(const bool activate) {
 
   } else {
 
-    if (!counter) { toActivate = (rand() % (kNPegSpecial - 1)) + 1; }
+    if (!counter) { 
+      toActivate = IOGetCurrentHoleSpecial();
+      if (toActivate == kPegSpecialNotSpecial) { // Hole can request to have a random special
+        toActivate = (rand() % (kNPegSpecial - 1)) + 1;
+      }
+    }
     ++counter;
 
   }

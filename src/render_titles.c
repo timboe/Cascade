@@ -148,7 +148,8 @@ void renderTitlesHoleSelect(const bool locked) {
   if (bm) { pd->graphics->drawBitmap(bm, DEVICE_PIX_X - 200, DEVICE_PIX_Y*3 + parallax, kBitmapUnflipped); }
 
   pd->graphics->drawBitmap(bitmapGetDither(), 0, (WF_DIVISION_PIX_Y * 15), kBitmapUnflipped);
-  pd->graphics->drawBitmap(bitmapGetTitleHoleCreator(), HALF_DEVICE_PIX_X, (DEVICE_PIX_Y * 4) - NUMERAL_BUF, kBitmapUnflipped);
+  pd->graphics->drawBitmap(bitmapGetTitleHoleName(), HALF_DEVICE_PIX_X, (DEVICE_PIX_Y * 3) + NUMERAL_BUF - TITLETEXT_HEIGHT + parallax, kBitmapUnflipped);
+  pd->graphics->drawBitmap(bitmapGetTitleHoleAuthor(), HALF_DEVICE_PIX_X, (DEVICE_PIX_Y * 4) - NUMERAL_BUF + parallax, kBitmapUnflipped);
 
   uint8_t digit[3];
   LCDBitmap* digitBm[3];
