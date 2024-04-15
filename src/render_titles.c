@@ -38,7 +38,7 @@ void commonRenderBackgroundWaterfallWithAnim(const bool locked, const uint8_t of
   }
 }
 
-void renderTitlesHeader(void) {
+void renderTitlesHeader(const int32_t fc) {
   for (int i = 0; i < 4; ++i) {
     pd->graphics->drawBitmap(bitmapGetWfFg(0, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
   }
@@ -56,7 +56,7 @@ void renderTitlesHeader(void) {
     pd->graphics->drawLine(DEVICE_PIX_X/4, (4*DEVICE_PIX_Y)/5, (3*DEVICE_PIX_X)/4, (4*DEVICE_PIX_Y)/5, TITLETEXT_HEIGHT, kColorBlack);
     pd->graphics->drawLine(DEVICE_PIX_X/4, (4*DEVICE_PIX_Y)/5, x2, (4*DEVICE_PIX_Y)/5, TITLETEXT_HEIGHT/2, kColorWhite);
   } else {
-    if (pd->system->isCrankDocked()) { 
+    if (pd->system->isCrankDocked() && (fc / (TICK_FREQUENCY / 2)) % 2) { 
       pd->graphics->drawBitmap(bitmapGetUseTheCrank(), DEVICE_PIX_X - 88, DEVICE_PIX_Y - 51 - 16, kBitmapUnflipped);
     }
   }

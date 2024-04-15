@@ -145,8 +145,8 @@ void FSMChooseHoleToSplash(const bool newState) {
     bitmapDoUpdateGameInfoTopper();
     bitmapDoUpdateLevelTitle(); 
   }
-  FSMDoCommonScrollTo(DEVICE_PIX_Y * 5, (float)timer/(TIME_TITLE_TRANSITION * 2), EASE_TITLE_DOWNWARDS);
-  if (timer++ == TIME_TITLE_TRANSITION) { return FSMDo(kGameFSM_DisplaySplash); }
+  FSMDoCommonScrollTo(DEVICE_PIX_Y * 5, (float)timer/TIME_TITLE_HOLE_TO_SPLASH, EASE_TITLE_HOLE_TO_SPLASH);
+  if (timer++ == TIME_TITLE_HOLE_TO_SPLASH) { return FSMDo(kGameFSM_DisplaySplash); }
 }
 
 void FSMChooseHoleToChooseLevel(const bool newState) {

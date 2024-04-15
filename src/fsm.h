@@ -57,6 +57,8 @@ void FSMDoResetBallStuckCounter(void);
 
 void FSMDoCommonScrollTo(const int16_t destination, const float progress, const enum EasingFunction_t e);
 
+bool FSMGetIsAimMode(void);
+
 void FSMDisplayTitles(const bool newState);
 void FSMTitlesToChoosePlayer(const bool newState);
 void FSMChoosePlayer(const bool newState);

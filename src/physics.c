@@ -150,7 +150,7 @@ void physicsDoUpdate(const int32_t fc, const enum FSM_t fsm) {
   
   const cpVect pos = cpBodyGetPosition(m_ball[0]);
 
-  if (fsm == kGameFSM_AimMode) {
+  if (FSMGetIsAimMode()) {
     const int i = (boardGetCurrentSpecial() == kPegSpecialAim ? fc % (PREDICTION_TRACE_LEN*2) : fc % PREDICTION_TRACE_LEN);
     if (i == 0) {
       physicsDoResetBall(0);

@@ -29,8 +29,11 @@ LCDBitmap* bitmapGetStencilWipe(const int8_t n);
 LCDBitmap* bitmapGetDither(void);
 LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int16_t offset);
 
-LCDBitmap* bitmapGetTutorialCrank(const uint8_t id);
+LCDBitmap* bitmapGetTutorialCrankRotate(const uint8_t id);
+LCDBitmap* bitmapGetTutorialCrankAngle(const uint8_t id);
 LCDBitmap* bitmapGetTutorialButton(const uint8_t id);
+LCDBitmap* bitmapGetTutorialDPad(const uint8_t id);
+LCDBitmap* bitmapGetTutorialArrows(const uint8_t id);
 
 LCDBitmap* bitmapGetTitlePlayer(void);
 LCDBitmap* bitmapGetTitleLevel(void);

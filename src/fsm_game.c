@@ -104,6 +104,27 @@ void FSMCommonTurretScrollAndBounceBack(const bool allowScroll) {
   gameSetTurretBarrelAngle(angle);
 }
 
+bool FSMCommonMarbleFire(uint16_t* timer) {
+  float progress = getEasing(kEaseOutQuart, (float)(*timer)/TIME_FIRE_BALL);
+  if ((*timer) >= TIME_FIRE_BALL || (progress > 0.5f && !inputGetPressed(kButtonA))) { // Fire
+    physicsDoResetBall(0);
+    physicsDoLaunchBall(progress);
+    ++m_ballCount;
+    if (boardGetCurrentSpecial() == kPegSpecialMultiball) { physicsDoAddSecondBall(); }
+    return true;
+  } else if (inputGetPressed(kButtonA)) { // Arm
+    (*timer)++;
+  } else if (*timer > 0) { // Reset
+    (*timer) = 0;
+  }
+  renderSetBallPootCircle((uint16_t)(progress * TURRET_RADIUS));
+  return false;
+}
+
+
+////////////////////////////////        ////////////////////////////////
+
+
 void FSMDisplaySplash(const bool newState) {
   static uint16_t timer = 0;
   if (newState) { 
@@ -154,20 +175,28 @@ void FSMTutorialScrollUp(const bool newState) {
 }
 
 void FSMTutorialFireMarble(const bool newState) {
+  static uint16_t timer = 0;
   if (newState) {
-    gameSetYOffset(0, true);
+    gameSetMinimumY(0); // Tutorial only
+    gameSetYOffset(0, true);  // Tutorial only
+    renderDoResetBallTrace();
+    gameDoResetFrameCount();
+    renderDoResetTriggerSplash();
+    timer = 0;
   }
-
-  FSMCommonTurretScrollAndBounceBack(true); // allow control = FALSE, while in the tutorial
-
+  //
+  FSMCommonTurretScrollAndBounceBack(false); // allow control = FALSE is tutorial only
+  //
+  const bool fired = FSMCommonMarbleFire(&timer); 
+  if (fired) { FSMDo(kGameFSM_BallInPlay); }
 }
 
 void FSMTutorialGetSpecial(const bool newState) {
-
+  return FSMTutorialFireMarble(newState); // Functionally identical
 }
 
 void FSMTutorialGetRequired(const bool newState) {
-
+  return FSMTutorialFireMarble(newState); // Functionally identical
 }
 
 void FSMAimMode(const bool newState) {
@@ -181,19 +210,8 @@ void FSMAimMode(const bool newState) {
   //
   FSMCommonTurretScrollAndBounceBack(true);
   //
-  float progress = getEasing(kEaseOutQuart, (float)timer/TIME_FIRE_BALL);
-  if ((timer >= TIME_FIRE_BALL) || (progress > 0.5f && !inputGetPressed(kButtonA))) { // Fire
-    physicsDoResetBall(0);
-    physicsDoLaunchBall(progress);
-    ++m_ballCount;
-    if (boardGetCurrentSpecial() == kPegSpecialMultiball) { physicsDoAddSecondBall(); }
-    return FSMDo(kGameFSM_BallInPlay);
-  } else if (inputGetPressed(kButtonA)) { // Arm
-    timer++;
-  } else if (timer > 0) { // Reset
-    timer = 0;
-  }
-  renderSetBallPootCircle((uint16_t)(progress * TURRET_RADIUS));
+  const bool fired = FSMCommonMarbleFire(&timer); 
+  if (fired) { FSMDo(kGameFSM_BallInPlay); }
 }
 
 void FSMAimModeScrollToTop(const bool newState) {
@@ -212,6 +230,7 @@ void FSMBallInPlay(const bool newState) {
   const enum PegSpecial_t special = boardGetCurrentSpecial();
   if (newState) {
     FSMDoResetBallStuckCounter();
+    renderSetBallPootCircle(0);
     m_finalRequiredPos.x = 0;
     m_finalRequiredPos.y = 0;
   }
@@ -368,7 +387,7 @@ void FSMGutterToTurret(const bool newState) {
         minY = p->minY;
       }
     }
-    if (minY > (DEVICE_PIX_Y/2)) gameSetMinimumY(minY - (DEVICE_PIX_Y/2));
+    if (minY > (DEVICE_PIX_Y/2) && !IOGetIsTutorial()) { gameSetMinimumY(minY - (DEVICE_PIX_Y/2)); }
     pd->system->logToConsole("kGameFSM_GutterToTurret smallest y was %i, min y is now %i", minY, gameGetMinimumY());
     //
     boardDoAddSpecial(true); // Activate
@@ -393,7 +412,9 @@ void FSMGutterToTurret(const bool newState) {
   // pd->system->logToConsole("end sweep active target %f, pop %f",target, popLevel);
   if (progress >= 1) {
     gameSetYOffset(minimumY, true);
-    return FSMDo(kGameFSM_AimMode);
+    if (IOGetIsTutorial() && boardGetSpecialPegsInPlay()) { return FSMDo(kGameFSM_TutorialGetSpecial); }
+    else if (IOGetIsTutorial()) { return FSMDo(kGameFSM_TutorialGetRequired); }
+    else { return FSMDo(kGameFSM_AimMode); }
   }
 }
 

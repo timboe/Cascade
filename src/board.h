@@ -67,6 +67,8 @@ struct Peg_t* boardGetPeg(const uint16_t i);
 
 int16_t boardGetRequiredPegsInPlay(void);
 
+int16_t boardGetSpecialPegsInPlay(void);
+
 void boardDoRequiredPegHit(void);
 
 void boardDoSpecialBlast(void);

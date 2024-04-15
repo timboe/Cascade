@@ -82,8 +82,11 @@ LCDBitmapTable* m_sheetWfFg[N_WF];
 LCDBitmapTable* m_waterSplashTable;
 
 LCDBitmapTable* m_blastTable;
-LCDBitmapTable* m_tutorialCrankTable;
+LCDBitmapTable* m_tutorialCrankRotateTable;
+LCDBitmapTable* m_tutorialCrankAngleTable;
 LCDBitmapTable* m_tutorialButtonTable;
+LCDBitmapTable* m_tutorialDPadTable;
+LCDBitmapTable* m_tutorialArrowsTable;
 
 LCDFont* m_fontRoobert24;
 LCDFont* m_fontRoobert10;
@@ -228,12 +231,24 @@ LCDBitmap* bitmapGetBlast(const uint8_t id) {
   return pd->graphics->getTableBitmap(m_blastTable, id % 9);
 }
 
-LCDBitmap* bitmapGetTutorialCrank(const uint8_t id) {
-  return pd->graphics->getTableBitmap(m_tutorialCrankTable, id % 8);
+LCDBitmap* bitmapGetTutorialCrankRotate(const uint8_t id) {
+  return pd->graphics->getTableBitmap(m_tutorialCrankRotateTable, id % 8);
+}
+
+LCDBitmap* bitmapGetTutorialCrankAngle(const uint8_t id) {
+  return pd->graphics->getTableBitmap(m_tutorialCrankAngleTable, id % 5);
 }
 
 LCDBitmap* bitmapGetTutorialButton(const uint8_t id) {
   return pd->graphics->getTableBitmap(m_tutorialButtonTable, id % 4);
+}
+
+LCDBitmap* bitmapGetTutorialDPad(const uint8_t id) {
+  return pd->graphics->getTableBitmap(m_tutorialDPadTable, id % 3);
+}
+
+LCDBitmap* bitmapGetTutorialArrows(const uint8_t id) {
+  return pd->graphics->getTableBitmap(m_tutorialArrowsTable, id % 2);
 }
 
 LCDBitmap* bitmapGetTitlePlayer(void) { return m_playerBitmap; }
@@ -545,8 +560,12 @@ void bitmapDoPreloadA(void) {
   m_turretBarrelTabel = bitmapDoLoadImageTableAtPath("images/turretBarrel");
   m_waterSplashTable = bitmapDoLoadImageTableAtPath("images/splash");
   m_blastTable = bitmapDoLoadImageTableAtPath("images/blast");
-  m_tutorialCrankTable = bitmapDoLoadImageTableAtPath("images/crankClockwise");
+  m_tutorialCrankRotateTable = bitmapDoLoadImageTableAtPath("images/crankClockwise");
+  m_tutorialCrankAngleTable = bitmapDoLoadImageTableAtPath("images/crankSpin");
   m_tutorialButtonTable = bitmapDoLoadImageTableAtPath("images/buttonPressed");
+  m_tutorialDPadTable = bitmapDoLoadImageTableAtPath("images/dPad");
+  m_tutorialArrowsTable = bitmapDoLoadImageTableAtPath("images/tutorialPoint");
+
 
   m_fontRoobert24 = bitmapDoLoadFontAtPath("fonts/Roobert-24-Medium");
   m_fontRoobert10 = bitmapDoLoadFontAtPath("fonts/Roobert-10-Bold");
@@ -695,7 +714,7 @@ void bitmapDoPreloadJ(void) {
     bitmapSetRoobert24();
     const int32_t w0 = pd->graphics->getTextWidth(bitmapGetRoobert24(), pegGetSpecialTxt(s), 128, kUTF8Encoding, 0);
     pd->graphics->setDrawMode(kDrawModeFillBlack);
-    bitmapDoDrawOutlineText(pegGetSpecialTxt(s), 128, NUMERAL_PIX_Y/2 - w0/2, 0, 2);
+    bitmapDoDrawOutlineText(pegGetSpecialTxt(s), 128, SPECIAL_TEXT_WIDTH/2 - w0/2, 0, 2);
     pd->graphics->popContext();
   }
 

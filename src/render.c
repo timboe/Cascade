@@ -14,7 +14,7 @@ uint16_t m_freeze = 0;
 
 uint8_t m_renderScale = 1;
 
-void renderTitles(void);
+void renderTitles(const int32_t fc);
 void renderGame(const int32_t fc, const enum FSM_t fsm);
 
 /// ///
@@ -58,11 +58,11 @@ void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) 
   pd->graphics->setDrawOffset(offX, offY);
   pd->display->setScale(m_renderScale);
 
-  pd->graphics->clear(kColorWhite);
+  pd->graphics->clear(kColorBlack);
   pd->graphics->setBackgroundColor(kColorBlack);
 
   switch (gm) {
-    case kTitles: renderTitles(); break;
+    case kTitles: renderTitles(fc); break;
     case kGameWindow: renderGame(fc, fsm); break;
     case kNGameModes: break;
   }
@@ -79,11 +79,11 @@ void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) 
 #endif // DEV
 }
 
-void renderTitles(void) {
+void renderTitles(const int32_t fc) {
   const int32_t so = gameGetYOffset();
 
   // INTRO SPLASH
-  if (so < DEVICE_PIX_Y) { renderTitlesHeader(); }
+  if (so < DEVICE_PIX_Y) { renderTitlesHeader(fc); }
 
   // PLAYER SELECT
   if (so > 0 && so <= DEVICE_PIX_Y*2 ) { renderTitlesPlayerSelect(so == DEVICE_PIX_Y); }

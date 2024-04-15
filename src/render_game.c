@@ -152,7 +152,7 @@ void renderGameBall(const int32_t fc) {
 }
 
 void renderGamePoot(const enum FSM_t fsm) {
-  if (fsm == kGameFSM_AimMode && m_ballPootRadius) {
+  if (FSMGetIsAimMode() && m_ballPootRadius) {
     pd->graphics->setDrawMode(kDrawModeNXOR);
     pd->graphics->drawBitmap(bitmapGetMarbleFirePoot(m_ballPootRadius), DEVICE_PIX_X/2 - TURRET_RADIUS, gameGetMinimumY(), kBitmapUnflipped);
     pd->graphics->setDrawMode(kDrawModeCopy);
@@ -166,15 +166,12 @@ void renderGameTurret(void) {
     return;
   }
   pd->graphics->drawLine(0, minY+1, DEVICE_PIX_X, minY+1, 2, kColorWhite);
-  // pd->graphics->drawBitmap(getBitmapHeader(), 0, 0, kBitmapUnflipped);
   pd->graphics->drawBitmap(bitmapGetTurretBody(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY,  kBitmapUnflipped);
   pd->graphics->drawBitmap(bitmapGetTurretBarrel(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY, kBitmapUnflipped);
-
-
 }
 
 void renderGameTrajectory(void) {
-  if (FSMGet() != kGameFSM_AimMode) {
+  if (!FSMGetIsAimMode()) {
     return;
   }
   for (int i = 2; i < m_ballTraces; ++i) {
@@ -253,7 +250,9 @@ void renderGameBackground(void) {
   for (uint32_t i = start; i < start+6; ++i) {
     if (i >= (WFSHEET_SIZE_Y - 2)) break;
     if (WF_DIVISION_PIX_Y * i > IOGetCurrentHoleHeight()) { break; }
+    pd->graphics->setDrawMode(kDrawModeInverted); // TODO fix in the gfx
     pd->graphics->drawBitmap(bitmapGetWfBg(wf), WF_BG_OFFSET[wf], (WF_DIVISION_PIX_Y * i) - wfOff + parallax, kBitmapUnflipped);
+    pd->graphics->setDrawMode(kDrawModeCopy);
   }
   for (uint32_t i = start; i < start+5; ++i) {
     LCDBitmap* bm = bitmapGetWfFg(wf, 0, i);
@@ -306,12 +305,62 @@ void renderGameGutter(void) {
 
 void renderGameTutorial(const int32_t fc, const enum FSM_t fsm) {
   const int16_t yOff = gameGetYOffset();
-  if (fsm == kGameFSM_TutorialScrollDown) {
-    pd->graphics->drawBitmap(bitmapGetTutorialCrank(fc / 8), 20, 20 + yOff, kBitmapUnflipped);
-  } else if (fsm == kGameFSM_TutorialScrollUp) {
     const uint16_t fast = TICK_FREQUENCY / 5;
     const uint16_t slow = TICK_FREQUENCY / 2;
-    pd->graphics->drawBitmap(bitmapGetTutorialCrank(fc / fast), 20, 20 + yOff, kBitmapFlippedX);
-    pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 2 ? 1 : 3) , HALF_DEVICE_PIX_X + 20, 40 + yOff, kBitmapUnflipped);
+  if (fsm == kGameFSM_TutorialScrollDown) {
+
+    if (pd->system->isCrankDocked()) {
+      pd->graphics->drawBitmap(bitmapGetTutorialDPad((fc / slow) % 2), 20, 40 + yOff, kBitmapFlippedY);
+    } else {
+      pd->graphics->drawBitmap(bitmapGetTutorialCrankRotate(fc / fast), 20, 20 + yOff, kBitmapUnflipped);
+    }
+
+  } else if (fsm == kGameFSM_TutorialScrollUp) {
+
+    if (pd->system->isCrankDocked()) {
+      pd->graphics->drawBitmap(bitmapGetTutorialDPad((fc / slow) % 2), 20, 40 + yOff, kBitmapUnflipped);
+    } else {
+      pd->graphics->drawBitmap(bitmapGetTutorialCrankRotate(fc / fast), 20, 20 + yOff, kBitmapFlippedX);
+    }
+    pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 2 ? 1 : 3) , HALF_DEVICE_PIX_X + 20, 60 + yOff, kBitmapUnflipped);
+
+  } else if (fsm == kGameFSM_TutorialFireMarble) {
+
+    if (pd->system->isCrankDocked()) {
+      const uint8_t f = (fc / slow) % 4;
+      const LCDBitmapFlip flip = (f == 2 ? kBitmapFlippedX : kBitmapUnflipped);
+      pd->graphics->drawBitmap(bitmapGetTutorialDPad(f % 2 ? 0 : 2), 20, 40 + yOff, flip);
+    } else {
+      uint8_t f = (fc / fast) % 8;
+      if (f > 4) f = 4 - (f - 4);
+      pd->graphics->drawBitmap(bitmapGetTutorialCrankAngle(f), 20, 65 + yOff, kBitmapUnflipped);
+    }
+    pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 2 ? 0 : 2) , HALF_DEVICE_PIX_X + 20, 60 + yOff, kBitmapUnflipped);
+
+  } else if (fsm == kGameFSM_TutorialGetSpecial) {
+
+    if (pd->system->isCrankDocked()) {
+      const uint8_t f = (fc / slow) % 4;
+      if (f < 2) pd->graphics->drawBitmap(bitmapGetTutorialDPad((fc / slow) % 2 ? 2 : 0), HALF_DEVICE_PIX_X + 20, 40 + yOff, kBitmapUnflipped);
+      else       pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 2 ? 2 : 0) , HALF_DEVICE_PIX_X + 20, 60 + yOff, kBitmapUnflipped);
+    } else {
+      pd->graphics->drawBitmap(bitmapGetTutorialCrankAngle(0), HALF_DEVICE_PIX_X + 20, 5 + yOff, kBitmapUnflipped);
+      pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 2 ? 0 : 2) , HALF_DEVICE_PIX_X + 20, 5 + 110 + yOff, kBitmapUnflipped);
+    }
+    if ((fc / slow) % 2) { pd->graphics->drawBitmap(bitmapGetTutorialArrows(0), 0, yOff, kBitmapUnflipped); }
+
+  } else if (fsm == kGameFSM_TutorialGetRequired) {
+
+    if (pd->system->isCrankDocked()) {
+      const uint8_t f = (fc / slow) % 4;
+      if (f < 2) pd->graphics->drawBitmap(bitmapGetTutorialDPad((fc / slow) % 2 ? 2 : 0), 20, 40 + yOff, kBitmapFlippedX);
+      else       pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 2 ? 2 : 0), 20, 60 + yOff, kBitmapUnflipped);
+    } else {
+      pd->graphics->drawBitmap(bitmapGetTutorialCrankAngle(4), 20, 5 + yOff, kBitmapUnflipped);
+      pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 2 ? 0 : 2), 20, 5 + 110 + yOff, kBitmapUnflipped);
+    }
+    if ((fc / slow) % 2) { pd->graphics->drawBitmap(bitmapGetTutorialArrows(1), HALF_DEVICE_PIX_X, yOff, kBitmapUnflipped); }
+
   }
+
 }

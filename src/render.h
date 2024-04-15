@@ -36,7 +36,7 @@ void renderSetNumeralOffset(const float no);
 
 void renderDoResetBallTrace(void);
 
-void renderTitlesHeader(void);
+void renderTitlesHeader(const int32_t fc);
 void renderTitlesPlayerSelect(const bool locked);
 void renderTitlesLevelSelect(const bool locked);
 void renderTitlesHoleSelect(const bool locked);

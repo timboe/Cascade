@@ -19,6 +19,14 @@ int16_t boardGetRequiredPegsInPlay(void) {
 
 void boardDoRequiredPegHit(void) { --m_requiredPegsInPlay; }
 
+int16_t boardGetSpecialPegsInPlay(void) { // This is not often needed and is not cached
+  int16_t count = 0;
+  for (int i = 0; i < m_nPegs; ++i) {
+    if (boardGetPeg(i)->type == kPegTypeSpecial && boardGetPeg(i)->state == kPegStateActive) { ++count; }
+  }
+  return count;
+}
+
 void boardDoInit(void) {
   memset(&m_pegs, 0, sizeof(struct Peg_t) * MAX_PEGS);
   for (int i = 0; i < MAX_PEGS; ++i) {
