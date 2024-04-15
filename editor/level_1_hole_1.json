@@ -9,6 +9,7 @@
     "foreground": 0,
     "background": 0,
     "special": 4,
+    "height": 480,
     "n_static": 38,
     "n_elliptic": 0,
     "n_linear": 0
