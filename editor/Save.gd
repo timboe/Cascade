@@ -95,6 +95,7 @@ func pack_save() -> Dictionary:
 	header["background"] = %Background.selected
 	header["special"] = %SpecialButton.selected
 	header["height"] = %HeightSlider.value
+	header["snap"] = %EditorSnap.value
 	
 	var static_pegs = get_tree().get_nodes_in_group("static_pegs")
 	var elliptic_paths = get_tree().get_nodes_in_group("elliptic_pegs")
