@@ -51,19 +51,26 @@ func rotate_peg(peg : Control, delta : float) -> void:
 
 func _input(event):
 	if event is InputEventKey:
-		if event.pressed and dragNode and !event.echo:
+		if event.pressed and dragNode:
+			var snap = %EditorSnap.value
 			if event.keycode == KEY_UP :
-				dragNode.find_child("YText").value -= 1
+				dragNode.find_child("YText").value -= snap
+				get_tree().get_root().set_input_as_handled()
 			if event.keycode == KEY_DOWN :
-				dragNode.find_child("YText").value += 1
+				dragNode.find_child("YText").value += snap
+				get_tree().get_root().set_input_as_handled()
 			if event.keycode == KEY_LEFT :
-				dragNode.find_child("XText").value -= 1
+				dragNode.find_child("XText").value -= snap
+				get_tree().get_root().set_input_as_handled()
 			if event.keycode == KEY_RIGHT :
-				dragNode.find_child("XText").value += 1
+				dragNode.find_child("XText").value += snap
+				get_tree().get_root().set_input_as_handled()
 			if event.keycode == KEY_C :
 				dragNode.find_child("Clone")._on_pressed()
+				get_tree().get_root().set_input_as_handled()
 			if event.keycode == KEY_D :
 				dragNode.find_child("Remove")._on_pressed()
+				get_tree().get_root().set_input_as_handled()
 					
 	if event is InputEventMouseButton:
 		if (event.button_index == 1 || event.button_index == 2) and event.pressed and event.position.x < PLAYDATE_WIDTH:
@@ -101,6 +108,8 @@ func _input(event):
 	if event is InputEventMouseMotion and dragMode:
 		var yOff = $%LeftScroll.get_v_scroll()
 		var v = Vector2(event.position.x, event.position.y + yOff)
+		v.x = snap(v.x)
+		v.y = snap(v.y)
 		print("Drag ", v)
 		if dragMode == 1: 
 			move_peg(dragNode, v)
@@ -111,3 +120,5 @@ func _input(event):
 				rotate_peg(dragNode, v.x - dragPos.x)
 			dragPos = v
 		
+func snap(v):
+	return round( v / %EditorSnap.value ) * %EditorSnap.value

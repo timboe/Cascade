@@ -10,7 +10,7 @@ size_flags_horizontal = 3
 text = "1"
 horizontal_alignment = 1
 
-[node name="XOffText" type="SpinBox" parent="."]
+[node name="XOffText" type="SpinBox" parent="." groups=["coordinate_text_group"]]
 layout_mode = 2
 size_flags_horizontal = 3
 min_value = -960.0
@@ -20,7 +20,7 @@ rounded = true
 alignment = 1
 script = ExtResource("1_fc0ls")
 
-[node name="YOffText" type="SpinBox" parent="."]
+[node name="YOffText" type="SpinBox" parent="." groups=["coordinate_text_group"]]
 layout_mode = 2
 size_flags_horizontal = 3
 min_value = -960.0

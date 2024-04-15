@@ -156,7 +156,7 @@ size_flags_horizontal = 3
 text = "X"
 horizontal_alignment = 2
 
-[node name="XText" type="SpinBox" parent="Margin/LineContVBox/Grid2"]
+[node name="XText" type="SpinBox" parent="Margin/LineContVBox/Grid2" groups=["coordinate_text_group"]]
 layout_mode = 2
 size_flags_horizontal = 3
 max_value = 960.0
@@ -169,7 +169,7 @@ size_flags_horizontal = 3
 text = "Y"
 horizontal_alignment = 2
 
-[node name="YText" type="SpinBox" parent="Margin/LineContVBox/Grid2" groups=["y_sensitive"]]
+[node name="YText" type="SpinBox" parent="Margin/LineContVBox/Grid2" groups=["coordinate_text_group", "y_sensitive"]]
 layout_mode = 2
 size_flags_horizontal = 3
 max_value = 960.0

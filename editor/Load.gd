@@ -94,6 +94,7 @@ func restore_save(save_game : Dictionary) -> void:
 	%ParSlider.value = save_game["header"]["par"]
 	%Foreground.selected = save_game["header"]["foreground"]
 	%Background.selected = save_game["header"]["background"]
+	%SpecialButton.selected = save_game["header"]["special"]
 		
 	%LevelSlider._on_value_changed(%LevelSlider.value)
 	%HoleSlider._on_value_changed(%HoleSlider.value)

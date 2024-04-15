@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://cmuubbicvggs5"]
+[gd_scene load_steps=20 format=3 uid="uid://cmuubbicvggs5"]
 
 [ext_resource type="Script" path="res://RenderScene.gd" id="1_1f7cp"]
 [ext_resource type="Theme" uid="uid://mvm1lqkscosr" path="res://editor/theme/aestro.tres" id="1_3tosr"]
@@ -51,7 +51,7 @@ func _on_value_changed(newValue):
 script/source = "extends HSlider
 
 func _on_value_changed(newValue):
-	$\"../ParLabel\".text = \"Par: \" + str(newValue)
+	$\"../ParLabel\".text = \"Hole Par: \" + str(newValue)
 "
 
 [sub_resource type="GDScript" id="GDScript_stxm2"]
@@ -61,6 +61,15 @@ func _on_value_changed(newValue):
 	$\"../HeightLabel\".text = \"Waterfall Height: \" + str(newValue)
 	$%Render.queue_redraw()
 	get_tree().call_group(\"y_sensitive\", \"new_max_y\", newValue)
+"
+
+[sub_resource type="GDScript" id="GDScript_4ako0"]
+script/source = "extends HSlider
+
+func _on_value_changed(new_value):
+	$\"../SnapLabel\".text = \"Editor Snap: \" + str(new_value)
+	for t in get_tree().get_nodes_in_group(\"coordinate_text_group\"):
+		t.step = new_value
 "
 
 [sub_resource type="GDScript" id="GDScript_2mwtp"]
@@ -302,7 +311,7 @@ script = SubResource("GDScript_scs8v")
 [node name="ParLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Par: 1"
+text = "Hole Par: 1"
 horizontal_alignment = 2
 
 [node name="ParSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
@@ -315,6 +324,32 @@ value = 3.0
 rounded = true
 tick_count = 8
 script = SubResource("GDScript_lhfae")
+
+[node name="SpecialLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Hole Special"
+horizontal_alignment = 2
+
+[node name="SpecialButton" type="OptionButton" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+item_count = 7
+selected = 0
+popup/item_0/text = "Random"
+popup/item_0/id = 0
+popup/item_1/text = "AIMSHOT"
+popup/item_1/id = 1
+popup/item_2/text = "SECONDSHOT"
+popup/item_2/id = 2
+popup/item_3/text = "BLASTBALL"
+popup/item_3/id = 3
+popup/item_4/text = "MULTIBALL"
+popup/item_4/id = 4
+popup/item_5/text = "ELASTIBALL"
+popup/item_5/id = 5
+popup/item_6/text = "GHOSTBALL"
+popup/item_6/id = 6
 
 [node name="HeightLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
@@ -334,16 +369,49 @@ rounded = true
 tick_count = 12
 script = SubResource("GDScript_stxm2")
 
+[node name="SnapLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Editor Snap: 5"
+horizontal_alignment = 2
+
+[node name="EditorSnap" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 30.0
+value = 5.0
+rounded = true
+tick_count = 15
+script = SubResource("GDScript_4ako0")
+
 [node name="Foreground" type="OptionButton" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 unique_name_in_owner = true
 layout_mode = 2
 alignment = 1
-item_count = 2
+item_count = 10
 selected = 0
-popup/item_0/text = "Waterfall0"
+popup/item_0/text = "Waterfall 1"
 popup/item_0/id = 0
-popup/item_1/text = "Waterfall1"
+popup/item_1/text = "Waterfall 2"
 popup/item_1/id = 1
+popup/item_2/text = "Waterfall 3"
+popup/item_2/id = 2
+popup/item_3/text = "Waterfall 4"
+popup/item_3/id = 3
+popup/item_4/text = "Waterfall 5"
+popup/item_4/id = 4
+popup/item_5/text = "Waterfall 6"
+popup/item_5/id = 5
+popup/item_6/text = "Waterfall 7"
+popup/item_6/id = 6
+popup/item_7/text = "Waterfall 8"
+popup/item_7/id = 7
+popup/item_8/text = "Waterfall 9"
+popup/item_8/id = 8
+popup/item_9/text = "Waterfall 10"
+popup/item_9/id = 9
 
 [node name="Background" type="OptionButton" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 unique_name_in_owner = true
@@ -421,6 +489,7 @@ text = "PEGS"
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/HoleSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/HoleSlider" method="_on_value_changed"]
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/ParSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/ParSlider" method="_on_value_changed"]
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/HeightSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/HeightSlider" method="_on_value_changed"]
+[connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/EditorSnap" to="HBox/RightScroll/Margin/RightVBox/Grid/EditorSnap" method="_on_value_changed"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Save" to="HBox/RightScroll/Margin/RightVBox/Grid/Save" method="_on_pressed"]
 [connection signal="canceled" from="HBox/RightScroll/Margin/RightVBox/Grid/Save/FileDialog" to="HBox/RightScroll/Margin/RightVBox/Grid/Save" method="_on_file_dialog_canceled"]
 [connection signal="confirmed" from="HBox/RightScroll/Margin/RightVBox/Grid/Save/FileDialog" to="HBox/RightScroll/Margin/RightVBox/Grid/Save" method="_on_file_dialog_confirmed"]
