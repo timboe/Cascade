@@ -23,6 +23,11 @@ enum FSM_t {
   kFSM_SPLIT_TitlesGame,
   kGameFSM_DisplaySplash,
   kGameFSM_SplashToStart,
+  kGameFSM_TutorialScrollDown,
+  kGameFSM_TutorialScrollUp,
+  kGameFSM_TutorialFireMarble,
+  kGameFSM_TutorialGetSpecial,
+  kGameFSM_TutorialGetRequired,
   kGameFSM_AimMode,
   kGameFSM_AimModeScrollToTop,
   kGameFSM_BallInPlay,
@@ -65,8 +70,13 @@ void FSMChooseHoleToChooseLevel(const bool newState);
 
 void FSMDisplaySplash(const bool newState);
 void FSMSplashToStart(const bool newState);
-void FSMAimModeScrollToTop(const bool newState);
+void FSMTutorialScrollDown(const bool newState);
+void FSMTutorialScrollUp(const bool newState);
+void FSMTutorialFireMarble(const bool newState);
+void FSMTutorialGetSpecial(const bool newState);
+void FSMTutorialGetRequired(const bool newState);
 void FSMAimMode(const bool newState);
+void FSMAimModeScrollToTop(const bool newState);
 void FSMBallInPlay(const bool newState);
 void FSMBallStuck(const bool newState);
 void FSMCloseUp(const bool newState);

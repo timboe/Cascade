@@ -2,6 +2,8 @@
 #include "render.h"
 #include "io.h"
 
+#ifdef TAKE_SCREENSHOTS
+
 SDFile* m_imageFile;
 LCDBitmap* m_imageBitmap;
 
@@ -50,14 +52,14 @@ void screenShotDo() {
     ssRender();
   } else { 
     ssEncode();
-    if (++m_yOffsetSS == WFALL_MAX_HEIGHT) { 
+    if (++m_yOffsetSS == WF_MAX_HEIGHT) { 
       ssWrite();
     }
   }
 }
 
 void screenShotInit(void) {
-  pd->system->logToConsole("ssInit frame %i", gameGetFrameCount());
+  // pd->system->logToConsole("ssInit frame %i", gameGetFrameCount());
   char filePath[128];
   snprintf(filePath, 128, "level_%i_hole_%i.bmp", IOGetCurrentLevel()+1, IOGetCurrentHole()+1);
   m_imageFile = pd->file->open(filePath, kFileWrite);
@@ -93,6 +95,10 @@ void ssEncode(void) {
 }
 
 void ssWrite(void) {
+  pd->graphics->pushContext(m_imageBitmap);
+  pd->graphics->drawLine(0, 0, DEVICE_PIX_X, 0, 4, kColorBlack);
+  pd->graphics->drawLine(0, IOGetCurrentHoleHeight(), DEVICE_PIX_X, IOGetCurrentHoleHeight(), 4, kColorBlack);
+  pd->graphics->popContext();
   bool finished = false;
   while (!finished) { finished = saveLCDBitmapToFile(m_imageFile); }
   pd->file->close(m_imageFile);
@@ -162,3 +168,5 @@ bool saveLCDBitmapToFile(SDFile* _file) {
 
   return false;
 }
+
+#endif

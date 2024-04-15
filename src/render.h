@@ -50,3 +50,4 @@ void renderGameTrajectory(void);
 void renderGameBoard(const int32_t fc);
 void renderGameBackground(void);
 void renderGameGutter(void);
+void renderGameTutorial(const int32_t fc, const enum FSM_t fsm);

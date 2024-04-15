@@ -50,7 +50,7 @@ void renderDoAddStar(const uint8_t ball) {
     const float ang =  (rand() % 180) * M_PIf;
     m_starType[s] = rand() % 2;
     m_starPos[s] = cpBodyGetPosition(cpBall);
-    m_starVel[s] = cpv(STAR_STRENGTH * cosf(ang), -STAR_STRENGTH * sinf(ang) * 2);
+    m_starVel[s] = cpv(STAR_STRENGTH * cosf(ang), -STAR_STRENGTH * sinf(ang));
     // m_starVel[s] = cpvadd( cpBodyGetVelocity(cpBall), m_starVel[s] );
     m_starVel[s] = cpvmult( m_starVel[s], TIMESTEP );
     m_starAng[s] = rand() % 128;
@@ -108,35 +108,53 @@ void renderGameBall(const int32_t fc) {
     }
   }
 
+  const int32_t gutterY = IOGetCurrentHoleHeight();
+  const float pfn = gameGetParalaxFactorNear(true);
+  const int32_t parallaxPond = pfn - gameGetParalaxFactorNearForY(true, gutterY - DEVICE_PIX_Y);
+
   if (!FSMGetBallInPlay()) {
     // render at dummy location
     pd->graphics->setDrawMode(kDrawModeInverted);
-    pd->graphics->drawBitmap(bitmapGetBall(), DEVICE_PIX_X/2 - BALL_RADIUS, gameGetMinimumY() + TURRET_RADIUS - BALL_RADIUS, kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetMarble(), DEVICE_PIX_X/2 - BALL_RADIUS, gameGetMinimumY() + TURRET_RADIUS - BALL_RADIUS, kBitmapUnflipped);
     pd->graphics->setDrawMode(kDrawModeCopy);
-    return;
+  } else {
+    for (int i = 0; i < MAX_BALLS; ++i) {
+      if (i == 1 && !physicsGetSecondBallInPlay()) { continue; }
+      const cpBody* ball = physicsGetBall(i);
+      const cpVect pos = cpBodyGetPosition(ball);
+      if (pos.y > gutterY) { continue; }
+      int16_t* trailX = physicsGetMotionTrailX(i);
+      int16_t* trailY = physicsGetMotionTrailY(i);
+      uint8_t size = BALL_RADIUS;
+      for (int32_t i = fc; i > fc - MOTION_TRAIL_LEN; --i) {
+        pd->graphics->fillEllipse(trailX[i%MOTION_TRAIL_LEN] - size, trailY[i%MOTION_TRAIL_LEN] - size, 2*size, 2*size, 0.0f, 360.0f, kColorWhite);
+        size -= (BALL_RADIUS / MOTION_TRAIL_LEN);
+      }
+      pd->graphics->setDrawMode(kDrawModeInverted);
+      pd->graphics->drawBitmap(bitmapGetMarble(), pos.x - BALL_RADIUS, pos.y - BALL_RADIUS, kBitmapUnflipped);
+      pd->graphics->setDrawMode(kDrawModeCopy);
+    }
   }
 
+  // Splash
   for (int i = 0; i < MAX_BALLS; ++i) {
-    if (i == 1 && !physicsGetSecondBallInPlay()) { continue; }
-    cpBody* ball = physicsGetBall(i);
-    int16_t* trailX = physicsGetMotionTrailX(i);
-    int16_t* trailY = physicsGetMotionTrailY(i);
-    uint8_t size = BALL_RADIUS;
-    for (int32_t i = fc; i > fc - MOTION_TRAIL_LEN; --i) {
-      pd->graphics->fillEllipse(trailX[i%MOTION_TRAIL_LEN] - size, trailY[i%MOTION_TRAIL_LEN] - size, 2*size, 2*size, 0.0f, 360.0f, kColorWhite);
-      size -= (BALL_RADIUS / MOTION_TRAIL_LEN);
+    if (m_ballSplashTimer[i]) {
+      uint8_t frame = m_ballSplashTimer[i] / 4;
+      if (frame == 9)  frame = 7; // Repeat
+      if (frame == 10) frame = 6; // Repeat
+      if (frame >= 9) continue;
+      pd->graphics->setDrawMode(kDrawModeNXOR);
+      pd->graphics->drawBitmap(bitmapGetWaterSplash(frame), m_ballSplashPos[i], gutterY + parallaxPond, kBitmapUnflipped);
+      pd->graphics->setDrawMode(kDrawModeCopy);
+      ++m_ballSplashTimer[i];
     }
-    const cpVect pos = cpBodyGetPosition(ball);
-    pd->graphics->setDrawMode(kDrawModeInverted);
-    pd->graphics->drawBitmap(bitmapGetBall(), pos.x - BALL_RADIUS, pos.y - BALL_RADIUS, kBitmapUnflipped);
-    pd->graphics->setDrawMode(kDrawModeCopy);
   }
 }
 
 void renderGamePoot(const enum FSM_t fsm) {
   if (fsm == kGameFSM_AimMode && m_ballPootRadius) {
     pd->graphics->setDrawMode(kDrawModeNXOR);
-    pd->graphics->drawBitmap(bitmapGetBallFirePoot(m_ballPootRadius), DEVICE_PIX_X/2 - TURRET_RADIUS, gameGetMinimumY(), kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetMarbleFirePoot(m_ballPootRadius), DEVICE_PIX_X/2 - TURRET_RADIUS, gameGetMinimumY(), kBitmapUnflipped);
     pd->graphics->setDrawMode(kDrawModeCopy);
   }
 }
@@ -166,6 +184,20 @@ void renderGameTrajectory(void) {
 }
 
 void renderGameBoard(const int32_t fc) {
+#ifdef TAKE_SCREENSHOTS
+  if (screenShotGetInProgress()) {
+    for (int i = 0; i < boardGetNPegs(); ++i) {
+      const struct Peg_t* p = boardGetPeg(i);
+      if (p->motion == kPegMotionEllipse) {
+        pd->graphics->drawEllipse(p->pathX[0], p->pathY[0], p->a, p->a, 4, 0.0f, 360.0f, kColorBlack);
+      } else if (p->motion == kPegMotionPath) {
+        for (int j = 1; j < p->pathSteps; ++j) {
+          pd->graphics->drawLine(p->pathX[j], p->pathY[j], p->pathX[j-1], p->pathY[j-1], 4, kColorBlack);
+        }
+      }
+    }
+  }
+#endif
   for (int i = 0; i < boardGetNPegs(); ++i) {
     const struct Peg_t* p = boardGetPeg(i);
     if (p->state == kPegStateRemoved) {
@@ -175,24 +207,14 @@ void renderGameBoard(const int32_t fc) {
     }
     pd->graphics->drawBitmap(p->bitmap, p->xBitmap, p->yBitmap, kBitmapUnflipped);
     pd->graphics->setDrawMode(kDrawModeCopy);
-    // if (!FSMGetBallInPlay() && !screenShotGetInProgress()) {
-    //   if (p->motion == kPegMotionEllipse) {
-    //     pd->graphics->fillEllipse(p->pathX[0]-3, p->pathY[0]-3, 6, 6, 0.0f, 360.0f, kColorWhite);
-    //     pd->graphics->fillEllipse(p->pathX[0]-2, p->pathY[0]-2, 4, 4, 0.0f, 360.0f, kColorBlack);
-    //   } else if (p->motion == kPegMotionPath) {
-    //     for (int j = 1; j < p->pathSteps; ++j) {
-    //       pd->graphics->drawLine(p->pathX[j], p->pathY[j], p->pathX[j-1], p->pathY[j-1], 2, kColorWhite);
-    //     }
-    //   }
-    // }
   }
 
-  if (m_specialPos.x) {
+  if (m_specialPos.x) { // Draw special obtained toast
     m_specialOffset++;
     if (m_specialOffset == TICK_FREQUENCY) {
       m_specialPos = cpvzero;
     } else {
-      pd->graphics->setDrawMode(kDrawModeNXOR); // kDrawModeNXOR
+      pd->graphics->setDrawMode(kDrawModeNXOR);
       pd->graphics->drawBitmap(bitmapGetSpecial(m_specialType),
         m_specialPos.x - SPECIAL_TEXT_WIDTH/2,
         m_specialPos.y - TITLETEXT_HEIGHT - m_specialOffset, kBitmapUnflipped);
@@ -200,21 +222,23 @@ void renderGameBoard(const int32_t fc) {
     }
   }
 
-  if (m_blastPos.x) {
+  if (m_blastPos.x) { // Draw blast graphic
     m_blastFrame++;
     if (m_blastFrame / 4 == 9) {
       m_blastPos = cpvzero;
     } else {
-      pd->graphics->setDrawMode(kDrawModeCopy); // kDrawModeNXOR
+      pd->graphics->setDrawMode(kDrawModeCopy); // kDrawModeNXOR ?
       pd->graphics->drawBitmap(bitmapGetBlast(m_blastFrame / 4), m_blastPos.x - BLAST_RADIUS, m_blastPos.y - BLAST_RADIUS, kBitmapUnflipped);
-      pd->graphics->setDrawMode(kDrawModeCopy);
+      // pd->graphics->setDrawMode(kDrawModeCopy);
     }
   }
 
 }
 
 void renderGameBackground(void) {
+#ifdef TAKE_SCREENSHOTS
   if (screenShotGetInProgress()) { return; }
+#endif
 
   const int32_t parallax = gameGetParalaxFactorFar(false); // Note: float -> int here. Hard=false
   const int32_t so = ((int32_t) gameGetYOffset()) - parallax;
@@ -249,6 +273,10 @@ void renderGameBackground(void) {
 }
 
 void renderGameGutter(void) {
+#ifdef TAKE_SCREENSHOTS
+  if (screenShotGetInProgress()) { return; }
+#endif
+
   const int32_t gutterY = IOGetCurrentHoleHeight();
   const float pfn = gameGetParalaxFactorNear(true);
   const int32_t parallaxPond = pfn - gameGetParalaxFactorNearForY(true, gutterY - DEVICE_PIX_Y); // Note: float -> int here. Hard = true
@@ -260,24 +288,11 @@ void renderGameGutter(void) {
     pd->graphics->drawRect(1, gutterY + 1, DEVICE_PIX_X-2, DEVICE_PIX_Y-2, kColorBlack);
   }
 
-  for (int i = 0; i < MAX_BALLS; ++i) {
-    if (m_ballSplashTimer[i]) {
-      uint8_t frame = m_ballSplashTimer[i] / 4;
-      if (frame == 9)  frame = 7; // repete
-      if (frame == 10) frame = 6; // repete
-      if (frame >= 9) continue;
-      pd->graphics->setDrawMode(kDrawModeNXOR);
-      pd->graphics->drawBitmap(bitmapGetWaterSplash(frame), m_ballSplashPos[i], gutterY + parallaxPond, kBitmapUnflipped);
-      pd->graphics->setDrawMode(kDrawModeCopy);
-      ++m_ballSplashTimer[i];
-    }
-  }
-
   //Note no parallax here
   if (so > DEVICE_PIX_Y * 4) {
     pd->graphics->drawBitmap(BitmapGetScoreHistogram(), 0, DEVICE_PIX_Y * 5, kBitmapUnflipped);
     for (int i = 0; i < m_ballFallN; ++i) {
-      pd->graphics->drawBitmap(bitmapGetBall(),
+      pd->graphics->drawBitmap(bitmapGetMarble(),
         BUF + BALL_RADIUS/2 + m_ballFallX*3*BALL_RADIUS,
         (DEVICE_PIX_Y * 5) + m_ballFallY[i],
         kBitmapUnflipped);
@@ -286,5 +301,17 @@ void renderGameGutter(void) {
 
   if (so > DEVICE_PIX_Y * 5) {
     pd->graphics->drawBitmap(bitmapGetLevelTitle(), 0, DEVICE_PIX_Y * 6, kBitmapUnflipped);
+  }
+}
+
+void renderGameTutorial(const int32_t fc, const enum FSM_t fsm) {
+  const int16_t yOff = gameGetYOffset();
+  if (fsm == kGameFSM_TutorialScrollDown) {
+    pd->graphics->drawBitmap(bitmapGetTutorialCrank(fc / 8), 20, 20 + yOff, kBitmapUnflipped);
+  } else if (fsm == kGameFSM_TutorialScrollUp) {
+    const uint16_t fast = TICK_FREQUENCY / 5;
+    const uint16_t slow = TICK_FREQUENCY / 2;
+    pd->graphics->drawBitmap(bitmapGetTutorialCrank(fc / fast), 20, 20 + yOff, kBitmapFlippedX);
+    pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 2 ? 1 : 3) , HALF_DEVICE_PIX_X + 20, 40 + yOff, kBitmapUnflipped);
   }
 }

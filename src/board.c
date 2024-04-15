@@ -69,7 +69,6 @@ void boardDoAddWheel(const struct EllipticLoader_t* ellipticLoader) {
 
 void boardDoAddLinear(const struct LinearLoader_t* linearLoader) {
   for (int i = 0; i < linearLoader->nPegs; ++i) {
-    pd->system->logToConsole("add peg %i", i);
     struct Peg_t* p = pegFromPool();
     enum PegShape_t shape = linearLoader->shape;
     if (linearLoader->shapeOverride[i]) { shape = (enum PegShape_t) linearLoader->shapeOverride[i] - 1; }
@@ -84,11 +83,9 @@ void boardDoAddLinear(const struct LinearLoader_t* linearLoader) {
     if (linearLoader->types[i] == kPegTypeRequired) { ++m_requiredPegsInPlay; }
     pegSetType(p, linearLoader->types[i]);
     for (int j = 0; j < linearLoader->nLines; ++j) {
-      pd->system->logToConsole("n lines is %i, j is %i, add path %i %i", linearLoader->nLines, j, linearLoader->pathX[j], linearLoader->pathY[j]);
       pegAddMotionPath(p, linearLoader->pathX[j], linearLoader->pathY[j]);
     }
     pegDoMotionPathFinalise(p);
-    pd->system->logToConsole("done add peg %i", i);
   }
 }
 

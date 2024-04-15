@@ -3,10 +3,6 @@
 
 #define TAKE_SCREENSHOTS 1
 
-//#define DEMO
-
-//#define TITLE_LOGO_ONLY
-
 #define ALWAYS_FPS true
 
 #define MAX(a,b) ((a) > (b) ? a : b)
@@ -27,12 +23,12 @@
 #define HALF_DEVICE_PIX_X (DEVICE_PIX_X/2)
 #define HALF_DEVICE_PIX_Y (DEVICE_PIX_Y/2)
 
-#define WFALL_MAX_HEIGHT 4
+#define WF_MAX_HEIGHT 4
 
 #define WF_DIVISION_PIX_Y 60
 
 #define WFSHEET_SIZE_X 1
-#define WFSHEET_SIZE_Y ((DEVICE_PIX_Y*WFALL_MAX_HEIGHT)/WF_DIVISION_PIX_Y)
+#define WFSHEET_SIZE_Y ((DEVICE_PIX_Y*WF_MAX_HEIGHT)/WF_DIVISION_PIX_Y)
 
 #define NUMERAL_PIX_X 128
 #define NUMERAL_PIX_Y 160
@@ -110,7 +106,7 @@
 #define M_2PIf 6.28318530718f
 
 // How many pixels down the side do we have to prevent the ball from bouncing out off
-#define PHYSWALL_PIX_Y (DEVICE_PIX_Y * WFALL_MAX_HEIGHT)
+#define PHYSWALL_PIX_Y (DEVICE_PIX_Y * WF_MAX_HEIGHT)
 
 #define BALL_RADIUS 8.0f
 #define BALL_MASS 1.0f
@@ -134,7 +130,7 @@
 
 #define POOT_STRENGTH 300.0f
 
-#define STAR_STRENGTH 86.0f
+#define STAR_STRENGTH 128.0f
 
 #define WF_VELOCITY 2.0f
 

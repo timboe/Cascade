@@ -68,11 +68,15 @@ void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) 
   }
 
   // Draw FPS indicator (dbg only)
-  #ifdef DEV
-  if (ALWAYS_FPS && !screenShotGetInProgress()) {
+#ifdef DEV
+  bool screenShotVeto = false;
+#ifdef TAKE_SCREENSHOTS
+  screenShotVeto = screenShotGetInProgress();
+#endif // TAKE_SCREENSHOTS
+  if (ALWAYS_FPS && !screenShotVeto) {
     pd->system->drawFPS(0, 0);
   }
-  #endif
+#endif // DEV
 }
 
 void renderTitles(void) {
@@ -99,18 +103,12 @@ void renderTitles(void) {
 
 
 
-void renderGame(int32_t fc, enum FSM_t fsm) {
+void renderGame(const int32_t fc, const enum FSM_t fsm) {
   // DRAW BACKGROUND
   renderGameBackground();
 
   // DRAW TURRET & TOP DECORATION
   renderGameTurret();
-
-  // DRAW BALL
-  renderGameBall(fc);
-
-  // DRAW POOT CIRCLE
-  renderGamePoot(fsm);
 
   // DRAW PEGS
   renderGameBoard(fc);
@@ -121,7 +119,17 @@ void renderGame(int32_t fc, enum FSM_t fsm) {
   // DRAW GUTTER
   renderGameGutter();
 
+  // DRAW BALL
+  renderGameBall(fc);
+
+  if (IOGetIsTutorial()) { renderGameTutorial(fc, fsm); }
+
+  // DRAW POOT CIRCLE
+  renderGamePoot(fsm);
+
+#ifdef DEV
   // Debug gutter line
   pd->graphics->drawLine(0, IOGetCurrentHoleHeight(), DEVICE_PIX_X, IOGetCurrentHoleHeight(), 4, kColorBlack);
   pd->graphics->drawLine(0, IOGetCurrentHoleHeight(), DEVICE_PIX_X, IOGetCurrentHoleHeight(), 2, kColorWhite);
+#endif
 }

@@ -19,6 +19,8 @@ uint16_t IOGetCurrentPlayer(void);
 void IODoPreviousPlayer(void);
 void IODoNextPlayer(void);
 
+bool IOGetIsTutorial(void);
+
 uint16_t IOGetCurrentLevel(void);
 uint16_t IOGetPreviousLevel(void);
 uint16_t IOGetNextLevel(void);

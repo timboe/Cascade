@@ -32,8 +32,6 @@ const static LCDPattern kHatchedPattern = {
   0b00001111};
 
 // Titiles
-
-LCDBitmap* m_titleSelected;
 LCDBitmap* m_headerImage;
 
 LCDBitmap* m_playerBitmap;
@@ -69,6 +67,7 @@ LCDBitmap* m_scoreHistogram = NULL;
 
 LCDBitmap* m_pootAnimation[TURRET_RADIUS];
 
+LCDBitmap* m_marbleBitmap;
 LCDBitmap* m_ballBitmap[2][MAX_PEG_SIZE];
 LCDBitmap* m_rectBitmap[2][MAX_PEG_SIZE][128];
 LCDBitmap* m_hexBitmap[MAX_PEG_SIZE][128];
@@ -83,6 +82,8 @@ LCDBitmapTable* m_sheetWfFg[N_WF];
 LCDBitmapTable* m_waterSplashTable;
 
 LCDBitmapTable* m_blastTable;
+LCDBitmapTable* m_tutorialCrankTable;
+LCDBitmapTable* m_tutorialButtonTable;
 
 LCDFont* m_fontRoobert24;
 LCDFont* m_fontRoobert10;
@@ -201,7 +202,7 @@ void bitmapDoUpdateGameInfoTopper(void) {
   pd->graphics->popContext();
 }
 
-LCDBitmap* bitmapGetBallFirePoot(const uint8_t i) { return m_pootAnimation[i]; }
+LCDBitmap* bitmapGetMarbleFirePoot(const uint8_t i) { return m_pootAnimation[i]; }
 
 LCDBitmap* bitmapGetUseTheCrank(void) { return m_useTheCrankBitmap; }
 
@@ -224,7 +225,15 @@ LCDBitmap* bitmapGetWfFg_byidx(const uint8_t wf, const uint32_t idx) {
 }
 
 LCDBitmap* bitmapGetBlast(const uint8_t id) {
-  return pd->graphics->getTableBitmap(m_blastTable, id);
+  return pd->graphics->getTableBitmap(m_blastTable, id % 9);
+}
+
+LCDBitmap* bitmapGetTutorialCrank(const uint8_t id) {
+  return pd->graphics->getTableBitmap(m_tutorialCrankTable, id % 8);
+}
+
+LCDBitmap* bitmapGetTutorialButton(const uint8_t id) {
+  return pd->graphics->getTableBitmap(m_tutorialButtonTable, id % 4);
 }
 
 LCDBitmap* bitmapGetTitlePlayer(void) { return m_playerBitmap; }
@@ -259,7 +268,7 @@ LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int1
   } else {
     offset = offset % (DEVICE_PIX_Y*2);
     pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, offset, kBitmapUnflipped);
-    pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, offset - (DEVICE_PIX_Y*2), kBitmapUnflipped);
+    pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, offset - (IOGetCurrentHoleHeight()/2), kBitmapUnflipped);
   }
   pd->graphics->popContext();
   return m_previewBitmapWindow;
@@ -275,7 +284,7 @@ LCDBitmap* bitmapGetPeg(const struct Peg_t* p) {
   return NULL;
 }
 
-LCDBitmap* bitmapGetBall(void) { return m_ballBitmap[0][0]; }
+LCDBitmap* bitmapGetMarble(void) { return m_marbleBitmap; }
 
 LCDBitmap* bitmapGetNumeral(const int8_t n) { return m_numeralBitmap[n % 10]; }
 
@@ -395,7 +404,7 @@ void bitmapDoUpdateScoreHistogram(void) {
   // This will be animated in instead
   balls[IOGetCurrentHole()] = 0;
 
-  for (int i = 0; i < MAX_HOLES;  ++i) {
+  for (int i = 0; i < MAX_HOLES; ++i) {
     pd->graphics->fillRect(
       BUF + i*3*BALL_RADIUS, BUF + (maxHistoBalls - par[i])*2*BALL_RADIUS,
       3*BALL_RADIUS,         par[i]*2*BALL_RADIUS,
@@ -423,8 +432,9 @@ void bitmapDoUpdateScoreHistogram(void) {
 
   pd->graphics->setDrawMode(kDrawModeCopy);
   for (int i = 0; i < MAX_HOLES; ++i) {
+    pd->system->logToConsole("for hole %i the histo will draw %i balls", i+1, balls[i]);
     for (int j = 1; j <= balls[i]; j++) {
-      pd->graphics->drawBitmap(m_ballBitmap[0][0], BUF + BALL_RADIUS/2 + i*3*BALL_RADIUS, BUF + (maxHistoBalls - j)*2*BALL_RADIUS, kBitmapUnflipped);
+      pd->graphics->drawBitmap(m_marbleBitmap, BUF + BALL_RADIUS/2 + i*3*BALL_RADIUS, BUF + (maxHistoBalls - j)*2*BALL_RADIUS, kBitmapUnflipped);
     }
   }
 
@@ -523,7 +533,6 @@ void bitmapDoUpdateHoleStatsBitmap(void) {
 }
 
 void bitmapDoPreloadA(void) {
-  m_titleSelected = bitmapDoLoadImageAtPath("images/titleSelected");
   m_useTheCrankBitmap = bitmapDoLoadImageAtPath("images/useTheCrank");
   m_ditherBitmap = bitmapDoLoadImageAtPath("images/dither");
   m_holeTutorialBitmap = bitmapDoLoadImageAtPath("images/tutorial");
@@ -536,6 +545,8 @@ void bitmapDoPreloadA(void) {
   m_turretBarrelTabel = bitmapDoLoadImageTableAtPath("images/turretBarrel");
   m_waterSplashTable = bitmapDoLoadImageTableAtPath("images/splash");
   m_blastTable = bitmapDoLoadImageTableAtPath("images/blast");
+  m_tutorialCrankTable = bitmapDoLoadImageTableAtPath("images/crankClockwise");
+  m_tutorialButtonTable = bitmapDoLoadImageTableAtPath("images/buttonPressed");
 
   m_fontRoobert24 = bitmapDoLoadFontAtPath("fonts/Roobert-24-Medium");
   m_fontRoobert10 = bitmapDoLoadFontAtPath("fonts/Roobert-10-Bold");
@@ -599,6 +610,11 @@ void bitmapDoPreloadE(void) {
 }
 
 void bitmapDoPreloadF(void) {
+  m_marbleBitmap = pd->graphics->newBitmap(BALL_RADIUS*2, BALL_RADIUS*2, kColorClear);
+  pd->graphics->pushContext(m_marbleBitmap);
+  pd->graphics->fillEllipse(0, 0, BALL_RADIUS*2, BALL_RADIUS*2, 0.0f, 360.0f, kColorWhite);
+  pd->graphics->drawEllipse(0, 0, BALL_RADIUS*2, BALL_RADIUS*2, 2, 0.0f, 360.0f, kColorBlack);
+  pd->graphics->popContext();
   for (int s = 0; s < MAX_PEG_SIZE; ++s) {
     const float scale = bitmapSizeToScale(s);
     const float ballSize = BALL_RADIUS * 2.0f * scale;
@@ -645,6 +661,18 @@ void bitmapDoPreloadH(const uint8_t size) {
 
 void bitmapDoPreloadI(void) {
   char text[128];
+  const uint8_t pixelFineTuning[10] = {
+    2, // 0
+    4, // 1
+    0, // 2
+    2, // 3
+    8, // 4
+    0, // 5
+    0, // 6
+    0, // 7
+    0, // 8
+    0  // 9
+  };
   for (int n = 0; n < 10; ++n) {
     m_numeralBitmap[n] = pd->graphics->newBitmap(NUMERAL_PIX_X, NUMERAL_PIX_Y, kColorClear);
     pd->graphics->pushContext(m_numeralBitmap[n]);
@@ -653,7 +681,7 @@ void bitmapDoPreloadI(void) {
     const int32_t w = pd->graphics->getTextWidth(bitmapGetGreatVibes109(), text, 128, kUTF8Encoding, 0);
     bitmapSetGreatVibes109();
     pd->graphics->setDrawMode(kDrawModeFillBlack);
-    bitmapDoDrawOutlineText(text, 128, NUMERAL_PIX_X/2 - w/2, 0, 4);
+    bitmapDoDrawOutlineText(text, 128, NUMERAL_PIX_X/2 - w/2 - pixelFineTuning[n], 0, 4);
     pd->graphics->popContext();
   }
 }

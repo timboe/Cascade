@@ -34,8 +34,13 @@ void FSMDo(const enum FSM_t transitionTo) {
     case kFSM_SPLIT_TitlesGame: pd->system->error("FSM error kFSM_SPLIT_TitlesGame"); return;
     case kGameFSM_DisplaySplash: return FSMDisplaySplash(newState);
     case kGameFSM_SplashToStart: return FSMSplashToStart(newState);
-    case kGameFSM_AimModeScrollToTop: return FSMAimModeScrollToTop(newState);
+    case kGameFSM_TutorialScrollDown: return FSMTutorialScrollDown(newState);
+    case kGameFSM_TutorialScrollUp: return FSMTutorialScrollUp(newState);
+    case kGameFSM_TutorialFireMarble: return FSMTutorialFireMarble(newState);
+    case kGameFSM_TutorialGetSpecial: return FSMTutorialGetSpecial(newState);
+    case kGameFSM_TutorialGetRequired: return FSMTutorialGetRequired(newState);
     case kGameFSM_AimMode: return FSMAimMode(newState);
+    case kGameFSM_AimModeScrollToTop: return FSMAimModeScrollToTop(newState);
     case kGameFSM_BallInPlay: return FSMBallInPlay(newState);
     case kGameFSM_BallStuck: return FSMBallStuck(newState);
     case kGameFSM_CloseUp: return FSMCloseUp(newState);
@@ -57,7 +62,6 @@ enum GameMode_t FSMGetGameMode(void) {
 bool FSMGetBallInPlay(void) {
   return (m_FSM >= kGameFSM_BallInPlay && m_FSM <= kGameFSM_BallGutter);
 }
-
 
 void FSMDoCommonScrollTo(const int16_t destination, const float progress, const enum EasingFunction_t e) {
   const float so = gameGetYOffset();

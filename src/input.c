@@ -56,7 +56,7 @@ void inputHandleTitles(const enum FSM_t fsm, const uint32_t buttonPressed) {
 }
 
 void inputHandleGame(const enum FSM_t fsm, const uint32_t buttonPressed) {
-  if (kButtonB == buttonPressed && fsm == kGameFSM_AimMode) {
+  if (kButtonB == buttonPressed && (fsm == kGameFSM_AimMode || fsm == kGameFSM_TutorialScrollUp)) {
     FSMDo(kGameFSM_AimModeScrollToTop);
   } else if ((kButtonA == buttonPressed || kButtonDown == buttonPressed) && fsm == kGameFSM_ScoresAnimation) {
     FSMDo(kGameFSM_ScoresToSplash);

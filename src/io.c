@@ -158,6 +158,8 @@ void IOResetPlayerSave(const uint16_t player) {
   }
 }
 
+bool IOGetIsTutorial(void) { return (m_level == 0 && m_hole == 0); }
+
 uint16_t IOGetCurrentLevel(void) { return m_level; }
 
 uint16_t IOGetPreviousLevel(void) {
@@ -219,7 +221,8 @@ void IODoNextHoleWithLevelWrap(void) {
 }
 
 void IOSetCurrentHoleScore(const uint16_t score) {
-  if (score && score < m_persistent_data[m_player][m_level][m_hole]) {
+  if (!score) { return; }
+  if (!m_persistent_data[m_player][m_level][m_hole] || score < m_persistent_data[m_player][m_level][m_hole]) {
     m_persistent_data[m_player][m_level][m_hole] = score;
   }
 }
@@ -308,7 +311,7 @@ int IOShouldDecodeScan(json_decoder* jd, const char* key) {
 }
 
 void IODidDecodeScan(json_decoder* jd, const char* key, json_value value) {
-  pd->system->logToConsole("IODidDecodeScan deode %s", key);
+  // pd->system->logToConsole("IODidDecodeScan deode %s", key);
   if (strcmp(key, "par") == 0) {
     m_hole_par[m_level][m_hole] = json_intValue(value);
     // pd->system->logToConsole("m_hole_par[%i][%i] = %i", m_level, m_hole, m_hole_par[m_level][m_hole]);
@@ -338,7 +341,6 @@ void IODoScanLevels() {
   char filePath[128];
   for (int32_t l = 0; l < MAX_LEVELS; ++l) {
     m_level = l;
-    // bool abort = false;
     for (int32_t h = 0; h < MAX_HOLES; ++h) {
       m_hole = h;
       // snprintf(filePath, 128, "levels/fall_%i_hole_%i.json", 1, 1);
@@ -350,7 +352,6 @@ void IODoScanLevels() {
         SDFile* file = pd->file->open(filePath, kFileReadData);
       }
       if (!file) {
-        // if (!h) { abort = true; } // If missing the first fall of this level then stop looking here
         break;
       }
       static json_decoder jd = {
@@ -358,10 +359,10 @@ void IODoScanLevels() {
         .didDecodeTableValue = IODidDecodeScan,
         .shouldDecodeTableValueForKey = IOShouldDecodeScan
       };
+      pd->system->logToConsole("decoding header for level %i hole %i", m_level, m_hole);
       pd->json->decode(&jd, (json_reader){ .read = IODoRead, .userdata = file }, NULL);
       int status = pd->file->close(file);
     }
-    // if (abort) { break; }
   }
   m_level = 0;
   m_hole = 0;
@@ -385,15 +386,13 @@ void IODoScanLevels() {
 ////
 
 void IOWillDecodeLevel(json_decoder* jd, const char* key, json_value_type type) {
-
+  // pd->system->logToConsole("IOWillDecodeLevel %s", key);
   if (strcmp(key, m_nameStatic) == 0) {
-    pd->system->logToConsole("IOWillDecodeLevel %s", m_nameStatic);
     m_decodeType = kDecodeStatic;
     return;
   }
 
   if (strcmp(key, m_nameElliptic) == 0) {
-    pd->system->logToConsole("IOWillDecodeLevel %s", m_nameElliptic);
     m_decodeType = kDecodeElliptic;
     m_pegContainerID = 0;
     snprintf(m_namePegContainer, 128, "PegContainer%i", (int)m_pegContainerID+1);
@@ -401,7 +400,6 @@ void IOWillDecodeLevel(json_decoder* jd, const char* key, json_value_type type) 
   }
 
   if (strcmp(key, m_nameLinear) == 0) {
-    pd->system->logToConsole("IOWillDecodeLevel %s", m_nameLinear);
     m_decodeType = kDecodeLinear;
     m_pegContainerID = 0;
     snprintf(m_namePegContainer, 128, "PegContainer%i", (int)m_pegContainerID+1);
@@ -409,8 +407,6 @@ void IOWillDecodeLevel(json_decoder* jd, const char* key, json_value_type type) 
     snprintf(m_nameLineContainer, 128, "LineContainer%i", (int)m_lineContainerID+1);
     return;
   }
-
-  // pd->system->logToConsole("WILL DECODE %s looking for %s, diff is %i ", key, m_nameElliptic, strcmp(key, m_nameElliptic));
 }
 
 void IODidDecodeLevel(json_decoder* jd, const char* key, json_value value) {
@@ -546,7 +542,7 @@ void* IOFinishDecodeLevel(json_decoder* jd, const char* key, json_value_type typ
 
   if (strcmp(key, m_nameStatic) == 0) {
     boardDoAddStatic(&m_static);
-    pd->system->logToConsole("IOFinishDecodeLevel %s", m_nameStatic);
+    // pd->system->logToConsole("IOFinishDecodeLevel %s", m_nameStatic);
     m_staticID++;
     snprintf(m_nameStatic, 128, "StaticControl%i", (int)m_staticID+1);
     return NULL;
@@ -554,7 +550,7 @@ void* IOFinishDecodeLevel(json_decoder* jd, const char* key, json_value_type typ
 
   if (strcmp(key, m_nameElliptic) == 0) {
     boardDoAddWheel(&m_elliptic);
-    pd->system->logToConsole("IOFinishDecodeLevel %s", m_nameElliptic);
+    // pd->system->logToConsole("IOFinishDecodeLevel %s", m_nameElliptic);
     m_ellipticID++;
     snprintf(m_nameElliptic, 128, "EllipticControl%i", (int)m_ellipticID+1);
     return NULL;
@@ -562,21 +558,21 @@ void* IOFinishDecodeLevel(json_decoder* jd, const char* key, json_value_type typ
 
   if (strcmp(key, m_nameLinear) == 0) {
     boardDoAddLinear(&m_linear);
-    pd->system->logToConsole("IOFinishDecodeLevel %s", m_nameLinear);
+    // pd->system->logToConsole("IOFinishDecodeLevel %s", m_nameLinear);
     m_linearID++;
     snprintf(m_nameLinear, 128, "LinearControl%i", (int)m_linearID+1);
     return NULL;
   }
 
   if (strcmp(key, m_namePegContainer) == 0) {
-    pd->system->logToConsole("IOFinishDecodeLevel %s", m_namePegContainer);
+    // pd->system->logToConsole("IOFinishDecodeLevel %s", m_namePegContainer);
     m_pegContainerID++;
     snprintf(m_namePegContainer, 128, "PegContainer%i", (int)m_pegContainerID+1);
     return NULL;
   }
 
   if (strcmp(key, m_nameLineContainer) == 0) {
-    pd->system->logToConsole("IOFinishDecodeLevel %s", m_nameLineContainer);
+    // pd->system->logToConsole("IOFinishDecodeLevel %s", m_nameLineContainer);
     m_lineContainerID++;
     snprintf(m_nameLineContainer, 128, "LineContainer%i", (int)m_lineContainerID+1);
     return NULL;

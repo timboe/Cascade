@@ -36,13 +36,13 @@ void gameDoResetPreviousWaterfall(void) { m_previousWaterfall = IOGetWaterfallFo
 int gameLoop(void* _data) {
   pd->graphics->setBackgroundColor(kColorBlack);
 
+#ifdef TAKE_SCREENSHOTS
   if (screenShotGetInProgress()) {
     screenShotDo();
     ++m_frameCount;
     return 1;
   }
 
-#ifdef TAKE_SCREENSHOTS
   static bool doingScreenshots = true;
   if (doingScreenshots && !IOGetIsPreloading()) {
     static bool first = true; // Don't increment the level on the first call
@@ -60,6 +60,7 @@ int gameLoop(void* _data) {
     inputSetCrankAngle(180.0f);
     FSMDo(kGameFSM_DisplaySplash); // To load the level
     FSMDo(kGameFSM_AimMode); // To be rendering the level
+    boardDoUpdate(); // To have called update at least once on elliptic and line peg paths
     screenShotInit();
     return 1;
   }
@@ -85,13 +86,15 @@ int gameLoop(void* _data) {
 }
 
 void menuOptionsCallbackResetSave(void* toReset) {
-  pdxlog("menuOptionsCallbackResetSave");
-  IOResetPlayerSave(*(uint16_t*)toReset);
+  pd->system->logToConsole("menuOptionsCallbackResetSave %i", (uintptr_t)toReset);
+  IOResetPlayerSave((uintptr_t)toReset);
 }
 
 void menuOptionsCallbackQuitHole(void* _unused) {
-  pdxlog("menuOptionsCallbackQuitHole");
-  // TODO
+  pd->system->logToConsole("menuOptionsCallbackQuitHole");
+  // TODO - insert a fade out or wipe here?
+  gameSetYOffset(DEVICE_PIX_Y*3, true);
+  FSMDo(kTitlesFSM_ChooseHole);
 }
 
 void menuOptionsCallbackAudio(void* userData) {

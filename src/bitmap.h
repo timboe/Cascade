@@ -29,6 +29,9 @@ LCDBitmap* bitmapGetStencilWipe(const int8_t n);
 LCDBitmap* bitmapGetDither(void);
 LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int16_t offset);
 
+LCDBitmap* bitmapGetTutorialCrank(const uint8_t id);
+LCDBitmap* bitmapGetTutorialButton(const uint8_t id);
+
 LCDBitmap* bitmapGetTitlePlayer(void);
 LCDBitmap* bitmapGetTitleLevel(void);
 LCDBitmap* bitmapGetTitleLevelStats(void);
@@ -46,8 +49,8 @@ LCDBitmap* bitmapGetLevelTitle(void);
 LCDBitmap* BitmapGetScoreHistogram(void);
 
 LCDBitmap* bitmapGetPeg(const struct Peg_t* p);
-LCDBitmap* bitmapGetBall(void);
-LCDBitmap* bitmapGetBallFirePoot(const uint8_t i);
+LCDBitmap* bitmapGetMarble(void);
+LCDBitmap* bitmapGetMarbleFirePoot(const uint8_t i);
 
 LCDBitmap* bitmapGetStar(const uint8_t type, const uint8_t angle);
 

@@ -61,7 +61,7 @@ bool FSMCommonFocusOnLowestBallInPlay(const enum PegSpecial_t special) {
   if (gutterd) {
     uint8_t whichBall = 0;
     if (y == ballPos[1].y) { whichBall = 1; }
-    renderDoTriggerSplash(whichBall, ballPos[whichBall].x);
+    if (special != kPegSpecialSecondTry) renderDoTriggerSplash(whichBall, ballPos[whichBall].x);
   }
   return gutterd;
 }
@@ -128,16 +128,45 @@ void FSMSplashToStart(const bool newState) {
   }
   float progress = getEasing(kEaseInOutQuint, 1.0f - (float)timer/TIME_SPLASH_TO_GAME);
   gameSetYOffset((-DEVICE_PIX_Y - TURRET_RADIUS) * progress, true);
-  if (timer++ == TIME_SPLASH_TO_GAME) { return FSMDo(kGameFSM_AimMode); }
+  if (timer++ == TIME_SPLASH_TO_GAME) { 
+    if (IOGetIsTutorial()) { return FSMDo(kGameFSM_TutorialScrollDown); }
+    else { return FSMDo(kGameFSM_AimMode); }
+  }
 }
 
-void FSMAimModeScrollToTop(const bool newState) {
+void FSMTutorialScrollDown(const bool newState) {
   static uint16_t timer = 0;
   if (newState) { timer = 0; }
-  const float progress = getEasing(kEaseInOutQuint, 1.0f - (float)timer/TIME_AIM_SCROLL_TO_TOP);
-  gameSetYOffset(gameGetMinimumY() + ((gameGetYOffset() - gameGetMinimumY())*progress), true);
-  FSMCommonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
-  if (timer++ == TIME_AIM_SCROLL_TO_TOP) { return FSMDo(kGameFSM_AimMode); }
+
+  FSMCommonTurretScrollAndBounceBack(true); // allow control = true
+  const float scrollOffsetMax = IOGetCurrentHoleHeight() - DEVICE_PIX_Y; 
+  if (gameGetYOffset() > scrollOffsetMax) { ++timer; }
+  if (timer > TICK_FREQUENCY/2) { FSMDo(kGameFSM_TutorialScrollUp); }
+}
+
+void FSMTutorialScrollUp(const bool newState) {
+  static uint16_t timer = 0;
+  if (newState) { timer = 0; }
+
+  FSMCommonTurretScrollAndBounceBack(true); // allow control = true
+  if (gameGetYOffset() < 4) { ++timer; }
+  if (timer > TICK_FREQUENCY/2) { FSMDo(kGameFSM_TutorialFireMarble); }
+}
+
+void FSMTutorialFireMarble(const bool newState) {
+  if (newState) {
+    gameSetYOffset(0, true);
+  }
+
+  FSMCommonTurretScrollAndBounceBack(true); // allow control = FALSE, while in the tutorial
+
+}
+
+void FSMTutorialGetSpecial(const bool newState) {
+
+}
+
+void FSMTutorialGetRequired(const bool newState) {
 
 }
 
@@ -165,6 +194,18 @@ void FSMAimMode(const bool newState) {
     timer = 0;
   }
   renderSetBallPootCircle((uint16_t)(progress * TURRET_RADIUS));
+}
+
+void FSMAimModeScrollToTop(const bool newState) {
+  static uint16_t timer = 0;
+  if (newState) { timer = 0; }
+  const float progress = getEasing(kEaseInOutQuint, 1.0f - (float)timer/TIME_AIM_SCROLL_TO_TOP);
+  gameSetYOffset(gameGetMinimumY() + ((gameGetYOffset() - gameGetMinimumY())*progress), true);
+  FSMCommonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
+  if (timer++ == TIME_AIM_SCROLL_TO_TOP) { 
+    if (IOGetIsTutorial() && m_ballCount == 0) { return FSMDo(kGameFSM_TutorialFireMarble); }
+    else return FSMDo(kGameFSM_AimMode);
+  }
 }
 
 void FSMBallInPlay(const bool newState) {
@@ -335,10 +376,12 @@ void FSMGutterToTurret(const bool newState) {
   const int16_t minimumY = gameGetMinimumY();
   // Take less time overall when we get lower down
   const float distance_mod = startY / (float)(startY - minimumY);
+  // Take less time on smaller levels
+  const float height_mod = (float)(DEVICE_PIX_Y * WF_MAX_HEIGHT) / IOGetCurrentHoleHeight();
   //
   FSMCommonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
   //
-  progress += (TIMESTEP * END_SWEEP_SCALE * distance_mod);
+  progress += (TIMESTEP * END_SWEEP_SCALE * distance_mod * height_mod);
   float easedProgress = getEasing(kEaseInOutSine, progress);
   easedProgress = (1.0f - easedProgress);
   const float tarIOGetPartial = minimumY + ((startY - minimumY) * easedProgress);
@@ -356,12 +399,12 @@ void FSMGutterToTurret(const bool newState) {
 
 void FSMGutterToScores(const bool newState) {
   static int16_t timer = 0;
-  if (newState) { timer = 0; }
-  FSMDoCommonScrollTo(DEVICE_PIX_Y * 5, (float)timer/TIME_GUTTER_TO_SCORE, kEaseOutSine);
-  if (timer++ == TIME_GUTTER_TO_SCORE) {
+  if (newState) { 
+    timer = 0;
     renderSetBallFallN(0);
-    return FSMDo(kGameFSM_ScoresAnimation);
   }
+  FSMDoCommonScrollTo(DEVICE_PIX_Y * 5, (float)timer/TIME_GUTTER_TO_SCORE, kEaseOutSine);
+  if (timer++ == TIME_GUTTER_TO_SCORE) { return FSMDo(kGameFSM_ScoresAnimation); }
 }
 
 void FSMScoresAnimation(const bool newState) {
@@ -382,12 +425,12 @@ void FSMScoresAnimation(const bool newState) {
       py[i] = -2*BALL_RADIUS*(i + 1);
       renderSetBallFallY(i, py[i]);
     }
-    pd->system->logToConsole("kGameFSM_ScoresAnimation, ballsToShow %i", ballsToShow);
     IOSetCurrentHoleScore(m_ballCount);
+    // pd->system->logToConsole("kGameFSM_ScoresAnimation, ballsToShow %i. Current hole score is %i", ballsToShow, IOGetCurrentHoleScore());
   }
   //
   for (int i = 0; i < activeBalls; ++i) {
-    const float floorY = BUF+(maxBallsToShow -1 - i)*2*BALL_RADIUS;
+    float floorY = BUF + ((maxBallsToShow - 1 - i)*2*BALL_RADIUS);
     if (py[i] >= floorY) {
       py[i] = floorY;
     } else {
