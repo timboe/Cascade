@@ -3,6 +3,7 @@ extends Node2D
 const BALL_RADIUS : float = 8.0
 const BOX_WIDTH : float = 22.5
 const BOX_HEIGHT : float = 12.5
+const HEX_WIDTH : float = 22.5/2
 const LINE_WIDTH : float = 2.0
 
 const PLAYDATE_WIDTH : int = 400
@@ -35,13 +36,30 @@ func lineColor(type : int) -> Color:
 	
 func renderPeg(circ : bool, x : int, y : int, a : float, size : int, type : int) -> void:
 	var s := sizeToScale(size)
-	if circ: renderCirc(x, y, s, type)
+	if type == 2: renderRegularPoly(6, x, y, a, s, type)
+	elif circ: renderCirc(x, y, s, type)
 	else: renderRect(x, y, a, s, type)
 	
 func renderCirc(x : int, y : int, s : float, type : int) -> void:
 	draw_circle(Vector2(x, y), BALL_RADIUS*s, fillColor(type))
 	draw_arc(Vector2(x, y), BALL_RADIUS*s, 0, 2*PI, 128, lineColor(type), LINE_WIDTH)
 	
+
+func renderRegularPoly(corners : int, x : int, y : int, a : float, s : float, type : int) -> void:
+	var points : PackedVector2Array
+	var angleAdvance = (2*PI) / corners
+	var w2 = HEX_WIDTH * s
+	var h2 = HEX_WIDTH * s
+	for p in range(corners):
+		var angle = (angleAdvance * p) + a
+		var vp : Vector2
+		vp.x = x + (w2 * cos(angle))
+		vp.y = y + (h2 * sin(angle))
+		points.append(vp)
+	points.append( points[0] )
+	draw_polygon(points, [fillColor(type)])
+	draw_polyline(points, lineColor(type), LINE_WIDTH)
+
 func renderRect(x : int, y : int, a : float, s : float, type : int) -> void:
 	var ca := cos(a)
 	var sa := sin(a)
