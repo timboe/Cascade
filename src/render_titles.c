@@ -38,7 +38,7 @@ void commonRenderBackgroundWaterfallWithAnim(const bool locked, const uint8_t of
   }
 }
 
-void renderTitlesSplash(void) {
+void renderTitlesHeader(void) {
   for (int i = 0; i < 4; ++i) {
     pd->graphics->drawBitmap(bitmapGetWfFg(0, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
   }
@@ -47,7 +47,7 @@ void renderTitlesSplash(void) {
   pd->graphics->drawText(VERSION, 8, kUTF8Encoding, 8, DEVICE_PIX_Y-16);
   pd->graphics->drawText("Tim Martin, 2024", 32, kUTF8Encoding, 8, 4);
   pd->graphics->setDrawMode(kDrawModeCopy);
-  pd->graphics->drawBitmap(bitmapGetTitleSplash(), 0, 0, kBitmapUnflipped);
+  pd->graphics->drawBitmap(bitmapGetTitleHeaderImage(), 0, 0, kBitmapUnflipped);
 
   if (IOGetIsPreloading()) {
     const float progress = IOGetPreloadingProgress();
@@ -188,7 +188,12 @@ void renderTitlesHoleSelect(const bool locked) {
   }
 }
 
+void renderTitlesWfPond(void) {
+  const float parallax = gameGetParalaxFactorNear(false) - gameGetParalaxFactorNearForY(false, DEVICE_PIX_Y*4); // Hard = false
+  pd->graphics->drawBitmap(bitmapGetWfPond(), 0, DEVICE_PIX_Y*4 + parallax, kBitmapUnflipped);
+}
+
 void renderTitlesTransitionLevelSplash(void) {
-  const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y*4); // Hard = true
-  pd->graphics->drawBitmap(bitmapGetLevelSplash(), 0, DEVICE_PIX_Y*4 + parallax, kBitmapUnflipped);
+  const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y*5); // Hard = true
+  pd->graphics->drawBitmap(bitmapGetLevelTitle(), 0, DEVICE_PIX_Y*5 + parallax, kBitmapUnflipped);
 }

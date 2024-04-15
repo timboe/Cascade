@@ -36,10 +36,11 @@ void renderSetNumeralOffset(const float no);
 
 void renderDoResetBallTrace(void);
 
-void renderTitlesSplash(void);
+void renderTitlesHeader(void);
 void renderTitlesPlayerSelect(const bool locked);
 void renderTitlesLevelSelect(const bool locked);
 void renderTitlesHoleSelect(const bool locked);
+void renderTitlesWfPond(void);
 void renderTitlesTransitionLevelSplash(void);
 
 void renderGameBall(const int32_t fc);

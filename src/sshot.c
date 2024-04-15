@@ -33,7 +33,6 @@ void saveLCDBitmapHeader(SDFile* _file, LCDBitmap* _bitmap);
 
 bool saveLCDBitmapToFile(SDFile* _file);
 
-void ssInit(void);
 void ssRender(void);
 void ssEncode(void) ;
 void ssWrite(void);
@@ -43,24 +42,27 @@ void ssWrite(void);
 bool screenShotGetInProgress(void) { return m_ssInProgress; }
 
 void screenShotDo() {
-  if (!m_ssInProgress) { ssInit(); }
+  if (!m_ssInProgress) {
+    pd->system->error("called screenShotDo with no screen shot in progress");
+    return;
+  }
   if (m_doRender) { 
     ssRender();
   } else { 
     ssEncode();
-    if (++m_yOffsetSS == WFALL_HEIGHT) { 
+    if (++m_yOffsetSS == WFALL_MAX_HEIGHT) { 
       ssWrite();
     }
   }
 }
 
-void ssInit(void) {
+void screenShotInit(void) {
   pd->system->logToConsole("ssInit frame %i", gameGetFrameCount());
   char filePath[128];
   snprintf(filePath, 128, "level_%i_hole_%i.bmp", IOGetCurrentLevel()+1, IOGetCurrentHole()+1);
   m_imageFile = pd->file->open(filePath, kFileWrite);
  
-  m_imageBitmap = pd->graphics->newBitmap(DEVICE_PIX_X, WF_PIX_Y, kColorWhite);
+  m_imageBitmap = pd->graphics->newBitmap(DEVICE_PIX_X, IOGetCurrentHoleHeight(), kColorWhite);
 
   m_pixIndex = 0;
   m_pixWidth = 0;
@@ -76,15 +78,13 @@ void ssInit(void) {
 }
 
 void ssRender(void) {
-  pd->system->logToConsole("ssRender, y=%i frame %i", m_yOffsetSS, gameGetFrameCount());
   gameSetYOffset(DEVICE_PIX_Y * m_yOffsetSS, true);
   pd->graphics->setDrawOffset(0, -DEVICE_PIX_Y * m_yOffsetSS);
-  renderDo(gameGetFrameCount(), FSMGetGameMode(), FSMGet());
+  renderDo(gameGetFrameCount(), FSMGet(), FSMGetGameMode());
   m_doRender = false;
 }
 
 void ssEncode(void) {
-  pd->system->logToConsole("ssEncode, y=%i frame %i", m_yOffsetSS, gameGetFrameCount());
   LCDBitmap* frame = pd->graphics->getDisplayBufferBitmap(); // Not owned
   pd->graphics->pushContext(m_imageBitmap);
   pd->graphics->drawBitmap(frame, 0, DEVICE_PIX_Y * m_yOffsetSS, kBitmapUnflipped);
@@ -93,7 +93,6 @@ void ssEncode(void) {
 }
 
 void ssWrite(void) {
-  pd->system->logToConsole("ssWrite, frame %i", gameGetFrameCount());
   bool finished = false;
   while (!finished) { finished = saveLCDBitmapToFile(m_imageFile); }
   pd->file->close(m_imageFile);
@@ -102,7 +101,6 @@ void ssWrite(void) {
   m_imageBitmap = NULL;
   m_ssInProgress = false;
 }
-
 
 void saveLCDBitmapHeader(SDFile* _file, LCDBitmap* _bitmap) {
   const int32_t fileHeaderLength = 14;

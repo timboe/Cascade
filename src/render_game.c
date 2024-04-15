@@ -4,6 +4,7 @@
 #include "board.h"
 #include "peg.h"
 #include "sshot.h"
+#include "io.h"
 
 uint16_t m_ballPootRadius = 0.0f;
 
@@ -49,7 +50,8 @@ void renderDoAddStar(const uint8_t ball) {
     const float ang =  (rand() % 180) * M_PIf;
     m_starType[s] = rand() % 2;
     m_starPos[s] = cpBodyGetPosition(cpBall);
-    m_starVel[s] = cpvadd( cpBodyGetVelocity(cpBall), cpv(STAR_STRENGTH * cosf(ang), -STAR_STRENGTH * sinf(ang) * 2) );
+    m_starVel[s] = cpv(STAR_STRENGTH * cosf(ang), -STAR_STRENGTH * sinf(ang) * 2);
+    // m_starVel[s] = cpvadd( cpBodyGetVelocity(cpBall), m_starVel[s] );
     m_starVel[s] = cpvmult( m_starVel[s], TIMESTEP );
     m_starAng[s] = rand() % 128;
     return;
@@ -226,10 +228,12 @@ void renderGameBackground(void) {
   // NOTE: Need to draw one extra background due to animation
   for (uint32_t i = start; i < start+6; ++i) {
     if (i >= (WFSHEET_SIZE_Y - 2)) break;
+    if (WF_DIVISION_PIX_Y * i > IOGetCurrentHoleHeight()) { break; }
     pd->graphics->drawBitmap(bitmapGetWfBg(wf), WF_BG_OFFSET[wf], (WF_DIVISION_PIX_Y * i) - wfOff + parallax, kBitmapUnflipped);
   }
   for (uint32_t i = start; i < start+5; ++i) {
     LCDBitmap* bm = bitmapGetWfFg(wf, 0, i);
+    if (WF_DIVISION_PIX_Y * i > IOGetCurrentHoleHeight()) { break; }
     if (bm) pd->graphics->drawBitmap(bm, 0, (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
   }
 
@@ -240,17 +244,17 @@ void renderGameBackground(void) {
   }
 
   if (gameGetYOffset() <= -TURRET_RADIUS) { // Note no parallax here
-    pd->graphics->drawBitmap(bitmapGetLevelSplash(), 0, -DEVICE_PIX_Y - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
+    pd->graphics->drawBitmap(bitmapGetLevelTitle(), 0, -DEVICE_PIX_Y - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
   }
 }
 
 void renderGameGutter(void) {
-  const int32_t gutterY = WF_PIX_Y;
+  const int32_t gutterY = IOGetCurrentHoleHeight();
   const float pfn = gameGetParalaxFactorNear(true);
-  const int32_t parallaxPond = pfn - gameGetParalaxFactorNearForY(true, WF_PIX_Y - DEVICE_PIX_Y); // Note: float -> int here. Hard = true
+  const int32_t parallaxPond = pfn - gameGetParalaxFactorNearForY(true, gutterY - DEVICE_PIX_Y); // Note: float -> int here. Hard = true
   const int32_t so = gameGetYOffset();
 
-  if (so > gutterY + parallaxPond - DEVICE_PIX_Y && FSMGet() != kGameFSM_ScoresToTitle) {
+  if (so > gutterY + parallaxPond - DEVICE_PIX_Y) {
     pd->graphics->drawBitmap(bitmapGetWfPond(), 0, gutterY + parallaxPond, kBitmapUnflipped);
     pd->graphics->drawRect(0, gutterY, DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
     pd->graphics->drawRect(1, gutterY + 1, DEVICE_PIX_X-2, DEVICE_PIX_Y-2, kColorBlack);
@@ -270,17 +274,17 @@ void renderGameGutter(void) {
   }
 
   //Note no parallax here
-  if (so > WF_PIX_Y) {
-    pd->graphics->drawBitmap(BitmapGetScoreHistogram(), 0, WF_PIX_Y + DEVICE_PIX_Y, kBitmapUnflipped);
+  if (so > DEVICE_PIX_Y * 4) {
+    pd->graphics->drawBitmap(BitmapGetScoreHistogram(), 0, DEVICE_PIX_Y * 5, kBitmapUnflipped);
     for (int i = 0; i < m_ballFallN; ++i) {
       pd->graphics->drawBitmap(bitmapGetBall(),
         BUF + BALL_RADIUS/2 + m_ballFallX*3*BALL_RADIUS,
-        WF_PIX_Y + DEVICE_PIX_Y + m_ballFallY[i],
+        (DEVICE_PIX_Y * 5) + m_ballFallY[i],
         kBitmapUnflipped);
     }
   }
 
-  if (so > WF_PIX_Y + DEVICE_PIX_Y) {
-    pd->graphics->drawBitmap(bitmapGetLevelSplash(), 0, WF_PIX_Y + (2*DEVICE_PIX_Y), kBitmapUnflipped);
+  if (so > DEVICE_PIX_Y * 5) {
+    pd->graphics->drawBitmap(bitmapGetLevelTitle(), 0, DEVICE_PIX_Y * 6, kBitmapUnflipped);
   }
 }

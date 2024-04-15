@@ -108,8 +108,8 @@ void boardDoRandomise(void) {
 
   for (int i = 0; i < maxStatic; ++i) {
     struct StaticLoader_t staticLoader;
-    staticLoader.x = rand() % WF_PIX_X;
-    staticLoader.y = (rand() % WF_PIX_Y) + TURRET_RADIUS;
+    staticLoader.x = rand() % DEVICE_PIX_X;
+    staticLoader.y = (rand() % IOGetCurrentHoleHeight()) - TURRET_RADIUS;
     staticLoader.angle = (M_2PIf / 256.0f) * (rand() % 256);
     // staticLoader.angle = 0;
     // staticLoader.angle = (M_2PIf / 30) * (rand() % 256);
@@ -122,13 +122,13 @@ void boardDoRandomise(void) {
   }
 
   struct StaticLoader_t staticLoader = {0};
-  staticLoader.x = WF_PIX_X/2;
+  staticLoader.x = DEVICE_PIX_X/2;
   staticLoader.y = DEVICE_PIX_Y;
   staticLoader.type = kPegTypeRequired;
   boardDoAddStatic(&staticLoader);  
 
   struct StaticLoader_t staticLoader2 = {0};
-  staticLoader2.x = WF_PIX_X/4;
+  staticLoader2.x = DEVICE_PIX_X/4;
   staticLoader2.y = DEVICE_PIX_Y/2;
   staticLoader2.type = kPegTypeSpecial;
   boardDoAddStatic(&staticLoader2);  
@@ -140,8 +140,8 @@ void boardDoRandomise(void) {
   #define WHEELS 2
   for (int wheelStep = 0; wheelStep < WHEELS; ++wheelStep) {
     struct EllipticLoader_t ellipticLoader = {0};
-    ellipticLoader.x = rand() % WF_PIX_X;
-    ellipticLoader.y = (rand() % WF_PIX_Y) + TURRET_RADIUS;
+    ellipticLoader.x = rand() % DEVICE_PIX_X;
+    ellipticLoader.y = (rand() % IOGetCurrentHoleHeight()) - TURRET_RADIUS;
     ellipticLoader.a = 64 + rand() % 32;
     ellipticLoader.b = 64 + rand() % 32;
     ellipticLoader.shape = (rand() % 2 ? kPegShapeBall : kPegShapeRect);
@@ -164,8 +164,8 @@ void boardDoRandomise(void) {
   // #define PATHS 1
   // for (int pathStep = 0; pathStep < PATHS; ++pathStep) {
   //   struct LinearLoader_t linearLoader;
-  //   linearLoader.x = rand() % WF_PIX_X;
-  //   linearLoader.y = (rand() % WF_PIX_Y) + TURRET_RADIUS;
+  //   linearLoader.x = rand() % DEVICE_PIX_X;
+  //   linearLoader.y = (rand() % IOGetCurrentHoleHeight()) - TURRET_RADIUS;
   //   linearLoader.nPegs = PEGS_PER_PATH;
   //   for (int i = 0; i < PEGS_PER_PATH; ++i) { 
   //     linearLoader.types[i] = kPegTypeNormal;

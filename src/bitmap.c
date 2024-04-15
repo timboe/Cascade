@@ -34,7 +34,7 @@ const static LCDPattern kHatchedPattern = {
 // Titiles
 
 LCDBitmap* m_titleSelected;
-LCDBitmap* m_splash;
+LCDBitmap* m_headerImage;
 
 LCDBitmap* m_playerBitmap;
 LCDBitmap* m_levelBitmap;
@@ -60,7 +60,7 @@ LCDBitmap* m_turretBody;
 LCDBitmap* m_turretBarrel[8][256];
 LCDBitmapTable* m_turretBarrelTabel;
 LCDBitmap* m_infoTopperBitmap;
-LCDBitmap* m_levelSplashBitmap;
+LCDBitmap* m_levelTitleBitmap;
 
 LCDBitmap* m_numeralBitmap[10];
 LCDBitmap* m_cardBitmap;
@@ -151,21 +151,36 @@ void bitmapDoDrawOutlineText(const char text[], const uint16_t textSize, int16_t
   pd->graphics->drawText(text, 128, kUTF8Encoding, x, y);
 }
 
-void bitmapDoUpdateLevelSplash(void) {
-  pd->graphics->clearBitmap(m_levelSplashBitmap, kColorBlack);
-  pd->graphics->pushContext(m_levelSplashBitmap);
+void bitmapDoUpdateLevelTitle(void) {
+  pd->graphics->clearBitmap(m_levelTitleBitmap, kColorBlack);
+  pd->graphics->pushContext(m_levelTitleBitmap);
   char text[128];
+  const bool hasTitle = (strlen(IOGetCurrentHoleName()) > 0);
+  uint16_t yA = 0;
+  uint16_t yB = 0;
+  uint16_t yC = 128+32;
+  if (hasTitle) {
+    yA = 16;
+    yB = 32+8;
+    yC = 128+64;
+    snprintf(text, 128, "%s", IOGetCurrentHoleName());
+    const int32_t w0 = pd->graphics->getTextWidth(bitmapGetRoobert24(), text, 128, kUTF8Encoding, 0);
+    bitmapSetRoobert24();
+    pd->graphics->setDrawMode(kDrawModeFillWhite);
+    pd->graphics->drawText(text, 128, kUTF8Encoding, DEVICE_PIX_X/2 - w0/2, yA);
+  }
+  //
   snprintf(text, 128, "%i~%i", (int)IOGetCurrentLevel() + 1, (int)IOGetCurrentHole() + 1);
   const int32_t w1 = pd->graphics->getTextWidth(bitmapGetGreatVibes109(), text, 128, kUTF8Encoding, 0);
   bitmapSetGreatVibes109();
   pd->graphics->setDrawMode(kDrawModeFillBlack);
-  bitmapDoDrawOutlineText(text, 128, DEVICE_PIX_X/2 - w1/2, 0, 4);
+  bitmapDoDrawOutlineText(text, 128, DEVICE_PIX_X/2 - w1/2, yB, 4);
   //
   snprintf(text, 128, "PAR %i", (int)IOGetCurrentHolePar());
   const int32_t w2 = pd->graphics->getTextWidth(bitmapGetRoobert24(), text, 128, kUTF8Encoding, 0);
   bitmapSetRoobert24();
   pd->graphics->setDrawMode(kDrawModeFillWhite);
-  pd->graphics->drawText(text, 128, kUTF8Encoding, DEVICE_PIX_X/2 - w2/2, 128+32);
+  pd->graphics->drawText(text, 128, kUTF8Encoding, DEVICE_PIX_X/2 - w2/2, yC);
   pd->graphics->popContext();
 }
 
@@ -178,8 +193,11 @@ void bitmapDoUpdateGameInfoTopper(void) {
   pd->graphics->setDrawMode(kDrawModeFillWhite);
   pd->graphics->drawText(text, 128, kUTF8Encoding, 0, 8);
   bitmapSetRoobert24();
-  const int32_t width = pd->graphics->getTextWidth(bitmapGetRoobert24(), "By Tim Martin", 128, kUTF8Encoding, 0);
-  pd->graphics->drawText("By Tim Martin", 128, kUTF8Encoding, DEVICE_PIX_X - width, 2);
+  if (strlen(IOGetCurrentHoleAuthor()) > 0){
+    snprintf(text, 128, "BY %s", IOGetCurrentHoleAuthor());
+    const int32_t width = pd->graphics->getTextWidth(bitmapGetRoobert24(), text, 128, kUTF8Encoding, 0);
+    pd->graphics->drawText(text, 128, kUTF8Encoding, DEVICE_PIX_X - width, 2);
+  }
   pd->graphics->popContext();
 }
 
@@ -187,7 +205,7 @@ LCDBitmap* bitmapGetBallFirePoot(const uint8_t i) { return m_pootAnimation[i]; }
 
 LCDBitmap* bitmapGetUseTheCrank(void) { return m_useTheCrankBitmap; }
 
-LCDBitmap* bitmapGetTitleSplash(void) { return m_splash; }
+LCDBitmap* bitmapGetTitleHeaderImage(void) { return m_headerImage; }
 
 LCDBitmap* bitmapGetWfPond(void) { return m_wfPond; }
 
@@ -231,12 +249,18 @@ LCDBitmap* bitmapGetDither(void) { return m_ditherBitmap; }
 
 LCDBitmap* bitmapGetStar(const uint8_t type, const uint8_t angle) { return m_starBitmap[type][angle % 128]; }
 
-LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int16_t offset) { 
-  offset = offset % (DEVICE_PIX_Y*2);
+LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int16_t offset) {
+  pd->graphics->clearBitmap(m_previewBitmapWindow, kColorBlack);
   pd->graphics->pushContext(m_previewBitmapWindow);
   pd->graphics->setDrawMode(kDrawModeInverted);
-  pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, offset, kBitmapUnflipped);
-  pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, offset - (DEVICE_PIX_Y*2), kBitmapUnflipped);
+  if (IOGetCurrentHoleHeight() <= DEVICE_PIX_Y*2) {
+    offset = (DEVICE_PIX_Y - (IOGetCurrentHoleHeight()/2)) / 2;
+    pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, offset, kBitmapUnflipped);
+  } else {
+    offset = offset % (DEVICE_PIX_Y*2);
+    pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, offset, kBitmapUnflipped);
+    pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, offset - (DEVICE_PIX_Y*2), kBitmapUnflipped);
+  }
   pd->graphics->popContext();
   return m_previewBitmapWindow;
 }
@@ -261,7 +285,7 @@ LCDBitmap* bitmapGetTurretBody(void) { return m_turretBody; }
 
 LCDBitmap* bitmapGetGameInfoTopper(void) { return m_infoTopperBitmap; }
 
-LCDBitmap* bitmapGetLevelSplash(void) { return m_levelSplashBitmap; }
+LCDBitmap* bitmapGetLevelTitle(void) { return m_levelTitleBitmap; }
 
 LCDBitmap* bitmapGetTurretBarrel(void) {
   return m_turretBarrel[(gameGetFrameCount() % 32) / 4][ angToByte(gameGetTurretBarrelAngle()) ];
@@ -520,7 +544,7 @@ void bitmapDoPreloadA(void) {
   pd->graphics->setFont(m_fontGreatvibes24);
 
   m_infoTopperBitmap = pd->graphics->newBitmap(DEVICE_PIX_X, TITLETEXT_HEIGHT, kColorClear);
-  m_levelSplashBitmap = pd->graphics->newBitmap(DEVICE_PIX_X, DEVICE_PIX_Y, kColorClear);
+  m_levelTitleBitmap = pd->graphics->newBitmap(DEVICE_PIX_X, DEVICE_PIX_Y, kColorClear);
   m_scoreHistogram = pd->graphics->newBitmap(DEVICE_PIX_X, DEVICE_PIX_Y, kColorBlack);
 
   m_levelStatsBitmap = pd->graphics->newBitmap(NUMERAL_PIX_X*2, TITLETEXT_HEIGHT, kColorClear);
@@ -596,15 +620,15 @@ void bitmapDoPreloadF(void) {
 void bitmapDoPreloadG(const uint8_t size) {
   const float scale = bitmapSizeToScale(size);
   for (int32_t iAngle = 0; iAngle < 128; ++iAngle) {
-    m_rectBitmap[0][size][iAngle] = pd->graphics->newBitmap(BOX_MAX*2*scale, BOX_MAX*2*scale, kColorClear);
+    m_rectBitmap[0][size][iAngle] = pd->graphics->newBitmap(BOX_HALF_MAX*2*scale, BOX_HALF_MAX*2*scale, kColorClear);
     pd->graphics->pushContext(m_rectBitmap[0][size][iAngle]);
-    bitmapDoDrawRotatedRect(BOX_MAX * scale, BOX_MAX * scale, (BOX_WIDTH/2) * scale, (BOX_HEIGHT/2) * scale, iAngle, kRenderColorWhite);
-    // pd->graphics->drawRect(0, 0, BOX_MAX*2*scale, BOX_MAX*2*scale, kColorWhite);
+    bitmapDoDrawRotatedRect(BOX_HALF_MAX * scale, BOX_HALF_MAX * scale, (BOX_HALF_WIDTH/2) * scale, (BOX_HALF_HEIGHT/2) * scale, iAngle, kRenderColorWhite);
+    // pd->graphics->drawRect(0, 0, BOX_HALF_MAX*2*scale, BOX_HALF_MAX*2*scale, kColorWhite);
     pd->graphics->popContext();
-    m_rectBitmap[1][size][iAngle] = pd->graphics->newBitmap(BOX_MAX*2*scale, BOX_MAX*2*scale, kColorClear);
+    m_rectBitmap[1][size][iAngle] = pd->graphics->newBitmap(BOX_HALF_MAX*2*scale, BOX_HALF_MAX*2*scale, kColorClear);
     pd->graphics->pushContext(m_rectBitmap[1][size][iAngle]);
-    bitmapDoDrawRotatedRect(BOX_MAX * scale, BOX_MAX * scale, (BOX_WIDTH/2) * scale, (BOX_HEIGHT/2) * scale, iAngle, kRenderColorGrey);
-    // pd->graphics->drawRect(0, 0, BOX_MAX*2*scale, BOX_MAX*2*scale, kColorWhite);
+    bitmapDoDrawRotatedRect(BOX_HALF_MAX * scale, BOX_HALF_MAX * scale, (BOX_HALF_WIDTH/2) * scale, (BOX_HALF_HEIGHT/2) * scale, iAngle, kRenderColorGrey);
+    // pd->graphics->drawRect(0, 0, BOX_HALF_MAX*2*scale, BOX_HALF_MAX*2*scale, kColorWhite);
     pd->graphics->popContext();
   }
 }
@@ -723,7 +747,7 @@ void bitmapDoPreloadL(const uint8_t star) {
 
 void bitmapDoInit(void) {
   // Load critical bitmaps
-  m_splash = bitmapDoLoadImageAtPath("images/splash");
+  m_headerImage = bitmapDoLoadImageAtPath("images/splash");
   m_wfBg[0] = bitmapDoLoadImageAtPath("images/falls0_bg");
   m_sheetWfFg[0] = bitmapDoLoadImageTableAtPath("images/falls0_fg");
 }

@@ -36,6 +36,7 @@ void IOGetHoleStatistics(const uint16_t level, uint16_t hole, uint16_t* score, u
 
 void IODoPreviousHole(void);
 void IODoNextHole(void);
+void IODoNextHoleWithLevelWrap(void);
 
 void IOSetCurrentHoleScore(const uint16_t score);
 

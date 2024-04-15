@@ -23,7 +23,7 @@ LCDBitmap* bitmapGetWfPond(void);
 LCDBitmap* bitmapGetWaterSplash(const uint8_t id);
 
 LCDBitmap* bitmapGetUseTheCrank(void);
-LCDBitmap* bitmapGetTitleSplash(void);
+LCDBitmap* bitmapGetTitleHeaderImage(void);
 LCDBitmap* bitmapGetNumeral(const int8_t n);
 LCDBitmap* bitmapGetStencilWipe(const int8_t n);
 LCDBitmap* bitmapGetDither(void);
@@ -42,7 +42,7 @@ LCDBitmap* bitmapGetTitleHoleTutorial(void);
 LCDBitmap* bitmapGetTurretBody(void);
 LCDBitmap* bitmapGetTurretBarrel(void);
 LCDBitmap* bitmapGetGameInfoTopper(void);
-LCDBitmap* bitmapGetLevelSplash(void);
+LCDBitmap* bitmapGetLevelTitle(void);
 LCDBitmap* BitmapGetScoreHistogram(void);
 
 LCDBitmap* bitmapGetPeg(const struct Peg_t* p);
@@ -56,7 +56,7 @@ LCDBitmap* bitmapGetBlast(const uint8_t id);
 LCDBitmap* bitmapGetSpecial(const enum PegSpecial_t special);
 
 void bitmapDoUpdateGameInfoTopper(void);
-void bitmapDoUpdateLevelSplash(void);
+void bitmapDoUpdateLevelTitle(void);
 void bitmapDoUpdateLevelStatsBitmap(void);
 void bitmapDoUpdateHoleStatsBitmap(void);
 void bitmapDoUpdateScoreHistogram(void);

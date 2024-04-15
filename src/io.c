@@ -213,6 +213,11 @@ void IODoNextHole(void) {
   pd->system->logToConsole("Now hole %i", (int)m_hole);
 }
 
+void IODoNextHoleWithLevelWrap(void) {
+  IODoNextHole();
+  if (m_hole == 0) { IODoNextLevel(); }
+}
+
 void IOSetCurrentHoleScore(const uint16_t score) {
   if (score && score < m_persistent_data[m_player][m_level][m_hole]) {
     m_persistent_data[m_player][m_level][m_hole] = score;
@@ -234,10 +239,7 @@ void IODoGoToNextUnplayedLevel(void) {
     if (found) { break; }
   }
   if (found) {
-    IODoNextHole();
-    if (m_hole == 0) {
-      IODoNextLevel();
-    }
+    IODoNextHoleWithLevelWrap();
   } else {
     m_level = 0;
     m_hole = 0;
