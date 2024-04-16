@@ -10,10 +10,12 @@ config_version=5
 
 [application]
 
-config/name="CascadeEditor"
+config/name="Cascella Editor"
 run/main_scene="res://Editor.tscn"
 config/features=PackedStringArray("4.2", "Forward Plus")
 run/max_fps=30
+boot_splash/image="res://splash.png"
+boot_splash/use_filter=false
 config/icon="res://icon.svg"
 
 [display]

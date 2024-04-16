@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://cmuubbicvggs5"]
+[gd_scene load_steps=23 format=3 uid="uid://cmuubbicvggs5"]
 
 [ext_resource type="Script" path="res://RenderScene.gd" id="1_1f7cp"]
 [ext_resource type="Theme" uid="uid://mvm1lqkscosr" path="res://editor/theme/aestro.tres" id="1_3tosr"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://InputParser.gd" id="4_f0pyn"]
 [ext_resource type="Script" path="res://Save.gd" id="5_n4mgq"]
 [ext_resource type="Script" path="res://Load.gd" id="6_81yac"]
+[ext_resource type="StyleBox" uid="uid://b0mcxi81am8bc" path="res://selected_style_box_flat.tres" id="9_cbpe6"]
 
 [sub_resource type="GDScript" id="GDScript_pob6t"]
 script/source = "extends LineEdit
@@ -71,6 +72,9 @@ func _on_value_changed(new_value):
 script/source = "extends OptionButton
 
 func _on_item_selected(index):
+	if index == 10: # custom
+		$FileDialog.visible = true
+		return
 	var res = load(\"res://foregrounds/falls\" + str(index) +  \"_fg-table-400-60.png\")
 	if res:
 		%ForegroundTexRect.texture = res
@@ -79,6 +83,28 @@ func _on_background_item_selected(index):
 	var res = load(\"res://backgrounds/falls\" + str(index) + \"_bg.png\")
 	if res:
 		%BackgroundTexRect.texture = res
+
+
+func _on_file_dialog_file_selected(path):
+	var image = Image.load_from_file(path)
+	var tex = ImageTexture.create_from_image(image)
+	print(\"will load custom image at \",path,\" giving \", tex)
+	if tex:
+		%ForegroundTexRect.texture = tex
+"
+
+[sub_resource type="GDScript" id="GDScript_hf5xj"]
+script/source = "extends Button
+
+var fs = false
+
+func _on_pressed():
+	if !fs:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+		fs = true
+	else: 
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+		fs = false
 "
 
 [sub_resource type="GDScript" id="GDScript_2mwtp"]
@@ -408,7 +434,7 @@ script = SubResource("GDScript_4ako0")
 unique_name_in_owner = true
 layout_mode = 2
 alignment = 1
-item_count = 10
+item_count = 11
 selected = 0
 popup/item_0/text = "Waterfall 1"
 popup/item_0/id = 0
@@ -430,7 +456,17 @@ popup/item_8/text = "Waterfall 9"
 popup/item_8/id = 8
 popup/item_9/text = "Waterfall 10"
 popup/item_9/id = 9
+popup/item_10/text = "CUSTOM"
+popup/item_10/id = 10
 script = SubResource("GDScript_2y8hb")
+
+[node name="FileDialog" type="FileDialog" parent="HBox/RightScroll/Margin/RightVBox/Grid/Foreground"]
+title = "Open a File"
+ok_button_text = "Open"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.png, *.jpg, *.jpeg ; Images")
+use_native_dialog = true
 
 [node name="Background" type="OptionButton" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 unique_name_in_owner = true
@@ -461,7 +497,7 @@ popup/item_9/id = 9
 
 [node name="Save" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
-text = "Save"
+text = "Export"
 script = ExtResource("5_n4mgq")
 
 [node name="FileDialog" type="FileDialog" parent="HBox/RightScroll/Margin/RightVBox/Grid/Save"]
@@ -470,9 +506,44 @@ size = Vector2i(600, 400)
 access = 2
 filters = PackedStringArray("*.json")
 
+[node name="PopupPanel" type="PopupPanel" parent="HBox/RightScroll/Margin/RightVBox/Grid/Save"]
+initial_position = 1
+size = Vector2i(500, 400)
+theme_override_styles/panel = ExtResource("9_cbpe6")
+
+[node name="MarginContainer" type="MarginContainer" parent="HBox/RightScroll/Margin/RightVBox/Grid/Save/PopupPanel"]
+offset_right = 500.0
+offset_bottom = 400.0
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBox/RightScroll/Margin/RightVBox/Grid/Save/PopupPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid/Save/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "EXPORTED LEVEL DATA"
+horizontal_alignment = 1
+
+[node name="TextExport" type="TextEdit" parent="HBox/RightScroll/Margin/RightVBox/Grid/Save/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+editable = false
+
+[node name="CopyButton" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid/Save/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Copy Level Data"
+
+[node name="Close" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid/Save/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Close"
+
 [node name="Load" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
-text = "Load"
+text = "Import"
 script = ExtResource("6_81yac")
 
 [node name="FileDialog" type="FileDialog" parent="HBox/RightScroll/Margin/RightVBox/Grid/Load"]
@@ -484,8 +555,49 @@ file_mode = 0
 access = 2
 filters = PackedStringArray("*.json")
 
-[node name="Dummy" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+[node name="PopupPanel" type="PopupPanel" parent="HBox/RightScroll/Margin/RightVBox/Grid/Load"]
+initial_position = 1
+size = Vector2i(500, 400)
+theme_override_styles/panel = ExtResource("9_cbpe6")
+
+[node name="MarginContainer" type="MarginContainer" parent="HBox/RightScroll/Margin/RightVBox/Grid/Load/PopupPanel"]
+offset_right = 500.0
+offset_bottom = 400.0
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBox/RightScroll/Margin/RightVBox/Grid/Load/PopupPanel/MarginContainer"]
 layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid/Load/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "IMPORT LEVEL DATA"
+horizontal_alignment = 1
+
+[node name="TextImport" type="TextEdit" parent="HBox/RightScroll/Margin/RightVBox/Grid/Load/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Status" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid/Load/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Status: OK"
+horizontal_alignment = 1
+
+[node name="PasteButton" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid/Load/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Paste Level Data From Clipboard"
+
+[node name="Import" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid/Load/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Import"
+
+[node name="FullScreen" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+text = "Fullscreen"
+script = SubResource("GDScript_hf5xj")
 
 [node name="Reset" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
@@ -533,13 +645,19 @@ text = "PEGS"
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/HeightSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/HeightSlider" method="_on_value_changed"]
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/EditorSnap" to="HBox/RightScroll/Margin/RightVBox/Grid/EditorSnap" method="_on_value_changed"]
 [connection signal="item_selected" from="HBox/RightScroll/Margin/RightVBox/Grid/Foreground" to="HBox/RightScroll/Margin/RightVBox/Grid/Foreground" method="_on_item_selected"]
+[connection signal="file_selected" from="HBox/RightScroll/Margin/RightVBox/Grid/Foreground/FileDialog" to="HBox/RightScroll/Margin/RightVBox/Grid/Foreground" method="_on_file_dialog_file_selected"]
 [connection signal="item_selected" from="HBox/RightScroll/Margin/RightVBox/Grid/Background" to="HBox/RightScroll/Margin/RightVBox/Grid/Foreground" method="_on_background_item_selected"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Save" to="HBox/RightScroll/Margin/RightVBox/Grid/Save" method="_on_pressed"]
 [connection signal="canceled" from="HBox/RightScroll/Margin/RightVBox/Grid/Save/FileDialog" to="HBox/RightScroll/Margin/RightVBox/Grid/Save" method="_on_file_dialog_canceled"]
 [connection signal="confirmed" from="HBox/RightScroll/Margin/RightVBox/Grid/Save/FileDialog" to="HBox/RightScroll/Margin/RightVBox/Grid/Save" method="_on_file_dialog_confirmed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Save/PopupPanel/MarginContainer/VBoxContainer/CopyButton" to="HBox/RightScroll/Margin/RightVBox/Grid/Save" method="_on_copy_button_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Save/PopupPanel/MarginContainer/VBoxContainer/Close" to="HBox/RightScroll/Margin/RightVBox/Grid/Save" method="_on_close_pressed"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Load" to="HBox/RightScroll/Margin/RightVBox/Grid/Load" method="_on_pressed"]
 [connection signal="canceled" from="HBox/RightScroll/Margin/RightVBox/Grid/Load/FileDialog" to="HBox/RightScroll/Margin/RightVBox/Grid/Load" method="_on_file_dialog_canceled"]
 [connection signal="confirmed" from="HBox/RightScroll/Margin/RightVBox/Grid/Load/FileDialog" to="HBox/RightScroll/Margin/RightVBox/Grid/Load" method="_on_file_dialog_confirmed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Load/PopupPanel/MarginContainer/VBoxContainer/PasteButton" to="HBox/RightScroll/Margin/RightVBox/Grid/Load" method="_on_paste_button_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Load/PopupPanel/MarginContainer/VBoxContainer/Import" to="HBox/RightScroll/Margin/RightVBox/Grid/Load" method="_on_import_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/FullScreen" to="HBox/RightScroll/Margin/RightVBox/Grid/FullScreen" method="_on_pressed"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Reset" to="HBox/RightScroll/Margin/RightVBox/Grid/Load" method="reset_level"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddStatic" to="HBox/RightScroll/Margin/RightVBox/AddStatic" method="_on_pressed"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddElliptic" to="HBox/RightScroll/Margin/RightVBox/AddElliptic" method="_on_pressed"]

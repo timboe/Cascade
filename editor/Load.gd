@@ -16,7 +16,8 @@ func _on_file_dialog_canceled():
 	print("SAVE Cancelled")
 
 func _on_pressed():
-	$FileDialog.visible = true
+	#$FileDialog.visible = true
+	$PopupPanel.visible = true
 
 func populate_static(save_game : Dictionary, static_instance : Control) -> void:
 	if save_game["shape"] == 0:
@@ -136,3 +137,17 @@ func restore_save(save_game : Dictionary) -> void:
 		var linear_name = "LinearControl" + str(i)
 		var linear_instance = %RightVBox.find_child(linear_name, true, false)
 		populate_linear(save_game["body"][linear_name], linear_instance)
+
+func _on_paste_button_pressed():
+	$PopupPanel/MarginContainer/VBoxContainer/TextImport.text = DisplayServer.clipboard_get()
+
+func _on_import_pressed():
+	var json := JSON.new()
+	var error = json.parse($PopupPanel/MarginContainer/VBoxContainer/TextImport.text)
+	if error == OK:
+		var save_game : Dictionary = json.data
+		restore_save(save_game)
+		$PopupPanel/MarginContainer/VBoxContainer/Status.text = "Status: OK"
+		$PopupPanel.visible = false
+	else:
+		$PopupPanel/MarginContainer/VBoxContainer/Status.text = "JSON Parse Error: " + json.get_error_message() + " at line " + str(json.get_error_line())

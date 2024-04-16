@@ -1,11 +1,14 @@
 extends Button
 
 func _on_pressed():
-	var level : int = $"../LevelSlider".value
-	var hole : int = $"../HoleSlider".value
-	var save_name := String("level_" + str(level) + "_hole_" + str(hole) + ".json")
-	$FileDialog.current_file = save_name
-	$FileDialog.visible = true
+	#var level : int = $"../LevelSlider".value
+	#var hole : int = $"../HoleSlider".value
+	#var save_name := String("level_" + str(level) + "_hole_" + str(hole) + ".json")
+	#$FileDialog.current_file = save_name
+	#$FileDialog.visible = true
+	var save_game = pack_save()
+	$PopupPanel/MarginContainer/VBoxContainer/TextExport.text = JSON.stringify(save_game, "  ", false)
+	$PopupPanel.visible = true
 
 func _on_file_dialog_confirmed():
 	var save_name = $FileDialog.current_path
@@ -125,3 +128,9 @@ func pack_save() -> Dictionary:
 	save_game["body"] = body
 
 	return save_game
+
+func _on_close_pressed():
+	$PopupPanel.visible = false
+
+func _on_copy_button_pressed():
+	DisplayServer.clipboard_set($PopupPanel/MarginContainer/VBoxContainer/TextExport.text)
