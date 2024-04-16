@@ -61,6 +61,11 @@ void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) 
   pd->graphics->clear(kColorBlack);
   pd->graphics->setBackgroundColor(kColorBlack);
 
+#ifdef TAKE_SCREENSHOTS
+  pd->graphics->clear(kColorWhite);
+  pd->graphics->setBackgroundColor(kColorWhite);
+#endif // TAKE_SCREENSHOTS
+
   switch (gm) {
     case kTitles: renderTitles(fc); break;
     case kGameWindow: renderGame(fc, fsm); break;
@@ -120,7 +125,7 @@ void renderGame(const int32_t fc, const enum FSM_t fsm) {
   renderGameGutter();
 
   // DRAW BALL
-  renderGameBall(fc);
+  renderGameMarble(fc);
 
   if (IOGetIsTutorial()) { renderGameTutorial(fc, fsm); }
 

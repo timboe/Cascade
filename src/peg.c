@@ -5,7 +5,7 @@
 #include "sshot.h"
 #include "util.h"
 
-void pegDoUpdateAngle(struct Peg_t* p, float angle);
+void pegDoUpdateAngle(struct Peg_t* p, const float angle);
 
 void pegSetBitmapCoordinates(struct Peg_t* p);
 
@@ -123,11 +123,11 @@ void pegSetBitmapCoordinates(struct Peg_t* p) {
   p->yBitmap = p->y - p->radius;
 }
 
-void pegDoUpdateAngle(struct Peg_t* p, float angle) {
+void pegDoUpdateAngle(struct Peg_t* p, const float angle) {
+  // Note we do NOT update the original p->angle, this is a constant for the peg
   if (p->shape == kPegShapeBall) {
     return; // Time saving, the angle is irrelevent for circles
   }
-  p->angle = angle;
   p->iAngle = radToByte(angle);
   cpBodySetAngle(p->cpBody, angle);
   p->bitmap = bitmapGetPeg(p);
@@ -142,8 +142,10 @@ void pegDoUpdate(struct Peg_t* p) {
     return;
   }
 
-  p->time += (TIMESTEP * p->speed);
+  const float tsm = physicsGetTimestepMultiplier();
+  p->time += (TIMESTEP * tsm * p->speed);
   if (p->time >= M_2PIf) { p->time -= M_2PIf; } // Keep this one bounded
+  else if (p->time < M_2PIf) { p->time += M_2PIf; } // Speed might be -ve
 
   if (p->motion == kPegMotionStatic) {
 
@@ -155,7 +157,7 @@ void pegDoUpdate(struct Peg_t* p) {
     p->x = p->pathX[0] + (p->a * cosf(easing));
     p->y = p->pathY[0] + (p->b * sinf(easing));
     if (p->doArcAngle) {
-      pegDoUpdateAngle(p, easing + (M_PIf * 0.5f) ); // Offset to point inwards
+      pegDoUpdateAngle(p, easing + p->angle );
     }
 
   } else if (p->motion == kPegMotionPath) {
@@ -166,7 +168,7 @@ void pegDoUpdate(struct Peg_t* p) {
     
     // TODO - this isn't great, no easing
     if (p->doArcAngle) {
-      pegDoUpdateAngle(p, (totLenFrac * M_2PIf) + (M_PIf * 0.5f) ); // Offset to point inwards
+      pegDoUpdateAngle(p, (totLenFrac * M_2PIf) + p->angle );
     }
 
     // TODO - cache this for calls after the first

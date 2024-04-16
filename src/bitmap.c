@@ -219,12 +219,8 @@ LCDBitmap* bitmapGetWaterSplash(const uint8_t id) {
   return pd->graphics->getTableBitmap(m_waterSplashTable, id);
 }
 
-LCDBitmap* bitmapGetWfFg(const uint8_t wf, const uint32_t x, const uint32_t y) {
-  return bitmapGetWfFg_byidx(wf, WF_ID(x, y));
-}
-
-LCDBitmap* bitmapGetWfFg_byidx(const uint8_t wf, const uint32_t idx) {
-  return pd->graphics->getTableBitmap(m_sheetWfFg[wf], idx);
+LCDBitmap* bitmapGetWfFg(const uint8_t wf, const uint8_t id) {
+  return pd->graphics->getTableBitmap(m_sheetWfFg[wf], id);
 }
 
 LCDBitmap* bitmapGetBlast(const uint8_t id) {
@@ -275,6 +271,7 @@ LCDBitmap* bitmapGetStar(const uint8_t type, const uint8_t angle) { return m_sta
 
 LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int16_t offset) {
   pd->graphics->clearBitmap(m_previewBitmapWindow, kColorBlack);
+  if (!m_previewBitmap[level][hole]) { return m_previewBitmapWindow; }
   pd->graphics->pushContext(m_previewBitmapWindow);
   pd->graphics->setDrawMode(kDrawModeInverted);
   if (IOGetCurrentHoleHeight() <= DEVICE_PIX_Y*2) {
@@ -285,6 +282,7 @@ LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int1
     pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, offset, kBitmapUnflipped);
     pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, offset - (IOGetCurrentHoleHeight()/2), kBitmapUnflipped);
   }
+  pd->graphics->setDrawMode(kDrawModeCopy);
   pd->graphics->popContext();
   return m_previewBitmapWindow;
 }
@@ -492,6 +490,7 @@ void bitmapDoUpdateLevelStatsBitmap(void) {
 }
 
 void bitmapDoUpdateHoleStatsBitmap(void) {
+
   uint16_t score = 0;
   uint16_t par = 0;
   IOGetHoleStatistics(IOGetCurrentLevel(), IOGetCurrentHole(), &score, &par);
@@ -622,8 +621,8 @@ void bitmapDoPreloadE(void) {
   for (int l = 0; l < MAX_LEVELS; ++l) {
     for (int h = 0; h < MAX_HOLES; ++h) {
       if (!IOGetPar(l,h)) { continue; } // No level
-      snprintf(text, 128, "images/holes/level_%i_hole_%i.png", l+1, h+1);
-      m_previewBitmap[l][h] = bitmapDoLoadImageAtPath(text);
+      snprintf(text, 128, "images/holes/level_%i_hole_%i", l+1, h+1);
+      m_previewBitmap[l][h] = pd->graphics->loadBitmap(text, NULL);
     }
   }
 }

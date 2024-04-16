@@ -14,9 +14,9 @@ bool renderGetSubFreeze(void);
 
 void renderSetScale(const uint8_t scale);
 
-void renderSetBallTrace(const uint16_t i, const uint16_t x, const uint16_t y);
+void renderSetMarbleTrace(const uint16_t i, const uint16_t x, const uint16_t y);
 
-void renderSetBallPootCircle(const uint16_t radius);
+void renderSetMarblePootCircle(const uint16_t radius);
 
 void renderDoTriggerSplash(const uint8_t ball, const int16_t x);
 void renderDoResetTriggerSplash(void);
@@ -28,13 +28,13 @@ void renderDoAddBlast(cpBody* body);
 
 void renderDoAddSpecial(cpBody* body, const enum PegSpecial_t special);
 
-void renderSetBallFallN(const uint16_t n);
-void renderSetBallFallX(const uint16_t x);
-void renderSetBallFallY(const uint16_t ball, const float y);
+void renderSetMarbleFallN(const uint16_t n);
+void renderSetMarbleFallX(const uint16_t x);
+void renderSetMarbleFallY(const uint16_t ball, const float y);
 
 void renderSetNumeralOffset(const float no);
 
-void renderDoResetBallTrace(void);
+void renderDoResetMarbleTrace(void);
 
 void renderTitlesHeader(const int32_t fc);
 void renderTitlesPlayerSelect(const bool locked);
@@ -43,7 +43,7 @@ void renderTitlesHoleSelect(const bool locked);
 void renderTitlesWfPond(void);
 void renderTitlesTransitionLevelSplash(void);
 
-void renderGameBall(const int32_t fc);
+void renderGameMarble(const int32_t fc);
 void renderGamePoot(const enum FSM_t fsm);
 void renderGameTurret(void);
 void renderGameTrajectory(void);

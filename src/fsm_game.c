@@ -105,8 +105,8 @@ void FSMCommonTurretScrollAndBounceBack(const bool allowScroll) {
 }
 
 bool FSMCommonMarbleFire(uint16_t* timer) {
-  float progress = getEasing(kEaseOutQuart, (float)(*timer)/TIME_FIRE_BALL);
-  if ((*timer) >= TIME_FIRE_BALL || (progress > 0.5f && !inputGetPressed(kButtonA))) { // Fire
+  float progress = getEasing(EASE_MARBLE_FIRE, (float)(*timer)/TIME_FIRE_MARBLE);
+  if ((*timer) >= TIME_FIRE_MARBLE || (progress > 0.5f && !inputGetPressed(kButtonA))) { // Fire
     physicsDoResetBall(0);
     physicsDoLaunchBall(progress);
     ++m_ballCount;
@@ -117,7 +117,7 @@ bool FSMCommonMarbleFire(uint16_t* timer) {
   } else if (*timer > 0) { // Reset
     (*timer) = 0;
   }
-  renderSetBallPootCircle((uint16_t)(progress * TURRET_RADIUS));
+  renderSetMarblePootCircle((uint16_t)(progress * TURRET_RADIUS));
   return false;
 }
 
@@ -127,7 +127,8 @@ bool FSMCommonMarbleFire(uint16_t* timer) {
 
 void FSMDisplaySplash(const bool newState) {
   static uint16_t timer = 0;
-  if (newState) { 
+  if (newState) {
+    const uint32_t before = pd->system->getCurrentTimeMilliseconds(); 
     timer = 0;
     renderDoResetStars();
     gameSetYOffset(-DEVICE_PIX_Y - TURRET_RADIUS, true);
@@ -136,6 +137,8 @@ void FSMDisplaySplash(const bool newState) {
     // boardDoRandomise(); // // TODO replace me
     boardDoClear();
     IODoLoadCurrentHole();
+    const uint32_t after = pd->system->getCurrentTimeMilliseconds();
+    pd->system->logToConsole("Hole loading took %i ms", (int)(after - before));
   }
   if (timer++ == TIME_DISPLAY_SPLASH) return FSMDo(kGameFSM_SplashToStart);
 }
@@ -147,7 +150,7 @@ void FSMSplashToStart(const bool newState) {
     m_ballCount = 0;
     gameSetMinimumY(0);
   }
-  float progress = getEasing(kEaseInOutQuint, 1.0f - (float)timer/TIME_SPLASH_TO_GAME);
+  float progress = getEasing(EASE_SPLASH_TO_GAME, 1.0f - (float)timer/TIME_SPLASH_TO_GAME);
   gameSetYOffset((-DEVICE_PIX_Y - TURRET_RADIUS) * progress, true);
   if (timer++ == TIME_SPLASH_TO_GAME) { 
     if (IOGetIsTutorial()) { return FSMDo(kGameFSM_TutorialScrollDown); }
@@ -179,7 +182,7 @@ void FSMTutorialFireMarble(const bool newState) {
   if (newState) {
     gameSetMinimumY(0); // Tutorial only
     gameSetYOffset(0, true);  // Tutorial only
-    renderDoResetBallTrace();
+    renderDoResetMarbleTrace();
     gameDoResetFrameCount();
     renderDoResetTriggerSplash();
     timer = 0;
@@ -202,7 +205,7 @@ void FSMTutorialGetRequired(const bool newState) {
 void FSMAimMode(const bool newState) {
   static uint16_t timer = 0;
   if (newState) {
-    renderDoResetBallTrace();
+    renderDoResetMarbleTrace();
     gameDoResetFrameCount();
     renderDoResetTriggerSplash();
     timer = 0;
@@ -217,7 +220,7 @@ void FSMAimMode(const bool newState) {
 void FSMAimModeScrollToTop(const bool newState) {
   static uint16_t timer = 0;
   if (newState) { timer = 0; }
-  const float progress = getEasing(kEaseInOutQuint, 1.0f - (float)timer/TIME_AIM_SCROLL_TO_TOP);
+  const float progress = getEasing(EASE_AIM_SCROLL_TO_TOP, 1.0f - (float)timer/TIME_AIM_SCROLL_TO_TOP);
   gameSetYOffset(gameGetMinimumY() + ((gameGetYOffset() - gameGetMinimumY())*progress), true);
   FSMCommonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
   if (timer++ == TIME_AIM_SCROLL_TO_TOP) { 
@@ -230,7 +233,7 @@ void FSMBallInPlay(const bool newState) {
   const enum PegSpecial_t special = boardGetCurrentSpecial();
   if (newState) {
     FSMDoResetBallStuckCounter();
-    renderSetBallPootCircle(0);
+    renderSetMarblePootCircle(0);
     m_finalRequiredPos.x = 0;
     m_finalRequiredPos.y = 0;
   }
@@ -401,7 +404,7 @@ void FSMGutterToTurret(const bool newState) {
   FSMCommonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
   //
   progress += (TIMESTEP * END_SWEEP_SCALE * distance_mod * height_mod);
-  float easedProgress = getEasing(kEaseInOutSine, progress);
+  float easedProgress = getEasing(EASE_GUTTER_TO_TOP, progress);
   easedProgress = (1.0f - easedProgress);
   const float tarIOGetPartial = minimumY + ((startY - minimumY) * easedProgress);
   gameSetYOffset(tarIOGetPartial, true);
@@ -422,9 +425,9 @@ void FSMGutterToScores(const bool newState) {
   static int16_t timer = 0;
   if (newState) { 
     timer = 0;
-    renderSetBallFallN(0);
+    renderSetMarbleFallN(0);
   }
-  FSMDoCommonScrollTo(DEVICE_PIX_Y * 5, (float)timer/TIME_GUTTER_TO_SCORE, kEaseOutSine);
+  FSMDoCommonScrollTo(DEVICE_PIX_Y * 5, (float)timer/TIME_GUTTER_TO_SCORE, EASE_GUTTER_TO_SCORE);
   if (timer++ == TIME_GUTTER_TO_SCORE) { return FSMDo(kGameFSM_ScoresAnimation); }
 }
 
@@ -439,12 +442,12 @@ void FSMScoresAnimation(const bool newState) {
     timer = 0;
     ballsToShow = m_ballCount;
     if (ballsToShow > maxBallsToShow) { ballsToShow = maxBallsToShow; }
-    renderSetBallFallN(ballsToShow);
-    renderSetBallFallX(IOGetCurrentHole());
+    renderSetMarbleFallN(ballsToShow);
+    renderSetMarbleFallX(IOGetCurrentHole());
     activeBalls = 1;
     for (int i = 0; i < ballsToShow; ++i) {
       py[i] = -2*BALL_RADIUS*(i + 1);
-      renderSetBallFallY(i, py[i]);
+      renderSetMarbleFallY(i, py[i]);
     }
     IOSetCurrentHoleScore(m_ballCount);
     // pd->system->logToConsole("kGameFSM_ScoresAnimation, ballsToShow %i. Current hole score is %i", ballsToShow, IOGetCurrentHoleScore());
@@ -458,7 +461,7 @@ void FSMScoresAnimation(const bool newState) {
       vy[i] += HISTO_BALL_ACCELERATION;
       py[i] += vy[i];
     }
-    renderSetBallFallY(i, py[i]);
+    renderSetMarbleFallY(i, py[i]);
     // pd->system->logToConsole("kGameFSM_ScoresAnimation, i %i y %f",i, py[i]);
   }
   if (timer++ % TIME_BALL_DROP_DELAY == 0 && activeBalls < ballsToShow) { activeBalls++; }
@@ -470,7 +473,7 @@ void FSMScoresAnimation(const bool newState) {
 void FSMScoresToChooseHole(const bool newState) {
   static int16_t timer = 0;
   if (newState) { timer = 0; }
-  FSMDoCommonScrollTo(DEVICE_PIX_Y * 3, (float)timer/TIME_SCORE_TO_TITLE, kEaseInSine);
+  FSMDoCommonScrollTo(DEVICE_PIX_Y * 3, (float)timer/TIME_SCORE_TO_TITLE, EASE_SCORE_TO_TITLE);
   if (timer++ == TIME_SCORE_TO_TITLE) { return FSMDo(kTitlesFSM_ChooseHole); }
 }
 
@@ -483,7 +486,7 @@ void FSMScoresToSplash(const bool newState) {
     bitmapDoUpdateGameInfoTopper();
     pd->system->logToConsole("kGameFSM_ScoresToSplash");
   }
-  FSMDoCommonScrollTo(DEVICE_PIX_Y * 6, (float)timer/TIME_SCORE_TO_SPLASH, kEaseOutSine);
+  FSMDoCommonScrollTo(DEVICE_PIX_Y * 6, (float)timer/TIME_SCORE_TO_SPLASH, EASE_SCORE_TO_SPLASH);
   if (timer++ == TIME_SCORE_TO_SPLASH) { return FSMDo(kGameFSM_DisplaySplash); }
 }
 
