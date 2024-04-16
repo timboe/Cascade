@@ -73,26 +73,26 @@ void renderDoResetTriggerSplash(void) {
   for (int i = 0; i < MAX_BALLS; ++i) { m_ballSplashTimer[i] = 0; }
 }
 
-void renderSetBallPootCircle(const uint16_t radius) { m_ballPootRadius = radius; }
+void renderSetMarblePootCircle(const uint16_t radius) { m_ballPootRadius = radius; }
 
-void renderSetBallFallN(const uint16_t n) { m_ballFallN = n; }
-void renderSetBallFallX(const uint16_t x) { m_ballFallX = x; }
-void renderSetBallFallY(const uint16_t ball, const float y) { m_ballFallY[ball] = y; }
+void renderSetMarbleFallN(const uint16_t n) { m_ballFallN = n; }
+void renderSetMarbleFallX(const uint16_t x) { m_ballFallX = x; }
+void renderSetMarbleFallY(const uint16_t ball, const float y) { m_ballFallY[ball] = y; }
 
-void renderSetBallTrace(const uint16_t i, const uint16_t x, const uint16_t y) {
+void renderSetMarbleTrace(const uint16_t i, const uint16_t x, const uint16_t y) {
   m_ballTrace[i].x = x;
   m_ballTrace[i].y = y;
   m_ballTraces = i;
 }
 
-void renderDoResetBallTrace(void) {
+void renderDoResetMarbleTrace(void) {
   for (int i = 0; i < PREDICTION_TRACE_LEN * 2; ++i) {
     m_ballTrace[i].x = HALF_DEVICE_PIX_X;
     m_ballTrace[i].y = gameGetMinimumY() + TURRET_RADIUS;
   }
 }
 
-void renderGameBall(const int32_t fc) {
+void renderGameMarble(const int32_t fc) {
   // Start out by rendering any end of level effects
   const enum FSM_t fsm = FSMGet();
   if (fsm >= kGameFSM_WinningToast && fsm <= kGameFSM_GutterToScores) {
@@ -143,7 +143,7 @@ void renderGameBall(const int32_t fc) {
       if (frame == 9)  frame = 7; // Repeat
       if (frame == 10) frame = 6; // Repeat
       if (frame >= 9) continue;
-      pd->graphics->setDrawMode(kDrawModeNXOR);
+      pd->graphics->setDrawMode(kDrawModeFillBlack); // kDrawModeNXOR
       pd->graphics->drawBitmap(bitmapGetWaterSplash(frame), m_ballSplashPos[i], gutterY + parallaxPond, kBitmapUnflipped);
       pd->graphics->setDrawMode(kDrawModeCopy);
       ++m_ballSplashTimer[i];
@@ -186,7 +186,7 @@ void renderGameBoard(const int32_t fc) {
     for (int i = 0; i < boardGetNPegs(); ++i) {
       const struct Peg_t* p = boardGetPeg(i);
       if (p->motion == kPegMotionEllipse) {
-        pd->graphics->drawEllipse(p->pathX[0], p->pathY[0], p->a, p->a, 4, 0.0f, 360.0f, kColorBlack);
+        pd->graphics->drawEllipse(p->pathX[0] - p->a, p->pathY[0] - p->b, p->a*2, p->b*2, 4, 0.0f, 360.0f, kColorBlack);
       } else if (p->motion == kPegMotionPath) {
         for (int j = 1; j < p->pathSteps; ++j) {
           pd->graphics->drawLine(p->pathX[j], p->pathY[j], p->pathX[j-1], p->pathY[j-1], 4, kColorBlack);
@@ -195,6 +195,7 @@ void renderGameBoard(const int32_t fc) {
     }
   }
 #endif
+
   for (int i = 0; i < boardGetNPegs(); ++i) {
     const struct Peg_t* p = boardGetPeg(i);
     if (p->state == kPegStateRemoved) {
@@ -239,25 +240,50 @@ void renderGameBackground(void) {
 
   const int32_t parallax = gameGetParalaxFactorFar(false); // Note: float -> int here. Hard=false
   const int32_t so = ((int32_t) gameGetYOffset()) - parallax;
-  const uint32_t start = MAX(0, so / WF_DIVISION_PIX_Y);
-  // pd->system->logToConsole("so is %i, rendering from %i to %i", so, start, start+5);
-  uint8_t wf = 0;
+  const uint32_t startID = MAX(0, so / WF_DIVISION_PIX_Y);
+
+  // pd->system->logToConsole("so is %i, rendering from %i to %i", so, startID, start+5);
+
+  const uint8_t wfFg = IOGetCurrentHoleWaterfallForeground();
+  const uint8_t wfBg = IOGetCurrentHoleWaterfallBackground();
+
   static float wfOffC = 0;
-  int16_t wfOff = 59 - ((int)wfOffC % 60); 
-  //pd->system->logToConsole("off %i", wfOff);
   wfOffC += WF_VELOCITY * physicsGetTimestepMultiplier();
-  // NOTE: Need to draw one extra background due to animation
-  for (uint32_t i = start; i < start+6; ++i) {
-    if (i >= (WFSHEET_SIZE_Y - 2)) break;
-    if (WF_DIVISION_PIX_Y * i > IOGetCurrentHoleHeight()) { break; }
-    pd->graphics->setDrawMode(kDrawModeInverted); // TODO fix in the gfx
-    pd->graphics->drawBitmap(bitmapGetWfBg(wf), WF_BG_OFFSET[wf], (WF_DIVISION_PIX_Y * i) - wfOff + parallax, kBitmapUnflipped);
+
+  int16_t wfOff = 60 - ((int)wfOffC % 60); 
+  
+  // TEMP second draw. Based on the sizes of the current bitmaps
+  int16_t secondDraw = wfBg == 0 ? 152 : 130;
+
+  // Draw background
+  for (uint32_t i = startID; i < startID+6; ++i) { 
+    // if (i >= (WFSHEET_SIZE_Y - 2)) { break; }
+    if (WF_DIVISION_PIX_Y*i > IOGetCurrentHoleHeight()) { break; }
+    pd->graphics->setDrawMode(kDrawModeCopy);
+    pd->graphics->drawBitmap(bitmapGetWfBg(wfBg), WF_BG_OFFSET[wfBg], (WF_DIVISION_PIX_Y*i) - wfOff + parallax, kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetWfBg(wfBg), WF_BG_OFFSET[wfBg] + secondDraw, (WF_DIVISION_PIX_Y*i) - wfOff + parallax, kBitmapUnflipped);
     pd->graphics->setDrawMode(kDrawModeCopy);
   }
-  for (uint32_t i = start; i < start+5; ++i) {
-    LCDBitmap* bm = bitmapGetWfFg(wf, 0, i);
+
+  // Draw foreground
+  for (uint32_t i = startID; i < startID+5; ++i) {
+    LCDBitmap* bm = bitmapGetWfFg(wfFg, i);
     if (WF_DIVISION_PIX_Y * i > IOGetCurrentHoleHeight()) { break; }
+    if (i >= 12) break;
     if (bm) pd->graphics->drawBitmap(bm, 0, (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
+  }
+
+  //Temp
+  for (int i = 0; i < 4; ++i) {
+    pd->graphics->drawRect(
+    0 + (32*i), (DEVICE_PIX_Y*(i+0)) + parallax,
+    DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
+  }
+
+  for (int i = 0; i < 4; ++i) {
+    pd->graphics->drawRect(
+    0           , (DEVICE_PIX_Y*(i+0)),
+    DEVICE_PIX_X, DEVICE_PIX_Y, kColorBlack);
   }
 
   const float minY = gameGetMinimumY(); 

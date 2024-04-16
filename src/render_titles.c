@@ -14,7 +14,7 @@ void commonRenderBackgroundWaterfallWithAnim(const bool locked, const uint8_t of
   // Draw "previous" waterfall (will become current once gameDoResetPreviousWaterfall is called)
   const uint16_t prevWf = gameGetPreviousWaterfall();
   for (int i = offY; i < (offY+4); ++i) {
-    pd->graphics->drawBitmap(bitmapGetWfFg(prevWf, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetWfFg(prevWf, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
   }
 
   // Animate in new waterfall
@@ -23,7 +23,7 @@ void commonRenderBackgroundWaterfallWithAnim(const bool locked, const uint8_t of
     if (locked) {
       pd->graphics->setStencilImage(bitmapGetStencilWipe(*timer), 0);
       for (int i = offY; i < (offY+4); ++i) {
-        pd->graphics->drawBitmap(bitmapGetWfFg(currentWf, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
+        pd->graphics->drawBitmap(bitmapGetWfFg(currentWf, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
       }
       pd->graphics->setStencilImage(NULL, 0);
       if (++(*timer) == STENCIL_WIPE_N) {
@@ -32,7 +32,7 @@ void commonRenderBackgroundWaterfallWithAnim(const bool locked, const uint8_t of
       }
     } else {
       for (int i = offY; i < (offY+4); ++i) {
-        pd->graphics->drawBitmap(bitmapGetWfFg(currentWf, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
+        pd->graphics->drawBitmap(bitmapGetWfFg(currentWf, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
       }
     }
   }
@@ -40,7 +40,7 @@ void commonRenderBackgroundWaterfallWithAnim(const bool locked, const uint8_t of
 
 void renderTitlesHeader(const int32_t fc) {
   for (int i = 0; i < 4; ++i) {
-    pd->graphics->drawBitmap(bitmapGetWfFg(0, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetWfFg(0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
   }
   bitmapSetRoobert10();
   pd->graphics->setDrawMode(kDrawModeFillWhite);
@@ -136,9 +136,10 @@ void renderTitlesLevelSelect(const bool locked) {
 }
 
 void renderTitlesHoleSelect(const bool locked) {
+
  const uint16_t currentWf = IOGetWaterfallForeground(IOGetCurrentLevel(), 0);
-  for (int i = 12; i < 16; ++i) {
-    pd->graphics->drawBitmap(bitmapGetWfFg(currentWf, 0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
+  for (int i = 8; i < 12; ++i) { // TODO -  add paralax to the start
+    pd->graphics->drawBitmap(bitmapGetWfFg(currentWf, i), 0, WF_DIVISION_PIX_Y * (i+4), kBitmapUnflipped);
   }
   const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y*3); // Hard = true
 

@@ -52,11 +52,12 @@
 // TIMINGS
 
 #define TIME_TITLE_TRANSITION (TICK_FREQUENCY/2)
-#define TIME_TITLE_HOLE_TO_SPLASH (TICK_FREQUENCY*2)
-#define TIME_DISPLAY_SPLASH (TICK_FREQUENCY/4)
+#define TIME_TITLE_HOLE_TO_SPLASH (TICK_FREQUENCY*1)
+// Testing VERY short on this one
+#define TIME_DISPLAY_SPLASH (2)
 #define TIME_SPLASH_TO_GAME (TICK_FREQUENCY/2)
 #define TIME_AIM_SCROLL_TO_TOP (TICK_FREQUENCY/2)
-#define TIME_FIRE_BALL ((9*TICK_FREQUENCY)/10)
+#define TIME_FIRE_MARBLE ((9*TICK_FREQUENCY)/10)
 #define TIME_STUCK_POP (TICK_FREQUENCY/5)
 #define TIME_GUTTER_TO_SCORE (TICK_FREQUENCY/2)
 #define TIME_BALL_DROP_DELAY 8
@@ -79,9 +80,19 @@
 
 #define TRAUMA_BLAST_HIT 3.0f
 
-#define EASE_TITLE_DOWNWARDS kEaseInOutQuad
-#define EASE_TITLE_UPWARDS kEaseInOutQuad
+// top two were kEaseInOutQuad
+#define EASE_TITLE_DOWNWARDS kEaseLinear
+#define EASE_TITLE_UPWARDS kEaseLinear
 #define EASE_TITLE_HOLE_TO_SPLASH kEaseLinear
+#define EASE_MARBLE_FIRE kEaseOutQuart
+// was kEaseInOutQuint
+#define EASE_SPLASH_TO_GAME kEaseLinear
+// This next one is a B press while scrolled down, it should be snappy
+#define EASE_AIM_SCROLL_TO_TOP kEaseInOutQuint
+#define EASE_GUTTER_TO_TOP kEaseInOutSine
+#define EASE_GUTTER_TO_SCORE kEaseOutSine
+#define EASE_SCORE_TO_TITLE kEaseOutSine
+#define EASE_SCORE_TO_SPLASH kEaseOutSine
 
 // PEGS
 
@@ -97,7 +108,7 @@
 
 /// ///
 
-#define N_WF 2
+#define N_WF 3
 
 #define N_MUSIC_TRACKS 5
 
@@ -134,11 +145,11 @@
 
 #define STAR_STRENGTH 128.0f
 
-#define WF_VELOCITY 2.0f
+#define WF_VELOCITY 0.6f
 
 // Velocity squared under which the ball is considered stuck
 #define BALL_IS_STUCK 100.0f
-#define STUCK_TICKS (TICK_FREQUENCY*3)
+#define STUCK_TICKS (TICK_FREQUENCY*2)
 
 #define HISTO_BALL_ACCELERATION 0.05f
 
@@ -163,7 +174,7 @@
 #define END_SWEEP_SCALE 0.25f
 
 // PARALAX
-#define PARALLAX_GENTLE_FAR 0.1f
+#define PARALLAX_GENTLE_FAR 0.333333f
 #define PARALLAX_GENTLE_NEAR (0.0f - PARALLAX_GENTLE_FAR)
 
 #define PARALLAX_HARD_FAR 0.5f

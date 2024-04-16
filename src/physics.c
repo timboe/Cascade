@@ -156,7 +156,7 @@ void physicsDoUpdate(const int32_t fc, const enum FSM_t fsm) {
       physicsDoResetBall(0);
       physicsDoLaunchBall(1.0f);
     }
-    renderSetBallTrace(i, pos.x, pos.y);
+    renderSetMarbleTrace(i, pos.x, pos.y);
   }
 
   m_physicsGetMotionTrailX[0][fc % MOTION_TRAIL_LEN] = pos.x;

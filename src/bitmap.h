@@ -2,7 +2,7 @@
 #include "game.h"
 #include "peg.h"
 
-const static uint8_t WF_BG_OFFSET[] = {194};
+const static uint8_t WF_BG_OFFSET[] = {100, 140};
 
 void bitmapDoInit(void);
 
@@ -16,8 +16,7 @@ LCDFont* bitmapGetRoobert10(void);
 LCDFont* bitmapGetGreatVibes24(void);
 LCDFont* bitmapGetGreatVibes109(void);
 
-LCDBitmap* bitmapGetWfFg(const uint8_t wf, const uint32_t x, const uint32_t y);
-LCDBitmap* bitmapGetWfFg_byidx(const uint8_t wf, const uint32_t idx);
+LCDBitmap* bitmapGetWfFg(const uint8_t wf, const uint8_t id);
 LCDBitmap* bitmapGetWfBg(const uint8_t wf);
 LCDBitmap* bitmapGetWfPond(void);
 LCDBitmap* bitmapGetWaterSplash(const uint8_t id);
@@ -81,7 +80,3 @@ void bitmapDoPreloadI(void);
 void bitmapDoPreloadJ(void);
 void bitmapDoPreloadK(void);
 void bitmapDoPreloadL(const uint8_t star);
-
-
-#define WF_ID(X, Y) ((WFSHEET_SIZE_X * Y) + X)
-

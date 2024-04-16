@@ -134,8 +134,11 @@ void IODoUpdatePreloading(void) {
   ++m_preloading;
 }
 
-uint16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole) { return m_hole_background[level][hole];}
+uint16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole) { return m_hole_background[level][hole]; }
 uint16_t IOGetWaterfallForeground(const uint16_t level, const uint16_t hole) { return m_hole_foreground[level][hole]; }
+
+uint16_t IOGetCurrentHoleWaterfallBackground(void) { return m_hole_background[m_level][m_hole]; }
+uint16_t IOGetCurrentHoleWaterfallForeground(void) { return m_hole_foreground[m_level][m_hole]; }
 
 uint16_t IOGetCurrentPlayer(void) { return m_player; }
 
