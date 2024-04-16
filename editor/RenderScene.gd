@@ -148,7 +148,7 @@ func render_elliptic_path(ellipticPath : Control):
 		var y_peg : float = y + (b * sin((t * speed) + arc_peg))
 		var draw_angle : float
 		if use_arc:
-			draw_angle = (t * speed) + arc_peg + (PI * 0.5)
+			draw_angle = (t * speed) + arc_peg + angle_rad
 		else:
 			draw_angle = angle_rad
 		renderPeg(shape_peg, x_peg, y_peg, draw_angle, size_peg, custom_type)
@@ -203,7 +203,7 @@ func render_line_path(linePath : Control):
 		
 		var draw_angle : float
 		if use_arc:
-			draw_angle = (t * speed) + arc_peg + (PI * 0.5)
+			draw_angle = (t * speed) + arc_peg + angle_rad
 		else:
 			draw_angle = angle_rad
 		

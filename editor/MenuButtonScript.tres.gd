@@ -5,10 +5,5 @@ extends Control
 func _on_pressed():
 	rend.do_update()
 
-
-func _on_toggled(toggled_on):
-	$"../AngleText".editable = !toggled_on
-
-
 func _on_value_changed(value):
 	rend.do_update()

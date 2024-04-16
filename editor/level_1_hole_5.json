@@ -1,0 +1,156 @@
+{
+  "header": {
+    "save_format": 1,
+    "name": "",
+    "author": "",
+    "level": 1,
+    "hole": 5,
+    "par": 3,
+    "foreground": 0,
+    "background": 0,
+    "special": 0,
+    "height": 960,
+    "snap": 3,
+    "n_static": 0,
+    "n_elliptic": 2,
+    "n_linear": 0
+  },
+  "body": {
+    "EllipticControl1": {
+      "shape": 0,
+      "x": 294,
+      "y": 144,
+      "angle": 200,
+      "size": 2,
+      "arc": 360,
+      "use_arc": true,
+      "speed": -1,
+      "a": 81,
+      "b": 57,
+      "n_pegs": 11,
+      "PegContainer1": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 1
+      },
+      "PegContainer2": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer3": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer4": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer5": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer6": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer7": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer8": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer9": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer10": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer11": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      }
+    },
+    "EllipticControl2": {
+      "shape": 0,
+      "x": 90,
+      "y": 150,
+      "angle": 200,
+      "size": 2,
+      "arc": 360,
+      "use_arc": true,
+      "speed": 1,
+      "a": 81,
+      "b": 57,
+      "n_pegs": 11,
+      "PegContainer1": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer2": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer3": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer4": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer5": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer6": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 1
+      },
+      "PegContainer7": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer8": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer9": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer10": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer11": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      }
+    }
+  }
+}
