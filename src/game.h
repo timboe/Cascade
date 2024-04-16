@@ -15,7 +15,8 @@ void gameDoResetFrameCount(void);
 void gameSetTurretBarrelAngle(const float angle);
 float gameGetTurretBarrelAngle(void);
 
-uint16_t gameGetPreviousWaterfall(void);
+uint16_t gameGetPreviousWaterfallFg(void);
+uint16_t gameGetPreviousWaterfallBg(void);
 void gameDoResetPreviousWaterfall(void);
 
 int16_t gameGetMinimumY(void);

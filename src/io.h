@@ -43,6 +43,8 @@ void IODoPreviousHole(void);
 void IODoNextHole(void);
 void IODoNextHoleWithLevelWrap(void);
 
+void IOSetLevelHole(uint16_t level, uint16_t hole);
+
 void IOSetCurrentHoleScore(const uint16_t score);
 
 uint16_t IOGetPar(const uint16_t level, const uint16_t hole);

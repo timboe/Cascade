@@ -134,7 +134,6 @@ void FSMDisplaySplash(const bool newState) {
     gameSetYOffset(-DEVICE_PIX_Y - TURRET_RADIUS, true);
     bitmapDoUpdateScoreHistogram();
     gameDoPopulateMenuGame();
-    // boardDoRandomise(); // // TODO replace me
     boardDoClear();
     IODoLoadCurrentHole();
     const uint32_t after = pd->system->getCurrentTimeMilliseconds();
@@ -423,11 +422,13 @@ void FSMGutterToTurret(const bool newState) {
 
 void FSMGutterToScores(const bool newState) {
   static int16_t timer = 0;
+  static int16_t origin = 0;
   if (newState) { 
     timer = 0;
+    origin = gameGetYOffset();
     renderSetMarbleFallN(0);
   }
-  FSMDoCommonScrollTo(DEVICE_PIX_Y * 5, (float)timer/TIME_GUTTER_TO_SCORE, EASE_GUTTER_TO_SCORE);
+  FSMDoCommonScrollTo(origin, DEVICE_PIX_Y*5, (float)timer/TIME_GUTTER_TO_SCORE, EASE_GUTTER_TO_SCORE);
   if (timer++ == TIME_GUTTER_TO_SCORE) { return FSMDo(kGameFSM_ScoresAnimation); }
 }
 
@@ -473,7 +474,7 @@ void FSMScoresAnimation(const bool newState) {
 void FSMScoresToChooseHole(const bool newState) {
   static int16_t timer = 0;
   if (newState) { timer = 0; }
-  FSMDoCommonScrollTo(DEVICE_PIX_Y * 3, (float)timer/TIME_SCORE_TO_TITLE, EASE_SCORE_TO_TITLE);
+  FSMDoCommonScrollTo(DEVICE_PIX_Y*5, DEVICE_PIX_Y*3, (float)timer/TIME_SCORE_TO_TITLE, EASE_SCORE_TO_TITLE);
   if (timer++ == TIME_SCORE_TO_TITLE) { return FSMDo(kTitlesFSM_ChooseHole); }
 }
 
@@ -486,7 +487,7 @@ void FSMScoresToSplash(const bool newState) {
     bitmapDoUpdateGameInfoTopper();
     pd->system->logToConsole("kGameFSM_ScoresToSplash");
   }
-  FSMDoCommonScrollTo(DEVICE_PIX_Y * 6, (float)timer/TIME_SCORE_TO_SPLASH, EASE_SCORE_TO_SPLASH);
+  FSMDoCommonScrollTo(DEVICE_PIX_Y*5, DEVICE_PIX_Y*6, (float)timer/TIME_SCORE_TO_SPLASH, EASE_SCORE_TO_SPLASH);
   if (timer++ == TIME_SCORE_TO_SPLASH) { return FSMDo(kGameFSM_DisplaySplash); }
 }
 

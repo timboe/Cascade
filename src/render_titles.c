@@ -4,44 +4,17 @@
 
 float m_numeralOffset = 0.0;
 
-void commonRenderBackgroundWaterfallWithAnim(const bool locked, const uint8_t offY, uint16_t* timer);
+// void commonRenderBackgroundWaterfallWithAnim(const bool locked, const uint8_t startID, uint16_t* timer);
 
 /// ///
 
 void renderSetNumeralOffset(float no) { m_numeralOffset = no; }
 
-void commonRenderBackgroundWaterfallWithAnim(const bool locked, const uint8_t offY, uint16_t* timer) {
-  // Draw "previous" waterfall (will become current once gameDoResetPreviousWaterfall is called)
-  const uint16_t prevWf = gameGetPreviousWaterfall();
-  for (int i = offY; i < (offY+4); ++i) {
-    pd->graphics->drawBitmap(bitmapGetWfFg(prevWf, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
-  }
 
-  // Animate in new waterfall
-  const uint16_t currentWf = IOGetWaterfallForeground(IOGetCurrentLevel(), 0);
-  if (currentWf != prevWf) {
-    if (locked) {
-      pd->graphics->setStencilImage(bitmapGetStencilWipe(*timer), 0);
-      for (int i = offY; i < (offY+4); ++i) {
-        pd->graphics->drawBitmap(bitmapGetWfFg(currentWf, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
-      }
-      pd->graphics->setStencilImage(NULL, 0);
-      if (++(*timer) == STENCIL_WIPE_N) {
-        gameDoResetPreviousWaterfall();
-        *timer = 0;
-      }
-    } else {
-      for (int i = offY; i < (offY+4); ++i) {
-        pd->graphics->drawBitmap(bitmapGetWfFg(currentWf, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
-      }
-    }
-  }
-}
 
 void renderTitlesHeader(const int32_t fc) {
-  for (int i = 0; i < 4; ++i) {
-    pd->graphics->drawBitmap(bitmapGetWfFg(0, i), 0, WF_DIVISION_PIX_Y * i, kBitmapUnflipped);
-  }
+  // commonRenderBackgroundWaterfallWithAnim(false, 0, NULL);
+
   bitmapSetRoobert10();
   pd->graphics->setDrawMode(kDrawModeFillWhite);
   pd->graphics->drawText(VERSION, 8, kUTF8Encoding, 8, DEVICE_PIX_Y-16);
@@ -63,9 +36,9 @@ void renderTitlesHeader(const int32_t fc) {
 }
 
 void renderTitlesPlayerSelect(const bool locked) {
-  static uint16_t newWaterfallTimer = 0;
-  if (!locked) newWaterfallTimer = 0;
-  commonRenderBackgroundWaterfallWithAnim(locked, 4, &newWaterfallTimer);
+  // static uint16_t newWaterfallTimer = 0;
+  // if (!locked) newWaterfallTimer = 0;
+  // commonRenderBackgroundWaterfallWithAnim(locked, 4, &newWaterfallTimer);
   const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y); // Hard = true
 
   uint8_t digit[3];
@@ -92,9 +65,9 @@ void renderTitlesPlayerSelect(const bool locked) {
 }
 
 void renderTitlesLevelSelect(const bool locked) {
-  static uint16_t newWaterfallTimer = 0;
-  if (!locked) newWaterfallTimer = 0;
-  commonRenderBackgroundWaterfallWithAnim(locked, 8, &newWaterfallTimer);
+  // static uint16_t newWaterfallTimer = 0;
+  // if (!locked) newWaterfallTimer = 0;
+  // commonRenderBackgroundWaterfallWithAnim(locked, 8, &newWaterfallTimer);
   const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y*2); // Hard = true
 
   uint8_t digit0[3];
@@ -137,15 +110,15 @@ void renderTitlesLevelSelect(const bool locked) {
 
 void renderTitlesHoleSelect(const bool locked) {
 
- const uint16_t currentWf = IOGetWaterfallForeground(IOGetCurrentLevel(), 0);
-  for (int i = 8; i < 12; ++i) { // TODO -  add paralax to the start
-    pd->graphics->drawBitmap(bitmapGetWfFg(currentWf, i), 0, WF_DIVISION_PIX_Y * (i+4), kBitmapUnflipped);
-  }
+ // const uint16_t currentWf = IOGetWaterfallForeground(IOGetCurrentLevel(), 0);
+ //  for (int i = 8; i < 12; ++i) { // TODO -  add paralax to the start
+ //    pd->graphics->drawBitmap(bitmapGetWfFg(currentWf, i), 0, WF_DIVISION_PIX_Y * (i+4), kBitmapUnflipped);
+ //  }
   const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y*3); // Hard = true
 
-  static uint16_t offset = 0;
+  static float offset = 0;
   LCDBitmap* bm = bitmapGetLevelPreview(IOGetCurrentLevel(), IOGetCurrentHole(), offset);
-  offset += 2;
+  offset += WF_VELOCITY;
   if (bm) { pd->graphics->drawBitmap(bm, DEVICE_PIX_X - 200, DEVICE_PIX_Y*3 + parallax, kBitmapUnflipped); }
 
   pd->graphics->drawBitmap(bitmapGetDither(), 0, (WF_DIVISION_PIX_Y * 15), kBitmapUnflipped);

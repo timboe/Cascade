@@ -13,7 +13,8 @@
 int32_t m_frameCount = 0;
 float m_turretBarrelAngle = 180.0f;
 
-uint16_t m_previousWaterfall = 0;
+uint16_t m_previousWaterfallFg = 0;
+uint16_t m_previousWaterfallBg = 0;
 
 int16_t m_minimumY = 0;
 int16_t m_maximumY = 0;
@@ -30,8 +31,12 @@ void gameDoResetFrameCount(void) { m_frameCount = 0; }
 void gameSetTurretBarrelAngle(const float angle) { m_turretBarrelAngle = angle; }
 float gameGetTurretBarrelAngle(void) { return m_turretBarrelAngle; }
 
-uint16_t gameGetPreviousWaterfall(void) { return m_previousWaterfall; }
-void gameDoResetPreviousWaterfall(void) { m_previousWaterfall = IOGetWaterfallForeground(IOGetCurrentLevel(), 0); }
+uint16_t gameGetPreviousWaterfallFg(void) { return m_previousWaterfallFg; }
+uint16_t gameGetPreviousWaterfallBg(void) { return m_previousWaterfallBg; }
+void gameDoResetPreviousWaterfall(void) { 
+  m_previousWaterfallFg = IOGetCurrentHoleWaterfallForeground();
+  m_previousWaterfallBg = IOGetCurrentHoleWaterfallBackground();
+}
 
 int gameLoop(void* _data) {
   pd->graphics->setBackgroundColor(kColorBlack);
@@ -173,7 +178,6 @@ void gameSetYOffset(float set, const bool force) {
   if (set < m_minimumY) set = m_minimumY;
   float diff = set - m_yOffset;
   m_yOffset += diff * SCREEN_EASING;
-  // pd->system->logToConsole("req %f, set %f", set, m_yOffset);
 }
 
 void gameSetXOffset(const float set) { m_xOffset = set; }

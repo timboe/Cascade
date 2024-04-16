@@ -145,12 +145,14 @@ uint16_t IOGetCurrentPlayer(void) { return m_player; }
 void IODoPreviousPlayer(void) {
   if (!m_player) { m_player = MAX_PLAYERS - 1; }
   else --m_player;
-  pd->system->logToConsole("Now player %i", (int)m_player);
+  pd->system->logToConsole("Now player %i - got to unplayed hole", (int)m_player+1);
+  IODoGoToNextUnplayedLevel();
 }
 
 void IODoNextPlayer(void) {
   m_player = (m_player + 1) % MAX_PLAYERS;
-  pd->system->logToConsole("Now player %i", (int)m_player);
+  pd->system->logToConsole("Now player %i - got to unplayed hole", (int)m_player+1);
+  IODoGoToNextUnplayedLevel();
 }
 
 void IOResetPlayerSave(const uint16_t player) {
@@ -200,27 +202,36 @@ uint16_t IOGetNextHole(void) {
 
 void IODoPreviousLevel(void) { 
   m_level = IOGetPreviousLevel();
-  pd->system->logToConsole("Now level %i", (int)m_level);
+  pd->system->logToConsole("Pre level called (player %i, level %i, hole %i)", (int)m_player+1, (int)m_level+1, (int)m_hole+1);
 }
 
 void IODoNextLevel(void) {
   m_level = IOGetNextLevel();
-  pd->system->logToConsole("Now level %i", (int)m_level);
+  pd->system->logToConsole("Next level called (player %i, level %i, hole %i)", (int)m_player+1, (int)m_level+1, (int)m_hole+1);
 }
 
 void IODoPreviousHole(void) { 
   m_hole = IOGetPreviousHole();
-  pd->system->logToConsole("Now hole %i", (int)m_hole);
+  pd->system->logToConsole("Prev hole called (player %i, level %i, hole %i)", (int)m_player+1, (int)m_level+1, (int)m_hole+1);
 }
 
 void IODoNextHole(void) {
   m_hole = IOGetNextHole();
-  pd->system->logToConsole("Now hole %i", (int)m_hole);
+  pd->system->logToConsole("Next hole called (player %i, level %i, hole %i)", (int)m_player+1, (int)m_level+1, (int)m_hole+1);
 }
 
 void IODoNextHoleWithLevelWrap(void) {
   IODoNextHole();
-  if (m_hole == 0) { IODoNextLevel(); }
+  if (m_hole == 0) { 
+    IODoNextLevel();
+    pd->system->logToConsole("Note: level wrap just activated");
+  }
+}
+
+void IOSetLevelHole(uint16_t level, uint16_t hole) {
+  m_level = level;
+  m_hole = hole;
+  pd->system->logToConsole("Set-level-hole called (player %i, level %i, hole %i)", (int)m_player+1, (int)m_level+1, (int)m_hole+1);
 }
 
 void IOSetCurrentHoleScore(const uint16_t score) {
@@ -249,8 +260,7 @@ void IODoGoToNextUnplayedLevel(void) {
   } else {
     m_level = 0;
     m_hole = 0;
-    pd->system->logToConsole("Now hole 0");
-    pd->system->logToConsole("Now level 0");
+    pd->system->logToConsole("! No levels played - set to level 1 hole 1");
   }
 }
 
@@ -617,6 +627,12 @@ void IODoLoadCurrentHole() {
 
   pd->json->decode(&jd, (json_reader){ .read = IODoRead, .userdata = file }, NULL);
   int status = pd->file->close(file);
+
+  // Check playable
+  if (boardGetRequiredPegsInPlay() == 0 || boardGetNPegs() == 0) {
+    boardDoClear();
+    boardDoTestLevel();
+  }
 
 }
 

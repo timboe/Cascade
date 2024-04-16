@@ -106,7 +106,7 @@ struct Peg_t* boardDoAddStatic(const struct StaticLoader_t* staticLoader) {
   return p;
 }
 
-void boardDoRandomise(void) {
+void boardDoTestLevel(void) {
   boardDoClear();
 
   const int maxStatic = 16;//rand() % 2 ? 16 : 64+32;
