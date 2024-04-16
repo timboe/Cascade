@@ -33,6 +33,8 @@ script/source = "extends Button
 
 @onready var add_static = $/root/RootControl.find_child(\"AddStatic\")
 
+@onready var ip = $/root/RootControl.find_child(\"InputParser\")
+
 func _on_pressed():
 	add_static._on_pressed()
 	var new_static = $/root/RootControl.find_child(\"StaticControl\" + str(add_static.static_count), true, false)
@@ -42,6 +44,7 @@ func _on_pressed():
 	new_static.find_child(\"SizeText\", true, false).selected = $\"../SizeText\".selected
 	new_static.find_child(\"AngleText\", true, false).value = $\"../AngleText\".value
 	new_static.find_child(\"TypeText\", true, false).selected = $\"../TypeText\".selected
+	ip.mostRecentlyCloned = new_static
 "
 
 [sub_resource type="GDScript" id="GDScript_mj66t"]

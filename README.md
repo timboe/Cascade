@@ -17,3 +17,15 @@ Kenny sonic explosion
 https://thenounproject.com/icon/crank-108874/
 
 https://thenounproject.com/icon/clockwise-3256360/
+
+https://thenounproject.com/icon/button-488661/
+
+https://thenounproject.com/icon/d-pad-1273656/
+
+
+https://unsplash.com/photos/waterfalls-surrounded-with-green-leafed-trees-during-daytime-NWrye3NRrKw
+https://ditherit.com/ Error + Stucki + Serpentine
+https://www.gingerbeardman.com/canvas-dither/ Disabled + Stucki
+
+https://unsplash.com/photos/photo-of-waterfalls-OE6qLhRHhhs
+pain.net FS dither + delete white areas 

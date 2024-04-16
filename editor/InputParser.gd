@@ -8,6 +8,8 @@ var dragMode : int = 0
 var dragNode : Control = null
 var dragPos : Vector2
 
+var mostRecentlyCloned
+
 func find_peg(v : Vector2, n : String) -> Control:
 	for peg in get_tree().get_nodes_in_group(n):
 		var v2 := Vector2()
@@ -68,6 +70,7 @@ func _input(event):
 			if event.keycode == KEY_C :
 				dragNode.find_child("Clone")._on_pressed()
 				get_tree().get_root().set_input_as_handled()
+				dragNode = mostRecentlyCloned
 			if event.keycode == KEY_D :
 				dragNode.find_child("Remove")._on_pressed()
 				get_tree().get_root().set_input_as_handled()
