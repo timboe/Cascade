@@ -1,19 +1,14 @@
-[gd_scene load_steps=20 format=3 uid="uid://cmuubbicvggs5"]
+[gd_scene load_steps=21 format=3 uid="uid://cmuubbicvggs5"]
 
 [ext_resource type="Script" path="res://RenderScene.gd" id="1_1f7cp"]
 [ext_resource type="Theme" uid="uid://mvm1lqkscosr" path="res://editor/theme/aestro.tres" id="1_3tosr"]
 [ext_resource type="StyleBox" uid="uid://cgsvf1qt0q4uy" path="res://background_style_box_flat.tres" id="2_gthnx"]
+[ext_resource type="Texture2D" uid="uid://b1kln5k6bph" path="res://foregrounds/falls2_fg-table-400-60.png" id="3_4cp5k"]
+[ext_resource type="Texture2D" uid="uid://dbmquo2p7io4d" path="res://backgrounds/falls2_bg.png" id="3_chff6"]
 [ext_resource type="Texture2D" uid="uid://b645rphiris4n" path="res://turretBody.png" id="3_u03i0"]
 [ext_resource type="Script" path="res://InputParser.gd" id="4_f0pyn"]
 [ext_resource type="Script" path="res://Save.gd" id="5_n4mgq"]
 [ext_resource type="Script" path="res://Load.gd" id="6_81yac"]
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_mxqya"]
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_7eq4d"]
-width = 400
-height = 960
-noise = SubResource("FastNoiseLite_mxqya")
 
 [sub_resource type="GDScript" id="GDScript_pob6t"]
 script/source = "extends LineEdit
@@ -70,6 +65,20 @@ func _on_value_changed(new_value):
 	$\"../SnapLabel\".text = \"Editor Snap: \" + str(new_value)
 	for t in get_tree().get_nodes_in_group(\"coordinate_text_group\"):
 		t.step = new_value
+"
+
+[sub_resource type="GDScript" id="GDScript_2y8hb"]
+script/source = "extends OptionButton
+
+func _on_item_selected(index):
+	var res = load(\"res://foregrounds/falls\" + str(index) +  \"_fg-table-400-60.png\")
+	if res:
+		%ForegroundTexRect.texture = res
+
+func _on_background_item_selected(index):
+	var res = load(\"res://backgrounds/falls\" + str(index) + \"_bg.png\")
+	if res:
+		%BackgroundTexRect.texture = res
 "
 
 [sub_resource type="GDScript" id="GDScript_2mwtp"]
@@ -188,11 +197,20 @@ vertical_scroll_mode = 2
 custom_minimum_size = Vector2(400, 960)
 layout_mode = 2
 
-[node name="Foreground" type="TextureRect" parent="HBox/LeftScroll/Control"]
+[node name="BackgroundTexRect" type="TextureRect" parent="HBox/LeftScroll/Control"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_right = 400.0
+offset_bottom = 1020.0
+texture = ExtResource("3_chff6")
+stretch_mode = 1
+
+[node name="ForegroundTexRect" type="TextureRect" parent="HBox/LeftScroll/Control"]
+unique_name_in_owner = true
 layout_mode = 2
 offset_right = 400.0
 offset_bottom = 960.0
-texture = SubResource("NoiseTexture2D_7eq4d")
+texture = ExtResource("3_4cp5k")
 
 [node name="Turret" type="TextureRect" parent="HBox/LeftScroll/Control"]
 layout_mode = 1
@@ -412,6 +430,7 @@ popup/item_8/text = "Waterfall 9"
 popup/item_8/id = 8
 popup/item_9/text = "Waterfall 10"
 popup/item_9/id = 9
+script = SubResource("GDScript_2y8hb")
 
 [node name="Background" type="OptionButton" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 unique_name_in_owner = true
@@ -513,6 +532,8 @@ text = "PEGS"
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/ParSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/ParSlider" method="_on_value_changed"]
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/HeightSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/HeightSlider" method="_on_value_changed"]
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/EditorSnap" to="HBox/RightScroll/Margin/RightVBox/Grid/EditorSnap" method="_on_value_changed"]
+[connection signal="item_selected" from="HBox/RightScroll/Margin/RightVBox/Grid/Foreground" to="HBox/RightScroll/Margin/RightVBox/Grid/Foreground" method="_on_item_selected"]
+[connection signal="item_selected" from="HBox/RightScroll/Margin/RightVBox/Grid/Background" to="HBox/RightScroll/Margin/RightVBox/Grid/Foreground" method="_on_background_item_selected"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Save" to="HBox/RightScroll/Margin/RightVBox/Grid/Save" method="_on_pressed"]
 [connection signal="canceled" from="HBox/RightScroll/Margin/RightVBox/Grid/Save/FileDialog" to="HBox/RightScroll/Margin/RightVBox/Grid/Save" method="_on_file_dialog_canceled"]
 [connection signal="confirmed" from="HBox/RightScroll/Margin/RightVBox/Grid/Save/FileDialog" to="HBox/RightScroll/Margin/RightVBox/Grid/Save" method="_on_file_dialog_confirmed"]

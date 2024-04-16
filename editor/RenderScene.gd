@@ -238,6 +238,9 @@ func _process(delta):
 	t += delta
 	#if t >= 2*PI: t -= 2*PI
 	queue_redraw()
+	%BackgroundTexRect.position.y += delta * 15.0
+	if %BackgroundTexRect.position.y >= 0:
+		%BackgroundTexRect.position.y -= 60
 	
 func do_update():
 	#print("Ping for redraw")
