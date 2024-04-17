@@ -55,7 +55,7 @@ bool FSMGetBallInPlay(void);
 
 void FSMDoResetBallStuckCounter(void);
 
-void FSMDoCommonScrollTo(const int16_t destination, const float progress, const enum EasingFunction_t e);
+void FSMDoCommonScrollTo(const int16_t origin, const int16_t destination, const float progress, const enum EasingFunction_t e);
 
 bool FSMGetIsAimMode(void);
 

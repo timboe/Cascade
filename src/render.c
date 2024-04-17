@@ -17,6 +17,8 @@ uint8_t m_renderScale = 1;
 void renderTitles(const int32_t fc);
 void renderGame(const int32_t fc, const enum FSM_t fsm);
 
+void renderCommonBackground(void);
+
 /// ///
 
 void renderSetScale(const uint8_t scale) { m_renderScale = scale; }
@@ -31,6 +33,10 @@ bool renderGetSubFreeze(void) {
     return m_freeze--;
   }
   return false;
+}
+
+int16_t snap(int16_t s) {
+  return (s / 4) * 4;
 }
 
 void renderAddTrauma(const float amount) {
@@ -52,7 +58,7 @@ void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) 
   }
 
   const float offX = -gameGetXOffset();
-  const float offY = -gameGetYOffset();
+  const float offY = -snap(gameGetYOffset());
 
   pd->graphics->setDrawMode(kDrawModeCopy);
   pd->graphics->setDrawOffset(offX, offY);
@@ -65,6 +71,8 @@ void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) 
   pd->graphics->clear(kColorWhite);
   pd->graphics->setBackgroundColor(kColorWhite);
 #endif // TAKE_SCREENSHOTS
+
+  renderCommonBackground();
 
   switch (gm) {
     case kTitles: renderTitles(fc); break;
@@ -110,7 +118,7 @@ void renderTitles(const int32_t fc) {
 
 void renderGame(const int32_t fc, const enum FSM_t fsm) {
   // DRAW BACKGROUND
-  renderGameBackground();
+  // renderGameBackground();
 
   // DRAW TURRET & TOP DECORATION
   renderGameTurret();
@@ -137,4 +145,93 @@ void renderGame(const int32_t fc, const enum FSM_t fsm) {
   pd->graphics->drawLine(0, IOGetCurrentHoleHeight(), DEVICE_PIX_X, IOGetCurrentHoleHeight(), 4, kColorBlack);
   pd->graphics->drawLine(0, IOGetCurrentHoleHeight(), DEVICE_PIX_X, IOGetCurrentHoleHeight(), 2, kColorWhite);
 #endif
+}
+
+void renderCommonBackground(void) {
+
+#ifdef TAKE_SCREENSHOTS
+  if (screenShotGetInProgress()) { return; }
+#endif
+
+  const int32_t yOffset = gameGetYOffset();
+  const bool locked = (yOffset % DEVICE_PIX_Y == 0);
+  const int32_t parallax = gameGetParalaxFactorFar(false); // Note: float -> int here. Hard=false
+  const int32_t startOffset = yOffset - parallax;
+  const uint32_t startID = MAX(0, startOffset / WF_DIVISION_PIX_Y);
+
+  // pd->system->logToConsole("startID %i, yOff is %i, paralax is %i, startOffset is %i", startID, yOffset, parallax, startOffset);
+
+  static float wfBgOffC = 0;
+  if (!IOGetIsPreloading()) {
+    wfBgOffC += WF_VELOCITY * physicsGetTimestepMultiplier();
+  }
+  const int16_t wfBgOff = WF_DIVISION_PIX_Y - ((int)wfBgOffC % WF_DIVISION_PIX_Y); 
+
+  // Draw "previous" waterfall (will become current once gameDoResetPreviousWaterfall is called)
+  const uint8_t prevWfFg = gameGetPreviousWaterfallFg();
+  const uint8_t prevWfBg = gameGetPreviousWaterfallBg();
+
+  for (int i = startID; i < (startID+6); ++i) {  // Background
+    if (i >= WFSHEET_SIZE_Y + 1) break;
+    pd->graphics->drawBitmap(bitmapGetWfBg(prevWfBg), WF_BG_OFFSET[0], (WF_DIVISION_PIX_Y * i) - wfBgOff + parallax, kBitmapUnflipped);
+  }
+  for (int i = startID; i < (startID+5); ++i) { // Foreground
+    if (i >= WFSHEET_SIZE_Y) break;
+    pd->graphics->drawBitmap(bitmapGetWfFg(prevWfFg, i), 0, (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
+  }
+
+  // Animate in new waterfall
+  const uint8_t currentWfFg = IOGetCurrentHoleWaterfallForeground();
+  const uint8_t currentWfBg = IOGetCurrentHoleWaterfallBackground(); 
+
+//   const uint8_t wfFg = IOGetCurrentHoleWaterfallForeground();
+//   const uint8_t wfBg = IOGetCurrentHoleWaterfallBackground();
+
+  if (currentWfFg != prevWfFg) {
+    for (int i = startID; i < (startID+6); ++i) { // Bakground
+      if (i >= WFSHEET_SIZE_Y + 1) break;
+      pd->graphics->drawBitmap(bitmapGetWfBg(currentWfBg), WF_BG_OFFSET[0], (WF_DIVISION_PIX_Y * i) - wfBgOff + parallax, kBitmapUnflipped);
+    }
+    if (locked) {
+      static uint16_t timer = 0;
+      pd->graphics->setStencilImage(bitmapGetStencilWipe(timer), 0);
+      for (int i = startID; i < (startID+5); ++i) {
+        if (i >= WFSHEET_SIZE_Y) break;
+        pd->graphics->drawBitmap(bitmapGetWfFg(currentWfFg, i), 0, (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
+      }
+      pd->graphics->setStencilImage(NULL, 0);
+      if (++timer == STENCIL_WIPE_N) {
+        gameDoResetPreviousWaterfall();
+        timer = 0;
+      }
+    } else {
+      for (int i = startID; i < (startID+4); ++i) {
+        pd->graphics->drawBitmap(bitmapGetWfFg(currentWfFg, i), 0, (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
+      }
+    }
+  }
+
+  // TEMP DEBUG
+  for (int i = 0; i < 4; ++i) {
+    pd->graphics->drawRect(
+    0 + (32*i), (DEVICE_PIX_Y*(i+0)) + parallax,
+    DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
+  }
+  for (int i = 0; i < 4; ++i) {
+    pd->graphics->drawRect(
+    0           , (DEVICE_PIX_Y*(i+0)),
+    DEVICE_PIX_X, DEVICE_PIX_Y, kColorBlack);
+  }
+
+  if (FSMGetGameMode() == kGameWindow) {
+    const float minY = gameGetMinimumY(); 
+    if (gameGetYOffset() - minY < 0) {
+      pd->graphics->fillRect(0, minY - TURRET_RADIUS - 60, DEVICE_PIX_X, 60, kColorBlack); // mask in case of over-scroll
+      pd->graphics->drawBitmap(bitmapGetGameInfoTopper(), 0, minY - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
+    }
+    if (gameGetYOffset() <= -TURRET_RADIUS) { // Note no parallax here
+      pd->graphics->drawBitmap(bitmapGetLevelTitle(), 0, -DEVICE_PIX_Y - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
+    }
+  }
+
 }

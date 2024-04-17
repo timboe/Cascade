@@ -53,7 +53,7 @@ struct LinearLoader_t {
 
 void boardDoInit(void);
 
-void boardDoRandomise(void);
+void boardDoTestLevel(void);
 
 void boardDoUpdate(void);
 
