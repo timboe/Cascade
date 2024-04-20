@@ -15,8 +15,10 @@ func _on_file_dialog_confirmed():
 func _on_file_dialog_canceled():
 	print("SAVE Cancelled")
 
-func _on_pressed():
-	#$FileDialog.visible = true
+func _on_Load_pressed():
+	$FileDialog.visible = true
+	
+func _on_Import_pressed():
 	$PopupPanel.visible = true
 
 func populate_static(save_game : Dictionary, static_instance : Control) -> void:
@@ -151,3 +153,6 @@ func _on_import_pressed():
 		$PopupPanel.visible = false
 	else:
 		$PopupPanel/MarginContainer/VBoxContainer/Status.text = "JSON Parse Error: " + json.get_error_message() + " at line " + str(json.get_error_line())
+
+func _on_close_pressed():
+	$PopupPanel.visible = false

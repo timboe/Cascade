@@ -497,7 +497,7 @@ popup/item_9/id = 9
 
 [node name="Save" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
-text = "Export"
+text = "Save"
 script = ExtResource("5_n4mgq")
 
 [node name="FileDialog" type="FileDialog" parent="HBox/RightScroll/Margin/RightVBox/Grid/Save"]
@@ -506,44 +506,9 @@ size = Vector2i(600, 400)
 access = 2
 filters = PackedStringArray("*.json")
 
-[node name="PopupPanel" type="PopupPanel" parent="HBox/RightScroll/Margin/RightVBox/Grid/Save"]
-initial_position = 1
-size = Vector2i(500, 400)
-theme_override_styles/panel = ExtResource("9_cbpe6")
-
-[node name="MarginContainer" type="MarginContainer" parent="HBox/RightScroll/Margin/RightVBox/Grid/Save/PopupPanel"]
-offset_right = 500.0
-offset_bottom = 400.0
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 16
-
-[node name="VBoxContainer" type="VBoxContainer" parent="HBox/RightScroll/Margin/RightVBox/Grid/Save/PopupPanel/MarginContainer"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="Label" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid/Save/PopupPanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "EXPORTED LEVEL DATA"
-horizontal_alignment = 1
-
-[node name="TextExport" type="TextEdit" parent="HBox/RightScroll/Margin/RightVBox/Grid/Save/PopupPanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-editable = false
-
-[node name="CopyButton" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid/Save/PopupPanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "Copy Level Data"
-
-[node name="Close" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid/Save/PopupPanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "Close"
-
 [node name="Load" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
-text = "Import"
+text = "Load"
 script = ExtResource("6_81yac")
 
 [node name="FileDialog" type="FileDialog" parent="HBox/RightScroll/Margin/RightVBox/Grid/Load"]
@@ -555,12 +520,17 @@ file_mode = 0
 access = 2
 filters = PackedStringArray("*.json")
 
-[node name="PopupPanel" type="PopupPanel" parent="HBox/RightScroll/Margin/RightVBox/Grid/Load"]
+[node name="Export" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+text = "Export"
+script = ExtResource("5_n4mgq")
+
+[node name="PopupPanel" type="PopupPanel" parent="HBox/RightScroll/Margin/RightVBox/Grid/Export"]
 initial_position = 1
 size = Vector2i(500, 400)
 theme_override_styles/panel = ExtResource("9_cbpe6")
 
-[node name="MarginContainer" type="MarginContainer" parent="HBox/RightScroll/Margin/RightVBox/Grid/Load/PopupPanel"]
+[node name="MarginContainer" type="MarginContainer" parent="HBox/RightScroll/Margin/RightVBox/Grid/Export/PopupPanel"]
 offset_right = 500.0
 offset_bottom = 400.0
 theme_override_constants/margin_left = 16
@@ -568,31 +538,76 @@ theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBox/RightScroll/Margin/RightVBox/Grid/Load/PopupPanel/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HBox/RightScroll/Margin/RightVBox/Grid/Export/PopupPanel/MarginContainer"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Label" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid/Load/PopupPanel/MarginContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid/Export/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "EXPORTED LEVEL DATA"
+horizontal_alignment = 1
+
+[node name="TextExport" type="TextEdit" parent="HBox/RightScroll/Margin/RightVBox/Grid/Export/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+editable = false
+
+[node name="CopyButton" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid/Export/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Copy Level Data"
+
+[node name="Close" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid/Export/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Close"
+
+[node name="Import" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+text = "Import"
+script = ExtResource("6_81yac")
+
+[node name="PopupPanel" type="PopupPanel" parent="HBox/RightScroll/Margin/RightVBox/Grid/Import"]
+initial_position = 1
+size = Vector2i(500, 400)
+visible = true
+theme_override_styles/panel = ExtResource("9_cbpe6")
+
+[node name="MarginContainer" type="MarginContainer" parent="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel"]
+offset_right = 500.0
+offset_bottom = 400.0
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "IMPORT LEVEL DATA"
 horizontal_alignment = 1
 
-[node name="TextImport" type="TextEdit" parent="HBox/RightScroll/Margin/RightVBox/Grid/Load/PopupPanel/MarginContainer/VBoxContainer"]
+[node name="TextImport" type="TextEdit" parent="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Status" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid/Load/PopupPanel/MarginContainer/VBoxContainer"]
+[node name="Status" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Status: OK"
 horizontal_alignment = 1
 
-[node name="PasteButton" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid/Load/PopupPanel/MarginContainer/VBoxContainer"]
+[node name="PasteButton" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Paste Level Data From Clipboard"
 
-[node name="Import" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid/Load/PopupPanel/MarginContainer/VBoxContainer"]
+[node name="Import" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Import"
+
+[node name="Close" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Close"
 
 [node name="FullScreen" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
@@ -647,16 +662,19 @@ text = "PEGS"
 [connection signal="item_selected" from="HBox/RightScroll/Margin/RightVBox/Grid/Foreground" to="HBox/RightScroll/Margin/RightVBox/Grid/Foreground" method="_on_item_selected"]
 [connection signal="file_selected" from="HBox/RightScroll/Margin/RightVBox/Grid/Foreground/FileDialog" to="HBox/RightScroll/Margin/RightVBox/Grid/Foreground" method="_on_file_dialog_file_selected"]
 [connection signal="item_selected" from="HBox/RightScroll/Margin/RightVBox/Grid/Background" to="HBox/RightScroll/Margin/RightVBox/Grid/Foreground" method="_on_background_item_selected"]
-[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Save" to="HBox/RightScroll/Margin/RightVBox/Grid/Save" method="_on_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Save" to="HBox/RightScroll/Margin/RightVBox/Grid/Save" method="_on_Save_pressed"]
 [connection signal="canceled" from="HBox/RightScroll/Margin/RightVBox/Grid/Save/FileDialog" to="HBox/RightScroll/Margin/RightVBox/Grid/Save" method="_on_file_dialog_canceled"]
 [connection signal="confirmed" from="HBox/RightScroll/Margin/RightVBox/Grid/Save/FileDialog" to="HBox/RightScroll/Margin/RightVBox/Grid/Save" method="_on_file_dialog_confirmed"]
-[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Save/PopupPanel/MarginContainer/VBoxContainer/CopyButton" to="HBox/RightScroll/Margin/RightVBox/Grid/Save" method="_on_copy_button_pressed"]
-[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Save/PopupPanel/MarginContainer/VBoxContainer/Close" to="HBox/RightScroll/Margin/RightVBox/Grid/Save" method="_on_close_pressed"]
-[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Load" to="HBox/RightScroll/Margin/RightVBox/Grid/Load" method="_on_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Load" to="HBox/RightScroll/Margin/RightVBox/Grid/Load" method="_on_Load_pressed"]
 [connection signal="canceled" from="HBox/RightScroll/Margin/RightVBox/Grid/Load/FileDialog" to="HBox/RightScroll/Margin/RightVBox/Grid/Load" method="_on_file_dialog_canceled"]
 [connection signal="confirmed" from="HBox/RightScroll/Margin/RightVBox/Grid/Load/FileDialog" to="HBox/RightScroll/Margin/RightVBox/Grid/Load" method="_on_file_dialog_confirmed"]
-[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Load/PopupPanel/MarginContainer/VBoxContainer/PasteButton" to="HBox/RightScroll/Margin/RightVBox/Grid/Load" method="_on_paste_button_pressed"]
-[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Load/PopupPanel/MarginContainer/VBoxContainer/Import" to="HBox/RightScroll/Margin/RightVBox/Grid/Load" method="_on_import_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Export" to="HBox/RightScroll/Margin/RightVBox/Grid/Export" method="_on_Export_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Export/PopupPanel/MarginContainer/VBoxContainer/CopyButton" to="HBox/RightScroll/Margin/RightVBox/Grid/Export" method="_on_copy_button_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Export/PopupPanel/MarginContainer/VBoxContainer/Close" to="HBox/RightScroll/Margin/RightVBox/Grid/Export" method="_on_close_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Import" to="HBox/RightScroll/Margin/RightVBox/Grid/Import" method="_on_Import_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel/MarginContainer/VBoxContainer/PasteButton" to="HBox/RightScroll/Margin/RightVBox/Grid/Import" method="_on_paste_button_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel/MarginContainer/VBoxContainer/Import" to="HBox/RightScroll/Margin/RightVBox/Grid/Import" method="_on_import_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel/MarginContainer/VBoxContainer/Close" to="HBox/RightScroll/Margin/RightVBox/Grid/Import" method="_on_close_pressed"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/FullScreen" to="HBox/RightScroll/Margin/RightVBox/Grid/FullScreen" method="_on_pressed"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Reset" to="HBox/RightScroll/Margin/RightVBox/Grid/Load" method="reset_level"]
 [connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddStatic" to="HBox/RightScroll/Margin/RightVBox/AddStatic" method="_on_pressed"]

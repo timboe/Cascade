@@ -1,11 +1,13 @@
 extends Button
 
-func _on_pressed():
-	#var level : int = $"../LevelSlider".value
-	#var hole : int = $"../HoleSlider".value
-	#var save_name := String("level_" + str(level) + "_hole_" + str(hole) + ".json")
-	#$FileDialog.current_file = save_name
-	#$FileDialog.visible = true
+func _on_Save_pressed():
+	var level : int = $"../LevelSlider".value
+	var hole : int = $"../HoleSlider".value
+	var save_name := String("level_" + str(level) + "_hole_" + str(hole) + ".json")
+	$FileDialog.current_file = save_name
+	$FileDialog.visible = true
+	
+func _on_Export_pressed():
 	var save_game = pack_save()
 	$PopupPanel/MarginContainer/VBoxContainer/TextExport.text = JSON.stringify(save_game, "  ", false)
 	$PopupPanel.visible = true
