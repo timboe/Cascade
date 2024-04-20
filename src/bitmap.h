@@ -2,7 +2,7 @@
 #include "game.h"
 #include "peg.h"
 
-const static uint8_t WF_BG_OFFSET[] = {100, 140};
+const static uint8_t WF_BG_OFFSET[] = {100, 140, 0, 0};
 
 void bitmapDoInit(void);
 
@@ -25,7 +25,6 @@ LCDBitmap* bitmapGetUseTheCrank(void);
 LCDBitmap* bitmapGetTitleHeaderImage(void);
 LCDBitmap* bitmapGetNumeral(const int8_t n);
 LCDBitmap* bitmapGetStencilWipe(const int8_t n);
-LCDBitmap* bitmapGetDither(void);
 LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int16_t offset);
 
 LCDBitmap* bitmapGetTutorialCrankRotate(const uint8_t id);
@@ -43,6 +42,7 @@ LCDBitmap* bitmapGetTitleHoleStatsB(void);
 LCDBitmap* bitmapGetTitleHoleAuthor(void);
 LCDBitmap* bitmapGetTitleHoleName(void);
 LCDBitmap* bitmapGetTitleHoleTutorial(void);
+LCDBitmap* bitmapGetTitleScoreCard(void);
 
 LCDBitmap* bitmapGetTurretBody(void);
 LCDBitmap* bitmapGetTurretBarrel(void);
@@ -65,6 +65,7 @@ void bitmapDoUpdateLevelTitle(void);
 void bitmapDoUpdateLevelStatsBitmap(void);
 void bitmapDoUpdateHoleStatsBitmap(void);
 void bitmapDoUpdateScoreHistogram(void);
+void bitmapDoUpdateScoreCard(void);
 
 float bitmapSizeToScale(const uint8_t size);
 

@@ -112,7 +112,7 @@
 
 /// ///
 
-#define N_WF 3
+#define N_WF 4
 
 #define N_MUSIC_TRACKS 5
 

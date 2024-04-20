@@ -147,6 +147,17 @@ void renderGame(const int32_t fc, const enum FSM_t fsm) {
 #endif
 }
 
+void renderBackgroundDo(int16_t bg, int16_t fg, uint16_t startID, int16_t wfBgOff, int16_t parallax) {
+  for (int i = startID; i < (startID+6); ++i) {  // Background
+    if (i >= WFSHEET_SIZE_Y + 1) break;
+    pd->graphics->drawBitmap(bitmapGetWfBg(bg), WF_BG_OFFSET[bg], (WF_DIVISION_PIX_Y * i) - wfBgOff + parallax, kBitmapUnflipped);
+  }
+  for (int i = startID; i < (startID+5); ++i) { // Foreground
+    if (i >= WFSHEET_SIZE_Y) break;
+    pd->graphics->drawBitmap(bitmapGetWfFg(fg, i), 0, (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
+  }
+}
+
 void renderCommonBackground(void) {
 
 #ifdef TAKE_SCREENSHOTS
@@ -168,46 +179,39 @@ void renderCommonBackground(void) {
   const int16_t wfBgOff = WF_DIVISION_PIX_Y - ((int)wfBgOffC % WF_DIVISION_PIX_Y); 
 
   // Draw "previous" waterfall (will become current once gameDoResetPreviousWaterfall is called)
-  const uint8_t prevWfFg = gameGetPreviousWaterfallFg();
   const uint8_t prevWfBg = gameGetPreviousWaterfallBg();
+  const uint8_t prevWfFg = gameGetPreviousWaterfallFg();
+  renderBackgroundDo(prevWfBg, prevWfFg, startID, wfBgOff, parallax);
 
-  for (int i = startID; i < (startID+6); ++i) {  // Background
-    if (i >= WFSHEET_SIZE_Y + 1) break;
-    pd->graphics->drawBitmap(bitmapGetWfBg(prevWfBg), WF_BG_OFFSET[0], (WF_DIVISION_PIX_Y * i) - wfBgOff + parallax, kBitmapUnflipped);
-  }
-  for (int i = startID; i < (startID+5); ++i) { // Foreground
-    if (i >= WFSHEET_SIZE_Y) break;
-    pd->graphics->drawBitmap(bitmapGetWfFg(prevWfFg, i), 0, (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
-  }
+  // for (int i = startID; i < (startID+6); ++i) {  // Background
+  //   if (i >= WFSHEET_SIZE_Y + 1) break;
+  //   pd->graphics->drawBitmap(bitmapGetWfBg(prevWfBg), WF_BG_OFFSET[0], (WF_DIVISION_PIX_Y * i) - wfBgOff + parallax, kBitmapUnflipped);
+  // }
+  // for (int i = startID; i < (startID+5); ++i) { // Foreground
+  //   if (i >= WFSHEET_SIZE_Y) break;
+  //   pd->graphics->drawBitmap(bitmapGetWfFg(prevWfFg, i), 0, (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
+  // }
 
   // Animate in new waterfall
-  const uint8_t currentWfFg = IOGetCurrentHoleWaterfallForeground();
   const uint8_t currentWfBg = IOGetCurrentHoleWaterfallBackground(); 
+  const uint8_t currentWfFg = IOGetCurrentHoleWaterfallForeground();
 
 //   const uint8_t wfFg = IOGetCurrentHoleWaterfallForeground();
 //   const uint8_t wfBg = IOGetCurrentHoleWaterfallBackground();
 
-  if (currentWfFg != prevWfFg) {
-    for (int i = startID; i < (startID+6); ++i) { // Bakground
-      if (i >= WFSHEET_SIZE_Y + 1) break;
-      pd->graphics->drawBitmap(bitmapGetWfBg(currentWfBg), WF_BG_OFFSET[0], (WF_DIVISION_PIX_Y * i) - wfBgOff + parallax, kBitmapUnflipped);
-    }
+  if (currentWfFg != prevWfFg || currentWfBg != prevWfBg) {
+
     if (locked) {
       static uint16_t timer = 0;
       pd->graphics->setStencilImage(bitmapGetStencilWipe(timer), 0);
-      for (int i = startID; i < (startID+5); ++i) {
-        if (i >= WFSHEET_SIZE_Y) break;
-        pd->graphics->drawBitmap(bitmapGetWfFg(currentWfFg, i), 0, (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
-      }
+      renderBackgroundDo(currentWfBg, currentWfFg, startID, wfBgOff, parallax);
       pd->graphics->setStencilImage(NULL, 0);
       if (++timer == STENCIL_WIPE_N) {
         gameDoResetPreviousWaterfall();
         timer = 0;
       }
     } else {
-      for (int i = startID; i < (startID+4); ++i) {
-        pd->graphics->drawBitmap(bitmapGetWfFg(currentWfFg, i), 0, (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
-      }
+      renderBackgroundDo(currentWfBg, currentWfFg, startID, wfBgOff, parallax);
     }
   }
 

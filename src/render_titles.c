@@ -41,6 +41,9 @@ void renderTitlesPlayerSelect(const bool locked) {
   // commonRenderBackgroundWaterfallWithAnim(locked, 4, &newWaterfallTimer);
   const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y); // Hard = true
 
+  bitmapDoUpdateScoreCard();
+  pd->graphics->drawBitmap(bitmapGetTitleScoreCard(), HALF_DEVICE_PIX_X - 5*BUF/2, DEVICE_PIX_Y + 3*BUF/4, kBitmapUnflipped);
+
   uint8_t digit[3];
   digit[1] = IOGetCurrentPlayer();
   digit[0] = digit[1] == 0 ? MAX_PLAYERS-1 : digit[1]-1;
@@ -121,7 +124,6 @@ void renderTitlesHoleSelect(const bool locked) {
   offset += WF_VELOCITY;
   if (bm) { pd->graphics->drawBitmap(bm, DEVICE_PIX_X - 200, DEVICE_PIX_Y*3 + parallax, kBitmapUnflipped); }
 
-  pd->graphics->drawBitmap(bitmapGetDither(), 0, (WF_DIVISION_PIX_Y * 15), kBitmapUnflipped);
   pd->graphics->drawBitmap(bitmapGetTitleHoleName(), HALF_DEVICE_PIX_X, (DEVICE_PIX_Y * 3) + NUMERAL_BUF - TITLETEXT_HEIGHT + parallax, kBitmapUnflipped);
   pd->graphics->drawBitmap(bitmapGetTitleHoleAuthor(), HALF_DEVICE_PIX_X, (DEVICE_PIX_Y * 4) - NUMERAL_BUF + parallax, kBitmapUnflipped);
 

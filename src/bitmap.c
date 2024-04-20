@@ -43,12 +43,15 @@ LCDBitmap* m_holeAuthorBitmap;
 LCDBitmap* m_holeNameBitmap;
 LCDBitmap* m_holeTutorialBitmap;
 
+LCDBitmap* m_scoreCardBitmap;
+
 LCDBitmap* m_useTheCrankBitmap;
 
 LCDBitmap* m_ditherBitmap;
 
 LCDBitmap* m_previewBitmap[MAX_LEVELS][MAX_HOLES] = {0};
 LCDBitmap* m_previewBitmapWindow;
+LCDBitmap* m_previewBitmapStencil;
 
 LCDBitmap* m_stencilWipeBitmap[STENCIL_WIPE_N];
 
@@ -265,14 +268,15 @@ LCDBitmap* bitmapGetTitleHoleName(void) { return m_holeNameBitmap; }
 
 LCDBitmap* bitmapGetTitleHoleTutorial(void) { return m_holeTutorialBitmap; }
 
-LCDBitmap* bitmapGetDither(void) { return m_ditherBitmap; }
+LCDBitmap* bitmapGetTitleScoreCard(void) { return m_scoreCardBitmap; }
 
 LCDBitmap* bitmapGetStar(const uint8_t type, const uint8_t angle) { return m_starBitmap[type][angle % 128]; }
 
 LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int16_t offset) {
-  pd->graphics->clearBitmap(m_previewBitmapWindow, kColorBlack);
+  pd->graphics->clearBitmap(m_previewBitmapWindow, kColorClear);
   if (!m_previewBitmap[level][hole]) { return m_previewBitmapWindow; }
   pd->graphics->pushContext(m_previewBitmapWindow);
+  pd->graphics->setStencilImage(m_previewBitmapStencil, 0);
   pd->graphics->setDrawMode(kDrawModeInverted);
   if (IOGetCurrentHoleHeight() <= DEVICE_PIX_Y*2) {
     offset = (DEVICE_PIX_Y - (IOGetCurrentHoleHeight()/2)) / 2;
@@ -283,6 +287,7 @@ LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int1
     pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, offset - (IOGetCurrentHoleHeight()/2), kBitmapUnflipped);
   }
   pd->graphics->setDrawMode(kDrawModeCopy);
+  pd->graphics->setStencilImage(NULL, 0);
   pd->graphics->popContext();
   return m_previewBitmapWindow;
 }
@@ -454,6 +459,167 @@ void bitmapDoUpdateScoreHistogram(void) {
   pd->graphics->popContext();
 }
 
+void bitmapDoUpdateScoreCard(void) {
+
+  uint16_t rounds[MAX_LEVELS] = {-1};
+  uint16_t holesPlayed[MAX_LEVELS] = {0};
+  uint16_t holesTotal[MAX_LEVELS] = {0};
+  uint16_t pars[MAX_LEVELS] = {0};
+  uint16_t scores[MAX_LEVELS] = {0};
+  uint16_t totPar = 0;
+  uint16_t totScore = 0;
+  uint16_t d = 0;
+  for (int l = 0; l < MAX_LEVELS; ++l) {
+    uint16_t par = 0;
+    uint16_t score = 0;
+    uint16_t played = 0;
+    uint16_t total = 0;
+    for (int h = 0; h < MAX_HOLES; ++h) {
+      const uint16_t p = IOGetPar(l, h);
+      const uint16_t s = IOGetScore(l, h);
+      par += p;
+      score += s;
+      if (p) { total++; }
+      if (p && s) { 
+        played++;
+        totPar += p;
+        totScore += s;
+      } 
+    }
+    //
+    if (!played && d) { continue; }
+    if (total != played) { score = 0; }
+    //
+    rounds[d] = l;
+    holesPlayed[d] = played;
+    holesTotal[d] = total;
+    pars[d] = par;
+    scores[d] = score;
+    ++d;
+  }
+
+
+  pd->graphics->clearBitmap(m_scoreCardBitmap, kColorClear);
+  pd->graphics->pushContext(m_scoreCardBitmap);
+
+  const uint8_t PIXX = 17;
+  const uint8_t PIXY = 16;
+  const uint8_t N_MAX = 7;
+  const uint8_t TBAR = 56;
+  const uint8_t BBAR = 11*PIXY + PIXY/2;
+
+  int points[12] = {
+    1*PIXX,  TBAR - (3*PIXY),
+    10*PIXX, TBAR - (3*PIXY),
+    13*PIXX, TBAR,
+    13*PIXX, BBAR + PIXY + PIXY/2,
+    4*PIXX, BBAR + PIXY + PIXY/2,
+    4*PIXX, TBAR
+  };
+  pd->graphics->fillPolygon(6, points, kColorBlack, kPolygonFillNonZero);
+
+  pd->graphics->drawLine(1*PIXX, TBAR - (3*PIXY), 10*PIXX, TBAR - (3*PIXY), 4, kColorWhite); // ---
+  pd->graphics->drawLine(4*PIXX, TBAR, 13*PIXX, TBAR, 4, kColorWhite); // ---
+
+  pd->graphics->drawLine(4*PIXX, BBAR, 13*PIXX, BBAR, 4, kColorWhite); // ---
+  pd->graphics->drawLine(4*PIXX, BBAR + PIXY + PIXY/2, 13*PIXX, BBAR + PIXY + PIXY/2, 4, kColorWhite); // ---
+
+
+  pd->graphics->drawLine(4*PIXX, TBAR, 4*PIXX, BBAR + PIXY + PIXY/2, 4, kColorWhite);
+  pd->graphics->drawLine(1*PIXX, TBAR - (3*PIXY), 4*PIXX, TBAR, 4, kColorWhite);
+
+  pd->graphics->drawLine(6*PIXX, TBAR, 6*PIXX, BBAR, 4, kColorWhite);
+  pd->graphics->drawLine(3*PIXX, TBAR - (3*PIXY), 6*PIXX, TBAR, 4, kColorWhite);
+
+  pd->graphics->drawLine(8*PIXX, TBAR, 8*PIXX, BBAR, 4, kColorWhite);
+  pd->graphics->drawLine(5*PIXX, TBAR - (3*PIXY), 8*PIXX, TBAR, 4, kColorWhite);
+
+  pd->graphics->drawLine(10*PIXX, TBAR, 10*PIXX, BBAR, 4, kColorWhite);
+  pd->graphics->drawLine(7*PIXX, TBAR - (3*PIXY), 10*PIXX, TBAR, 4, kColorWhite);
+
+  pd->graphics->drawLine(13*PIXX, TBAR, 13*PIXX, BBAR + PIXY + PIXY/2, 4, kColorWhite);
+  pd->graphics->drawLine(10*PIXX, TBAR - (3*PIXY), 13*PIXX, TBAR, 4, kColorWhite);
+
+  bitmapSetRoobert10();
+  LCDBitmap* tempBitmap = pd->graphics->newBitmap(64, 64, kColorClear);
+  for (int i = 0; i < 4; ++i) {
+    pd->graphics->clearBitmap(tempBitmap, kColorClear);
+    pd->graphics->pushContext(tempBitmap);
+    bitmapSetRoobert10();
+    const char* text;
+    switch (i) {
+      case 0: text = "ROUND"; break;
+      case 1: text = "HOLES"; break;
+      case 2: text = "PAR  "; break; // Spaces for better alignment
+      case 3: text = "SCORE"; break;
+    }
+    const int32_t w = pd->graphics->getTextWidth(bitmapGetRoobert10(), text, 128, kUTF8Encoding, 0);
+    pd->graphics->setDrawMode(kDrawModeFillWhite);
+    pd->graphics->drawText(text, 128, kUTF8Encoding, 64 - w, 32 - 8);
+    pd->graphics->popContext();
+    uint8_t extra = (i == 3 ? BUF/2 : 0); 
+    pd->graphics->drawRotatedBitmap(tempBitmap, 3*PIXX + i*PIXX*2 + extra, 24, 45.0f, 0.5f, 0.5f, 1.0f, 1.0f);
+  }
+  pd->graphics->freeBitmap(tempBitmap);
+
+  uint32_t start = 0;
+  uint32_t stop = d;
+  uint16_t yOff = 0;
+
+  static uint32_t timer = 0;
+  ++timer;
+
+  // Scroll mode
+  if (d > N_MAX) {
+    start = (timer/2) / BUF;
+    stop = start + N_MAX + 1;
+    yOff = (timer/2) % BUF;
+  }
+
+  pd->graphics->setClipRect(4*PIXX, TBAR, 9*PIXX, BBAR - TBAR);
+
+  pd->graphics->setDrawMode(kDrawModeFillWhite);
+  uint8_t count = 0;
+  for (int i = start; i < stop; ++i) {
+    const uint16_t l = i % d; 
+    char text[128];
+
+    snprintf(text, 128, "%i", rounds[l]+1);
+    int32_t w = pd->graphics->getTextWidth(bitmapGetRoobert10(), text, 128, kUTF8Encoding, 0);
+    pd->graphics->drawText(text, 128, kUTF8Encoding, 5*PIXX - w/2, 4*PIXY + (count*PIXY) - yOff);
+
+    snprintf(text, 128, "%i/%i", holesPlayed[l], holesTotal[l]);
+    w = pd->graphics->getTextWidth(bitmapGetRoobert10(), text, 128, kUTF8Encoding, 0);
+    pd->graphics->drawText(text, 128, kUTF8Encoding, 7*PIXX - w/2, 4*PIXY + (count*PIXY) - yOff);
+
+    if (scores[l] == 0) { // Not played all holes
+      snprintf(text, 128, "~");
+    } else {
+      int16_t diff = pars[l] - scores[l];
+      if (diff > 0) { snprintf(text, 128, "+%i", diff); }
+      else { snprintf(text, 128, "%i", diff); }
+    }
+    w = pd->graphics->getTextWidth(bitmapGetRoobert10(), text, 128, kUTF8Encoding, 0);
+    pd->graphics->drawText(text, 128, kUTF8Encoding, 11*PIXX + PIXX/2 - w/2, 4*PIXY + (count*PIXY) - yOff);
+
+    ++count;
+  }
+
+  pd->graphics->clearClipRect();
+
+  {
+    char text[128];
+    int16_t tot = totPar - totScore;
+    if (tot > 0) { snprintf(text, 128, "TOTAL %i OVER PAR", tot); }
+    else if (tot < 0) { snprintf(text, 128, "TOTAL %i UNDER PAR", tot*-1); }
+    else { snprintf(text, 128, "TOTAL EQUAL TO PAR"); }
+    const int32_t w = pd->graphics->getTextWidth(bitmapGetRoobert10(), text, 128, kUTF8Encoding, 0);
+    pd->graphics->drawText(text, 128, kUTF8Encoding, 8*PIXX + PIXX/2 - w/2, BBAR + PIXY/4);
+  }
+
+  pd->graphics->popContext();
+}
+
 
 void bitmapDoUpdateLevelStatsBitmap(void) {
   bitmapSetRoobert24();
@@ -578,6 +744,8 @@ void bitmapDoPreloadA(void) {
 
   m_levelStatsBitmap = pd->graphics->newBitmap(NUMERAL_PIX_X*2, TITLETEXT_HEIGHT, kColorClear);
 
+  m_scoreCardBitmap = pd->graphics->newBitmap(HALF_DEVICE_PIX_X + 32, DEVICE_PIX_Y, kColorClear);
+
   m_holeStatsBitmap[0] = pd->graphics->newBitmap(NUMERAL_PIX_X, TITLETEXT_HEIGHT, kColorClear);
   m_holeStatsBitmap[1] = pd->graphics->newBitmap(NUMERAL_PIX_X + (2*NUMERAL_BUF), TITLETEXT_HEIGHT, kColorClear);
   m_holeAuthorBitmap = pd->graphics->newBitmap(HALF_DEVICE_PIX_X, TITLETEXT_HEIGHT, kColorClear);
@@ -617,6 +785,7 @@ void bitmapDoPreloadD(void) {
 
 void bitmapDoPreloadE(void) {
   m_previewBitmapWindow = pd->graphics->newBitmap(HALF_DEVICE_PIX_X, DEVICE_PIX_Y, kColorClear);
+  m_previewBitmapStencil = bitmapDoLoadImageAtPath("images/previewBorder");
   char text[128];
   for (int l = 0; l < MAX_LEVELS; ++l) {
     for (int h = 0; h < MAX_HOLES; ++h) {
@@ -774,7 +943,7 @@ void bitmapDoPreloadK(void) {
     m_stencilWipeBitmap[i] = pd->graphics->newBitmap(DEVICE_PIX_X, DEVICE_PIX_Y, kColorClear);
     pd->graphics->pushContext(m_stencilWipeBitmap[i]);
     pd->graphics->setDrawMode(kDrawModeInverted); // White is used by the stencil
-    pd->graphics->drawBitmap(bitmapGetDither(), 0, -WF_DIVISION_PIX_Y + (stencilStep * i), kBitmapFlippedY);
+    pd->graphics->drawBitmap(m_ditherBitmap, 0, -WF_DIVISION_PIX_Y + (stencilStep * i), kBitmapFlippedY);
     pd->graphics->setDrawMode(kDrawModeCopy);
     pd->graphics->fillRect(0, -WF_DIVISION_PIX_Y, DEVICE_PIX_X, (stencilStep * i), kColorWhite);
     pd->graphics->popContext();
