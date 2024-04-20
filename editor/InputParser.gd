@@ -56,23 +56,23 @@ func _input(event):
 		if event.pressed and dragNode:
 			var snap = %EditorSnap.value
 			if event.keycode == KEY_UP :
-				dragNode.find_child("YText").value -= snap
+				dragNode.find_child("YText", true, false).value -= snap
 				get_tree().get_root().set_input_as_handled()
 			if event.keycode == KEY_DOWN :
-				dragNode.find_child("YText").value += snap
+				dragNode.find_child("YText", true, false).value += snap
 				get_tree().get_root().set_input_as_handled()
 			if event.keycode == KEY_LEFT :
-				dragNode.find_child("XText").value -= snap
+				dragNode.find_child("XText", true, false).value -= snap
 				get_tree().get_root().set_input_as_handled()
 			if event.keycode == KEY_RIGHT :
-				dragNode.find_child("XText").value += snap
+				dragNode.find_child("XText", true, false).value += snap
 				get_tree().get_root().set_input_as_handled()
 			if event.keycode == KEY_C :
-				dragNode.find_child("Clone")._on_pressed()
+				dragNode.find_child("Clone", true, false)._on_pressed()
 				get_tree().get_root().set_input_as_handled()
 				dragNode = mostRecentlyCloned
 			if event.keycode == KEY_D :
-				dragNode.find_child("Remove")._on_pressed()
+				dragNode.find_child("Remove", true, false)._on_pressed()
 				get_tree().get_root().set_input_as_handled()
 					
 	if event is InputEventMouseButton:

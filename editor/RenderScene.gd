@@ -17,7 +17,7 @@ func sizeToScale(size : int) -> float:
 		0: return 1.25
 		1: return 1.5
 		2: return 1.75
-		3: return 2.0
+		3: return 2.5
 	return 1.0;
 	
 func fillColor(type : int) -> Color:

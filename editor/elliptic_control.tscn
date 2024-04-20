@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://l2fsqq1mog6x"]
+[gd_scene load_steps=8 format=3 uid="uid://l2fsqq1mog6x"]
 
 [ext_resource type="Script" path="res://PathSlider.gd" id="1_x3mqg"]
 [ext_resource type="Script" path="res://MenuButtonScript.tres.gd" id="2_sdnji"]
@@ -28,6 +28,45 @@ func new_max_y(new_max : int):
 
 func _on_value_changed(_value):
 	rend.do_update()
+"
+
+[sub_resource type="GDScript" id="GDScript_wi6sb"]
+script/source = "extends Button
+
+@onready var add_elliptic = $/root/RootControl.find_child(\"AddElliptic\")
+
+@onready var ip = $/root/RootControl.find_child(\"InputParser\")
+
+func _on_pressed():
+	add_elliptic._on_pressed()
+	var new_elliptic = $/root/RootControl.find_child(\"EllipticControl\" + str(add_elliptic.elliptic_count), true, false)
+	new_elliptic.find_child(\"CheckRect\", true, false).button_pressed = $\"../../Grid1/CheckRect\".button_pressed
+	new_elliptic.find_child(\"XText\", true, false).value = $\"../XText\".value + 16
+	new_elliptic.find_child(\"YText\", true, false).value = $\"../YText\".value + 16
+	new_elliptic.find_child(\"SizeText\", true, false).selected = $\"../SizeText\".selected
+	new_elliptic.find_child(\"AngleText\", true, false).value = $\"../AngleText\".value
+	new_elliptic.find_child(\"ArcText\", true, false).value = $\"../ArcText\".value
+	new_elliptic.find_child(\"SpeedText\", true, false).value = $\"../SpeedText\".value
+	new_elliptic.find_child(\"AText\", true, false).value = $\"../AText\".value
+	new_elliptic.find_child(\"BText\", true, false).value = $\"../BText\".value
+	new_elliptic.find_child(\"ArcAngleCheckbox\", true, false).button_pressed = $\"../ArcAngleCheckbox\".button_pressed
+	var n_peg = $\"../../HBoxContainer2/PathSlider\".value
+	new_elliptic.find_child(\"PathSlider\", true, false).value = n_peg
+	for i in range(n_peg):
+		var peg_name : String = \"PegContainer\"+str(i+1)
+		var new_peg_container : Control = new_elliptic.find_child(peg_name, true, false)
+		var old_peg_container : Control = get_parent().get_parent().find_child(peg_name, true, false)
+		new_peg_container.find_child(\"ShapeButton\").selected = old_peg_container.find_child(\"ShapeButton\").selected
+		new_peg_container.find_child(\"SizeButton\").selected = old_peg_container.find_child(\"SizeButton\").selected
+		new_peg_container.find_child(\"TypeButton\").selected = old_peg_container.find_child(\"TypeButton\").selected
+	ip.mostRecentlyCloned = new_elliptic
+"
+
+[sub_resource type="GDScript" id="GDScript_k0d6m"]
+script/source = "extends Button
+
+func _on_pressed():
+	get_parent().get_parent().get_parent().get_parent().queue_free()
 "
 
 [node name="EllipticControl" type="Panel" groups=["elliptic_pegs", "pegs"]]
@@ -234,10 +273,27 @@ tooltip_text = "Pegs inherit their angle from their position around the ellipse.
 button_pressed = true
 script = ExtResource("2_sdnji")
 
-[node name="Remove" type="Button" parent="Margin/EllipticVBox"]
+[node name="Dummy" type="Label" parent="Margin/EllipticVBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+
+[node name="Clone" type="Button" parent="Margin/EllipticVBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Clone"
+script = SubResource("GDScript_wi6sb")
+
+[node name="Dummy2" type="Label" parent="Margin/EllipticVBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+
+[node name="Remove" type="Button" parent="Margin/EllipticVBox/Grid2"]
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Remove"
+script = SubResource("GDScript_k0d6m")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Margin/EllipticVBox"]
 layout_mode = 2
@@ -289,4 +345,5 @@ layout_mode = 2
 [connection signal="value_changed" from="Margin/EllipticVBox/Grid2/AngleText" to="Margin/EllipticVBox/Grid2/YText" method="_on_value_changed"]
 [connection signal="pressed" from="Margin/EllipticVBox/Grid2/ArcAngleCheckbox" to="Margin/EllipticVBox/Grid2/ArcAngleCheckbox" method="_on_pressed"]
 [connection signal="toggled" from="Margin/EllipticVBox/Grid2/ArcAngleCheckbox" to="Margin/EllipticVBox/Grid2/ArcAngleCheckbox" method="_on_toggled"]
-[connection signal="pressed" from="Margin/EllipticVBox/Remove" to="." method="queue_free"]
+[connection signal="pressed" from="Margin/EllipticVBox/Grid2/Clone" to="Margin/EllipticVBox/Grid2/Clone" method="_on_pressed"]
+[connection signal="pressed" from="Margin/EllipticVBox/Grid2/Remove" to="Margin/EllipticVBox/Grid2/Remove" method="_on_pressed"]
