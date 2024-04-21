@@ -233,70 +233,7 @@ void renderGameBoard(const int32_t fc) {
 
 }
 
-// void renderGameBackground(void) {
-// #ifdef TAKE_SCREENSHOTS
-//   if (screenShotGetInProgress()) { return; }
-// #endif
-
-//   const int32_t parallax = gameGetParalaxFactorFar(false); // Note: float -> int here. Hard=false
-//   const int32_t so = ((int32_t) gameGetYOffset()) - parallax;
-//   const uint32_t startID = MAX(0, so / WF_DIVISION_PIX_Y);
-
-//   // pd->system->logToConsole("so is %i, rendering from %i to %i", so, startID, start+5);
-
-//   const uint8_t wfFg = IOGetCurrentHoleWaterfallForeground();
-//   const uint8_t wfBg = IOGetCurrentHoleWaterfallBackground();
-
-//   static float wfOffC = 0;
-//   wfOffC += WF_VELOCITY * physicsGetTimestepMultiplier();
-//   const int16_t wfOff = WF_DIVISION_PIX_Y - ((int)wfOffC % WF_DIVISION_PIX_Y); 
-  
-//   // TEMP second draw. Based on the sizes of the current bitmaps
-//   int16_t secondDraw = wfBg == 0 ? 152 : 130;
-
-//   // Draw background
-//   for (uint32_t i = startID; i < startID+6; ++i) { 
-//     // if (i >= (WFSHEET_SIZE_Y - 2)) { break; }
-//     if (WF_DIVISION_PIX_Y*i > IOGetCurrentHoleHeight()) { break; }
-//     pd->graphics->setDrawMode(kDrawModeCopy);
-//     pd->graphics->drawBitmap(bitmapGetWfBg(wfBg), WF_BG_OFFSET[wfBg], (WF_DIVISION_PIX_Y*i) - wfOff + parallax, kBitmapUnflipped);
-//     pd->graphics->drawBitmap(bitmapGetWfBg(wfBg), WF_BG_OFFSET[wfBg] + secondDraw, (WF_DIVISION_PIX_Y*i) - wfOff + parallax, kBitmapUnflipped);
-//     pd->graphics->setDrawMode(kDrawModeCopy);
-//   }
-
-//   // Draw foreground
-//   for (uint32_t i = startID; i < startID+5; ++i) {
-//     LCDBitmap* bm = bitmapGetWfFg(wfFg, i);
-//     if (WF_DIVISION_PIX_Y * i > IOGetCurrentHoleHeight()) { break; }
-//     if (i >= 12) break;
-//     if (bm) pd->graphics->drawBitmap(bm, 0, (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
-//   }
-
-//   //Temp
-//   for (int i = 0; i < 4; ++i) {
-//     pd->graphics->drawRect(
-//     0 + (32*i), (DEVICE_PIX_Y*(i+0)) + parallax,
-//     DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
-//   }
-
-//   for (int i = 0; i < 4; ++i) {
-//     pd->graphics->drawRect(
-//     0           , (DEVICE_PIX_Y*(i+0)),
-//     DEVICE_PIX_X, DEVICE_PIX_Y, kColorBlack);
-//   }
-
-//   const float minY = gameGetMinimumY(); 
-//   if (gameGetYOffset() - minY < 0) {
-//     pd->graphics->fillRect(0, minY - TURRET_RADIUS - 60, DEVICE_PIX_X, 60, kColorBlack); // mask in case of over-scroll
-//     pd->graphics->drawBitmap(bitmapGetGameInfoTopper(), 0, minY - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
-//   }
-
-//   if (gameGetYOffset() <= -TURRET_RADIUS) { // Note no parallax here
-//     pd->graphics->drawBitmap(bitmapGetLevelTitle(), 0, -DEVICE_PIX_Y - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
-//   }
-// }
-
-void renderGameGutter(void) {
+void renderGameGutter(const int32_t fc) {
 #ifdef TAKE_SCREENSHOTS
   if (screenShotGetInProgress()) { return; }
 #endif
@@ -314,12 +251,17 @@ void renderGameGutter(void) {
 
   //Note no parallax here
   if (so > DEVICE_PIX_Y * 4) {
-    pd->graphics->drawBitmap(BitmapGetScoreHistogram(), 0, DEVICE_PIX_Y * 5, kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetScoreHistogram(), 0, DEVICE_PIX_Y * 5, kBitmapUnflipped);
     for (int i = 0; i < m_ballFallN; ++i) {
       pd->graphics->drawBitmap(bitmapGetMarble(),
         BUF + BALL_RADIUS/2 + m_ballFallX*3*BALL_RADIUS,
         (DEVICE_PIX_Y * 5) + m_ballFallY[i],
         kBitmapUnflipped);
+    }
+
+    if (FSMGet() == kGameFSM_DisplayScores) {
+      pd->graphics->drawBitmap(bitmapGetChevron((fc / (TICK_FREQUENCY/2)) % 3), DEVICE_PIX_X - 2*BUF - 96, DEVICE_PIX_Y*5 + BUF, kBitmapFlippedY);
+      pd->graphics->drawBitmap(bitmapGetChevron((fc / (TICK_FREQUENCY/2)) % 3), DEVICE_PIX_X - 2*BUF - 96, DEVICE_PIX_Y*6 - 96 - BUF, kBitmapUnflipped);
     }
   }
 

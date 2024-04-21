@@ -51,7 +51,6 @@ void FSMDisplayTitles(const bool newState) {
 void FSMTitlesToChoosePlayer(const bool newState) {
   static int16_t timer = 0;
   if (newState) { 
-    IODoGoToNextUnplayedLevel();
     timer = 0;
   }
   // pd->system->logToConsole("Timer %i which is progress %f", timer, (float)timer/TIME_TITLE_TRANSITION);
@@ -63,6 +62,8 @@ void FSMChoosePlayer(const bool newState) {
   static float progress = 0.0f;
   if (newState) {
     progress = 0.0f;
+    gameDoResetPreviousWaterfall();
+    IODoGoToNextUnplayedLevel();
     gameDoPopulateMenuTitlesPlayer();
   }
   const float status = FSMCommonCrankNumeral(&progress);

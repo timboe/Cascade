@@ -83,6 +83,7 @@ LCDBitmap* m_wfPond;
 LCDBitmap* m_wfBg[N_WF];
 LCDBitmapTable* m_sheetWfFg[N_WF];
 LCDBitmapTable* m_waterSplashTable;
+LCDBitmapTable* m_chevronTable;
 
 LCDBitmapTable* m_blastTable;
 LCDBitmapTable* m_tutorialCrankRotateTable;
@@ -216,14 +217,14 @@ LCDBitmap* bitmapGetTitleHeaderImage(void) { return m_headerImage; }
 
 LCDBitmap* bitmapGetWfPond(void) { return m_wfPond; }
 
-LCDBitmap* bitmapGetWfBg(const uint8_t wf) { return m_wfBg[wf]; }
+LCDBitmap* bitmapGetWfBg(const uint8_t wf) { return m_wfBg[wf % N_WF]; }
 
 LCDBitmap* bitmapGetWaterSplash(const uint8_t id) { 
   return pd->graphics->getTableBitmap(m_waterSplashTable, id);
 }
 
 LCDBitmap* bitmapGetWfFg(const uint8_t wf, const uint8_t id) {
-  return pd->graphics->getTableBitmap(m_sheetWfFg[wf], id);
+  return pd->graphics->getTableBitmap(m_sheetWfFg[wf % N_WF], id);
 }
 
 LCDBitmap* bitmapGetBlast(const uint8_t id) {
@@ -282,7 +283,7 @@ LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int1
     offset = (DEVICE_PIX_Y - (IOGetCurrentHoleHeight()/2)) / 2;
     pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, offset, kBitmapUnflipped);
   } else {
-    offset = offset % (DEVICE_PIX_Y*2);
+    offset = offset % (IOGetCurrentHoleHeight()/2);
     pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, offset, kBitmapUnflipped);
     pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, offset - (IOGetCurrentHoleHeight()/2), kBitmapUnflipped);
   }
@@ -341,13 +342,17 @@ float bitmapSizeToScale(uint8_t size) {
     case 0: return 1.25f;
     case 1: return 1.50f;
     case 2: return 1.75f;
-    case 3: return 2.0f;
+    case 3: return 2.5f;
     default: pd->system->error("Error bitmapSizeToScale called with unknown size %i", size);
   }
   return 1.0f;
 }
 
-LCDBitmap* BitmapGetScoreHistogram(void) { return m_scoreHistogram; }
+LCDBitmap* bitmapGetScoreHistogram(void) { return m_scoreHistogram; }
+
+LCDBitmap* bitmapGetChevron(const uint8_t id) {
+  return pd->graphics->getTableBitmap(m_chevronTable, id % 3);
+}
 
 // Can't currently use bitmapDoDrawRotatedPoly here as the points are not evenly spaced around the unit circle
 void bitmapDoDrawRotatedRect(const float x, const float y, const float w2, const float h2, const uint8_t iAngle, const enum RenderColor_t rc) {
@@ -730,7 +735,7 @@ void bitmapDoPreloadA(void) {
   m_tutorialButtonTable = bitmapDoLoadImageTableAtPath("images/buttonPressed");
   m_tutorialDPadTable = bitmapDoLoadImageTableAtPath("images/dPad");
   m_tutorialArrowsTable = bitmapDoLoadImageTableAtPath("images/tutorialPoint");
-
+  m_chevronTable =  bitmapDoLoadImageTableAtPath("images/chevron");
 
   m_fontRoobert24 = bitmapDoLoadFontAtPath("fonts/Roobert-24-Medium");
   m_fontRoobert10 = bitmapDoLoadFontAtPath("fonts/Roobert-10-Bold");

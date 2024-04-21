@@ -53,15 +53,15 @@
 
 // TIMINGS
 
-#define BASE_TIME (TICK_FREQUENCY)
+#define BASE_TIME (TICK_FREQUENCY*2)
 
 #define TIME_TITLE_TRANSITION (BASE_TIME/2)
 #define TIME_TITLE_HOLE_TO_SPLASH (BASE_TIME/2)
 // Testing VERY short on this one
-#define TIME_DISPLAY_SPLASH (BASE_TIME/50)
+#define TIME_DISPLAY_SPLASH (BASE_TIME/2)
 #define TIME_SPLASH_TO_GAME (BASE_TIME/2)
 #define TIME_AIM_SCROLL_TO_TOP (BASE_TIME/2)
-#define TIME_FIRE_MARBLE ((9*BASE_TIME)/10)
+#define TIME_FIRE_MARBLE ((9*TICK_FREQUENCY)/10)
 #define TIME_STUCK_POP (BASE_TIME/5)
 #define TIME_GUTTER_TO_SCORE (BASE_TIME/2)
 #define TIME_BALL_DROP_DELAY (BASE_TIME/5)
@@ -84,13 +84,11 @@
 
 #define TRAUMA_BLAST_HIT 3.0f
 
-// top two were kEaseInOutQuad
-#define EASE_TITLE_DOWNWARDS kEaseLinear
-#define EASE_TITLE_UPWARDS kEaseLinear
-#define EASE_TITLE_HOLE_TO_SPLASH kEaseLinear
+#define EASE_TITLE_DOWNWARDS kEaseInOutQuad
+#define EASE_TITLE_UPWARDS kEaseInOutQuad
+#define EASE_TITLE_HOLE_TO_SPLASH kEaseInOutSine
 #define EASE_MARBLE_FIRE kEaseOutQuart
-// was kEaseInOutQuint
-#define EASE_SPLASH_TO_GAME kEaseLinear
+#define EASE_SPLASH_TO_GAME kEaseInOutQuint
 // This next one is a B press while scrolled down, it should be snappy
 #define EASE_AIM_SCROLL_TO_TOP kEaseInOutQuint
 #define EASE_GUTTER_TO_TOP kEaseInOutSine

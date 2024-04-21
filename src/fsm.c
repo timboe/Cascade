@@ -49,6 +49,7 @@ void FSMDo(const enum FSM_t transitionTo) {
     case kGameFSM_GutterToTurret: return FSMGutterToTurret(newState);
     case kGameFSM_GutterToScores: return FSMGutterToScores(newState);
     case kGameFSM_ScoresAnimation: return FSMScoresAnimation(newState);
+    case kGameFSM_DisplayScores: return FSMDisplayScores(newState);
     case kGameFSM_ScoresToChooseHole: return FSMScoresToChooseHole(newState);
     case kGameFSM_ScoresToSplash: return FSMScoresToSplash(newState);
     case kNFSMModes: pd->system->error("FSM error kNFSMModes"); return;

@@ -4,17 +4,11 @@
 
 float m_numeralOffset = 0.0;
 
-// void commonRenderBackgroundWaterfallWithAnim(const bool locked, const uint8_t startID, uint16_t* timer);
-
 /// ///
 
 void renderSetNumeralOffset(float no) { m_numeralOffset = no; }
 
-
-
 void renderTitlesHeader(const int32_t fc) {
-  // commonRenderBackgroundWaterfallWithAnim(false, 0, NULL);
-
   bitmapSetRoobert10();
   pd->graphics->setDrawMode(kDrawModeFillWhite);
   pd->graphics->drawText(VERSION, 8, kUTF8Encoding, 8, DEVICE_PIX_Y-16);
@@ -36,9 +30,6 @@ void renderTitlesHeader(const int32_t fc) {
 }
 
 void renderTitlesPlayerSelect(const bool locked) {
-  // static uint16_t newWaterfallTimer = 0;
-  // if (!locked) newWaterfallTimer = 0;
-  // commonRenderBackgroundWaterfallWithAnim(locked, 4, &newWaterfallTimer);
   const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y); // Hard = true
 
   bitmapDoUpdateScoreCard();
@@ -68,9 +59,6 @@ void renderTitlesPlayerSelect(const bool locked) {
 }
 
 void renderTitlesLevelSelect(const bool locked) {
-  // static uint16_t newWaterfallTimer = 0;
-  // if (!locked) newWaterfallTimer = 0;
-  // commonRenderBackgroundWaterfallWithAnim(locked, 8, &newWaterfallTimer);
   const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y*2); // Hard = true
 
   uint8_t digit0[3];
@@ -112,13 +100,7 @@ void renderTitlesLevelSelect(const bool locked) {
 }
 
 void renderTitlesHoleSelect(const bool locked) {
-
- // const uint16_t currentWf = IOGetWaterfallForeground(IOGetCurrentLevel(), 0);
- //  for (int i = 8; i < 12; ++i) { // TODO -  add paralax to the start
- //    pd->graphics->drawBitmap(bitmapGetWfFg(currentWf, i), 0, WF_DIVISION_PIX_Y * (i+4), kBitmapUnflipped);
- //  }
   const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y*3); // Hard = true
-
   static float offset = 0;
   LCDBitmap* bm = bitmapGetLevelPreview(IOGetCurrentLevel(), IOGetCurrentHole(), offset);
   offset += WF_VELOCITY;

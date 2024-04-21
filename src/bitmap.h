@@ -2,7 +2,7 @@
 #include "game.h"
 #include "peg.h"
 
-const static uint8_t WF_BG_OFFSET[] = {100, 140, 0, 0};
+const static uint8_t WF_BG_OFFSET[MAX_LEVELS] = {0};
 
 void bitmapDoInit(void);
 
@@ -20,6 +20,7 @@ LCDBitmap* bitmapGetWfFg(const uint8_t wf, const uint8_t id);
 LCDBitmap* bitmapGetWfBg(const uint8_t wf);
 LCDBitmap* bitmapGetWfPond(void);
 LCDBitmap* bitmapGetWaterSplash(const uint8_t id);
+
 
 LCDBitmap* bitmapGetUseTheCrank(void);
 LCDBitmap* bitmapGetTitleHeaderImage(void);
@@ -48,7 +49,8 @@ LCDBitmap* bitmapGetTurretBody(void);
 LCDBitmap* bitmapGetTurretBarrel(void);
 LCDBitmap* bitmapGetGameInfoTopper(void);
 LCDBitmap* bitmapGetLevelTitle(void);
-LCDBitmap* BitmapGetScoreHistogram(void);
+LCDBitmap* bitmapGetScoreHistogram(void);
+LCDBitmap* bitmapGetChevron(const uint8_t id);
 
 LCDBitmap* bitmapGetPeg(const struct Peg_t* p);
 LCDBitmap* bitmapGetMarble(void);

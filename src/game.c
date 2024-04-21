@@ -17,7 +17,6 @@ uint16_t m_previousWaterfallFg = 0;
 uint16_t m_previousWaterfallBg = 0;
 
 int16_t m_minimumY = 0;
-int16_t m_maximumY = 0;
 
 float m_xOffset = 0;
 float m_yOffset = 0;
@@ -53,6 +52,7 @@ int gameLoop(void* _data) {
     static bool first = true; // Don't increment the level on the first call
     if (first) { 
       first = false;
+      IOSetLevelHole(0, 0);
     } else {
       IODoNextHoleWithLevelWrap();
       if (IOGetCurrentHole() == 0 && IOGetCurrentLevel() == 0) {

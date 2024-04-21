@@ -277,7 +277,7 @@ void pegDoHit(struct Peg_t* p) {
     if (special == kPegSpecialMultiball && !physicsGetSecondBallInPlay()) {
       physicsSetSecondBallInPlay();
     } else if (special == kPegSpecialBlast) {
-      pd->system->logToConsole("BLAST");
+      // pd->system->logToConsole("BLAST");
       boardDoClearSpecial(); // Do this first, it's going to recurse!
       boardDoSpecialBlast();
       renderAddTrauma(TRAUMA_BLAST_HIT);

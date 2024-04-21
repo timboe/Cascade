@@ -454,6 +454,7 @@ void FSMScoresAnimation(const bool newState) {
     // pd->system->logToConsole("kGameFSM_ScoresAnimation, ballsToShow %i. Current hole score is %i", ballsToShow, IOGetCurrentHoleScore());
   }
   //
+  bool moving = false;
   for (int i = 0; i < activeBalls; ++i) {
     float floorY = BUF + ((maxBallsToShow - 1 - i)*2*BALL_RADIUS);
     if (py[i] >= floorY) {
@@ -461,12 +462,17 @@ void FSMScoresAnimation(const bool newState) {
     } else {
       vy[i] += HISTO_BALL_ACCELERATION;
       py[i] += vy[i];
+      moving = true;
     }
     renderSetMarbleFallY(i, py[i]);
     // pd->system->logToConsole("kGameFSM_ScoresAnimation, i %i y %f",i, py[i]);
   }
   if (timer++ % TIME_BALL_DROP_DELAY == 0 && activeBalls < ballsToShow) { activeBalls++; }
+  if (!moving) return FSMDo(kGameFSM_DisplayScores);
+}
 
+
+void FSMDisplayScores(const bool _newState) {
   if (inputGetPressed(kButtonUp))   return FSMDo(kGameFSM_ScoresToChooseHole); // TODO apply some friction here, else move to Inputs
   if (inputGetPressed(kButtonDown)) return FSMDo(kGameFSM_ScoresToSplash);
 }

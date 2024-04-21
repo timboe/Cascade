@@ -36,7 +36,8 @@ bool renderGetSubFreeze(void) {
 }
 
 int16_t snap(int16_t s) {
-  return (s / 4) * 4;
+  return s;
+  //return (s / 4) * 4;
 }
 
 void renderAddTrauma(const float amount) {
@@ -117,20 +118,17 @@ void renderTitles(const int32_t fc) {
 
 
 void renderGame(const int32_t fc, const enum FSM_t fsm) {
-  // DRAW BACKGROUND
-  // renderGameBackground();
-
   // DRAW TURRET & TOP DECORATION
   renderGameTurret();
-
-  // DRAW PEGS
-  renderGameBoard(fc);
 
   // DRAW TRAJECTORY
   renderGameTrajectory();
 
   // DRAW GUTTER
-  renderGameGutter();
+  renderGameGutter(fc);
+
+  // DRAW PEGS
+  renderGameBoard(fc);
 
   // DRAW BALL
   renderGameMarble(fc);
@@ -183,21 +181,9 @@ void renderCommonBackground(void) {
   const uint8_t prevWfFg = gameGetPreviousWaterfallFg();
   renderBackgroundDo(prevWfBg, prevWfFg, startID, wfBgOff, parallax);
 
-  // for (int i = startID; i < (startID+6); ++i) {  // Background
-  //   if (i >= WFSHEET_SIZE_Y + 1) break;
-  //   pd->graphics->drawBitmap(bitmapGetWfBg(prevWfBg), WF_BG_OFFSET[0], (WF_DIVISION_PIX_Y * i) - wfBgOff + parallax, kBitmapUnflipped);
-  // }
-  // for (int i = startID; i < (startID+5); ++i) { // Foreground
-  //   if (i >= WFSHEET_SIZE_Y) break;
-  //   pd->graphics->drawBitmap(bitmapGetWfFg(prevWfFg, i), 0, (WF_DIVISION_PIX_Y * i) + parallax, kBitmapUnflipped);
-  // }
-
   // Animate in new waterfall
   const uint8_t currentWfBg = IOGetCurrentHoleWaterfallBackground(); 
   const uint8_t currentWfFg = IOGetCurrentHoleWaterfallForeground();
-
-//   const uint8_t wfFg = IOGetCurrentHoleWaterfallForeground();
-//   const uint8_t wfBg = IOGetCurrentHoleWaterfallBackground();
 
   if (currentWfFg != prevWfFg || currentWfBg != prevWfBg) {
 
@@ -215,17 +201,17 @@ void renderCommonBackground(void) {
     }
   }
 
-  // TEMP DEBUG
-  for (int i = 0; i < 4; ++i) {
-    pd->graphics->drawRect(
-    0 + (32*i), (DEVICE_PIX_Y*(i+0)) + parallax,
-    DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
-  }
-  for (int i = 0; i < 4; ++i) {
-    pd->graphics->drawRect(
-    0           , (DEVICE_PIX_Y*(i+0)),
-    DEVICE_PIX_X, DEVICE_PIX_Y, kColorBlack);
-  }
+  // // TEMP DEBUG
+  // for (int i = 0; i < 4; ++i) {
+  //   pd->graphics->drawRect(
+  //   0 + (32*i), (DEVICE_PIX_Y*(i+0)) + parallax,
+  //   DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
+  // }
+  // for (int i = 0; i < 4; ++i) {
+  //   pd->graphics->drawRect(
+  //   0           , (DEVICE_PIX_Y*(i+0)),
+  //   DEVICE_PIX_X, DEVICE_PIX_Y, kColorBlack);
+  // }
 
   if (FSMGetGameMode() == kGameWindow) {
     const float minY = gameGetMinimumY(); 
