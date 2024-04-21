@@ -91,7 +91,7 @@ func _on_file_dialog_file_selected(path):
 	print(\"will load custom image at \",path,\" giving \", tex)
 	if tex:
 		%ForegroundTexRect.texture = tex
-		%ForegroundTexRect.stretch_mode = TextureRect.StretchMode.STRETCH_KEEP_ASPECT
+		#%ForegroundTexRect.stretch_mode = TextureRect.StretchMode.STRETCH_KEEP_ASPECT
 "
 
 [sub_resource type="GDScript" id="GDScript_hf5xj"]
@@ -238,7 +238,6 @@ layout_mode = 2
 offset_right = 400.0
 offset_bottom = 960.0
 texture = ExtResource("3_4cp5k")
-stretch_mode = 4
 
 [node name="Turret" type="TextureRect" parent="HBox/LeftScroll/Control"]
 layout_mode = 1
