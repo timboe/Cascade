@@ -28,7 +28,14 @@ func _on_file_dialog_canceled():
 func pack_static(static_peg : Control) -> Dictionary:
 	var peg_name : String = static_peg.name
 	var payload : Dictionary
-	payload["shape"] = 1 if static_peg.find_child("CheckCirc").button_pressed else 0
+	var shape
+	if static_peg.find_child("CheckRect").button_pressed:
+		shape = 0
+	elif static_peg.find_child("CheckCirc").button_pressed:
+		shape = 1
+	elif static_peg.find_child("CheckTriangle").button_pressed:
+		shape = 2
+	payload["shape"] = shape
 	payload["x"] = static_peg.find_child("XText").value
 	payload["y"] = static_peg.find_child("YText").value
 	payload["angle"] = static_peg.find_child("AngleText").value
@@ -39,7 +46,14 @@ func pack_static(static_peg : Control) -> Dictionary:
 func pack_elliptic(elliptic_path : Control) -> Dictionary:
 	var peg_name : String = elliptic_path.name
 	var payload : Dictionary
-	payload["shape"] = 1 if elliptic_path.find_child("CheckCirc").button_pressed else 0
+	var shape
+	if elliptic_path.find_child("CheckRect").button_pressed:
+		shape = 0
+	elif elliptic_path.find_child("CheckCirc").button_pressed:
+		shape = 1
+	elif elliptic_path.find_child("CheckTriangle").button_pressed:
+		shape = 2
+	payload["shape"] = shape
 	payload["x"] = elliptic_path.find_child("XText").value
 	payload["y"] = elliptic_path.find_child("YText").value
 	payload["angle"] = elliptic_path.find_child("AngleText").value
@@ -47,6 +61,7 @@ func pack_elliptic(elliptic_path : Control) -> Dictionary:
 	payload["arc"] = elliptic_path.find_child("ArcText").value
 	payload["use_arc"] = elliptic_path.find_child("ArcAngleCheckbox").button_pressed
 	payload["speed"] = elliptic_path.find_child("SpeedText").value
+	payload["easing"] = elliptic_path.find_child("EaseText").selected
 	payload["a"] = elliptic_path.find_child("AText").value
 	payload["b"] = elliptic_path.find_child("BText").value
 	payload["n_pegs"] = elliptic_path.find_child("PathSlider").value
@@ -62,7 +77,14 @@ func pack_elliptic(elliptic_path : Control) -> Dictionary:
 func pack_linear(linear_path : Control) -> Dictionary:
 	var peg_name : String = linear_path.name
 	var payload : Dictionary
-	payload["shape"] = 1 if linear_path.find_child("CheckCirc").button_pressed else 0
+	var shape
+	if linear_path.find_child("CheckRect").button_pressed:
+		shape = 0
+	elif linear_path.find_child("CheckCirc").button_pressed:
+		shape = 1
+	elif linear_path.find_child("CheckTriangle").button_pressed:
+		shape = 2
+	payload["shape"] = shape
 	payload["x"] = linear_path.find_child("XText").value
 	payload["y"] = linear_path.find_child("YText").value
 	payload["angle"] = linear_path.find_child("AngleText").value
@@ -70,6 +92,7 @@ func pack_linear(linear_path : Control) -> Dictionary:
 	payload["arc"] = linear_path.find_child("ArcText").value
 	payload["use_arc"] = linear_path.find_child("ArcAngleCheckbox").button_pressed
 	payload["speed"] = linear_path.find_child("SpeedText").value
+	payload["easing"] = linear_path.find_child("EaseText").selected
 	payload["n_pegs"] = linear_path.find_child("PathSlider").value
 	payload["n_lines"] = linear_path.find_child("LineSlider").value
 	for i in range(0, payload["n_pegs"]):

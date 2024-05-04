@@ -13,9 +13,9 @@ func _on_value_changed(newValue):
 	var tot_lines_node = $"../../HBoxContainer3/LineSlider"
 	if tot_lines_node:
 		var tot_lines = tot_lines_node.value
-		parentControl.custom_minimum_size.y = 340 + ((tot_lines+1) * (27+6)) + ((tot_pegs+1) * (27+6))
+		parentControl.custom_minimum_size.y = 370 + ((tot_lines+1) * (27+6)) + ((tot_pegs+1) * (27+6))
 	else:
-		parentControl.custom_minimum_size.y = 320 + ((tot_pegs+1) * (27+6))
+		parentControl.custom_minimum_size.y = 350 + ((tot_pegs+1) * (27+6))
 	for i in range(1, newValue+1):
 		var pName = "PegContainer"+str(i)
 		var pegControl = pegVbox.find_child(pName,true,false)

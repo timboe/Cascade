@@ -1,0 +1,21 @@
+{
+  "header": {
+    "save_format": 1,
+    "name": "",
+    "author": "",
+    "level": 1,
+    "hole": 8,
+    "par": 3,
+    "foreground": 0,
+    "background": 0,
+    "special": 0,
+    "height": 960,
+    "snap": 2,
+    "n_static": 0,
+    "n_elliptic": 0,
+    "n_linear": 0
+  },
+  "body": {
+
+  }
+}

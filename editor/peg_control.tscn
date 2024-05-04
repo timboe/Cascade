@@ -11,7 +11,8 @@ func _ready():
 	var bg := ButtonGroup.new()
 	button_group = bg
 	$\"../CheckRect\".button_group = bg
-
+	$\"../CheckTriangle\".button_group = bg
+	
 func _on_pressed():
 	rend.do_update()
 "
@@ -39,12 +40,14 @@ func _on_pressed():
 	add_static._on_pressed()
 	var new_static = $/root/RootControl.find_child(\"StaticControl\" + str(add_static.static_count), true, false)
 	new_static.find_child(\"CheckRect\", true, false).button_pressed = $\"../../Grid1/CheckRect\".button_pressed
+	new_static.find_child(\"CheckTriangle\", true, false).button_pressed = $\"../../Grid1/CheckTriangle\".button_pressed
 	new_static.find_child(\"XText\", true, false).value = $\"../XText\".value + 16
 	new_static.find_child(\"YText\", true, false).value = $\"../YText\".value + 16
 	new_static.find_child(\"SizeText\", true, false).selected = $\"../SizeText\".selected
 	new_static.find_child(\"AngleText\", true, false).value = $\"../AngleText\".value
 	new_static.find_child(\"TypeText\", true, false).selected = $\"../TypeText\".selected
 	ip.mostRecentlyCloned = new_static
+	ip.set_scrollbottom()
 "
 
 [sub_resource type="GDScript" id="GDScript_mj66t"]
@@ -55,7 +58,7 @@ func _on_pressed():
 "
 
 [node name="PegControl" type="Panel" groups=["pegs", "static_pegs"]]
-custom_minimum_size = Vector2(100, 235)
+custom_minimum_size = Vector2(100, 250)
 
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -94,6 +97,12 @@ script = SubResource("GDScript_gn8tb")
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Rectangle"
+alignment = 1
+
+[node name="CheckTriangle" type="CheckButton" parent="Margin/VBox/Grid1"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Triangle"
 alignment = 1
 
 [node name="Grid2" type="GridContainer" parent="Margin/VBox"]
@@ -139,7 +148,7 @@ horizontal_alignment = 2
 [node name="SizeText" type="OptionButton" parent="Margin/VBox/Grid2"]
 layout_mode = 2
 size_flags_horizontal = 3
-item_count = 4
+item_count = 3
 selected = 0
 popup/item_0/text = "Small"
 popup/item_0/id = 0
@@ -147,8 +156,6 @@ popup/item_1/text = "Medium"
 popup/item_1/id = 1
 popup/item_2/text = "Large"
 popup/item_2/id = 2
-popup/item_3/text = "Max"
-popup/item_3/id = 3
 script = ExtResource("1_dtm3l")
 
 [node name="AngleLabel" type="Label" parent="Margin/VBox/Grid2"]
@@ -160,6 +167,7 @@ horizontal_alignment = 2
 [node name="AngleText" type="SpinBox" parent="Margin/VBox/Grid2"]
 layout_mode = 2
 size_flags_horizontal = 3
+min_value = -360.0
 max_value = 360.0
 rounded = true
 
@@ -214,6 +222,7 @@ script = SubResource("GDScript_mj66t")
 [connection signal="tree_exited" from="." to="Margin/VBox/Grid1/CheckCirc" method="_on_pressed"]
 [connection signal="pressed" from="Margin/VBox/Grid1/CheckCirc" to="Margin/VBox/Grid1/CheckCirc" method="_on_pressed"]
 [connection signal="pressed" from="Margin/VBox/Grid1/CheckRect" to="Margin/VBox/Grid1/CheckCirc" method="_on_pressed"]
+[connection signal="pressed" from="Margin/VBox/Grid1/CheckTriangle" to="Margin/VBox/Grid1/CheckCirc" method="_on_pressed"]
 [connection signal="value_changed" from="Margin/VBox/Grid2/XText" to="Margin/VBox/Grid2/YText" method="_on_value_changed"]
 [connection signal="value_changed" from="Margin/VBox/Grid2/YText" to="Margin/VBox/Grid2/YText" method="_on_value_changed"]
 [connection signal="pressed" from="Margin/VBox/Grid2/SizeText" to="Margin/VBox/Grid2/SizeText" method="_on_pressed"]

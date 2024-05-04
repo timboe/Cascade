@@ -1,7 +1,7 @@
 {
   "header": {
     "save_format": 1,
-    "name": "",
+    "name": "PRECISION",
     "author": "",
     "level": 1,
     "hole": 5,
@@ -9,97 +9,185 @@
     "foreground": 0,
     "background": 0,
     "special": 0,
-    "height": 960,
-    "snap": 3,
-    "n_static": 0,
+    "height": 250,
+    "snap": 2,
+    "n_static": 17,
     "n_elliptic": 2,
     "n_linear": 0
   },
   "body": {
-    "EllipticControl1": {
-      "shape": 0,
-      "x": 294,
-      "y": 144,
-      "angle": 200,
-      "size": 2,
-      "arc": 360,
-      "use_arc": true,
-      "speed": -1,
-      "a": 81,
-      "b": 57,
-      "n_pegs": 11,
-      "PegContainer1": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 1
-      },
-      "PegContainer2": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer3": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer4": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer5": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer6": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer7": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer8": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer9": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer10": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer11": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      }
+    "StaticControl1": {
+      "shape": 1,
+      "x": 300,
+      "y": 150,
+      "angle": 0,
+      "size": 0,
+      "type": 0
     },
-    "EllipticControl2": {
+    "StaticControl2": {
       "shape": 0,
-      "x": 90,
+      "x": 150,
+      "y": 144,
+      "angle": 0,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl3": {
+      "shape": 0,
+      "x": 120,
+      "y": 132,
+      "angle": 42,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl4": {
+      "shape": 0,
+      "x": 132,
+      "y": 90,
+      "angle": 42,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl5": {
+      "shape": 0,
+      "x": 110,
+      "y": 70,
+      "angle": 42,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl6": {
+      "shape": 0,
+      "x": 88,
+      "y": 50,
+      "angle": 42,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl7": {
+      "shape": 0,
+      "x": 98,
+      "y": 112,
+      "angle": 42,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl8": {
+      "shape": 0,
+      "x": 76,
+      "y": 92,
+      "angle": 42,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl9": {
+      "shape": 0,
+      "x": 36,
+      "y": 46,
+      "angle": 148,
+      "size": 0,
+      "type": 1
+    },
+    "StaticControl10": {
+      "shape": 0,
+      "x": 150,
+      "y": 168,
+      "angle": 270,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl11": {
+      "shape": 0,
+      "x": 150,
+      "y": 198,
+      "angle": 270,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl12": {
+      "shape": 0,
+      "x": 54,
+      "y": 134,
+      "angle": 240,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl13": {
+      "shape": 0,
+      "x": 66,
+      "y": 158,
+      "angle": 240,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl14": {
+      "shape": 0,
+      "x": 80,
+      "y": 184,
+      "angle": 240,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl15": {
+      "shape": 0,
+      "x": 150,
+      "y": 228,
+      "angle": 270,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl16": {
+      "shape": 2,
+      "x": 126,
+      "y": 218,
+      "angle": 30,
+      "size": 2,
+      "type": 1
+    },
+    "StaticControl17": {
+      "shape": 0,
+      "x": 38,
+      "y": 108,
+      "angle": 240,
+      "size": 0,
+      "type": 0
+    },
+    "EllipticControl1": {
+      "shape": 1,
+      "x": 300,
       "y": 150,
       "angle": 200,
       "size": 2,
       "arc": 360,
       "use_arc": true,
-      "speed": 1,
-      "a": 81,
-      "b": 57,
-      "n_pegs": 11,
+      "speed": -1,
+      "easing": 0,
+      "a": 40,
+      "b": 40,
+      "n_pegs": 1,
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 2
+      }
+    },
+    "EllipticControl2": {
+      "shape": 0,
+      "x": 300,
+      "y": 150,
+      "angle": 90,
+      "size": 0,
+      "arc": 360,
+      "use_arc": true,
+      "speed": 1,
+      "easing": 0,
+      "a": 85,
+      "b": 85,
+      "n_pegs": 6,
+      "PegContainer1": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 1
       },
       "PegContainer2": {
         "shape_override": 0,
@@ -114,7 +202,7 @@
       "PegContainer4": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       },
       "PegContainer5": {
         "shape_override": 0,
@@ -122,31 +210,6 @@
         "type": 0
       },
       "PegContainer6": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 1
-      },
-      "PegContainer7": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer8": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer9": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer10": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer11": {
         "shape_override": 0,
         "size_override": 0,
         "type": 0

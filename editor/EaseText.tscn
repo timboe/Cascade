@@ -1,0 +1,72 @@
+[gd_scene load_steps=2 format=3 uid="uid://sj5pbfjyi0us"]
+
+[ext_resource type="Script" path="res://MenuButtonScript.tres.gd" id="1_wyl8c"]
+
+[node name="EaseText" type="OptionButton"]
+item_count = 31
+selected = 0
+popup/item_0/text = "Linear"
+popup/item_0/id = 0
+popup/item_1/text = "InSin"
+popup/item_1/id = 1
+popup/item_2/text = "OutSin"
+popup/item_2/id = 2
+popup/item_3/text = "InOutSin"
+popup/item_3/id = 3
+popup/item_4/text = "InQuad"
+popup/item_4/id = 4
+popup/item_5/text = "OutQuad"
+popup/item_5/id = 5
+popup/item_6/text = "InOutQuad"
+popup/item_6/id = 6
+popup/item_7/text = "InCubic"
+popup/item_7/id = 7
+popup/item_8/text = "OutCubic"
+popup/item_8/id = 8
+popup/item_9/text = "InOutCubic"
+popup/item_9/id = 9
+popup/item_10/text = "InQuart"
+popup/item_10/id = 10
+popup/item_11/text = "OutQuart"
+popup/item_11/id = 11
+popup/item_12/text = "InOutQuart"
+popup/item_12/id = 12
+popup/item_13/text = "InQuint"
+popup/item_13/id = 13
+popup/item_14/text = "OutQuint"
+popup/item_14/id = 14
+popup/item_15/text = "InOutQuint"
+popup/item_15/id = 15
+popup/item_16/text = "InExpo"
+popup/item_16/id = 16
+popup/item_17/text = "OutExpo"
+popup/item_17/id = 17
+popup/item_18/text = "InOutExpo"
+popup/item_18/id = 18
+popup/item_19/text = "InCirc"
+popup/item_19/id = 19
+popup/item_20/text = "OutCirc"
+popup/item_20/id = 20
+popup/item_21/text = "InOutCirc"
+popup/item_21/id = 21
+popup/item_22/text = "InBack"
+popup/item_22/id = 22
+popup/item_23/text = "OutBack"
+popup/item_23/id = 23
+popup/item_24/text = "InOutBack"
+popup/item_24/id = 24
+popup/item_25/text = "InElastic"
+popup/item_25/id = 25
+popup/item_26/text = "OutElastic"
+popup/item_26/id = 26
+popup/item_27/text = "InOutElastic"
+popup/item_27/id = 27
+popup/item_28/text = "InBounce"
+popup/item_28/id = 28
+popup/item_29/text = "OutBounce"
+popup/item_29/id = 29
+popup/item_30/text = "InOutBounce"
+popup/item_30/id = 30
+script = ExtResource("1_wyl8c")
+
+[connection signal="pressed" from="." to="." method="_on_pressed"]

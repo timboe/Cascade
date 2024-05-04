@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://bkucdftd1j28k"]
+[gd_scene load_steps=10 format=3 uid="uid://bkucdftd1j28k"]
 
 [ext_resource type="Script" path="res://PathSlider.gd" id="1_2av14"]
 [ext_resource type="Script" path="res://MenuButtonScript.tres.gd" id="2_3s2by"]
+[ext_resource type="PackedScene" uid="uid://sj5pbfjyi0us" path="res://EaseText.tscn" id="3_j6iw5"]
 [ext_resource type="PackedScene" uid="uid://bc0o4iaqfoya" path="res://line_container.tscn" id="3_jywnv"]
 [ext_resource type="PackedScene" uid="uid://1c88u1703smi" path="res://peg_container.tscn" id="4_aj4g3"]
 
@@ -14,7 +15,8 @@ func _ready():
 	var bg := ButtonGroup.new()
 	button_group = bg
 	$\"../CheckRect\".button_group = bg
-
+	$\"../CheckTriangle\".button_group = bg
+	
 func _on_pressed():
 	rend.do_update()
 "
@@ -31,8 +33,56 @@ func _on_value_changed(_value):
 	rend.do_update()
 "
 
+[sub_resource type="GDScript" id="GDScript_nuxrp"]
+script/source = "extends Button
+
+@onready var add_linear = $/root/RootControl.find_child(\"AddLinear\")
+
+@onready var ip = $/root/RootControl.find_child(\"InputParser\")
+
+func _on_pressed():
+	add_linear._on_pressed()
+	var new_linear = $/root/RootControl.find_child(\"LinearControl\" + str(add_linear.lineCount), true, false)
+	new_linear.find_child(\"CheckRect\", true, false).button_pressed = $\"../../Grid1/CheckRect\".button_pressed
+	new_linear.find_child(\"CheckTriangle\", true, false).button_pressed = $\"../../Grid1/CheckTriangle\".button_pressed
+	new_linear.find_child(\"XText\", true, false).value = $\"../XText\".value + 16
+	new_linear.find_child(\"YText\", true, false).value = $\"../YText\".value + 16
+	new_linear.find_child(\"SizeText\", true, false).selected = $\"../SizeText\".selected
+	new_linear.find_child(\"AngleText\", true, false).value = $\"../AngleText\".value
+	new_linear.find_child(\"ArcText\", true, false).value = $\"../ArcText\".value
+	new_linear.find_child(\"SpeedText\", true, false).value = $\"../SpeedText\".value
+	new_linear.find_child(\"EaseText\", true, false).selected = $\"../EaseText\".selected
+	new_linear.find_child(\"ArcAngleCheckbox\", true, false).button_pressed = $\"../ArcAngleCheckbox\".button_pressed
+	var n_peg = $\"../../HBoxContainer2/PathSlider\".value
+	new_linear.find_child(\"PathSlider\", true, false).value = n_peg
+	for i in range(n_peg):
+		var peg_name : String = \"PegContainer\"+str(i+1)
+		var new_peg_container : Control = new_linear.find_child(peg_name, true, false)
+		var old_peg_container : Control = get_parent().get_parent().find_child(peg_name, true, false)
+		new_peg_container.find_child(\"ShapeButton\").selected = old_peg_container.find_child(\"ShapeButton\").selected
+		new_peg_container.find_child(\"SizeButton\").selected = old_peg_container.find_child(\"SizeButton\").selected
+		new_peg_container.find_child(\"TypeButton\").selected = old_peg_container.find_child(\"TypeButton\").selected
+	var n_line = $\"../../HBoxContainer3/LineSlider\".value
+	new_linear.find_child(\"LineSlider\", true, false).value = n_line
+	for i in range(n_line):
+		var line_name : String = \"LineContainer\"+str(i+1)
+		var new_line_container : Control = new_linear.find_child(line_name, true, false)
+		var old_line_container : Control = get_parent().get_parent().find_child(line_name, true, false)
+		new_line_container.find_child(\"XOffText\").value = old_line_container.find_child(\"XOffText\").value
+		new_line_container.find_child(\"YOffText\").value = old_line_container.find_child(\"YOffText\").value
+	ip.mostRecentlyCloned = new_linear
+	ip.set_scrollbottom()
+"
+
+[sub_resource type="GDScript" id="GDScript_sxirk"]
+script/source = "extends Button
+
+func _on_pressed():
+	get_parent().get_parent().get_parent().get_parent().queue_free()
+"
+
 [node name="LineControl" type="Panel" groups=["line_pegs", "pegs"]]
-custom_minimum_size = Vector2(100, 470)
+custom_minimum_size = Vector2(100, 480)
 
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -113,6 +163,12 @@ size_flags_horizontal = 3
 text = "Rectangle"
 alignment = 1
 
+[node name="CheckTriangle" type="CheckButton" parent="Margin/LineContVBox/Grid1"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Triangle"
+alignment = 1
+
 [node name="Grid2" type="GridContainer" parent="Margin/LineContVBox"]
 layout_mode = 2
 theme_override_constants/h_separation = 6
@@ -128,7 +184,7 @@ horizontal_alignment = 2
 [node name="SizeText" type="OptionButton" parent="Margin/LineContVBox/Grid2"]
 layout_mode = 2
 size_flags_horizontal = 3
-item_count = 4
+item_count = 3
 selected = 0
 popup/item_0/text = "Small"
 popup/item_0/id = 0
@@ -136,8 +192,6 @@ popup/item_1/text = "Medium"
 popup/item_1/id = 1
 popup/item_2/text = "Large"
 popup/item_2/id = 2
-popup/item_3/text = "Max"
-popup/item_3/id = 3
 script = ExtResource("2_3s2by")
 
 [node name="EaseLabel" type="Label" parent="Margin/LineContVBox/Grid2"]
@@ -146,9 +200,8 @@ size_flags_horizontal = 3
 text = "Easing"
 horizontal_alignment = 2
 
-[node name="EaseText" type="OptionButton" parent="Margin/LineContVBox/Grid2"]
+[node name="EaseText" parent="Margin/LineContVBox/Grid2" instance=ExtResource("3_j6iw5")]
 layout_mode = 2
-script = ExtResource("2_3s2by")
 
 [node name="XLabel" type="Label" parent="Margin/LineContVBox/Grid2"]
 layout_mode = 2
@@ -159,7 +212,8 @@ horizontal_alignment = 2
 [node name="XText" type="SpinBox" parent="Margin/LineContVBox/Grid2" groups=["coordinate_text_group"]]
 layout_mode = 2
 size_flags_horizontal = 3
-max_value = 400.0
+min_value = -100.0
+max_value = 500.0
 value = 130.0
 rounded = true
 
@@ -172,6 +226,7 @@ horizontal_alignment = 2
 [node name="YText" type="SpinBox" parent="Margin/LineContVBox/Grid2" groups=["coordinate_text_group", "y_sensitive"]]
 layout_mode = 2
 size_flags_horizontal = 3
+min_value = -100.0
 max_value = 960.0
 value = 130.0
 rounded = true
@@ -215,6 +270,7 @@ horizontal_alignment = 2
 layout_mode = 2
 size_flags_horizontal = 3
 tooltip_text = "Set angle to use for each peg, only used if Arc Angle is false."
+min_value = -360.0
 max_value = 360.0
 rounded = true
 
@@ -230,10 +286,25 @@ tooltip_text = "Pegs inherit their angle from their position around the ellipse.
 button_pressed = true
 script = ExtResource("2_3s2by")
 
-[node name="Remove" type="Button" parent="Margin/LineContVBox"]
+[node name="Dummy" type="Label" parent="Margin/LineContVBox/Grid2"]
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 3
+horizontal_alignment = 2
+
+[node name="Clone" type="Button" parent="Margin/LineContVBox/Grid2"]
+layout_mode = 2
+text = "Clone"
+script = SubResource("GDScript_nuxrp")
+
+[node name="Dummy2" type="Label" parent="Margin/LineContVBox/Grid2"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+
+[node name="Remove" type="Button" parent="Margin/LineContVBox/Grid2"]
+layout_mode = 2
 text = "Remove"
+script = SubResource("GDScript_sxirk")
 
 [node name="LineInfoHBox" type="HBoxContainer" parent="Margin/LineContVBox"]
 layout_mode = 2
@@ -304,8 +375,8 @@ layout_mode = 2
 [connection signal="value_changed" from="Margin/LineContVBox/HBoxContainer2/PathSlider" to="Margin/LineContVBox/HBoxContainer2/PathSlider" method="_on_value_changed"]
 [connection signal="pressed" from="Margin/LineContVBox/Grid1/CheckCirc" to="Margin/LineContVBox/Grid1/CheckCirc" method="_on_pressed"]
 [connection signal="pressed" from="Margin/LineContVBox/Grid1/CheckRect" to="Margin/LineContVBox/Grid1/CheckCirc" method="_on_pressed"]
+[connection signal="pressed" from="Margin/LineContVBox/Grid1/CheckTriangle" to="Margin/LineContVBox/Grid1/CheckCirc" method="_on_pressed"]
 [connection signal="pressed" from="Margin/LineContVBox/Grid2/SizeText" to="Margin/LineContVBox/Grid2/SizeText" method="_on_pressed"]
-[connection signal="pressed" from="Margin/LineContVBox/Grid2/EaseText" to="Margin/LineContVBox/Grid2/EaseText" method="_on_pressed"]
 [connection signal="value_changed" from="Margin/LineContVBox/Grid2/XText" to="Margin/LineContVBox/Grid2/YText" method="_on_value_changed"]
 [connection signal="value_changed" from="Margin/LineContVBox/Grid2/YText" to="Margin/LineContVBox/Grid2/YText" method="_on_value_changed"]
 [connection signal="value_changed" from="Margin/LineContVBox/Grid2/ArcText" to="Margin/LineContVBox/Grid2/YText" method="_on_value_changed"]
@@ -313,4 +384,5 @@ layout_mode = 2
 [connection signal="value_changed" from="Margin/LineContVBox/Grid2/AngleText" to="Margin/LineContVBox/Grid2/YText" method="_on_value_changed"]
 [connection signal="pressed" from="Margin/LineContVBox/Grid2/ArcAngleCheckbox" to="Margin/LineContVBox/Grid2/ArcAngleCheckbox" method="_on_pressed"]
 [connection signal="toggled" from="Margin/LineContVBox/Grid2/ArcAngleCheckbox" to="Margin/LineContVBox/Grid2/ArcAngleCheckbox" method="_on_toggled"]
-[connection signal="pressed" from="Margin/LineContVBox/Remove" to="." method="queue_free"]
+[connection signal="pressed" from="Margin/LineContVBox/Grid2/Clone" to="Margin/LineContVBox/Grid2/Clone" method="_on_pressed"]
+[connection signal="pressed" from="Margin/LineContVBox/Grid2/Remove" to="Margin/LineContVBox/Grid2/Remove" method="_on_pressed"]

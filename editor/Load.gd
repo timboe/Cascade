@@ -24,6 +24,10 @@ func _on_Import_pressed():
 func populate_static(save_game : Dictionary, static_instance : Control) -> void:
 	if save_game["shape"] == 0:
 		static_instance.find_child("CheckRect").button_pressed = 1
+	elif save_game["shape"] == 1:
+		static_instance.find_child("CheckCirc").button_pressed = 1
+	elif save_game["shape"] == 2:
+		static_instance.find_child("CheckTriangle").button_pressed = 1
 	static_instance.find_child("XText").value = save_game["x"]
 	static_instance.find_child("YText").value = save_game["y"]
 	static_instance.find_child("AngleText").value = save_game["angle"]
@@ -33,6 +37,10 @@ func populate_static(save_game : Dictionary, static_instance : Control) -> void:
 func populate_elliptic(save_game : Dictionary, elliptic_instance : Control) -> void:
 	if save_game["shape"] == 0:
 		elliptic_instance.find_child("CheckRect").button_pressed = 1
+	elif save_game["shape"] == 1:
+		elliptic_instance.find_child("CheckCirc").button_pressed = 1
+	elif save_game["shape"] == 2:
+		elliptic_instance.find_child("CheckTriangle").button_pressed = 1
 	elliptic_instance.find_child("XText").value = save_game["x"]
 	elliptic_instance.find_child("YText").value = save_game["y"]
 	elliptic_instance.find_child("AngleText").value = save_game["angle"]
@@ -40,6 +48,7 @@ func populate_elliptic(save_game : Dictionary, elliptic_instance : Control) -> v
 	elliptic_instance.find_child("ArcText").value = save_game["arc"]
 	elliptic_instance.find_child("ArcAngleCheckbox").button_pressed = save_game["use_arc"]
 	elliptic_instance.find_child("SpeedText").value = save_game["speed"]
+	elliptic_instance.find_child("EaseText").selected = save_game["easing"]
 	elliptic_instance.find_child("AText").value = save_game["a"]
 	elliptic_instance.find_child("BText").value = save_game["b"]
 	elliptic_instance.find_child("PathSlider").value = save_game["n_pegs"]
@@ -55,6 +64,10 @@ func populate_elliptic(save_game : Dictionary, elliptic_instance : Control) -> v
 func populate_linear(save_game : Dictionary, linear_instance : Control) -> void:
 	if save_game["shape"] == 0:
 		linear_instance.find_child("CheckRect").button_pressed = 1
+	elif save_game["shape"] == 1:
+		linear_instance.find_child("CheckCirc").button_pressed = 1
+	elif save_game["shape"] == 2:
+		linear_instance.find_child("CheckTriangle").button_pressed = 1
 	linear_instance.find_child("XText").value = save_game["x"]
 	linear_instance.find_child("YText").value = save_game["y"]
 	linear_instance.find_child("AngleText").value = save_game["angle"]
@@ -62,6 +75,7 @@ func populate_linear(save_game : Dictionary, linear_instance : Control) -> void:
 	linear_instance.find_child("ArcText").value = save_game["arc"]
 	linear_instance.find_child("ArcAngleCheckbox").button_pressed = save_game["use_arc"]
 	linear_instance.find_child("SpeedText").value = save_game["speed"]
+	linear_instance.find_child("EaseText").selected = save_game["easing"]
 	linear_instance.find_child("PathSlider").value = save_game["n_pegs"]
 	# Changing PathSliderPathSlider. value will populate the sub-nodes already, just need to set them
 	for i in range(0, save_game["n_pegs"]):
@@ -96,6 +110,7 @@ func reset_level() -> void:
 	%SpecialButton.selected = 0
 	%HeightSlider.value = 960
 	%EditorSnap.value = 4
+	%InputParser.dragNode = null
 
 func restore_save(save_game : Dictionary) -> void:
 	reset_level()

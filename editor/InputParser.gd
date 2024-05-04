@@ -8,6 +8,8 @@ var dragMode : int = 0
 var dragNode : Control = null
 var dragPos : Vector2
 
+var mousePos : Vector2
+
 var mostRecentlyCloned
 
 func find_peg(v : Vector2, n : String) -> Control:
@@ -51,6 +53,24 @@ func rotate_peg(peg : Control, delta : float) -> void:
 	if not angle: return
 	angle.value += delta
 
+func set_scrollbottom():
+	await get_tree().process_frame 
+	%RightScroll.scroll_vertical = %RightScroll.get_v_scroll_bar().max_value
+
+func set_scroll(peg):
+	for peg_remove : Control in get_tree().get_nodes_in_group("pegs"):
+		peg_remove.remove_theme_stylebox_override("panel")
+	var parentLineControl = peg.find_parent("LinearControl*")
+	#print("Found " , peg, " with parent ", parentLineControl, " at y ",  parentLineControl.position.y)
+	if parentLineControl:
+		parentLineControl.add_theme_stylebox_override("panel", load("res://selected_style_box_flat.tres"))
+		%RightScroll.set_v_scroll( parentLineControl.position.y )
+		print("LSSto " , parentLineControl.position.y)
+	else:
+		peg.add_theme_stylebox_override("panel", load("res://selected_style_box_flat.tres"))
+		%RightScroll.set_v_scroll( peg.position.y )
+		print("PSSto " , peg.position.y)
+		
 func _input(event):
 	if event is InputEventKey:
 		if event.pressed and dragNode:
@@ -68,37 +88,41 @@ func _input(event):
 				dragNode.find_child("XText", true, false).value += snap
 				get_tree().get_root().set_input_as_handled()
 			if event.keycode == KEY_C :
-				dragNode.find_child("Clone", true, false)._on_pressed()
-				get_tree().get_root().set_input_as_handled()
-				dragNode = mostRecentlyCloned
-			if event.keycode == KEY_D :
+				var searchFrom = dragNode.find_parent("LinearControl*")
+				if not searchFrom:
+					searchFrom = dragNode
+				var clone = searchFrom.find_child("Clone", true, false) if searchFrom else null
+				if clone:
+					clone._on_pressed()
+					get_tree().get_root().set_input_as_handled()
+					dragNode = mostRecentlyCloned
+					set_scroll(dragNode)
+				else:
+					print("No Clone button for ", dragNode, " ", clone)
+			if event.keycode == KEY_DELETE :
 				dragNode.find_child("Remove", true, false)._on_pressed()
 				get_tree().get_root().set_input_as_handled()
+				dragNode = null
 					
 	if event is InputEventMouseButton:
 		if (event.button_index == 1 || event.button_index == 2) and event.pressed and event.position.x < PLAYDATE_WIDTH:
 			var yOff = %LeftScroll.get_v_scroll()
 			var v = Vector2(event.position.x, event.position.y + yOff)
 			print("Mouse " , event.button_index , " Click/Unclick at: ", v)
-			for peg_remove : Control in get_tree().get_nodes_in_group("pegs"):
-				peg_remove.remove_theme_stylebox_override("panel")
+
 			var peg : Control = find_peg(v, "static_pegs")
 			if not peg: peg = find_peg(v, "elliptic_pegs")
 			if not peg: peg = find_peg(v, "line_pegs")
 			if peg:
 				print("Found " , peg)
-				peg.add_theme_stylebox_override("panel", load("res://selected_style_box_flat.tres"))
-				%RightScroll.set_v_scroll( peg.position.y )
+				set_scroll(peg)
 				dragMode = event.button_index
 				dragNode = peg
 				dragPos = v
 				return
 			if not peg: peg = find_line_segment(v, "line_segments")
 			if peg:
-				var parentLineControl = peg.find_parent("LinearControl*")
-				#print("Found " , peg, " with parent ", parentLineControl, " at y ",  parentLineControl.position.y)
-				parentLineControl.add_theme_stylebox_override("panel", load("res://selected_style_box_flat.tres"))
-				%RightScroll.set_v_scroll( parentLineControl.position.y )
+				set_scroll(peg)
 				dragMode = event.button_index
 				dragNode = peg
 				dragPos = v
@@ -108,20 +132,22 @@ func _input(event):
 			dragMode = 0
 			#dragNode = null
 
-	if event is InputEventMouseMotion and dragMode:
+	if event is InputEventMouseMotion:
 		var yOff = $%LeftScroll.get_v_scroll()
 		var v = Vector2(event.position.x, event.position.y + yOff)
 		v.x = snap(v.x)
 		v.y = snap(v.y)
-		print("Drag ", v)
-		if dragMode == 1: 
-			move_peg(dragNode, v)
-		elif dragMode == 2:
-			if abs(v.y - dragPos.y) > abs(v.x - dragPos.x):
-				rotate_peg(dragNode, v.y - dragPos.y)
-			else:
-				rotate_peg(dragNode, v.x - dragPos.x)
-			dragPos = v
+		mousePos = v
+		if dragMode:
+			print("Drag ", v)
+			if dragMode == 1: 
+				move_peg(dragNode, v)
+			elif dragMode == 2:
+				if abs(v.y - dragPos.y) > abs(v.x - dragPos.x):
+					rotate_peg(dragNode, v.y - dragPos.y)
+				else:
+					rotate_peg(dragNode, v.x - dragPos.x)
+				dragPos = v
 		
 func snap(v):
 	return round( v / %EditorSnap.value ) * %EditorSnap.value
