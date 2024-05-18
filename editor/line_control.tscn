@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://PathSlider.gd" id="1_2av14"]
 [ext_resource type="Script" path="res://MenuButtonScript.tres.gd" id="2_3s2by"]
-[ext_resource type="PackedScene" uid="uid://sj5pbfjyi0us" path="res://EaseText.tscn" id="3_j6iw5"]
+[ext_resource type="PackedScene" path="res://EaseText.tscn" id="3_j6iw5"]
 [ext_resource type="PackedScene" uid="uid://bc0o4iaqfoya" path="res://line_container.tscn" id="3_jywnv"]
 [ext_resource type="PackedScene" uid="uid://1c88u1703smi" path="res://peg_container.tscn" id="4_aj4g3"]
 

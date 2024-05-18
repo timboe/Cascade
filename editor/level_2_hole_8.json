@@ -8,7 +8,7 @@
     "par": 3,
     "foreground": 10,
     "background": 0,
-    "special": 0,
+    "special": 6,
     "height": 510,
     "snap": 4,
     "n_static": 0,
@@ -106,7 +106,7 @@
       "PegContainer5": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 2
       },
       "PegContainer6": {
         "shape_override": 0,
@@ -116,7 +116,7 @@
       "PegContainer7": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 2
+        "type": 0
       },
       "PegContainer8": {
         "shape_override": 0,
@@ -126,7 +126,7 @@
       "PegContainer9": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 2
       },
       "PegContainer10": {
         "shape_override": 0,

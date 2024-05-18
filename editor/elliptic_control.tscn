@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://PathSlider.gd" id="1_x3mqg"]
 [ext_resource type="Script" path="res://MenuButtonScript.tres.gd" id="2_sdnji"]
 [ext_resource type="PackedScene" uid="uid://1c88u1703smi" path="res://peg_container.tscn" id="3_rfi6a"]
-[ext_resource type="PackedScene" uid="uid://sj5pbfjyi0us" path="res://EaseText.tscn" id="3_x1d2d"]
+[ext_resource type="PackedScene" path="res://EaseText.tscn" id="3_x1d2d"]
 
 [sub_resource type="GDScript" id="GDScript_gn8tb"]
 script/source = "extends CheckButton

@@ -8,7 +8,7 @@
     "par": 3,
     "foreground": 0,
     "background": 0,
-    "special": 0,
+    "special": 2,
     "height": 440,
     "snap": 2,
     "n_static": 62,
@@ -84,7 +84,7 @@
       "shape": 0,
       "x": 96,
       "y": 16,
-      "angle": 89,
+      "angle": 90,
       "size": 0,
       "type": 0
     },
@@ -92,7 +92,7 @@
       "shape": 0,
       "x": 96,
       "y": 46,
-      "angle": 89,
+      "angle": 90,
       "size": 0,
       "type": 0
     },
@@ -100,7 +100,7 @@
       "shape": 0,
       "x": 96,
       "y": 106,
-      "angle": 89,
+      "angle": 90,
       "size": 0,
       "type": 0
     },
@@ -508,7 +508,7 @@
       "shape": 0,
       "x": 96,
       "y": 76,
-      "angle": 89,
+      "angle": 90,
       "size": 0,
       "type": 0
     },
