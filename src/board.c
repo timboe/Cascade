@@ -67,7 +67,8 @@ void boardDoAddWheel(const struct EllipticLoader_t* ellipticLoader) {
     pegSetMotionSpeed(p, ellipticLoader->speed);
     const float angleOffset = (ellipticLoader->maxAngle / ellipticLoader->nPegs) * i;
     pegSetMotionOffset(p, angleOffset);
-    pegSetMotionEasing(p, ellipticLoader->easing);
+    // TODO - restore easing
+    //pegSetMotionEasing(p, ellipticLoader->easing);
     pegSetMotionDoArcAngle(p, ellipticLoader->useArc);
     pegSetMotionEllipse(p, ellipticLoader->a, ellipticLoader->b);
     if (ellipticLoader->types[i] == kPegTypeRequired) { ++m_requiredPegsInPlay; }
@@ -86,7 +87,8 @@ void boardDoAddLinear(const struct LinearLoader_t* linearLoader) {
     const float angleOffset = (linearLoader->maxAngle / linearLoader->nPegs) * i;
     pegSetMotionSpeed(p, linearLoader->speed);
     pegSetMotionOffset(p, angleOffset);
-    pegSetMotionEasing(p, linearLoader->easing);
+    // TODO - restore easing
+    // pegSetMotionEasing(p, linearLoader->easing);
     pegSetMotionDoArcAngle(p, linearLoader->useArc);
     if (linearLoader->types[i] == kPegTypeRequired) { ++m_requiredPegsInPlay; }
     pegSetType(p, linearLoader->types[i]);

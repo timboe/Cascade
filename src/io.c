@@ -116,17 +116,18 @@ void IODoUpdatePreloading(void) {
     case 13: bitmapDoPreloadF(); break;
     case 14: bitmapDoPreloadG(0); break;
     case 15: bitmapDoPreloadG(1); break;
-    case 16: bitmapDoPreloadG(2); break;
-    case 17: bitmapDoPreloadG(3); break; // MAX_PEG_SIZE
-    case 18: bitmapDoPreloadH(0); break;
-    case 19: bitmapDoPreloadH(1); break;
-    case 20: bitmapDoPreloadH(2); break;
-    case 21: bitmapDoPreloadH(3); break; // MAX_PEG_SIZE
-    case 22: bitmapDoPreloadI(); break;
-    case 23: bitmapDoPreloadJ(); break;
-    case 24: bitmapDoPreloadK(); break;
-    case 25: bitmapDoPreloadL(0); break;
-    case 26: bitmapDoPreloadL(1); break;
+    case 16: bitmapDoPreloadG(2); break; // MAX_PEG_SIZE
+    case 17: bitmapDoPreloadH(0); break;
+    case 18: bitmapDoPreloadH(1); break;
+    case 19: bitmapDoPreloadH(2); break; // MAX_PEG_SIZE
+    case 20: bitmapDoPreloadH2(0); break;
+    case 21: bitmapDoPreloadH2(1); break;
+    case 22: bitmapDoPreloadH2(2); break; // MAX_PEG_SIZE
+    case 23: bitmapDoPreloadI(); break;
+    case 24: bitmapDoPreloadJ(); break;
+    case 25: bitmapDoPreloadK(); break;
+    case 26: bitmapDoPreloadL(0); break;
+    case 27: bitmapDoPreloadL(1); break;
   }
   const uint32_t after = pd->system->getCurrentTimeMilliseconds();
   pd->system->logToConsole("Preload %i took %i ms", (int)m_preloading, (int)(after - before));
@@ -632,6 +633,7 @@ void IODoLoadCurrentHole() {
   if (boardGetRequiredPegsInPlay() == 0 || boardGetNPegs() == 0) {
     boardDoClear();
     boardDoTestLevel();
+    pd->system->logToConsole("Unplayable! Load test level!");
   }
 
 }

@@ -102,6 +102,12 @@ void menuOptionsCallbackQuitHole(void* _unused) {
   FSMDo(kTitlesFSM_ChooseHole);
 }
 
+void menuOptionsCallbackResetHole(void* _unused) {
+  pd->system->logToConsole("menuOptionsCallbackResetHole");
+  // TODO - insert a fade out or wipe here?
+  FSMDo(kGameFSM_DisplaySplash);
+}
+
 void menuOptionsCallbackAudio(void* userData) {
   int value = pd->system->getMenuItemValue((PDMenuItem*)userData);
   // if (value == 0) {
@@ -139,6 +145,7 @@ void gameDoPopulateMenuGame() {
   PDMenuItem* menu = pd->system->addOptionsMenuItem("audio", options, 4, menuOptionsCallbackAudio, NULL);
   pd->system->setMenuItemUserdata(menu, (void*) menu); // User data is a pointer to the menu itself
   pd->system->addMenuItem("quit hole", menuOptionsCallbackQuitHole, NULL);
+  pd->system->addMenuItem("reset hole", menuOptionsCallbackResetHole, NULL);
 }
 
 void gameModYVelocity(const float mod) { 

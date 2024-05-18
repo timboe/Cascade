@@ -140,9 +140,7 @@ void renderGameMarble(const int32_t fc) {
   for (int i = 0; i < MAX_BALLS; ++i) {
     if (m_ballSplashTimer[i]) {
       uint8_t frame = m_ballSplashTimer[i] / 4;
-      if (frame == 9)  frame = 7; // Repeat
-      if (frame == 10) frame = 6; // Repeat
-      if (frame >= 9) continue;
+      if (frame >= POND_SPLASH_ANIM_FRAMES) continue;
       pd->graphics->setDrawMode(kDrawModeFillBlack); // kDrawModeNXOR
       pd->graphics->drawBitmap(bitmapGetWaterSplash(frame), m_ballSplashPos[i], gutterY + parallaxPond, kBitmapUnflipped);
       pd->graphics->setDrawMode(kDrawModeCopy);
@@ -231,6 +229,20 @@ void renderGameBoard(const int32_t fc) {
     }
   }
 
+}
+
+void renderGamePops(const int32_t fc) {
+  pd->graphics->setDrawMode(kDrawModeXOR);
+  for (int i = 0; i < boardGetNPegs(); ++i) {
+    struct Peg_t* p = boardGetPeg(i);
+    if (p->popFrame >= 0 && p->popFrame < POP_ANIM_FRAMES) {
+      LCDBitmap* bm = bitmapGetPegPop(p);
+      pd->graphics->drawBitmap(bm, p->x - POP_ANIM_HALF_WIDTH, p->y - POP_ANIM_HALF_WIDTH, kBitmapUnflipped);
+      // pd->system->logToConsole("!! %i : %i %i (%f, %f)", i, p->popAnim, p->popFrame, p->x - POP_ANIM_HALF_WIDTH, p->y - POP_ANIM_HALF_WIDTH);
+      if (fc % 2 == 0) { p->popFrame++; }
+    }
+  }
+  pd->graphics->setDrawMode(kDrawModeCopy);
 }
 
 void renderGameGutter(const int32_t fc) {

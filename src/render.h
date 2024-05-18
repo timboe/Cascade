@@ -48,6 +48,7 @@ void renderGamePoot(const enum FSM_t fsm);
 void renderGameTurret(void);
 void renderGameTrajectory(void);
 void renderGameBoard(const int32_t fc);
+void renderGamePops(const int32_t fc);
 void renderGameBackground(void);
 void renderGameGutter(const int32_t fc);
 void renderGameTutorial(const int32_t fc, const enum FSM_t fsm);

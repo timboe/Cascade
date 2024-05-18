@@ -6,6 +6,7 @@
 enum PegShape_t {
   kPegShapeRect,
   kPegShapeBall,
+  kPegShapeTri,
   kPegShapeHex
 };
 
@@ -58,6 +59,8 @@ struct Peg_t {
   enum PegType_t type;
   enum PegState_t state;
   bool queueRemove;
+  uint8_t popAnim;
+  int8_t popFrame;
 
   // Motion
   float time;

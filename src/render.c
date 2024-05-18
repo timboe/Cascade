@@ -130,6 +130,10 @@ void renderGame(const int32_t fc, const enum FSM_t fsm) {
   // DRAW PEGS
   renderGameBoard(fc);
 
+  if (fsm == kGameFSM_BallStuck || fsm == kGameFSM_GutterToTurret) {
+    renderGamePops(fc);
+  }
+
   // DRAW BALL
   renderGameMarble(fc);
 

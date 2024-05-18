@@ -4,6 +4,7 @@
 #include "board.h"
 #include "sshot.h"
 #include "util.h"
+#include "io.h"
 
 void pegDoUpdateAngle(struct Peg_t* p, const float angle);
 
@@ -55,6 +56,8 @@ void pegDoInit(struct Peg_t* p, const enum PegShape_t s, const float x, const fl
   p->size = size;
   p->easing = kEaseLinear;
   p->queueRemove = false;
+  p->popAnim = rand() % MAX_POPS;
+  p->popFrame = -1;
   const float scale = bitmapSizeToScale(size);
 
   pegDoAddBody(p);
@@ -64,6 +67,17 @@ void pegDoInit(struct Peg_t* p, const enum PegShape_t s, const float x, const fl
   } else if (s == kPegShapeRect) {
     p->cpShape = cpBoxShapeNew(p->cpBody, BOX_HALF_WIDTH*scale, BOX_HALF_HEIGHT*scale, 0.0f);
     p->radius = BOX_HALF_MAX*scale;
+  } else if (s == kPegShapeTri) {
+    cpVect verts[3];
+    const float angleAdvance = M_2PIf / 3.0f;
+    const float scale = bitmapSizeToScale(p->size);
+    for (uint8_t p = 0; p < 3; ++p) {
+      const float angle = (angleAdvance * p) - degToRad(90);
+      verts[p].x = (TRI_WIDTH/2) * scale * sinf(angle);
+      verts[p].y = (TRI_WIDTH/2) * scale * cosf(angle);
+    }
+    p->cpShape = cpPolyShapeNew(p->cpBody, 3, verts, cpTransformIdentity, 0.0f);
+    p->radius = TRI_MAX*scale;
   } else {    
     pd->system->error("Error pegDoInit called with unknown peg shape");
     pegDoClear(p);
@@ -145,7 +159,7 @@ void pegDoUpdate(struct Peg_t* p) {
   const float tsm = physicsGetTimestepMultiplier();
   p->time += (TIMESTEP * tsm * p->speed);
   if (p->time >= M_2PIf) { p->time -= M_2PIf; } // Keep this one bounded
-  else if (p->time < M_2PIf) { p->time += M_2PIf; } // Speed might be -ve
+  else if (p->time < -M_2PIf) { p->time += M_2PIf; } // Speed might be -ve
 
   if (p->motion == kPegMotionStatic) {
 
@@ -154,8 +168,8 @@ void pegDoUpdate(struct Peg_t* p) {
   } else if (p->motion == kPegMotionEllipse) {
 
     const float easing = getEasing(p->easing, p->time / M_2PIf) * M_2PIf;
-    p->x = p->pathX[0] + (p->a * cosf(easing));
-    p->y = p->pathY[0] + (p->b * sinf(easing));
+    p->x = p->pathX[0] + (p->a * cosf(easing - p->angle));
+    p->y = p->pathY[0] + (p->b * sinf(easing - p->angle));
     if (p->doArcAngle) {
       pegDoUpdateAngle(p, easing + p->angle );
     }
@@ -202,10 +216,23 @@ void pegDoUpdate(struct Peg_t* p) {
   }
 
   const cpVect pos = cpBodyGetPosition(p->cpBody);
-  cpBodySetVelocity(p->cpBody, cpv((p->x - pos.x)/TIMESTEP, (p->y - pos.y)/TIMESTEP));
-  // cpBodySetPosition(p->cpBody, cpv(p->x, p->y));
+  if (p->speed == 0.0f) {
+    cpBodySetPosition(p->cpBody, cpv(p->x, p->y));
+    cpBodySetVelocity(p->cpBody, cpvzero);
+    // No need for more updates
+    p->motion = kPegMotionStatic;
+  } else {
+    cpBodySetVelocity(p->cpBody, cpv((p->x - pos.x)/TIMESTEP, (p->y - pos.y)/TIMESTEP));
+  }
   pegSetBitmapCoordinates(p);
+  
   if (p->y < p->minY) { p->minY = p->y; }
+
+  // Removes collisions?
+  // if (p->speed == 0.0f) {
+  //   // No need for more updates
+  //   p->motion = kPegMotionStatic;
+  // }
 }
 
 void pegSetMotionSpeed(struct Peg_t* p, const float s) { p->speed = s; }
@@ -219,6 +246,7 @@ void emptyCpBodyVelocityFunc(cpBody* body, cpVect gravity, cpFloat damping, cpFl
 void emptyCpBodyPositionFunc(cpBody* body, cpFloat dt) {};
 
 void pegSetMotionStatic(struct Peg_t* p) {
+  if (!p->cpBody) pd->system->error("Error called pegSetMotionStatic on a peg with no body");
   cpBodySetVelocityUpdateFunc(p->cpBody, emptyCpBodyVelocityFunc);
   cpBodySetPositionUpdateFunc(p->cpBody, emptyCpBodyPositionFunc);
 }
@@ -256,7 +284,11 @@ void pegDoMotionPathFinalise(struct Peg_t* p) {
 }
 
 void pegDoHit(struct Peg_t* p) {
-  if (p->state == kPegStateActive && FSMGetBallInPlay()) {
+  if (p->state == kPegStateActive 
+    && FSMGetBallInPlay()
+    && p->y < IOGetCurrentHoleHeight()
+    && p->y > 0
+  ) {
     p->state = kPegStateHit;
     FSMDoResetBallStuckCounter();
     if (p->type == kPegTypeRequired) {
@@ -286,15 +318,21 @@ void pegDoHit(struct Peg_t* p) {
   }
   if (p->state == kPegStateHit && FSMGet() == kGameFSM_WinningToast) {
     p->queueRemove = true; // Can't remove in the middle of a physics callback
+    p->popFrame = 0;
   }
   // pd->system->logToConsole("bam!");
 }
 
 bool pegDoCheckBurst(struct Peg_t* p, const float y) {
-  if (p->state == kPegStateHit && p->y >= y) {
-    p->state = kPegStateRemoved;
-    pegDoRemove(p);
-    return true;
+  if (p->state == kPegStateHit) {
+    if (p->popFrame == -1 && p->y >= y - POP_EARLY_Y) {
+      p->popFrame = 0;
+    }
+    if (p->y >= y) {
+      p->state = kPegStateRemoved;
+      pegDoRemove(p);
+      return true;
+    }
   }
   return false;
 }

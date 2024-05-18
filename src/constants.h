@@ -46,6 +46,7 @@
 
 #define POND_SPLASH_WIDTH 128
 #define POND_SPLASH_HEIGHT 82
+#define POND_SPLASH_ANIM_FRAMES 16
 
 #define STAR_WIDTH 48
 
@@ -53,20 +54,20 @@
 
 // TIMINGS
 
-#define BASE_TIME (TICK_FREQUENCY*2)
+#define BASE_TIME (TICK_FREQUENCY)
 
-#define TIME_TITLE_TRANSITION (BASE_TIME/2)
-#define TIME_TITLE_HOLE_TO_SPLASH (BASE_TIME/2)
+#define TIME_TITLE_TRANSITION (BASE_TIME)
+#define TIME_TITLE_HOLE_TO_SPLASH (BASE_TIME)
 // Testing VERY short on this one
-#define TIME_DISPLAY_SPLASH (BASE_TIME/2)
-#define TIME_SPLASH_TO_GAME (BASE_TIME/2)
-#define TIME_AIM_SCROLL_TO_TOP (BASE_TIME/2)
+#define TIME_DISPLAY_SPLASH (BASE_TIME)
+#define TIME_SPLASH_TO_GAME (BASE_TIME)
+#define TIME_AIM_SCROLL_TO_TOP (BASE_TIME)
 #define TIME_FIRE_MARBLE ((9*TICK_FREQUENCY)/10)
-#define TIME_STUCK_POP (BASE_TIME/5)
-#define TIME_GUTTER_TO_SCORE (BASE_TIME/2)
-#define TIME_BALL_DROP_DELAY (BASE_TIME/5)
-#define TIME_SCORE_TO_TITLE (BASE_TIME/2)
-#define TIME_SCORE_TO_SPLASH (BASE_TIME/2)
+#define TIME_STUCK_POP (BASE_TIME/2)
+#define TIME_GUTTER_TO_SCORE (BASE_TIME)
+#define TIME_BALL_DROP_DELAY (BASE_TIME/3)
+#define TIME_SCORE_TO_TITLE (BASE_TIME)
+#define TIME_SCORE_TO_SPLASH (BASE_TIME)
 
 // JUICE
 
@@ -84,13 +85,13 @@
 
 #define TRAUMA_BLAST_HIT 3.0f
 
-#define EASE_TITLE_DOWNWARDS kEaseInOutQuad
-#define EASE_TITLE_UPWARDS kEaseInOutQuad
+#define EASE_TITLE_DOWNWARDS kEaseInOutSine
+#define EASE_TITLE_UPWARDS kEaseInOutSine
 #define EASE_TITLE_HOLE_TO_SPLASH kEaseInOutSine
-#define EASE_MARBLE_FIRE kEaseOutQuart
-#define EASE_SPLASH_TO_GAME kEaseInOutQuint
+#define EASE_MARBLE_FIRE kEaseOutSine
+#define EASE_SPLASH_TO_GAME kEaseInOutSine
 // This next one is a B press while scrolled down, it should be snappy
-#define EASE_AIM_SCROLL_TO_TOP kEaseInOutQuint
+#define EASE_AIM_SCROLL_TO_TOP kEaseInOutSine
 #define EASE_GUTTER_TO_TOP kEaseInOutSine
 #define EASE_GUTTER_TO_SCORE kEaseOutSine
 #define EASE_SCORE_TO_TITLE kEaseOutSine
@@ -102,11 +103,16 @@
 
 #define MAX_LINEAR_PATH_SEGMENTS 64 
 
-#define MAX_PEG_SIZE 4
+#define MAX_PEG_SIZE 3
 
 #define MAX_PEGS_ON_PATH 32
 
 #define MAX_STARS 32
+
+#define MAX_POPS 4
+#define POP_EARLY_Y 32.0f
+#define POP_ANIM_FRAMES 16
+#define POP_ANIM_HALF_WIDTH 32
 
 /// ///
 
@@ -136,6 +142,9 @@
 
 #define HEX_WIDTH 22.5f
 #define HEX_MAX (HEX_WIDTH * SQRT_HALF)
+
+#define TRI_WIDTH 22.5f
+#define TRI_MAX (TRI_WIDTH * SQRT_HALF)
 
 #define TIMESTEP (1.0f / TICK_FREQUENCY)
 #define ELASTICITY 0.8f 
@@ -199,4 +208,4 @@
 
 #define VERSION "v0.1"
 
-#define PRELOADING_STEPS 27
+#define PRELOADING_STEPS 28

@@ -73,6 +73,7 @@ LCDBitmap* m_pootAnimation[TURRET_RADIUS];
 LCDBitmap* m_marbleBitmap;
 LCDBitmap* m_ballBitmap[2][MAX_PEG_SIZE];
 LCDBitmap* m_rectBitmap[2][MAX_PEG_SIZE][128];
+LCDBitmap* m_triBitmap[2][MAX_PEG_SIZE][256];
 LCDBitmap* m_hexBitmap[MAX_PEG_SIZE][128];
 
 LCDBitmap* m_starBitmap[2][128];
@@ -84,6 +85,7 @@ LCDBitmap* m_wfBg[N_WF];
 LCDBitmapTable* m_sheetWfFg[N_WF];
 LCDBitmapTable* m_waterSplashTable;
 LCDBitmapTable* m_chevronTable;
+LCDBitmapTable* m_pegPopTable[MAX_POPS];
 
 LCDBitmapTable* m_blastTable;
 LCDBitmapTable* m_tutorialCrankRotateTable;
@@ -105,9 +107,9 @@ LCDFont* bitmapDoLoadFontAtPath(const char* path);
 
 void bitmapDoDrawOutlineText(const char text[], const uint16_t textSize, int16_t x, int16_t y, const uint16_t outlineSize);
 
-void bitmapDoDrawRotatedRect(const float x, const float y, const float w2, const float h2, const uint8_t iAngle, const enum RenderColor_t rc);
+void bitmapDoDrawRotatedRect(const float x, const float y, const float w2, const float h2, const int16_t iAngle, const enum RenderColor_t rc);
 
-void bitmapDoDrawRotatedPoly(const uint8_t corners, const float x, const float y, const float w2, const float h2, const uint8_t iAngle, const enum RenderColor_t rc);
+void bitmapDoDrawRotatedPoly(const uint8_t corners, const float x, const float y, const float w2, const float h2, const int16_t iAngle, const enum RenderColor_t rc);
 
 /// ///
 
@@ -298,9 +300,14 @@ LCDBitmap* bitmapGetPeg(const struct Peg_t* p) {
     case kPegShapeHex:  return m_hexBitmap[p->size % MAX_PEG_SIZE][p->iAngle % 128];
     case kPegShapeBall: return m_ballBitmap[p->type == 0 ? 0 : 1][p->size % MAX_PEG_SIZE];
     case kPegShapeRect: return m_rectBitmap[p->type == 0 ? 0 : 1][p->size % MAX_PEG_SIZE][p->iAngle % 128]; // Symmetry
+    case kPegShapeTri: return m_triBitmap[p->type == 0 ? 0 : 1][p->size % MAX_PEG_SIZE][p->iAngle % 256]; // Symmetry
     default: return NULL;
   }
   return NULL;
+}
+
+LCDBitmap* bitmapGetPegPop(const struct Peg_t* p) {
+  return pd->graphics->getTableBitmap(m_pegPopTable[p->popAnim], p->popFrame % POP_ANIM_FRAMES);
 }
 
 LCDBitmap* bitmapGetMarble(void) { return m_marbleBitmap; }
@@ -340,9 +347,8 @@ LCDFont* bitmapGetGreatVibes109(void) { return m_fontGreatvibes109; }
 float bitmapSizeToScale(uint8_t size) {
   switch (size) {
     case 0: return 1.25f;
-    case 1: return 1.50f;
-    case 2: return 1.75f;
-    case 3: return 2.5f;
+    case 1: return 1.75f;
+    case 2: return 2.5f;
     default: pd->system->error("Error bitmapSizeToScale called with unknown size %i", size);
   }
   return 1.0f;
@@ -355,7 +361,7 @@ LCDBitmap* bitmapGetChevron(const uint8_t id) {
 }
 
 // Can't currently use bitmapDoDrawRotatedPoly here as the points are not evenly spaced around the unit circle
-void bitmapDoDrawRotatedRect(const float x, const float y, const float w2, const float h2, const uint8_t iAngle, const enum RenderColor_t rc) {
+void bitmapDoDrawRotatedRect(const float x, const float y, const float w2, const float h2, const int16_t iAngle, const enum RenderColor_t rc) {
     const float angleRad = (M_PIf / 128.0f) * iAngle;
     const float ca = cosf(angleRad);
     const float sa = sinf(angleRad);
@@ -384,7 +390,7 @@ void bitmapDoDrawRotatedRect(const float x, const float y, const float w2, const
     pd->graphics->drawLine(points[6], points[7], points[0], points[1], 2, kColorBlack);
 }
 
-void bitmapDoDrawRotatedPoly(const uint8_t corners, const float x, const float y, const float w2, const float h2, const uint8_t iAngle, const enum RenderColor_t rc) {
+void bitmapDoDrawRotatedPoly(const uint8_t corners, const float x, const float y, const float w2, const float h2, const int16_t iAngle, const enum RenderColor_t rc) {
     const float angleOff = (M_PIf / 128.0f) * iAngle;
     int points[128] = {0};
     const float angleAdvance = M_2PIf / (float)corners;
@@ -615,9 +621,9 @@ void bitmapDoUpdateScoreCard(void) {
   {
     char text[128];
     int16_t tot = totPar - totScore;
-    if (tot > 0) { snprintf(text, 128, "TOTAL %i OVER PAR", tot); }
-    else if (tot < 0) { snprintf(text, 128, "TOTAL %i UNDER PAR", tot*-1); }
-    else { snprintf(text, 128, "TOTAL EQUAL TO PAR"); }
+    if (tot > 0) { snprintf(text, 128, "%i OVER PAR", tot); }
+    else if (tot < 0) { snprintf(text, 128, "%i UNDER PAR", tot*-1); }
+    else { snprintf(text, 128, "EQUAL TO PAR"); }
     const int32_t w = pd->graphics->getTextWidth(bitmapGetRoobert10(), text, 128, kUTF8Encoding, 0);
     pd->graphics->drawText(text, 128, kUTF8Encoding, 8*PIXX + PIXX/2 - w/2, BBAR + PIXY/4);
   }
@@ -728,7 +734,7 @@ void bitmapDoPreloadA(void) {
   m_starBitmap[1][0] = bitmapDoLoadImageAtPath("images/star1");
 
   m_turretBarrelTabel = bitmapDoLoadImageTableAtPath("images/turretBarrel");
-  m_waterSplashTable = bitmapDoLoadImageTableAtPath("images/splash");
+  m_waterSplashTable = bitmapDoLoadImageTableAtPath("images/MarbleSplash");
   m_blastTable = bitmapDoLoadImageTableAtPath("images/blast");
   m_tutorialCrankRotateTable = bitmapDoLoadImageTableAtPath("images/crankClockwise");
   m_tutorialCrankAngleTable = bitmapDoLoadImageTableAtPath("images/crankSpin");
@@ -736,6 +742,11 @@ void bitmapDoPreloadA(void) {
   m_tutorialDPadTable = bitmapDoLoadImageTableAtPath("images/dPad");
   m_tutorialArrowsTable = bitmapDoLoadImageTableAtPath("images/tutorialPoint");
   m_chevronTable =  bitmapDoLoadImageTableAtPath("images/chevron");
+  for (int i = 0; i < MAX_POPS; ++i) {
+    char text[128];
+    snprintf(text, 128, "images/Pop%i", i);
+    m_pegPopTable[i] =  bitmapDoLoadImageTableAtPath(text);
+  }
 
   m_fontRoobert24 = bitmapDoLoadFontAtPath("fonts/Roobert-24-Medium");
   m_fontRoobert10 = bitmapDoLoadFontAtPath("fonts/Roobert-10-Bold");
@@ -847,6 +858,21 @@ void bitmapDoPreloadH(const uint8_t size) {
     m_hexBitmap[size][iAngle] = pd->graphics->newBitmap(HEX_MAX*2*scale, HEX_MAX*2*scale, kColorClear);
     pd->graphics->pushContext(m_hexBitmap[size][iAngle]);
     bitmapDoDrawRotatedPoly(6, HEX_MAX * scale, HEX_MAX * scale, (HEX_WIDTH/2) * scale, (HEX_WIDTH/2) * scale, iAngle, kRenderColorHatched);
+    pd->graphics->popContext();
+  }
+}
+
+void bitmapDoPreloadH2(const uint8_t size) {
+  const float scale = bitmapSizeToScale(size);
+  for (int32_t iAngle = 0; iAngle < 256; ++iAngle) {
+    m_triBitmap[0][size][iAngle] = pd->graphics->newBitmap(TRI_MAX*2*scale, TRI_MAX*2*scale, kColorClear);
+    pd->graphics->pushContext(m_triBitmap[0][size][iAngle]);
+    bitmapDoDrawRotatedPoly(3, TRI_MAX * scale, TRI_MAX * scale, (TRI_WIDTH/2) * scale, (TRI_WIDTH/2) * scale, iAngle - 64, kRenderColorWhite);
+    pd->graphics->popContext();
+
+    m_triBitmap[1][size][iAngle] = pd->graphics->newBitmap(TRI_MAX*2*scale, TRI_MAX*2*scale, kColorClear);
+    pd->graphics->pushContext(m_triBitmap[1][size][iAngle]);
+    bitmapDoDrawRotatedPoly(3, TRI_MAX * scale, TRI_MAX * scale, (TRI_WIDTH/2) * scale, (TRI_WIDTH/2) * scale, iAngle - 64, kRenderColorGrey);
     pd->graphics->popContext();
   }
 }

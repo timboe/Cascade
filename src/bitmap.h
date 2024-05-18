@@ -53,6 +53,7 @@ LCDBitmap* bitmapGetScoreHistogram(void);
 LCDBitmap* bitmapGetChevron(const uint8_t id);
 
 LCDBitmap* bitmapGetPeg(const struct Peg_t* p);
+LCDBitmap* bitmapGetPegPop(const struct Peg_t* p);
 LCDBitmap* bitmapGetMarble(void);
 LCDBitmap* bitmapGetMarbleFirePoot(const uint8_t i);
 
@@ -79,6 +80,7 @@ void bitmapDoPreloadE(void);
 void bitmapDoPreloadF(void);
 void bitmapDoPreloadG(const uint8_t size);
 void bitmapDoPreloadH(const uint8_t size);
+void bitmapDoPreloadH2(const uint8_t size);
 void bitmapDoPreloadI(void);
 void bitmapDoPreloadJ(void);
 void bitmapDoPreloadK(void);
