@@ -10,6 +10,8 @@ const PLAYDATE_WIDTH : int = 400
 
 const GRAB_CIRCLE_RADIUS : float = BALL_RADIUS/2
 
+const TYPE_MISSING : int = 3
+
 var t : float = 0
 var static_pegs := 0
 var motion_pegs := 0
@@ -159,6 +161,8 @@ func render_elliptic_path(ellipticPath : Control):
 		var custom_shape = peg_container.find_child("ShapeButton").selected
 		var custom_size = peg_container.find_child("SizeButton").selected
 		var custom_type = peg_container.find_child("TypeButton").selected
+		if custom_type == TYPE_MISSING:
+			continue
 		var shape_peg = shape
 		var size_peg = size
 		if custom_shape:
@@ -166,8 +170,8 @@ func render_elliptic_path(ellipticPath : Control):
 		if custom_size:
 			size_peg = custom_size-1
 		var arc_peg : float = (arc_rad / n_pegs) * i
-		var x_peg : float = x + (a * cos((t * speed) + arc_peg + arc_rad))
-		var y_peg : float = y + (b * sin((t * speed) + arc_peg + arc_rad))
+		var x_peg : float = x + (a * cos((t * speed) + arc_peg ))
+		var y_peg : float = y + (b * sin((t * speed) + arc_peg ))
 		var draw_angle : float
 		if use_arc:
 			draw_angle = (t * speed) + arc_peg + angle_rad
