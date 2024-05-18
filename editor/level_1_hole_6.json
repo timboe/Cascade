@@ -125,21 +125,21 @@
       "x": 168,
       "y": 124,
       "angle": 0,
-      "size": 0,
+      "size": 1,
       "type": 0
     },
     "StaticControl15": {
       "shape": 0,
-      "x": 232,
+      "x": 236,
       "y": 124,
       "angle": 0,
-      "size": 0,
+      "size": 1,
       "type": 0
     },
     "StaticControl16": {
       "shape": 1,
       "x": 200,
-      "y": 80,
+      "y": 76,
       "angle": 30,
       "size": 0,
       "type": 2
@@ -148,9 +148,9 @@
       "shape": 2,
       "x": 204,
       "y": 220,
-      "angle": 95,
+      "angle": 90,
       "size": 1,
-      "arc": 305,
+      "arc": 360,
       "use_arc": true,
       "speed": 0,
       "easing": 0,
@@ -215,17 +215,17 @@
       "PegContainer12": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 3
       },
       "PegContainer13": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 3
       },
       "PegContainer14": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 3
       },
       "PegContainer15": {
         "shape_override": 0,
@@ -242,9 +242,9 @@
       "shape": 2,
       "x": 204,
       "y": 220,
-      "angle": 104,
+      "angle": 90,
       "size": 0,
-      "arc": 315,
+      "arc": 340,
       "use_arc": true,
       "speed": 0.5,
       "easing": 0,
@@ -336,9 +336,9 @@
       "shape": 2,
       "x": 204,
       "y": 220,
-      "angle": 40,
+      "angle": 90,
       "size": 2,
-      "arc": 309,
+      "arc": 360,
       "use_arc": true,
       "speed": 0,
       "easing": 0,
@@ -383,12 +383,12 @@
       "PegContainer8": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 3
       },
       "PegContainer9": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 3
       },
       "PegContainer10": {
         "shape_override": 0,
