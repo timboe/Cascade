@@ -7,7 +7,7 @@ extends HSlider
 
 func _on_value_changed(newValue):
 	$"../PathLabel".text = "Path Pegs: " + str(newValue)
-	rend.do_update()
+	rend.call_deferred("do_update")
 	var pegVbox : VBoxContainer = parentControl.find_child("PegVBox")
 	var tot_pegs = newValue
 	var tot_lines_node = $"../../HBoxContainer3/LineSlider"

@@ -9,7 +9,7 @@
     "foreground": 0,
     "background": 0,
     "special": 0,
-    "height": 960,
+    "height": 380,
     "snap": 4,
     "n_static": 0,
     "n_elliptic": 0,
@@ -119,7 +119,7 @@
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       },
       "LineContainer1": {
         "lc_x": 200,
@@ -251,7 +251,7 @@
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 2
       },
       "LineContainer1": {
         "lc_x": 40,
@@ -339,7 +339,7 @@
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       },
       "LineContainer1": {
         "lc_x": 120,
@@ -361,7 +361,7 @@
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       },
       "LineContainer1": {
         "lc_x": 160,
@@ -383,7 +383,7 @@
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       },
       "LineContainer1": {
         "lc_x": 160,
@@ -405,7 +405,7 @@
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       },
       "LineContainer1": {
         "lc_x": 200,
@@ -427,7 +427,7 @@
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       },
       "LineContainer1": {
         "lc_x": 200,
@@ -449,7 +449,7 @@
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       },
       "LineContainer1": {
         "lc_x": 240,
@@ -471,7 +471,7 @@
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       },
       "LineContainer1": {
         "lc_x": 240,
@@ -515,7 +515,7 @@
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       },
       "LineContainer1": {
         "lc_x": 280,
@@ -603,7 +603,7 @@
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 2
       },
       "LineContainer1": {
         "lc_x": 360,
