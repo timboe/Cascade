@@ -155,10 +155,10 @@ func render_elliptic_path(ellipticPath : Control):
 	var b : int = ellipticPath.find_child("BText").value
 	var angle_rad : float = ellipticPath.find_child("AngleText").value * (2*PI / 360.0) 
 	var use_arc : int = ellipticPath.find_child("ArcAngleCheckbox").button_pressed
-	var timeText = ellipticPath.find_child("TimeText")
 	
 	for i in range(0, n_pegs):
 		var peg_container : Control = ellipticPath.find_child("PegContainer"+str(i+1), true, false)
+		var timeText = peg_container.find_child("TimeText")
 		var custom_shape = peg_container.find_child("ShapeButton").selected
 		var custom_size = peg_container.find_child("SizeButton").selected
 		var custom_type = peg_container.find_child("TypeButton").selected
@@ -170,14 +170,12 @@ func render_elliptic_path(ellipticPath : Control):
 			shape_peg = custom_shape-1
 		if custom_size:
 			size_peg = custom_size-1
-		var arc_peg : float = (arc_rad / n_pegs) * i
-		var arc_offset = arc_peg + arc_rad
-		timeText.value = timeText.value + speed
-		var x_peg : float = x + (a * cos((t * speed) + arc_offset ))
-		var y_peg : float = y + (b * sin((t * speed) + arc_offset ))
+		timeText.value = timeText.value + (speed * (1.0/30.0))
+		var x_peg : float = x + (a * cos(timeText.value))
+		var y_peg : float = y + (b * sin(timeText.value))
 		var draw_angle : float
 		if use_arc:
-			draw_angle = (t * speed) + arc_offset + angle_rad
+			draw_angle = timeText.value + angle_rad# + arc_offset + 
 		else:
 			draw_angle = angle_rad
 		renderPeg(shape_peg, x_peg, y_peg, draw_angle, size_peg, custom_type)
@@ -280,13 +278,27 @@ func _process(delta):
 	%BackgroundTexRect.position.y += delta * 15.0
 	if %BackgroundTexRect.position.y >= 0:
 		%BackgroundTexRect.position.y -= 60
-	
+
+func do_reset():
+	print("reset")
+	var ellipticPaths = get_tree().get_nodes_in_group("elliptic_pegs")
+	var linePaths = get_tree().get_nodes_in_group("line_pegs")
+	for ellipticPath in ellipticPaths:
+		#const float angleOffset = (ellipticLoader->maxAngle / ellipticLoader->nPegs) * i;
+		#pegSetMotionOffset(p, angleOffset + (ellipticLoader->maxAngle));
+		var n_pegs : int = ellipticPath.find_child("PathSlider").value
+		var arc_rad : float = ellipticPath.find_child("ArcText").value * (2*PI / 360.0)
+		for i in range(0, n_pegs):
+			var arc_peg : float = (arc_rad / n_pegs) * i
+			var arc_offset = arc_peg + arc_rad
+			var timeText = ellipticPath.find_child("PegContainer"+str(i+1), true, false).find_child("TimeText")
+			timeText.value = arc_offset
+
 func do_update():
-	#print("Ping for redraw")
-	queue_redraw()
+	do_reset()
 
 func do_update_value(_value):
-	do_update()
+	do_reset()
 
 func _draw():
 	static_pegs = 0
