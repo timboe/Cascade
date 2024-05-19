@@ -155,6 +155,7 @@ func render_elliptic_path(ellipticPath : Control):
 	var b : int = ellipticPath.find_child("BText").value
 	var angle_rad : float = ellipticPath.find_child("AngleText").value * (2*PI / 360.0) 
 	var use_arc : int = ellipticPath.find_child("ArcAngleCheckbox").button_pressed
+	var timeText = ellipticPath.find_child("TimeText")
 	
 	for i in range(0, n_pegs):
 		var peg_container : Control = ellipticPath.find_child("PegContainer"+str(i+1), true, false)
@@ -170,11 +171,13 @@ func render_elliptic_path(ellipticPath : Control):
 		if custom_size:
 			size_peg = custom_size-1
 		var arc_peg : float = (arc_rad / n_pegs) * i
-		var x_peg : float = x + (a * cos((t * speed) + arc_peg ))
-		var y_peg : float = y + (b * sin((t * speed) + arc_peg ))
+		var arc_offset = arc_peg + arc_rad
+		timeText.value = timeText.value + speed
+		var x_peg : float = x + (a * cos((t * speed) + arc_offset ))
+		var y_peg : float = y + (b * sin((t * speed) + arc_offset ))
 		var draw_angle : float
 		if use_arc:
-			draw_angle = (t * speed) + arc_peg + angle_rad
+			draw_angle = (t * speed) + arc_offset + angle_rad
 		else:
 			draw_angle = angle_rad
 		renderPeg(shape_peg, x_peg, y_peg, draw_angle, size_peg, custom_type)
