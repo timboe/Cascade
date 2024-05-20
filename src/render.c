@@ -130,8 +130,15 @@ void renderGame(const int32_t fc, const enum FSM_t fsm) {
   // DRAW PEGS
   renderGameBoard(fc);
 
-  if (fsm == kGameFSM_BallStuck || fsm == kGameFSM_GutterToTurret) {
+  if (fsm == kGameFSM_BallStuck || fsm == kGameFSM_GutterToTurret || fsm == kGameFSM_WinningToast) {
     renderGamePops(fc);
+  }
+
+  if (  fsm == kGameFSM_WinningToast 
+    || (fsm == kGameFSM_BallGutter && boardGetRequiredPegsInPlay() == 0)
+    ||  fsm == kGameFSM_GutterToScores)
+  {
+    renderGameFountains(fc);
   }
 
   // DRAW BALL
@@ -146,6 +153,11 @@ void renderGame(const int32_t fc, const enum FSM_t fsm) {
   // Debug gutter line
   pd->graphics->drawLine(0, IOGetCurrentHoleHeight(), DEVICE_PIX_X, IOGetCurrentHoleHeight(), 4, kColorBlack);
   pd->graphics->drawLine(0, IOGetCurrentHoleHeight(), DEVICE_PIX_X, IOGetCurrentHoleHeight(), 2, kColorWhite);
+
+  if (fsm == kGameFSM_GutterToTurret) {
+    pd->graphics->drawLine(0, boardGetLastBurstLevel(), DEVICE_PIX_X, boardGetLastBurstLevel(), 4, kColorWhite);
+    pd->graphics->drawLine(0, boardGetLastBurstLevel(), DEVICE_PIX_X, boardGetLastBurstLevel(), 2, kColorBlack);
+  }
 #endif
 }
 

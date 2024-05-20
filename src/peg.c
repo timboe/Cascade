@@ -50,6 +50,7 @@ void pegDoInit(struct Peg_t* p, const enum PegShape_t s, const float x, const fl
   p->x = x;
   p->y = y;
   p->minY = y;
+  p->doMinY = true;
   p->angle = a;
   p->iAngle = radToByte(a);
   p->speed = 1.0f;
@@ -127,7 +128,8 @@ void pegSetType(struct Peg_t* p, const enum PegType_t type) {
     p->cpShape = cpPolyShapeNew(p->cpBody, 6, verts, cpTransformIdentity, 0.0f);
     p->radius = HEX_MAX*scale;
     pegDoAddedShape(p);
-  } else {
+  } else { // Required
+    p->doMinY = true;
     p->bitmap = bitmapGetPeg(p);
   }
 }
@@ -156,6 +158,7 @@ void pegDoUpdate(struct Peg_t* p) {
     return;
   }
 
+
   const float tsm = physicsGetTimestepMultiplier();
   p->time += (TIMESTEP * tsm * p->speed);
   if (p->time >= M_2PIf) { p->time -= M_2PIf; } // Keep this one bounded
@@ -168,8 +171,8 @@ void pegDoUpdate(struct Peg_t* p) {
   } else if (p->motion == kPegMotionEllipse) {
 
     const float easing = getEasing(p->easing, p->time / M_2PIf) * M_2PIf;
-    p->x = p->pathX[0] + (p->a * cosf(easing - p->angle));
-    p->y = p->pathY[0] + (p->b * sinf(easing - p->angle));
+    p->x = p->pathX[0] + (p->a * cosf(easing));
+    p->y = p->pathY[0] + (p->b * sinf(easing));
     if (p->doArcAngle) {
       pegDoUpdateAngle(p, easing + p->angle );
     }
@@ -215,18 +218,21 @@ void pegDoUpdate(struct Peg_t* p) {
 
   }
 
+  if (p->y < p->minY && p->x > 0 && p->x < DEVICE_PIX_X && p->y > 0) { p->minY = p->y; }
+
   const cpVect pos = cpBodyGetPosition(p->cpBody);
   if (p->speed == 0.0f) {
     cpBodySetPosition(p->cpBody, cpv(p->x, p->y));
     cpBodySetVelocity(p->cpBody, cpvzero);
     // No need for more updates
     p->motion = kPegMotionStatic;
+    p->doMinY = true; 
+    pd->system->logToConsole("Peg changing to static at y=%f minY=%f", p->y, p->minY);
   } else {
     cpBodySetVelocity(p->cpBody, cpv((p->x - pos.x)/TIMESTEP, (p->y - pos.y)/TIMESTEP));
   }
   pegSetBitmapCoordinates(p);
   
-  if (p->y < p->minY) { p->minY = p->y; }
 
   // Removes collisions?
   // if (p->speed == 0.0f) {
@@ -235,7 +241,11 @@ void pegDoUpdate(struct Peg_t* p) {
   // }
 }
 
-void pegSetMotionSpeed(struct Peg_t* p, const float s) { p->speed = s; }
+void pegSetMotionSpeed(struct Peg_t* p, const float s) { 
+  p->speed = s;
+  p->doMinY = false;
+  p->minY = 10000.0; // Force recomputation
+}
 
 void pegSetMotionEasing(struct Peg_t* p, const enum EasingFunction_t e) { p->easing = e; }
 

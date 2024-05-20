@@ -61,6 +61,7 @@ void boardDoClear(void);
 
 void boardDoBurstPegs(const float yLevel);
 bool boardDoBurstRandomPeg(void);
+float boardGetLastBurstLevel(void);
 
 uint16_t boardGetNPegs(void);
 struct Peg_t* boardGetPeg(const uint16_t i);

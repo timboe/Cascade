@@ -19,7 +19,8 @@ enum PegMotion_t {
 enum PegType_t {
   kPegTypeNormal,
   kPegTypeRequired,
-  kPegTypeSpecial
+  kPegTypeSpecial,
+  kPegTypeMissing
 };
 
 enum PegState_t {
@@ -50,6 +51,7 @@ struct Peg_t {
   float x;
   float y;
   float minY; // Based on movement path
+  bool doMinY; // Include this peg in the set of pegs which we keep on-screen?
   float radius;
   uint8_t size;
   int16_t xBitmap; // Top left corner for rendering

@@ -20,7 +20,7 @@ LCDBitmap* bitmapGetWfFg(const uint8_t wf, const uint8_t id);
 LCDBitmap* bitmapGetWfBg(const uint8_t wf);
 LCDBitmap* bitmapGetWfPond(void);
 LCDBitmap* bitmapGetWaterSplash(const uint8_t id);
-
+LCDBitmap* bitmapGetFountain(const uint8_t f, const int id);
 
 LCDBitmap* bitmapGetUseTheCrank(void);
 LCDBitmap* bitmapGetTitleHeaderImage(void);

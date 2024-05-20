@@ -243,7 +243,8 @@ void FSMBallInPlay(const bool newState) {
   const bool stuck = FSMCommonGetIsBallStuck(special);
   if (stuck) { FSMDo(kGameFSM_BallStuck); }
   // Ball close -> to close up
-  if (boardGetRequiredPegsInPlay() == 1) {
+  const int16_t bgrpip = boardGetRequiredPegsInPlay();
+  if (bgrpip == 1) {
     // Locate and cache final peg
     if (!m_finalRequiredPos.y) {
       for (int i = 0; i < boardGetNPegs(); ++i) {
@@ -261,6 +262,8 @@ void FSMBallInPlay(const bool newState) {
       cpVect ballPos = cpBodyGetPosition(physicsGetBall(i));
       if (cpvdist(m_finalRequiredPos, ballPos) < FINAL_PEG_SLOWMO_RADIUS)  { return FSMDo(kGameFSM_CloseUp); }
     }
+  } else if (bgrpip == 0) { // Or straight to toast if zero left
+    return FSMDo(kGameFSM_WinningToast);
   }
 }
 
@@ -378,42 +381,83 @@ void FSMBallGutter(const bool newState) {
 void FSMGutterToTurret(const bool newState) {
   static float progress = 0.0f;
   static float startY = 0.0f;
+  static float endY = 0.0f;
+  static float distance_mod = 0.0f;
+  static float height_mod = 0.0f;
   if (newState) {
     progress = 0.0f;
     startY = gameGetYOffset();
-    //
-    int32_t minY = 10000;
-    for (uint32_t i = 0; i < MAX_PEGS; ++i) {
-      const struct Peg_t* p = boardGetPeg(i);
-      if (p->minY < minY && p->state == kPegStateActive) {
-        minY = p->minY;
-      }
-    }
-    if (minY > (DEVICE_PIX_Y/2) && !IOGetIsTutorial()) { gameSetMinimumY(minY - (DEVICE_PIX_Y/2)); }
-    pd->system->logToConsole("kGameFSM_GutterToTurret smallest y was %i, min y is now %i", minY, gameGetMinimumY());
+    endY = gameGetMinimumY();
+    // Take less time overall when we get lower down
+    distance_mod = startY / (float)(startY - endY);
+    // Take less time on smaller levels
+    height_mod = (float)(DEVICE_PIX_Y * WF_MAX_HEIGHT) / IOGetCurrentHoleHeight();
     //
     boardDoAddSpecial(true); // Activate
   }
-  const int16_t minimumY = gameGetMinimumY();
-  // Take less time overall when we get lower down
-  const float distance_mod = startY / (float)(startY - minimumY);
-  // Take less time on smaller levels
-  const float height_mod = (float)(DEVICE_PIX_Y * WF_MAX_HEIGHT) / IOGetCurrentHoleHeight();
   //
   FSMCommonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
   //
   progress += (TIMESTEP * END_SWEEP_SCALE * distance_mod * height_mod);
   float easedProgress = getEasing(EASE_GUTTER_TO_TOP, progress);
   easedProgress = (1.0f - easedProgress);
-  const float tarIOGetPartial = minimumY + ((startY - minimumY) * easedProgress);
+  const float tarIOGetPartial = endY + ((startY - endY) * easedProgress);
   gameSetYOffset(tarIOGetPartial, true);
   //
-  const float popLevel = (startY + DEVICE_PIX_Y) * easedProgress;
+  // const float popLevel = (startY + DEVICE_PIX_Y) * easedProgress;
+  const float popLevel = tarIOGetPartial + (DEVICE_PIX_Y * easedProgress);
   boardDoBurstPegs(popLevel);
   //
   // pd->system->logToConsole("end sweep active target %f, pop %f",target, popLevel);
   if (progress >= 1) {
-    gameSetYOffset(minimumY, true);
+    gameSetYOffset(endY, true);
+    boardDoBurstPegs(0);
+    FSMDo(kGameFSM_TurretLower);
+  }
+}
+
+void FSMTurretLower(const bool newState) {
+  static float progress = 0.0f;
+  static float startY = 0.0f;
+  static float endY = 0.0f;
+  static float speed = 0.0f;
+  if (newState) {
+    progress = 0.0f;
+    startY = gameGetYOffset();
+    endY = gameGetMinimumY();
+    //
+    int32_t minY = 10000;
+    for (uint32_t i = 0; i < MAX_PEGS; ++i) {
+      const struct Peg_t* p = boardGetPeg(i);
+      pd->system->logToConsole("peg %i state=%i (1==active), shape=%i (rect,ball,tri), doMinY=%i y=%f minY=%f", i, p->state, p->shape, p->doMinY, p->y, p->minY);
+      if (p->state == kPegStateActive && p->doMinY && p->minY < minY) {
+        minY = p->minY;
+      }
+    }
+    if (minY > (DEVICE_PIX_Y/2) && !IOGetIsTutorial()) { 
+      endY = minY - (DEVICE_PIX_Y/2);
+    }
+    if (startY == endY) {
+      progress = 1.0f;
+    } else {
+      speed = 100.0f / (endY - startY);
+      if (speed < 1.0f) speed = 1.0f;
+    }
+    // pd->system->logToConsole("speed is %f", speed);
+  }
+  //
+  FSMCommonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
+  //
+  progress += (TIMESTEP * speed);
+  const float easedProgress = getEasing(EASE_GUTTER_TO_TOP, progress);
+  const float progressY = startY + ((endY - startY) * easedProgress);
+  gameSetYOffset(progressY, true);
+  gameSetMinimumY(progressY);
+  //
+  // pd->system->logToConsole("end sweep active target %f, pop %f",target, popLevel);
+  if (progress >= 1) {
+    gameSetYOffset(endY, true);
+    gameSetMinimumY(endY);
     if (IOGetIsTutorial() && boardGetSpecialPegsInPlay()) { return FSMDo(kGameFSM_TutorialGetSpecial); }
     else if (IOGetIsTutorial()) { return FSMDo(kGameFSM_TutorialGetRequired); }
     else { return FSMDo(kGameFSM_AimMode); }

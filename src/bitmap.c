@@ -83,7 +83,8 @@ LCDBitmap* m_specialTextBitmap[(uint8_t)kNPegSpecial];
 LCDBitmap* m_wfPond;
 LCDBitmap* m_wfBg[N_WF];
 LCDBitmapTable* m_sheetWfFg[N_WF];
-LCDBitmapTable* m_waterSplashTable;
+LCDBitmapTable* m_waterSplashTable[MAX_SPLASH];
+LCDBitmapTable* m_fountainTable[MAX_FOUNTAIN];
 LCDBitmapTable* m_chevronTable;
 LCDBitmapTable* m_pegPopTable[MAX_POPS];
 
@@ -188,7 +189,7 @@ void bitmapDoUpdateLevelTitle(void) {
   //
   snprintf(text, 128, "PAR %i", (int)IOGetCurrentHolePar());
   const int32_t w2 = pd->graphics->getTextWidth(bitmapGetRoobert24(), text, 128, kUTF8Encoding, 0);
-  bitmapSetRoobert24();
+  bitmapSetRoobert24(); 
   pd->graphics->setDrawMode(kDrawModeFillWhite);
   pd->graphics->drawText(text, 128, kUTF8Encoding, DEVICE_PIX_X/2 - w2/2, yC);
   pd->graphics->popContext();
@@ -198,7 +199,7 @@ void bitmapDoUpdateGameInfoTopper(void) {
   pd->graphics->clearBitmap(m_infoTopperBitmap, kColorBlack);
   pd->graphics->pushContext(m_infoTopperBitmap);
   char text[128];
-  snprintf(text, 128, "%i~%i", (int)IOGetCurrentLevel(), (int)IOGetCurrentHole());
+  snprintf(text, 128, "%i~%i", (int)IOGetCurrentLevel() + 1, (int)IOGetCurrentHole() + 1);
   bitmapSetGreatVibes24();
   pd->graphics->setDrawMode(kDrawModeFillWhite);
   pd->graphics->drawText(text, 128, kUTF8Encoding, 0, 8);
@@ -222,7 +223,11 @@ LCDBitmap* bitmapGetWfPond(void) { return m_wfPond; }
 LCDBitmap* bitmapGetWfBg(const uint8_t wf) { return m_wfBg[wf % N_WF]; }
 
 LCDBitmap* bitmapGetWaterSplash(const uint8_t id) { 
-  return pd->graphics->getTableBitmap(m_waterSplashTable, id);
+  return pd->graphics->getTableBitmap(m_waterSplashTable[0], id);
+}
+
+LCDBitmap* bitmapGetFountain(const uint8_t f, const int id) { 
+  return pd->graphics->getTableBitmap(m_fountainTable[f % MAX_FOUNTAIN], id % FOUNTAIN_FRAMES);
 }
 
 LCDBitmap* bitmapGetWfFg(const uint8_t wf, const uint8_t id) {
@@ -286,8 +291,8 @@ LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int1
     pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, offset, kBitmapUnflipped);
   } else {
     offset = offset % (IOGetCurrentHoleHeight()/2);
-    pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, offset, kBitmapUnflipped);
-    pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, offset - (IOGetCurrentHoleHeight()/2), kBitmapUnflipped);
+    pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, -offset, kBitmapUnflipped);
+    pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, -offset + (IOGetCurrentHoleHeight()/2), kBitmapUnflipped);
   }
   pd->graphics->setDrawMode(kDrawModeCopy);
   pd->graphics->setStencilImage(NULL, 0);
@@ -625,7 +630,7 @@ void bitmapDoUpdateScoreCard(void) {
     else if (tot < 0) { snprintf(text, 128, "%i UNDER PAR", tot*-1); }
     else { snprintf(text, 128, "EQUAL TO PAR"); }
     const int32_t w = pd->graphics->getTextWidth(bitmapGetRoobert10(), text, 128, kUTF8Encoding, 0);
-    pd->graphics->drawText(text, 128, kUTF8Encoding, 8*PIXX + PIXX/2 - w/2, BBAR + PIXY/4);
+    pd->graphics->drawText(text, 128, kUTF8Encoding, 8*PIXX + PIXX/2 - w/2, BBAR + PIXY/4 + 1);
   }
 
   pd->graphics->popContext();
@@ -734,7 +739,7 @@ void bitmapDoPreloadA(void) {
   m_starBitmap[1][0] = bitmapDoLoadImageAtPath("images/star1");
 
   m_turretBarrelTabel = bitmapDoLoadImageTableAtPath("images/turretBarrel");
-  m_waterSplashTable = bitmapDoLoadImageTableAtPath("images/MarbleSplash");
+  m_waterSplashTable[0] = bitmapDoLoadImageTableAtPath("images/MarbleSplash0");
   m_blastTable = bitmapDoLoadImageTableAtPath("images/blast");
   m_tutorialCrankRotateTable = bitmapDoLoadImageTableAtPath("images/crankClockwise");
   m_tutorialCrankAngleTable = bitmapDoLoadImageTableAtPath("images/crankSpin");
@@ -742,10 +747,14 @@ void bitmapDoPreloadA(void) {
   m_tutorialDPadTable = bitmapDoLoadImageTableAtPath("images/dPad");
   m_tutorialArrowsTable = bitmapDoLoadImageTableAtPath("images/tutorialPoint");
   m_chevronTable =  bitmapDoLoadImageTableAtPath("images/chevron");
+  char text[128];
   for (int i = 0; i < MAX_POPS; ++i) {
-    char text[128];
     snprintf(text, 128, "images/Pop%i", i);
     m_pegPopTable[i] =  bitmapDoLoadImageTableAtPath(text);
+  }
+  for (int i = 0; i < MAX_FOUNTAIN; ++i) {
+    snprintf(text, 128, "images/Fountain%i", i);
+    m_fountainTable[i] =  bitmapDoLoadImageTableAtPath(text);
   }
 
   m_fontRoobert24 = bitmapDoLoadFontAtPath("fonts/Roobert-24-Medium");

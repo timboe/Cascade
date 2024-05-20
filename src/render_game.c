@@ -196,7 +196,7 @@ void renderGameBoard(const int32_t fc) {
 
   for (int i = 0; i < boardGetNPegs(); ++i) {
     const struct Peg_t* p = boardGetPeg(i);
-    if (p->state == kPegStateRemoved) {
+    if (p->state == kPegStateRemoved || p->y < 0 || p->y > IOGetCurrentHoleHeight()) {
       continue;
     } else if (p->state == kPegStateHit) {
       pd->graphics->setDrawMode(kDrawModeInverted);
@@ -223,9 +223,8 @@ void renderGameBoard(const int32_t fc) {
     if (m_blastFrame / 4 == 9) {
       m_blastPos = cpvzero;
     } else {
-      pd->graphics->setDrawMode(kDrawModeCopy); // kDrawModeNXOR ?
+      pd->graphics->setDrawMode(kDrawModeCopy);
       pd->graphics->drawBitmap(bitmapGetBlast(m_blastFrame / 4), m_blastPos.x - BLAST_RADIUS, m_blastPos.y - BLAST_RADIUS, kBitmapUnflipped);
-      // pd->graphics->setDrawMode(kDrawModeCopy);
     }
   }
 
@@ -241,6 +240,15 @@ void renderGamePops(const int32_t fc) {
       // pd->system->logToConsole("!! %i : %i %i (%f, %f)", i, p->popAnim, p->popFrame, p->x - POP_ANIM_HALF_WIDTH, p->y - POP_ANIM_HALF_WIDTH);
       if (fc % 2 == 0) { p->popFrame++; }
     }
+  }
+  pd->graphics->setDrawMode(kDrawModeCopy);
+}
+
+void renderGameFountains(const int32_t fc) {
+  pd->graphics->setDrawMode(kDrawModeXOR);
+  for (int i = 0; i < 3; ++i) {
+    const int16_t x = (i*128) + ((i+1) * 4);
+    pd->graphics->drawBitmap(bitmapGetFountain(i, fc / 2), x, IOGetCurrentHoleHeight() - 128, kBitmapUnflipped);
   }
   pd->graphics->setDrawMode(kDrawModeCopy);
 }
