@@ -49,7 +49,7 @@ void boardDoSpecialBlast(void) {
     struct Peg_t* p = boardGetPeg(i);
     if (p->state == kPegStateActive) {
       const cpVect pegPos = cpv(p->x, p->y);
-      if (cpvdist(pos, pegPos) < BLAST_RADIUS) {
+      if (cpvdist(pos, pegPos) < SPECIAL_BLAST_RADIUS) {
         pegDoHit(p);
       }
     }

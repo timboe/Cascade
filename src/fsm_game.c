@@ -130,7 +130,6 @@ void FSMDisplaySplash(const bool newState) {
   if (newState) {
     const uint32_t before = pd->system->getCurrentTimeMilliseconds(); 
     timer = 0;
-    renderDoResetStars();
     gameSetYOffset(-DEVICE_PIX_Y - TURRET_RADIUS, true);
     bitmapDoUpdateScoreHistogram();
     gameDoPopulateMenuGame();
@@ -329,16 +328,16 @@ void FSMWinningToast(const bool newState) {
   // TODO
   const enum PegSpecial_t special = boardGetCurrentSpecial();
   if (newState) {
-    renderDoResetStars();
+    renderDoResetEndBlast();
   }
 
   const float tsm = physicsGetTimestepMultiplier();
   if (tsm < 1.0f) { physicsSetTimestepMultiplier(tsm + 0.005f);  }
 
   int fc = gameGetFrameCount();
-  if (fc % (TICK_FREQUENCY/5) == 0) { renderDoAddStar(0); }
+  if (fc % (TICK_FREQUENCY/5) == 0) { renderDoAddEndBlast(physicsGetBall(0)); }
   fc += (TICK_FREQUENCY/10);
-  if (physicsGetSecondBallInPlay() && fc % (TICK_FREQUENCY/5) == 0) { renderDoAddStar(1); }
+  if (physicsGetSecondBallInPlay() && fc % (TICK_FREQUENCY/5) == 0) { renderDoAddEndBlast(physicsGetBall(1)); }
 
   const bool guttered = FSMCommonFocusOnLowestBallInPlay(special);
   if (guttered) { 
@@ -429,7 +428,7 @@ void FSMTurretLower(const bool newState) {
     int32_t minY = 10000;
     for (uint32_t i = 0; i < MAX_PEGS; ++i) {
       const struct Peg_t* p = boardGetPeg(i);
-      pd->system->logToConsole("peg %i state=%i (1==active), shape=%i (rect,ball,tri), doMinY=%i y=%f minY=%f", i, p->state, p->shape, p->doMinY, p->y, p->minY);
+      //pd->system->logToConsole("peg %i state=%i (1==active), shape=%i (rect,ball,tri), doMinY=%i y=%f minY=%f", i, p->state, p->shape, p->doMinY, p->y, p->minY);
       if (p->state == kPegStateActive && p->doMinY && p->minY < minY) {
         minY = p->minY;
       }

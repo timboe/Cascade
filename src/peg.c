@@ -66,7 +66,7 @@ void pegDoInit(struct Peg_t* p, const enum PegShape_t s, const float x, const fl
     p->cpShape = cpCircleShapeNew(p->cpBody, BALL_RADIUS*scale, cpvzero);
     p->radius = BALL_RADIUS*scale;
   } else if (s == kPegShapeRect) {
-    p->cpShape = cpBoxShapeNew(p->cpBody, BOX_HALF_WIDTH*scale, BOX_HALF_HEIGHT*scale, 0.0f);
+    p->cpShape = cpBoxShapeNew(p->cpBody, BOX_HWIDTH*scale, BOX_HALF_HEIGHT*scale, 0.0f);
     p->radius = BOX_HALF_MAX*scale;
   } else if (s == kPegShapeTri) {
     cpVect verts[3];
@@ -227,7 +227,7 @@ void pegDoUpdate(struct Peg_t* p) {
     // No need for more updates
     p->motion = kPegMotionStatic;
     p->doMinY = true; 
-    pd->system->logToConsole("Peg changing to static at y=%f minY=%f", p->y, p->minY);
+    //pd->system->logToConsole("Peg changing to static at y=%f minY=%f", p->y, p->minY);
   } else {
     cpBodySetVelocity(p->cpBody, cpv((p->x - pos.x)/TIMESTEP, (p->y - pos.y)/TIMESTEP));
   }
@@ -323,7 +323,7 @@ void pegDoHit(struct Peg_t* p) {
       boardDoClearSpecial(); // Do this first, it's going to recurse!
       boardDoSpecialBlast();
       renderAddTrauma(TRAUMA_BLAST_HIT);
-      renderDoAddBlast(p->cpBody);
+      renderDoAddSpecialBlast(p->cpBody);
     }
   }
   if (p->state == kPegStateHit && FSMGet() == kGameFSM_WinningToast) {

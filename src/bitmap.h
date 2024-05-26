@@ -57,9 +57,9 @@ LCDBitmap* bitmapGetPegPop(const struct Peg_t* p);
 LCDBitmap* bitmapGetMarble(void);
 LCDBitmap* bitmapGetMarbleFirePoot(const uint8_t i);
 
-LCDBitmap* bitmapGetStar(const uint8_t type, const uint8_t angle);
+LCDBitmap* bitmapGetEndBlast(const uint8_t id, const uint8_t frame);
 
-LCDBitmap* bitmapGetBlast(const uint8_t id);
+LCDBitmap* bitmapGetSpecialBlast(const uint8_t id);
 
 LCDBitmap* bitmapGetSpecial(const enum PegSpecial_t special);
 

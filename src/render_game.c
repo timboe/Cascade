@@ -18,10 +18,10 @@ uint8_t m_ballTraces = 0;
 int16_t m_ballSplashPos[MAX_BALLS];
 uint16_t m_ballSplashTimer[MAX_BALLS];
 
-cpVect m_starPos[MAX_STARS];
-cpVect m_starVel[MAX_STARS];
-uint8_t m_starAng[MAX_STARS];
-int8_t m_starType[MAX_STARS] = {-1};
+uint8_t m_endBlasts = 0;
+int8_t m_endBlastID[MAX_END_BLASTS] = {-1};
+cpVect m_endBlast[MAX_END_BLASTS];
+uint8_t m_endBlastFrame[MAX_END_BLASTS] = {0};
 
 cpVect m_blastPos = cpvzero;
 uint8_t m_blastFrame;
@@ -32,34 +32,26 @@ enum PegSpecial_t m_specialType;
 
 /// ///
 
+void renderDoAddEndBlast(cpBody* body) {
+  m_endBlast[m_endBlasts] = cpBodyGetPosition(body);
+  m_endBlastID[m_endBlasts] = rand() % N_END_BLASTS;
+  m_endBlastFrame[m_endBlasts] = 0;
+  ++m_endBlasts;
+}
+
+void renderDoResetEndBlast(void) {
+  for (int i = 0; i < MAX_END_BLASTS; ++i) { m_endBlastID[i] = -1; }
+}
+
 void renderDoAddSpecial(cpBody* body, const enum PegSpecial_t special) {
   m_specialPos = cpBodyGetPosition(body);
   m_specialOffset = 0;
   m_specialType = special;
 }
 
-void renderDoAddBlast(cpBody* body) {
+void renderDoAddSpecialBlast(cpBody* body) {
   m_blastPos = cpBodyGetPosition(body);
   m_blastFrame = 0;
-}
-
-void renderDoAddStar(const uint8_t ball) {
-  for (int s = 0; s < MAX_STARS; ++s) {
-    if (m_starType[s] != -1) { continue; }
-    cpBody* cpBall = physicsGetBall(ball);
-    const float ang =  (rand() % 180) * M_PIf;
-    m_starType[s] = rand() % 2;
-    m_starPos[s] = cpBodyGetPosition(cpBall);
-    m_starVel[s] = cpv(STAR_STRENGTH * cosf(ang), -STAR_STRENGTH * sinf(ang));
-    // m_starVel[s] = cpvadd( cpBodyGetVelocity(cpBall), m_starVel[s] );
-    m_starVel[s] = cpvmult( m_starVel[s], TIMESTEP );
-    m_starAng[s] = rand() % 128;
-    return;
-  }
-}
-
-void renderDoResetStars(void) {
-  for (int s = 0; s < MAX_STARS; ++s) { m_starType[s] = -1; }
 }
 
 void renderDoTriggerSplash(const uint8_t ball, const int16_t x) {
@@ -96,15 +88,16 @@ void renderGameMarble(const int32_t fc) {
   // Start out by rendering any end of level effects
   const enum FSM_t fsm = FSMGet();
   if (fsm >= kGameFSM_WinningToast && fsm <= kGameFSM_GutterToScores) {
-    for (int s = 0; s < MAX_STARS; ++s) {
-      if (m_starType[s] == -1) { continue; }
-      m_starPos[s] = cpvadd( m_starPos[s], m_starVel[s] );
-      m_starVel[s].y += 0.01f; 
-      m_starAng[s] += 3;
-      pd->graphics->setDrawMode(kDrawModeNXOR);
-      pd->graphics->drawBitmap(bitmapGetStar(m_starType[s], m_starAng[s]), m_starPos[s].x - STAR_WIDTH/2, m_starPos[s].y - STAR_WIDTH/2, kBitmapUnflipped);
+    for (int s = 0; s < MAX_END_BLASTS; ++s) {
+      if (m_endBlastID[s] == -1) { continue; }
+      pd->graphics->setDrawMode(kDrawModeXOR);
+      pd->graphics->drawBitmap(bitmapGetEndBlast(m_endBlastID[s], m_endBlastFrame[s]), m_endBlast[s].x - END_BLAST_HWIDTH, m_endBlast[s].y - END_BLAST_HWIDTH, kBitmapUnflipped);
       pd->graphics->setDrawMode(kDrawModeCopy);
-      if (m_starAng[s] > 250) { m_starType[s] = -1; }
+      if (fc % 4 == 0) {
+        if (++m_endBlastFrame[s] == 16) {
+          m_endBlastID[s] = -1;
+        }
+      }
     }
   }
 
@@ -220,11 +213,11 @@ void renderGameBoard(const int32_t fc) {
 
   if (m_blastPos.x) { // Draw blast graphic
     m_blastFrame++;
-    if (m_blastFrame / 4 == 9) {
+    if (m_blastFrame / 4 == SPECIAL_BLAST_FRAMES) {
       m_blastPos = cpvzero;
     } else {
       pd->graphics->setDrawMode(kDrawModeCopy);
-      pd->graphics->drawBitmap(bitmapGetBlast(m_blastFrame / 4), m_blastPos.x - BLAST_RADIUS, m_blastPos.y - BLAST_RADIUS, kBitmapUnflipped);
+      pd->graphics->drawBitmap(bitmapGetSpecialBlast(m_blastFrame / 4), m_blastPos.x - SPECIAL_BLAST_RADIUS, m_blastPos.y - SPECIAL_BLAST_RADIUS, kBitmapUnflipped);
     }
   }
 
@@ -236,8 +229,8 @@ void renderGamePops(const int32_t fc) {
     struct Peg_t* p = boardGetPeg(i);
     if (p->popFrame >= 0 && p->popFrame < POP_ANIM_FRAMES) {
       LCDBitmap* bm = bitmapGetPegPop(p);
-      pd->graphics->drawBitmap(bm, p->x - POP_ANIM_HALF_WIDTH, p->y - POP_ANIM_HALF_WIDTH, kBitmapUnflipped);
-      // pd->system->logToConsole("!! %i : %i %i (%f, %f)", i, p->popAnim, p->popFrame, p->x - POP_ANIM_HALF_WIDTH, p->y - POP_ANIM_HALF_WIDTH);
+      pd->graphics->drawBitmap(bm, p->x - POP_ANIM_HWIDTH, p->y - POP_ANIM_HWIDTH, kBitmapUnflipped);
+      // pd->system->logToConsole("!! %i : %i %i (%f, %f)", i, p->popAnim, p->popFrame, p->x - POP_ANIM_HWIDTH, p->y - POP_ANIM_HWIDTH);
       if (fc % 2 == 0) { p->popFrame++; }
     }
   }

@@ -21,10 +21,10 @@ void renderSetMarblePootCircle(const uint16_t radius);
 void renderDoTriggerSplash(const uint8_t ball, const int16_t x);
 void renderDoResetTriggerSplash(void);
 
-void renderDoAddStar(const uint8_t ball);
-void renderDoResetStars(void);
+void renderDoAddSpecialBlast(cpBody* body);
 
-void renderDoAddBlast(cpBody* body);
+void renderDoAddEndBlast(cpBody* body);
+void renderDoResetEndBlast(void);
 
 void renderDoAddSpecial(cpBody* body, const enum PegSpecial_t special);
 

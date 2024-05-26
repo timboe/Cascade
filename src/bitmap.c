@@ -76,19 +76,18 @@ LCDBitmap* m_rectBitmap[2][MAX_PEG_SIZE][128];
 LCDBitmap* m_triBitmap[2][MAX_PEG_SIZE][256];
 LCDBitmap* m_hexBitmap[MAX_PEG_SIZE][128];
 
-LCDBitmap* m_starBitmap[2][128];
-
 LCDBitmap* m_specialTextBitmap[(uint8_t)kNPegSpecial];
 
 LCDBitmap* m_wfPond;
 LCDBitmap* m_wfBg[N_WF];
 LCDBitmapTable* m_sheetWfFg[N_WF];
-LCDBitmapTable* m_waterSplashTable[MAX_SPLASH];
-LCDBitmapTable* m_fountainTable[MAX_FOUNTAIN];
+LCDBitmapTable* m_waterSplashTable[N_SPLASHES];
+LCDBitmapTable* m_fountainTable[N_FOUNTAINS];
 LCDBitmapTable* m_chevronTable;
 LCDBitmapTable* m_pegPopTable[MAX_POPS];
 
-LCDBitmapTable* m_blastTable;
+LCDBitmapTable* m_specialBlastTable;
+LCDBitmapTable* m_endBlastTable[N_END_BLASTS];
 LCDBitmapTable* m_tutorialCrankRotateTable;
 LCDBitmapTable* m_tutorialCrankAngleTable;
 LCDBitmapTable* m_tutorialButtonTable;
@@ -227,15 +226,19 @@ LCDBitmap* bitmapGetWaterSplash(const uint8_t id) {
 }
 
 LCDBitmap* bitmapGetFountain(const uint8_t f, const int id) { 
-  return pd->graphics->getTableBitmap(m_fountainTable[f % MAX_FOUNTAIN], id % FOUNTAIN_FRAMES);
+  return pd->graphics->getTableBitmap(m_fountainTable[f % N_FOUNTAINS], id % FOUNTAIN_FRAMES);
 }
 
 LCDBitmap* bitmapGetWfFg(const uint8_t wf, const uint8_t id) {
   return pd->graphics->getTableBitmap(m_sheetWfFg[wf % N_WF], id);
 }
 
-LCDBitmap* bitmapGetBlast(const uint8_t id) {
-  return pd->graphics->getTableBitmap(m_blastTable, id % 9);
+LCDBitmap* bitmapGetSpecialBlast(const uint8_t id) {
+  return pd->graphics->getTableBitmap(m_specialBlastTable, id % 9);
+}
+
+LCDBitmap* bitmapGetEndBlast(const uint8_t id, const uint8_t frame) {
+  return pd->graphics->getTableBitmap(m_endBlastTable[id % N_END_BLASTS], frame % END_BLAST_FRAMES);
 }
 
 LCDBitmap* bitmapGetTutorialCrankRotate(const uint8_t id) {
@@ -277,8 +280,6 @@ LCDBitmap* bitmapGetTitleHoleName(void) { return m_holeNameBitmap; }
 LCDBitmap* bitmapGetTitleHoleTutorial(void) { return m_holeTutorialBitmap; }
 
 LCDBitmap* bitmapGetTitleScoreCard(void) { return m_scoreCardBitmap; }
-
-LCDBitmap* bitmapGetStar(const uint8_t type, const uint8_t angle) { return m_starBitmap[type][angle % 128]; }
 
 LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int16_t offset) {
   pd->graphics->clearBitmap(m_previewBitmapWindow, kColorClear);
@@ -735,12 +736,10 @@ void bitmapDoPreloadA(void) {
   m_wfPond = bitmapDoLoadImageAtPath("images/falls_pond");
   m_cardBitmap = bitmapDoLoadImageAtPath("images/card");
   m_turretBody = bitmapDoLoadImageAtPath("images/turretBody");
-  m_starBitmap[0][0] = bitmapDoLoadImageAtPath("images/star0");
-  m_starBitmap[1][0] = bitmapDoLoadImageAtPath("images/star1");
 
   m_turretBarrelTabel = bitmapDoLoadImageTableAtPath("images/turretBarrel");
   m_waterSplashTable[0] = bitmapDoLoadImageTableAtPath("images/MarbleSplash0");
-  m_blastTable = bitmapDoLoadImageTableAtPath("images/blast");
+  m_specialBlastTable = bitmapDoLoadImageTableAtPath("images/blast");
   m_tutorialCrankRotateTable = bitmapDoLoadImageTableAtPath("images/crankClockwise");
   m_tutorialCrankAngleTable = bitmapDoLoadImageTableAtPath("images/crankSpin");
   m_tutorialButtonTable = bitmapDoLoadImageTableAtPath("images/buttonPressed");
@@ -752,9 +751,13 @@ void bitmapDoPreloadA(void) {
     snprintf(text, 128, "images/Pop%i", i);
     m_pegPopTable[i] =  bitmapDoLoadImageTableAtPath(text);
   }
-  for (int i = 0; i < MAX_FOUNTAIN; ++i) {
+  for (int i = 0; i < N_FOUNTAINS; ++i) {
     snprintf(text, 128, "images/Fountain%i", i);
     m_fountainTable[i] =  bitmapDoLoadImageTableAtPath(text);
+  }
+  for (int i = 0; i < N_END_BLASTS; ++i) {
+    snprintf(text, 128, "images/Blast%i", i);
+    m_endBlastTable[i] =  bitmapDoLoadImageTableAtPath(text);
   }
 
   m_fontRoobert24 = bitmapDoLoadFontAtPath("fonts/Roobert-24-Medium");
@@ -850,12 +853,12 @@ void bitmapDoPreloadG(const uint8_t size) {
   for (int32_t iAngle = 0; iAngle < 128; ++iAngle) {
     m_rectBitmap[0][size][iAngle] = pd->graphics->newBitmap(BOX_HALF_MAX*2*scale, BOX_HALF_MAX*2*scale, kColorClear);
     pd->graphics->pushContext(m_rectBitmap[0][size][iAngle]);
-    bitmapDoDrawRotatedRect(BOX_HALF_MAX * scale, BOX_HALF_MAX * scale, (BOX_HALF_WIDTH/2) * scale, (BOX_HALF_HEIGHT/2) * scale, iAngle, kRenderColorWhite);
+    bitmapDoDrawRotatedRect(BOX_HALF_MAX * scale, BOX_HALF_MAX * scale, (BOX_HWIDTH/2) * scale, (BOX_HALF_HEIGHT/2) * scale, iAngle, kRenderColorWhite);
     // pd->graphics->drawRect(0, 0, BOX_HALF_MAX*2*scale, BOX_HALF_MAX*2*scale, kColorWhite);
     pd->graphics->popContext();
     m_rectBitmap[1][size][iAngle] = pd->graphics->newBitmap(BOX_HALF_MAX*2*scale, BOX_HALF_MAX*2*scale, kColorClear);
     pd->graphics->pushContext(m_rectBitmap[1][size][iAngle]);
-    bitmapDoDrawRotatedRect(BOX_HALF_MAX * scale, BOX_HALF_MAX * scale, (BOX_HALF_WIDTH/2) * scale, (BOX_HALF_HEIGHT/2) * scale, iAngle, kRenderColorGrey);
+    bitmapDoDrawRotatedRect(BOX_HALF_MAX * scale, BOX_HALF_MAX * scale, (BOX_HWIDTH/2) * scale, (BOX_HALF_HEIGHT/2) * scale, iAngle, kRenderColorGrey);
     // pd->graphics->drawRect(0, 0, BOX_HALF_MAX*2*scale, BOX_HALF_MAX*2*scale, kColorWhite);
     pd->graphics->popContext();
   }
@@ -991,13 +994,7 @@ void bitmapDoPreloadK(void) {
 }
 
 void bitmapDoPreloadL(const uint8_t star) {
-  for (int a = 1; a < 128; ++a) {
-    m_starBitmap[star][a] = pd->graphics->newBitmap(STAR_WIDTH, STAR_WIDTH, kColorClear);
-    const float angle = (360.0f / 128.0f) * a;
-    pd->graphics->pushContext(m_starBitmap[star][a]);
-    pd->graphics->drawRotatedBitmap(m_starBitmap[star][0], STAR_WIDTH/2, STAR_WIDTH/2, angle, 0.5f, 0.5f, 1.0f, 1.0f);
-    pd->graphics->popContext();
-  }
+  // TODO - re-use me for something
 }
 
 void bitmapDoInit(void) {

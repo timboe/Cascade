@@ -9,7 +9,7 @@
 
 int gameLoop(void* data);
 
-int gameGetFrameCount(void);
+int32_t gameGetFrameCount(void);
 void gameDoResetFrameCount(void);
 
 void gameSetTurretBarrelAngle(const float angle);

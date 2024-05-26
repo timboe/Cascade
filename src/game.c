@@ -24,7 +24,7 @@ float m_vY = 0;
 
 /// ///
 
-int gameGetFrameCount() { return m_frameCount; }
+int32_t gameGetFrameCount() { return m_frameCount; }
 void gameDoResetFrameCount(void) { m_frameCount = 0; }
 
 void gameSetTurretBarrelAngle(const float angle) { m_turretBarrelAngle = angle; }
