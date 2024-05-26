@@ -4,6 +4,8 @@
 #include "physics.h"
 #include "peg.h"
 
+void renderDoInit(void);
+
 void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm);
 
 void renderAddTrauma(const float amount);
@@ -40,7 +42,7 @@ void renderTitlesHeader(const int32_t fc);
 void renderTitlesPlayerSelect(const bool locked);
 void renderTitlesLevelSelect(const bool locked);
 void renderTitlesHoleSelect(const bool locked);
-void renderTitlesWfPond(void);
+void renderTitlesWfPond(const int32_t fc);
 void renderTitlesTransitionLevelSplash(void);
 
 void renderGameMarble(const int32_t fc);

@@ -78,7 +78,7 @@ LCDBitmap* m_hexBitmap[MAX_PEG_SIZE][128];
 
 LCDBitmap* m_specialTextBitmap[(uint8_t)kNPegSpecial];
 
-LCDBitmap* m_wfPond;
+LCDBitmap* m_wfPond[POND_WATER_FRAMES];
 LCDBitmap* m_wfBg[N_WF];
 LCDBitmapTable* m_sheetWfFg[N_WF];
 LCDBitmapTable* m_waterSplashTable[N_SPLASHES];
@@ -217,7 +217,7 @@ LCDBitmap* bitmapGetUseTheCrank(void) { return m_useTheCrankBitmap; }
 
 LCDBitmap* bitmapGetTitleHeaderImage(void) { return m_headerImage; }
 
-LCDBitmap* bitmapGetWfPond(void) { return m_wfPond; }
+LCDBitmap* bitmapGetWfPond(const int32_t fc) { return m_wfPond[fc/2 % POND_WATER_FRAMES]; }
 
 LCDBitmap* bitmapGetWfBg(const uint8_t wf) { return m_wfBg[wf % N_WF]; }
 
@@ -733,7 +733,7 @@ void bitmapDoPreloadA(void) {
   m_useTheCrankBitmap = bitmapDoLoadImageAtPath("images/useTheCrank");
   m_ditherBitmap = bitmapDoLoadImageAtPath("images/dither");
   m_holeTutorialBitmap = bitmapDoLoadImageAtPath("images/tutorial");
-  m_wfPond = bitmapDoLoadImageAtPath("images/falls_pond");
+  //m_wfPond = bitmapDoLoadImageAtPath("images/falls_pond");
   m_cardBitmap = bitmapDoLoadImageAtPath("images/card");
   m_turretBody = bitmapDoLoadImageAtPath("images/turretBody");
 
@@ -993,8 +993,40 @@ void bitmapDoPreloadK(void) {
   }
 }
 
-void bitmapDoPreloadL(const uint8_t star) {
-  // TODO - re-use me for something
+void bitmapDoPreloadL(void) {
+  for (int i = 0; i < POND_WATER_FRAMES; ++i) {
+    m_wfPond[i] = pd->graphics->newBitmap(DEVICE_PIX_X, POND_WATER_HEIGHT, kColorBlack);
+  }
+#define N_POND_LINES 3
+  int16_t x[POND_WATER_HEIGHT][N_POND_LINES];
+  uint8_t w[POND_WATER_HEIGHT][N_POND_LINES];
+  for (int line = 0; line < POND_WATER_HEIGHT; ++line) {
+    uint8_t nLines = (rand() % (N_POND_LINES - 1)) + 1;
+    for (int n = 0; n < N_POND_LINES; ++n) { x[line][n] = -1; }
+    for (int n = 0; n < nLines; ++n) { 
+      x[line][n] = rand() % DEVICE_PIX_X;
+      w[line][n] = (rand() % POND_WATER_HEIGHT > line ? 1 : 2);
+    }
+  }
+  for (int t = 0; t < POND_WATER_FRAMES; ++t) {
+    pd->graphics->pushContext(m_wfPond[t]);
+    pd->graphics->setDrawMode(kDrawModeCopy);
+    for (int line = 0; line < POND_WATER_HEIGHT; ++line) {
+      const float speed = line/128.0f + 0.1f;
+      const int width = MAX(line/4, 2);
+      for (int n = 0; n < N_POND_LINES; ++n) {
+        if (x[line][n] == -1) { continue; }
+        const int x1 = x[line][n] + (t * speed);
+        const int x2 = x1 + width;
+        for (int off = -16; off < 16; ++off) {
+          const int x3 = x1 + (POND_WATER_FRAMES * speed * off);
+          const int x4 = x3 + width;
+          pd->graphics->drawLine(x3, line, x4, line, w[line][n], kColorWhite);
+        }
+      }
+    }
+    pd->graphics->popContext();
+  }
 }
 
 void bitmapDoInit(void) {

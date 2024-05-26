@@ -126,8 +126,7 @@ void IODoUpdatePreloading(void) {
     case 23: bitmapDoPreloadI(); break;
     case 24: bitmapDoPreloadJ(); break;
     case 25: bitmapDoPreloadK(); break;
-    case 26: bitmapDoPreloadL(0); break;
-    case 27: bitmapDoPreloadL(1); break;
+    case 26: bitmapDoPreloadL(); break;
   }
   const uint32_t after = pd->system->getCurrentTimeMilliseconds();
   pd->system->logToConsole("Preload %i took %i ms", (int)m_preloading, (int)(after - before));

@@ -99,12 +99,14 @@ void menuOptionsCallbackQuitHole(void* _unused) {
   pd->system->logToConsole("menuOptionsCallbackQuitHole");
   // TODO - insert a fade out or wipe here?
   gameSetYOffset(DEVICE_PIX_Y*3, true);
+  physicsSetTimestepMultiplier(1.0f);
   FSMDo(kTitlesFSM_ChooseHole);
 }
 
 void menuOptionsCallbackResetHole(void* _unused) {
   pd->system->logToConsole("menuOptionsCallbackResetHole");
   // TODO - insert a fade out or wipe here?
+  physicsSetTimestepMultiplier(1.0f);
   FSMDo(kGameFSM_DisplaySplash);
 }
 
@@ -134,14 +136,15 @@ void gameDoPopulateMenuTitlesPlayer(void) {
 
 void gameDoPopulateMenuTitles(void) {
   pd->system->removeAllMenuItems();
-  static const char* options[] = {"Music+SFX", "Music", "SFX", "None"};
+  static const char* options[] = {"music+sfx", "music", "sfx", "none"};
   PDMenuItem* menu = pd->system->addOptionsMenuItem("audio", options, 4, menuOptionsCallbackAudio, NULL);
   pd->system->setMenuItemUserdata(menu, (void*) menu); // User data is a pointer to the menu itself
+  pd->system->addMenuItem("credits", NULL, (void*)1);
 }
 
 void gameDoPopulateMenuGame() {
   pd->system->removeAllMenuItems();
-  static const char* options[] = {"Music+SFX", "Music", "SFX", "None"};
+  static const char* options[] = {"music+sfx", "music", "sfx", "none"};
   PDMenuItem* menu = pd->system->addOptionsMenuItem("audio", options, 4, menuOptionsCallbackAudio, NULL);
   pd->system->setMenuItemUserdata(menu, (void*) menu); // User data is a pointer to the menu itself
   pd->system->addMenuItem("quit hole", menuOptionsCallbackQuitHole, NULL);

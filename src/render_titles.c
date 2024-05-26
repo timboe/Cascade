@@ -146,9 +146,9 @@ void renderTitlesHoleSelect(const bool locked) {
   }
 }
 
-void renderTitlesWfPond(void) {
+void renderTitlesWfPond(const int32_t fc) {
   const float parallax = gameGetParalaxFactorNear(false) - gameGetParalaxFactorNearForY(false, DEVICE_PIX_Y*4); // Hard = false
-  pd->graphics->drawBitmap(bitmapGetWfPond(), 0, DEVICE_PIX_Y*4 + parallax, kBitmapUnflipped);
+  pd->graphics->drawBitmap(bitmapGetWfPond(fc), 0, DEVICE_PIX_Y*4 + parallax, kBitmapUnflipped);
 }
 
 void renderTitlesTransitionLevelSplash(void) {

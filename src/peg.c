@@ -73,7 +73,7 @@ void pegDoInit(struct Peg_t* p, const enum PegShape_t s, const float x, const fl
     const float angleAdvance = M_2PIf / 3.0f;
     const float scale = bitmapSizeToScale(p->size);
     for (uint8_t p = 0; p < 3; ++p) {
-      const float angle = (angleAdvance * p) - degToRad(90);
+      const float angle = (angleAdvance * p) - degToRad(180);
       verts[p].x = (TRI_WIDTH/2) * scale * sinf(angle);
       verts[p].y = (TRI_WIDTH/2) * scale * cosf(angle);
     }

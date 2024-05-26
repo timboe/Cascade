@@ -135,6 +135,7 @@ void FSMDisplaySplash(const bool newState) {
     gameDoPopulateMenuGame();
     boardDoClear();
     IODoLoadCurrentHole();
+    physicsSetTimestepMultiplier(1.0f);
     const uint32_t after = pd->system->getCurrentTimeMilliseconds();
     pd->system->logToConsole("Hole loading took %i ms", (int)(after - before));
   }
@@ -332,7 +333,7 @@ void FSMWinningToast(const bool newState) {
   }
 
   const float tsm = physicsGetTimestepMultiplier();
-  if (tsm < 1.0f) { physicsSetTimestepMultiplier(tsm + 0.005f);  }
+  if (tsm < 0.75f) { physicsSetTimestepMultiplier(tsm + 0.005f);  }
 
   int fc = gameGetFrameCount();
   if (fc % (TICK_FREQUENCY/5) == 0) { renderDoAddEndBlast(physicsGetBall(0)); }

@@ -36,7 +36,7 @@ void renderDoAddEndBlast(cpBody* body) {
   m_endBlast[m_endBlasts] = cpBodyGetPosition(body);
   m_endBlastID[m_endBlasts] = rand() % N_END_BLASTS;
   m_endBlastFrame[m_endBlasts] = 0;
-  ++m_endBlasts;
+  if (++m_endBlasts == MAX_END_BLASTS) { m_endBlasts = 0; }
 }
 
 void renderDoResetEndBlast(void) {
@@ -87,14 +87,16 @@ void renderDoResetMarbleTrace(void) {
 void renderGameMarble(const int32_t fc) {
   // Start out by rendering any end of level effects
   const enum FSM_t fsm = FSMGet();
+
+  // Draw end blasts
   if (fsm >= kGameFSM_WinningToast && fsm <= kGameFSM_GutterToScores) {
     for (int s = 0; s < MAX_END_BLASTS; ++s) {
       if (m_endBlastID[s] == -1) { continue; }
       pd->graphics->setDrawMode(kDrawModeXOR);
       pd->graphics->drawBitmap(bitmapGetEndBlast(m_endBlastID[s], m_endBlastFrame[s]), m_endBlast[s].x - END_BLAST_HWIDTH, m_endBlast[s].y - END_BLAST_HWIDTH, kBitmapUnflipped);
       pd->graphics->setDrawMode(kDrawModeCopy);
-      if (fc % 4 == 0) {
-        if (++m_endBlastFrame[s] == 16) {
+      if (fc % 2 == 0) {
+        if (++m_endBlastFrame[s] == END_BLAST_FRAMES) {
           m_endBlastID[s] = -1;
         }
       }
@@ -134,7 +136,7 @@ void renderGameMarble(const int32_t fc) {
     if (m_ballSplashTimer[i]) {
       uint8_t frame = m_ballSplashTimer[i] / 4;
       if (frame >= POND_SPLASH_ANIM_FRAMES) continue;
-      pd->graphics->setDrawMode(kDrawModeFillBlack); // kDrawModeNXOR
+      pd->graphics->setDrawMode(kDrawModeXOR);
       pd->graphics->drawBitmap(bitmapGetWaterSplash(frame), m_ballSplashPos[i], gutterY + parallaxPond, kBitmapUnflipped);
       pd->graphics->setDrawMode(kDrawModeCopy);
       ++m_ballSplashTimer[i];
@@ -257,9 +259,10 @@ void renderGameGutter(const int32_t fc) {
   const int32_t so = gameGetYOffset();
 
   if (so > gutterY + parallaxPond - DEVICE_PIX_Y) {
-    pd->graphics->drawBitmap(bitmapGetWfPond(), 0, gutterY + parallaxPond, kBitmapUnflipped);
-    pd->graphics->drawRect(0, gutterY, DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
-    pd->graphics->drawRect(1, gutterY + 1, DEVICE_PIX_X-2, DEVICE_PIX_Y-2, kColorBlack);
+    pd->graphics->drawBitmap(bitmapGetWfPond(fc), 0, gutterY + parallaxPond, kBitmapUnflipped);
+    // DEBUG
+    // pd->graphics->drawRect(0, gutterY, DEVICE_PIX_X, POND_WATER_HEIGHT, kColorWhite);
+    // pd->graphics->drawRect(1, gutterY + 1, DEVICE_PIX_X-2, POND_WATER_HEIGHT-2, kColorBlack);
   }
 
   //Note no parallax here

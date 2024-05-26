@@ -1,8 +1,8 @@
-name=Cascade
+name=Cascada
 author=Tim Martin
-description=Proof of concept
-bundleID=uk.co.tim-martin.cascade
+description=Cascade balls down relaxing waterfalls
+bundleID=uk.co.tim-martin.cascada
 version=0.1
-buildNumber=1928
+buildNumber=1931
 imagePath=launch
 launchSoundPath=
