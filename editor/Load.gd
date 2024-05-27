@@ -154,7 +154,10 @@ func restore_save(save_game : Dictionary) -> void:
 		var linear_name = "LinearControl" + str(i)
 		var linear_instance = %RightVBox.find_child(linear_name, true, false)
 		populate_linear(save_game["body"][linear_name], linear_instance)
-
+		
+	%Foreground._on_item_selected(%Foreground.selected)
+	%Foreground._on_background_item_selected(%Background.selected)
+	
 func _on_paste_button_pressed():
 	$PopupPanel/MarginContainer/VBoxContainer/TextImport.text = DisplayServer.clipboard_get()
 
