@@ -72,10 +72,11 @@ func _on_value_changed(new_value):
 script/source = "extends OptionButton
 
 func _on_item_selected(index):
-	if index == 10: # custom
+	var id = get_item_id(index)
+	if id == 10: # custom
 		$FileDialog.visible = true
 		return
-	var res = load(\"res://foregrounds/falls\" + str(index) +  \"_fg-table-400-60.png\")
+	var res = load(\"res://foregrounds/falls\" + str(id) +  \"_fg-table-400-60.png\")
 	if res:
 		%ForegroundTexRect.texture = res
 
