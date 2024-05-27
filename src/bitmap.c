@@ -609,6 +609,10 @@ void bitmapDoUpdateScoreCard(void) {
     w = pd->graphics->getTextWidth(bitmapGetRoobert10(), text, 128, kUTF8Encoding, 0);
     pd->graphics->drawText(text, 128, kUTF8Encoding, 7*PIXX - w/2, 4*PIXY + (count*PIXY) - yOff);
 
+    snprintf(text, 128, "%i", pars[l]);
+    w = pd->graphics->getTextWidth(bitmapGetRoobert10(), text, 128, kUTF8Encoding, 0);
+    pd->graphics->drawText(text, 128, kUTF8Encoding, 9*PIXX - w/2, 4*PIXY + (count*PIXY) - yOff);
+
     if (scores[l] == 0) { // Not played all holes
       snprintf(text, 128, "~");
     } else {
@@ -1028,7 +1032,7 @@ void bitmapDoPreloadM(const uint8_t n) {
         if (x[line][n] == -1) { continue; }
         const int x1 = x[line][n] + (t * speed);
         const int x2 = x1 + width;
-        for (int xOff = -18; xOff < 14; ++xOff) {
+        for (int xOff = -18; xOff < 18; ++xOff) {
           const int x3 = x1 + (POND_WATER_FRAMES * speed * xOff);
           const int x4 = x3 + width;
           pd->graphics->drawLine(x3, line, x4, line, w[line][n], kColorWhite);

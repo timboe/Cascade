@@ -90,6 +90,10 @@ void renderDoResetMarbleTrace(void) {
 }
 
 void renderGameMarble(const int32_t fc) {
+#ifdef TAKE_SCREENSHOTS
+  return;
+#endif
+
   // Start out by rendering any end of level effects
   const enum FSM_t fsm = FSMGet();
 
@@ -165,7 +169,9 @@ void renderGameTurret(void) {
   }
   pd->graphics->drawLine(0, minY+1, DEVICE_PIX_X, minY+1, 2, kColorWhite);
   pd->graphics->drawBitmap(bitmapGetTurretBody(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY,  kBitmapUnflipped);
+#ifndef TAKE_SCREENSHOTS
   pd->graphics->drawBitmap(bitmapGetTurretBarrel(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY, kBitmapUnflipped);
+#endif
 }
 
 void renderGameTrajectory(void) {

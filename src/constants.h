@@ -3,7 +3,7 @@
 
 //#define TAKE_SCREENSHOTS 1
 
-#define ALWAYS_FPS true
+#define ALWAYS_FPS 1
 
 #define MAX(a,b) ((a) > (b) ? a : b)
 #define MIN(a,b) ((a) < (b) ? a : b)
