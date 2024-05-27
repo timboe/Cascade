@@ -65,6 +65,7 @@ void FSMChoosePlayer(const bool newState) {
     gameDoResetPreviousWaterfall();
     IODoGoToNextUnplayedLevel();
     gameDoPopulateMenuTitlesPlayer();
+    renderDoUpdateBacklines();
   }
   const float status = FSMCommonCrankNumeral(&progress);
   if      (status > 0) {

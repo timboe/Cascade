@@ -80,7 +80,7 @@ LCDBitmap* m_specialTextBitmap[(uint8_t)kNPegSpecial];
 
 LCDBitmap* m_wfPond[POND_WATER_TILES][POND_WATER_FRAMES];
 LCDBitmap* m_wfBg[N_WF];
-LCDBitmapTable* m_sheetWfFg[N_WF];
+LCDBitmapTable* m_sheetWfFg[16]; // N_WF + room for specials
 LCDBitmapTable* m_waterSplashTable[N_SPLASHES];
 LCDBitmapTable* m_fountainTable[N_FOUNTAINS];
 LCDBitmapTable* m_chevronTable;
@@ -219,7 +219,7 @@ LCDBitmap* bitmapGetTitleHeaderImage(void) { return m_headerImage; }
 
 LCDBitmap* bitmapGetWfPond(const uint8_t n, const int32_t fc) { return m_wfPond[n % POND_WATER_TILES][fc/2 % POND_WATER_FRAMES]; }
 
-LCDBitmap* bitmapGetWfBg(const uint8_t wf) { return m_wfBg[wf % N_WF]; }
+LCDBitmap* bitmapGetWfBg(const uint8_t wf) { return m_wfBg[wf]; }
 
 LCDBitmap* bitmapGetWaterSplash(const uint8_t id) { 
   return pd->graphics->getTableBitmap(m_waterSplashTable[0], id);
@@ -230,7 +230,7 @@ LCDBitmap* bitmapGetFountain(const uint8_t f, const int id) {
 }
 
 LCDBitmap* bitmapGetWfFg(const uint8_t wf, const uint8_t id) {
-  return pd->graphics->getTableBitmap(m_sheetWfFg[wf % N_WF], id);
+  return pd->graphics->getTableBitmap(m_sheetWfFg[wf], id);
 }
 
 LCDBitmap* bitmapGetSpecialBlast(const uint8_t id) {
@@ -810,6 +810,8 @@ void bitmapDoPreloadD(void) {
     snprintf(text, 128, "images/falls%i_fg", (int)i);
     m_sheetWfFg[i] = bitmapDoLoadImageTableAtPath(text);
   }
+  // Special
+  m_sheetWfFg[10] = bitmapDoLoadImageTableAtPath("images/falls10_fg");
 }
 
 void bitmapDoPreloadE(void) {
@@ -994,15 +996,21 @@ void bitmapDoPreloadK(void) {
   }
 }
 
-#define N_POND_LINES 3
-void bitmapDoPreloadL(const uint8_t n) {
-  const uint16_t offset = POND_WATER_HEIGHT * n;
-  for (int i = 0; i < POND_WATER_FRAMES; ++i) {
-    m_wfPond[n][i] = pd->graphics->newBitmap(DEVICE_PIX_X, POND_WATER_HEIGHT, kColorBlack);
+
+void bitmapDoPreloadL(void) {
+  for (int n = 0; n < POND_WATER_TILES; ++n) {
+    for (int i = 0; i < POND_WATER_FRAMES; ++i) {
+      m_wfPond[n][i] = pd->graphics->newBitmap(DEVICE_PIX_X, POND_WATER_HEIGHT, kColorBlack);
+    }
   }
+}
+
+#define N_POND_LINES 3
+void bitmapDoPreloadM(const uint8_t n) {
+  const uint16_t offset = POND_WATER_HEIGHT * n;
   int16_t x[POND_WATER_HEIGHT][N_POND_LINES];
   uint8_t w[POND_WATER_HEIGHT][N_POND_LINES];
-  for (int line = 0; line < POND_WATER_HEIGHT; ++line) {
+  for (int line = 0; line < POND_WATER_HEIGHT; line += 2) {
     uint8_t nLines = (rand() % (N_POND_LINES - 1)) + 1;
     for (int n = 0; n < N_POND_LINES; ++n) { x[line][n] = -1; }
     for (int n = 0; n < nLines; ++n) { 
@@ -1013,14 +1021,14 @@ void bitmapDoPreloadL(const uint8_t n) {
   for (int t = 0; t < POND_WATER_FRAMES; ++t) {
     pd->graphics->pushContext(m_wfPond[n][t]);
     pd->graphics->setDrawMode(kDrawModeCopy);
-    for (int line = 0; line < POND_WATER_HEIGHT; ++line) {
+    for (int line = 0; line < POND_WATER_HEIGHT; line += 2) {
       const float speed = (line + offset)/256.0f + 0.1f;
       const int width = MAX((line + offset)/6, 4);
       for (int n = 0; n < N_POND_LINES; ++n) {
         if (x[line][n] == -1) { continue; }
         const int x1 = x[line][n] + (t * speed);
         const int x2 = x1 + width;
-        for (int xOff = -16; xOff < 16; ++xOff) {
+        for (int xOff = -18; xOff < 14; ++xOff) {
           const int x3 = x1 + (POND_WATER_FRAMES * speed * xOff);
           const int x4 = x3 + width;
           pd->graphics->drawLine(x3, line, x4, line, w[line][n], kColorWhite);
@@ -1036,7 +1044,7 @@ void bitmapDoInit(void) {
   m_fontRoobert10 = bitmapDoLoadFontAtPath("fonts/Roobert-10-Bold");
   m_headerImage = bitmapDoLoadImageAtPath("images/splash");
 #ifdef WF_FIXED_BG
-  m_wfBg[0] = bitmapDoLoadImageAtPath("images/falls3_bg"); // Set desired path
+  m_wfBg[0] = bitmapDoLoadImageAtPath("images/falls0_bg"); // Set desired path
 #else
   m_wfBg[0] = bitmapDoLoadImageAtPath("images/falls0_bg");
 #endif

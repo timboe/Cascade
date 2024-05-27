@@ -19,15 +19,20 @@ uint8_t m_renderScale = 1;
 void renderTitles(const int32_t fc);
 void renderGame(const int32_t fc, const enum FSM_t fsm);
 
-void renderCommonBackground(const enum FSM_t fsm);
+void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm);
 
 void renderBackgroundDo(const int16_t bg, const int16_t fg, const uint16_t startID, const int16_t wfBgOff, const int16_t parallax, const uint16_t maxY);
 
 /// ///
 
-void renderDoInit(void) {
+void renderDoUpdateBacklines(void) {
+  const uint16_t start = 16;
+  const uint16_t stop = (DEVICE_PIX_Y * (WF_MAX_HEIGHT+1)) - BACKLINE_HEIGHT - 16;
+  const float step = (stop - start) / (float)N_BACKLINES;
   for (int i = 0; i < N_BACKLINES; ++i) {
-    m_backLines[i] = cpv( 16 + rand() % (DEVICE_PIX_X - 32), rand() % ((DEVICE_PIX_Y * (WF_MAX_HEIGHT+1)) - BACKLINE_HEIGHT) );
+    do {
+      m_backLines[i] = cpv( 16 * (( rand() % ((DEVICE_PIX_X/16)-1) )+1), start + (i * step));
+    } while (i > 0 && m_backLines[i].x == m_backLines[i-1].x );
   }
 }
 
@@ -54,7 +59,8 @@ void renderAddTrauma(const float amount) {
   m_trauma += amount;
   m_trauma *= -1;
   m_decay = amount;
-  const float traumaAngle = M_2PIf / (rand() % 255);
+  // Trauma currently only in the Y direction
+  const float traumaAngle = 0; // M_2PIf / (rand() % 255);
   m_cTraumaAngle = cosf(traumaAngle) * TRAUMA_AMPLIFICATION;
   m_sTraumaAngle = sinf(traumaAngle) * TRAUMA_AMPLIFICATION;
 }
@@ -63,7 +69,7 @@ void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) 
   if (!pd->system->getReduceFlashing() && m_decay > 0.0f) {
     m_decay -= TRAUMA_DECAY;
     m_trauma += (m_trauma > 0 ? -m_decay : m_decay);
-    pd->display->setOffset(m_trauma * m_cTraumaAngle, m_trauma * m_sTraumaAngle);
+    pd->display->setOffset(m_trauma * m_sTraumaAngle, m_trauma * m_cTraumaAngle);
   } else {
     pd->display->setOffset(0, 0);
   }
@@ -83,7 +89,7 @@ void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) 
   pd->graphics->setBackgroundColor(kColorWhite);
 #endif // TAKE_SCREENSHOTS
 
-  renderCommonBackground(fsm);
+  renderCommonBackground(fsm, gm);
 
   switch (gm) {
     case kTitles: renderTitles(fc); break;
@@ -124,8 +130,6 @@ void renderTitles(const int32_t fc) {
   // TRANSITION LEVEL SPLASH
   if (so > DEVICE_PIX_Y*4) { renderTitlesTransitionLevelSplash(); }
 }
-
-
 
 void renderGame(const int32_t fc, const enum FSM_t fsm) {
 
@@ -186,7 +190,7 @@ void renderBackgroundDo(const int16_t bg, const int16_t fg, const uint16_t start
   for (int i = startID; i < (startID+6); ++i) {  // Background
     const int16_t y = (WF_DIVISION_PIX_Y * i) - wfBgOff + parallax;
     if (i >= WFSHEET_SIZE_Y + 1 || y > maxY) break;
-    pd->graphics->drawBitmap(bitmapGetWfBg(bg), WF_BG_OFFSET[bg], y, kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetWfBg(bg), 0/*WF_BG_OFFSET[bg]*/, y, kBitmapUnflipped);
   }
   for (int i = startID; i < (startID+5); ++i) { // Foreground
     const int16_t y = (WF_DIVISION_PIX_Y * i) + parallax;
@@ -195,17 +199,23 @@ void renderBackgroundDo(const int16_t bg, const int16_t fg, const uint16_t start
   }
 }
 
-void renderCommonBackground(const enum FSM_t fsm) {
+void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm) {
 
 #ifdef TAKE_SCREENSHOTS
   if (screenShotGetInProgress()) { return; }
 #endif
 
+  const uint8_t prevWfBg = gameGetPreviousWaterfallBg();
+  const uint8_t prevWfFg = gameGetPreviousWaterfallFg();
+
+  const uint8_t currentWfBg = IOGetCurrentHoleWaterfallBackground(gm); 
+  const uint8_t currentWfFg = IOGetCurrentHoleWaterfallForeground(gm);
+
   const int32_t yOffset = gameGetYOffset();
   const uint16_t chh = IOGetCurrentHoleHeight();
   const uint16_t maxY = (FSMGetGameMode() == kTitles ? (WF_MAX_HEIGHT * DEVICE_PIX_Y) : chh);
   const bool locked = (yOffset % DEVICE_PIX_Y == 0);
-  const int32_t parallax = gameGetParalaxFactorFar(false); // Note: float -> int here. Hard=false
+  const int32_t parallax = (currentWfFg >= 10 ? 0 : gameGetParalaxFactorFar(false)); // Note: float -> int here. Hard=false
   const int32_t startOffset = yOffset - parallax;
   const uint32_t startID = MAX(0, startOffset / WF_DIVISION_PIX_Y);
 
@@ -213,7 +223,7 @@ void renderCommonBackground(const enum FSM_t fsm) {
 
   pd->graphics->setLineCapStyle(kLineCapStyleRound);
   for (int i = 0; i < N_BACKLINES; ++i) {
-    if (m_backLines[i].y - BACKLINE_HEIGHT < maxY) { continue; }
+    if (m_backLines[i].y - BACKLINE_HEIGHT < maxY && fsm != kGameFSM_ScoresToTryAgain) { continue; }
     if (m_backLines[i].y + BACKLINE_HEIGHT < yOffset) { continue; }
     pd->graphics->drawLine(m_backLines[i].x, m_backLines[i].y, m_backLines[i].x, m_backLines[i].y + BACKLINE_HEIGHT, BACKLINE_WIDTH, kColorWhite);
   }
@@ -227,14 +237,9 @@ void renderCommonBackground(const enum FSM_t fsm) {
   const int16_t wfBgOff = WF_DIVISION_PIX_Y - ((int)wfBgOffC % WF_DIVISION_PIX_Y); 
 
   // Draw "previous" waterfall (will become current once gameDoResetPreviousWaterfall is called)
-  const uint8_t prevWfBg = gameGetPreviousWaterfallBg();
-  const uint8_t prevWfFg = gameGetPreviousWaterfallFg();
   renderBackgroundDo(prevWfBg, prevWfFg, startID, wfBgOff, parallax, maxY);
 
   // Animate in new waterfall
-  const uint8_t currentWfBg = IOGetCurrentHoleWaterfallBackground(); 
-  const uint8_t currentWfFg = IOGetCurrentHoleWaterfallForeground();
-
   if (currentWfFg != prevWfFg || currentWfBg != prevWfBg) {
 
     if (locked) {

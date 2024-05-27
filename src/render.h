@@ -4,7 +4,7 @@
 #include "physics.h"
 #include "peg.h"
 
-void renderDoInit(void);
+void renderDoUpdateBacklines(void);
 
 void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm);
 
@@ -27,6 +27,7 @@ void renderDoAddSpecialBlast(cpBody* body);
 
 void renderDoAddEndBlast(cpBody* body);
 void renderDoResetEndBlast(void);
+cpVect renderGetLastEndBlast(void);
 
 void renderDoAddSpecial(cpBody* body, const enum PegSpecial_t special);
 

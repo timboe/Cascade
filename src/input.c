@@ -58,9 +58,9 @@ void inputHandleTitles(const enum FSM_t fsm, const uint32_t buttonPressed) {
 void inputHandleGame(const enum FSM_t fsm, const uint32_t buttonPressed) {
   if (kButtonB == buttonPressed && (fsm == kGameFSM_AimMode || fsm == kGameFSM_TutorialScrollUp)) {
     FSMDo(kGameFSM_AimModeScrollToTop);
-  } else if ((kButtonA == buttonPressed || kButtonDown == buttonPressed) && fsm == kGameFSM_DisplayScores) {
+  } else if (kButtonA == buttonPressed && fsm == kGameFSM_DisplayScores) {
     FSMDo(kGameFSM_ScoresToSplash);
-  } else if ((kButtonB == buttonPressed || kButtonUp == buttonPressed) && fsm == kGameFSM_DisplayScores) {
+  } else if (kButtonB == buttonPressed && fsm == kGameFSM_DisplayScores) {
     FSMDo(kGameFSM_ScoresToTryAgain);
   }
 }

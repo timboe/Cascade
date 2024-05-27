@@ -149,6 +149,8 @@ void physicsDoUpdate(const int32_t fc, const enum FSM_t fsm) {
   cpSpaceStep(m_space, m_timestep);
   
   const cpVect pos = cpBodyGetPosition(m_ball[0]);
+  if (pos.x < 4) { cpBodySetPosition(m_ball[0], cpv(4, pos.y)); }
+  else if (pos.x > DEVICE_PIX_X - 4) { cpBodySetPosition(m_ball[0], cpv(DEVICE_PIX_X - 4, pos.y)); }
 
   if (FSMGetIsAimMode()) {
     const int i = (boardGetCurrentSpecial() == kPegSpecialAim ? fc % (PREDICTION_TRACE_LEN*2) : fc % PREDICTION_TRACE_LEN);

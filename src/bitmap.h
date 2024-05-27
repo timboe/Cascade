@@ -2,7 +2,7 @@
 #include "game.h"
 #include "peg.h"
 
-const static uint8_t WF_BG_OFFSET[MAX_LEVELS] = {0};
+// const static uint8_t WF_BG_OFFSET[MAX_LEVELS] = {0};
 
 void bitmapDoInit(void);
 
@@ -84,4 +84,5 @@ void bitmapDoPreloadH2(const uint8_t size);
 void bitmapDoPreloadI(void);
 void bitmapDoPreloadJ(void);
 void bitmapDoPreloadK(void);
-void bitmapDoPreloadL(const uint8_t n);
+void bitmapDoPreloadL(void);
+void bitmapDoPreloadM(const uint8_t n);

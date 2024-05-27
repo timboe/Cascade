@@ -121,9 +121,7 @@ bool FSMCommonMarbleFire(uint16_t* timer) {
   return false;
 }
 
-
 ////////////////////////////////        ////////////////////////////////
-
 
 void FSMDisplaySplash(const bool newState) {
   static uint16_t timer = 0;
@@ -136,6 +134,8 @@ void FSMDisplaySplash(const bool newState) {
     boardDoClear();
     IODoLoadCurrentHole();
     physicsSetTimestepMultiplier(1.0f);
+    gameDoResetPreviousWaterfall();
+    renderDoUpdateBacklines();
     const uint32_t after = pd->system->getCurrentTimeMilliseconds();
     pd->system->logToConsole("Hole loading took %i ms", (int)(after - before));
   }
@@ -326,18 +326,22 @@ void FSMCloseUp(const bool newState) {
 }
 
 void FSMWinningToast(const bool newState) {
-  // TODO
   const enum PegSpecial_t special = boardGetCurrentSpecial();
   if (newState) {
     renderDoResetEndBlast();
+    renderDoAddEndBlast(physicsGetBall(0));
   }
 
   const float tsm = physicsGetTimestepMultiplier();
   if (tsm < 0.75f) { physicsSetTimestepMultiplier(tsm + 0.005f);  }
 
+  const cpVect last = renderGetLastEndBlast();
+  const cpVect ballPos = cpBodyGetPosition(physicsGetBall(0));
+  if (cpvlengthsq( cpvsub(last, ballPos) ) > (16*16)) {
+    renderDoAddEndBlast(physicsGetBall(0));
+  }
+
   int fc = gameGetFrameCount();
-  if (fc % (TICK_FREQUENCY/5) == 0) { renderDoAddEndBlast(physicsGetBall(0)); }
-  fc += (TICK_FREQUENCY/10);
   if (physicsGetSecondBallInPlay() && fc % (TICK_FREQUENCY/5) == 0) { renderDoAddEndBlast(physicsGetBall(1)); }
 
   const bool guttered = FSMCommonFocusOnLowestBallInPlay(special);
@@ -492,6 +496,7 @@ void FSMScoresAnimation(const bool newState) {
     activeBalls = 1;
     for (int i = 0; i < ballsToShow; ++i) {
       py[i] = -2*BALL_RADIUS*(i + 1);
+      vy[i] = 0;
       renderSetMarbleFallY(i, py[i]);
     }
     IOSetCurrentHoleScore(m_ballCount);
@@ -516,28 +521,44 @@ void FSMScoresAnimation(const bool newState) {
 }
 
 
-void FSMDisplayScores(const bool _newState) {
-  if (inputGetPressed(kButtonUp))   return FSMDo(kGameFSM_ScoresToTryAgain); // TODO apply some friction here, else move to Inputs
-  if (inputGetPressed(kButtonDown)) return FSMDo(kGameFSM_ScoresToSplash);
+void FSMDisplayScores(const bool newState) {
+  static float offset = 0;
+  if (newState) { offset = 0; }
+
+  float change = inputGetCrankChanged();
+  if      (inputGetPressed(kButtonUp)) change -= 2.5f;
+  else if (inputGetPressed(kButtonDown)) change += 2.5f;
+  offset += change;
+  offset *= 0.9f;
+  gameSetYOffset(DEVICE_PIX_Y*5 + offset, true);
+
+  if      (offset >  16.0f) return FSMDo(kGameFSM_ScoresToSplash);
+  else if (offset < -16.0f) return FSMDo(kGameFSM_ScoresToTryAgain);
 }
 
 void FSMScoresToTryAgain(const bool newState) {
   static int16_t timer = 0;
-  if (newState) { timer = 0; }
-  FSMDoCommonScrollTo(DEVICE_PIX_Y*5, -DEVICE_PIX_Y - TURRET_RADIUS, (float)timer/TIME_SCORE_TO_TRY_AGAIN, EASE_SCORE_TO_TRY_AGAIN);
+  static float start = 0;
+  if (newState) { 
+    timer = 0;
+    start = gameGetYOffset();
+  }
+  FSMDoCommonScrollTo(start, -DEVICE_PIX_Y - TURRET_RADIUS, (float)timer/TIME_SCORE_TO_TRY_AGAIN, EASE_SCORE_TO_TRY_AGAIN);
   if (timer++ == TIME_SCORE_TO_TRY_AGAIN) { return FSMDo(kGameFSM_DisplaySplash); }
 }
 
 void FSMScoresToSplash(const bool newState) {
   static int16_t timer = 0;
+  static float start = 0;
   if (newState) {
     timer = 0;
+    start = gameGetYOffset();
     IODoNextHoleWithLevelWrap();
     bitmapDoUpdateLevelTitle();
     bitmapDoUpdateGameInfoTopper();
     pd->system->logToConsole("kGameFSM_ScoresToSplash");
   }
-  FSMDoCommonScrollTo(DEVICE_PIX_Y*5, DEVICE_PIX_Y*6, (float)timer/TIME_SCORE_TO_SPLASH, EASE_SCORE_TO_SPLASH);
+  FSMDoCommonScrollTo(start, DEVICE_PIX_Y*6, (float)timer/TIME_SCORE_TO_SPLASH, EASE_SCORE_TO_SPLASH);
   if (timer++ == TIME_SCORE_TO_SPLASH) { return FSMDo(kGameFSM_DisplaySplash); }
 }
 

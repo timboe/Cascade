@@ -5,7 +5,6 @@
 #include "game.h"
 #include "bitmap.h"
 #include "board.h"
-#include "render.h"
 #include "sound.h"
 #include "fsm.h"
 #include "io.h"
@@ -19,7 +18,6 @@ static void init(void) {
   bitmapDoInit();
   soundDoInit();
   physicsDoInit();
-  renderDoInit();
   FSMDo(kTitlesFSM_DisplayTitles);
 }
 

@@ -32,7 +32,8 @@
 #define WFSHEET_SIZE_X 1
 #define WFSHEET_SIZE_Y 12
 
-#define WF_FIXED_BG 1
+// Comment line to disable
+//#define WF_FIXED_BG 1
 
 #define NUMERAL_PIX_X 128
 #define NUMERAL_PIX_Y 160
@@ -76,15 +77,15 @@
 #define BASE_TIME (TICK_FREQUENCY)
 
 #define TIME_TITLE_TRANSITION (BASE_TIME)
-#define TIME_TITLE_HOLE_TO_SPLASH (BASE_TIME*5)
+#define TIME_TITLE_HOLE_TO_SPLASH (BASE_TIME*2)
 #define TIME_DISPLAY_SPLASH (BASE_TIME/2)
 #define TIME_SPLASH_TO_GAME (BASE_TIME)
 #define TIME_AIM_SCROLL_TO_TOP (BASE_TIME)
 #define TIME_FIRE_MARBLE ((9*TICK_FREQUENCY)/10)
-#define TIME_STUCK_POP (BASE_TIME/2)
+#define TIME_STUCK_POP (BASE_TIME/4)
 #define TIME_GUTTER_TO_SCORE (BASE_TIME*2)
 #define TIME_BALL_DROP_DELAY (BASE_TIME/3)
-#define TIME_SCORE_TO_TRY_AGAIN (BASE_TIME*7)
+#define TIME_SCORE_TO_TRY_AGAIN (BASE_TIME*5)
 #define TIME_SCORE_TO_SPLASH (BASE_TIME)
 
 // JUICE
@@ -166,14 +167,15 @@
 #define ELASTICITY 0.8f 
 #define ULTRA_BOUNCE 1.1f
 #define FRICTION 0.0f 
-#define G cpv(0.0f, 256.0f)
+// Was 256
+#define G cpv(0.0f, 196.0f)
 
 #define POOT_STRENGTH 300.0f
 
 #define WF_VELOCITY 0.6f
 
 // Velocity squared under which the ball is considered stuck
-#define BALL_IS_STUCK 100.0f
+#define BALL_IS_STUCK 1000.0f
 #define STUCK_TICKS (TICK_FREQUENCY*2)
 
 #define HISTO_BALL_ACCELERATION 0.05f
@@ -222,4 +224,4 @@
 
 #define VERSION "v0.1"
 
-#define PRELOADING_STEPS 30
+#define PRELOADING_STEPS 31

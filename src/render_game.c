@@ -43,6 +43,11 @@ void renderDoResetEndBlast(void) {
   for (int i = 0; i < MAX_END_BLASTS; ++i) { m_endBlastID[i] = -1; }
 }
 
+cpVect renderGetLastEndBlast(void) {
+  if (m_endBlasts == 0) return m_endBlast[MAX_END_BLASTS-1];
+  return m_endBlast[m_endBlasts-1];
+}
+
 void renderDoAddSpecial(cpBody* body, const enum PegSpecial_t special) {
   m_specialPos = cpBodyGetPosition(body);
   m_specialOffset = 0;
@@ -137,7 +142,7 @@ void renderGameMarble(const int32_t fc) {
       uint8_t frame = m_ballSplashTimer[i] / 4;
       if (frame >= POND_SPLASH_ANIM_FRAMES) continue;
       pd->graphics->setDrawMode(kDrawModeXOR);
-      pd->graphics->drawBitmap(bitmapGetWaterSplash(frame), m_ballSplashPos[i], gutterY + parallaxPond, kBitmapUnflipped);
+      pd->graphics->drawBitmap(bitmapGetWaterSplash(frame), m_ballSplashPos[i], gutterY - POND_SPLASH_HEIGHT, kBitmapUnflipped);
       pd->graphics->setDrawMode(kDrawModeCopy);
       ++m_ballSplashTimer[i];
     }
@@ -205,10 +210,12 @@ void renderGameBoard(const int32_t fc) {
     if (m_specialOffset == TICK_FREQUENCY) {
       m_specialPos = cpvzero;
     } else {
-      pd->graphics->setDrawMode(kDrawModeNXOR);
+      int16_t x = m_specialPos.x - SPECIAL_TEXT_WIDTH/2;
+      if (x < 16) { x = 16; }
+      else if (x + SPECIAL_TEXT_WIDTH > DEVICE_PIX_X - 16) { x = DEVICE_PIX_X - SPECIAL_TEXT_WIDTH - 16; }
+      pd->graphics->setDrawMode(kDrawModeCopy); // kDrawModeNXOR
       pd->graphics->drawBitmap(bitmapGetSpecial(m_specialType),
-        m_specialPos.x - SPECIAL_TEXT_WIDTH/2,
-        m_specialPos.y - TITLETEXT_HEIGHT - m_specialOffset, kBitmapUnflipped);
+        x, m_specialPos.y - TITLETEXT_HEIGHT - m_specialOffset, kBitmapUnflipped);
       pd->graphics->setDrawMode(kDrawModeCopy);
     }
   }
@@ -295,7 +302,7 @@ void renderGameScores(const int32_t fc) {
         kBitmapUnflipped);
     }
 
-    if (FSMGet() == kGameFSM_DisplayScores) {
+    if (FSMGet() >= kGameFSM_DisplayScores) {
       pd->graphics->drawBitmap(bitmapGetChevron((fc / (TICK_FREQUENCY/2)) % 3), DEVICE_PIX_X - 2*BUF - 96, DEVICE_PIX_Y*5 + BUF, kBitmapFlippedY);
       pd->graphics->drawBitmap(bitmapGetChevron((fc / (TICK_FREQUENCY/2)) % 3), DEVICE_PIX_X - 2*BUF - 96, DEVICE_PIX_Y*6 - 96 - BUF, kBitmapUnflipped);
     }
@@ -308,8 +315,8 @@ void renderGameScores(const int32_t fc) {
 
 void renderGameTutorial(const int32_t fc, const enum FSM_t fsm) {
   const int16_t yOff = gameGetYOffset();
-    const uint16_t fast = TICK_FREQUENCY / 5;
-    const uint16_t slow = TICK_FREQUENCY / 2;
+  const uint16_t fast = TICK_FREQUENCY / 5;
+  const uint16_t slow = TICK_FREQUENCY / 2;
   if (fsm == kGameFSM_TutorialScrollDown) {
 
     if (pd->system->isCrankDocked()) {

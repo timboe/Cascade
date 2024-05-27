@@ -126,10 +126,11 @@ void IODoUpdatePreloading(void) {
     case 23: bitmapDoPreloadI(); break;
     case 24: bitmapDoPreloadJ(); break;
     case 25: bitmapDoPreloadK(); break;
-    case 26: bitmapDoPreloadL(0); break;
-    case 27: bitmapDoPreloadL(1); break;
-    case 28: bitmapDoPreloadL(2); break;
-    case 29: bitmapDoPreloadL(3); break; // POND_WATER_SIZE
+    case 26: bitmapDoPreloadL(); break;
+    case 27: bitmapDoPreloadM(0); break;
+    case 28: bitmapDoPreloadM(1); break;
+    case 29: bitmapDoPreloadM(2); break;
+    case 30: bitmapDoPreloadM(3); break; // POND_WATER_SIZE
   }
   const uint32_t after = pd->system->getCurrentTimeMilliseconds();
   pd->system->logToConsole("Preload %i took %i ms", (int)m_preloading, (int)(after - before));
@@ -144,8 +145,13 @@ uint16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole) { r
 #endif
 uint16_t IOGetWaterfallForeground(const uint16_t level, const uint16_t hole) { return m_hole_foreground[level][hole]; }
 
-uint16_t IOGetCurrentHoleWaterfallBackground(void) { return m_hole_background[m_level][m_hole]; }
-uint16_t IOGetCurrentHoleWaterfallForeground(void) { return m_hole_foreground[m_level][m_hole]; }
+uint16_t IOGetCurrentHoleWaterfallBackground(const enum GameMode_t gm) { 
+  return IOGetWaterfallBackground(m_level, (gm == kTitles ? 0 : m_hole));
+}
+
+uint16_t IOGetCurrentHoleWaterfallForeground(const enum GameMode_t gm) {
+  return IOGetWaterfallForeground(m_level, (gm == kTitles ? 0 : m_hole));
+}
 
 uint16_t IOGetCurrentPlayer(void) { return m_player; }
 
@@ -492,10 +498,12 @@ void IODidDecodeLevel(json_decoder* jd, const char* key, json_value value) {
   }
 
   if (strcmp(key, "angle") == 0) {
+    int v = json_intValue(value);
+    if (v < 0) { v += 360; } // Needed for device only, why?
     switch (m_decodeType) {
-      case kDecodeStatic: m_static.angle = degToRad(json_intValue(value)); return;
-      case kDecodeElliptic: m_elliptic.angle = degToRad(json_intValue(value)); return;
-      case kDecodeLinear: m_linear.angle = degToRad(json_intValue(value)); return;
+      case kDecodeStatic: m_static.angle = degToRad(v); return;
+      case kDecodeElliptic: m_elliptic.angle = degToRad(v); return;
+      case kDecodeLinear: m_linear.angle = degToRad(v); return;
     }
   }
 

@@ -37,8 +37,8 @@ uint16_t gameGetPreviousWaterfallBg(void) { return 0; }
 uint16_t gameGetPreviousWaterfallBg(void) { return m_previousWaterfallBg; }
 #endif
 void gameDoResetPreviousWaterfall(void) { 
-  m_previousWaterfallFg = IOGetCurrentHoleWaterfallForeground();
-  m_previousWaterfallBg = IOGetCurrentHoleWaterfallBackground();
+  m_previousWaterfallFg = IOGetCurrentHoleWaterfallForeground(FSMGetGameMode());
+  m_previousWaterfallBg = IOGetCurrentHoleWaterfallBackground(FSMGetGameMode());
 }
 
 int gameLoop(void* _data) {

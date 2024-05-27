@@ -10,7 +10,7 @@ void renderSetNumeralOffset(float no) { m_numeralOffset = no; }
 
 void renderTitlesHeader(const int32_t fc) {
   bitmapSetRoobert10();
-  pd->graphics->setDrawMode(kDrawModeFillWhite);
+  pd->graphics->setDrawMode(kDrawModeFillBlack);
   pd->graphics->drawText(VERSION, 8, kUTF8Encoding, 8, DEVICE_PIX_Y-16);
   pd->graphics->drawText("Tim Martin, 2024", 32, kUTF8Encoding, 8, 4);
   pd->graphics->setDrawMode(kDrawModeCopy);
