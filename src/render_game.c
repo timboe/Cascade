@@ -248,6 +248,19 @@ void renderGameFountains(const int32_t fc) {
   pd->graphics->setDrawMode(kDrawModeCopy);
 }
 
+
+void renderGameTopper(void) {
+  const float minY = gameGetMinimumY(); 
+  const float yOff = gameGetYOffset();
+  if (yOff - minY < 0) {
+    pd->graphics->fillRect(0, minY - TURRET_RADIUS - 60, DEVICE_PIX_X, 60, kColorBlack); // mask in case of over-scroll
+    pd->graphics->drawBitmap(bitmapGetGameInfoTopper(), 0, minY - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
+  }
+  if (yOff <= -TURRET_RADIUS) { // Note no parallax here
+    pd->graphics->drawBitmap(bitmapGetLevelTitle(), 0, -DEVICE_PIX_Y - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
+  }
+}
+
 void renderGameGutter(const int32_t fc) {
 #ifdef TAKE_SCREENSHOTS
   if (screenShotGetInProgress()) { return; }
@@ -258,12 +271,19 @@ void renderGameGutter(const int32_t fc) {
   const int32_t parallaxPond = pfn - gameGetParalaxFactorNearForY(true, gutterY - DEVICE_PIX_Y); // Note: float -> int here. Hard = true
   const int32_t so = gameGetYOffset();
 
-  if (so > gutterY + parallaxPond - DEVICE_PIX_Y) {
-    pd->graphics->drawBitmap(bitmapGetWfPond(fc), 0, gutterY + parallaxPond, kBitmapUnflipped);
-    // DEBUG
-    // pd->graphics->drawRect(0, gutterY, DEVICE_PIX_X, POND_WATER_HEIGHT, kColorWhite);
-    // pd->graphics->drawRect(1, gutterY + 1, DEVICE_PIX_X-2, POND_WATER_HEIGHT-2, kColorBlack);
+  for (int i = 0; i < POND_WATER_TILES; ++i) {
+    const int16_t offset = (i * POND_WATER_HEIGHT);
+    if (so > gutterY + parallaxPond + offset - DEVICE_PIX_Y) {
+      pd->graphics->drawBitmap(bitmapGetWfPond(i, fc), 0, gutterY + parallaxPond + offset, kBitmapUnflipped);
+    }
   }
+  // DEBUG
+  // pd->graphics->drawRect(0, gutterY, DEVICE_PIX_X, (POND_WATER_HEIGHT*POND_WATER_TILES), kColorWhite);
+  // pd->graphics->drawRect(1, gutterY + 1, DEVICE_PIX_X-2, (POND_WATER_HEIGHT*POND_WATER_TILES)-2, kColorBlack);
+}
+
+void renderGameScores(const int32_t fc) {
+  const int32_t so = gameGetYOffset();
 
   //Note no parallax here
   if (so > DEVICE_PIX_Y * 4) {

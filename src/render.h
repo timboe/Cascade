@@ -45,6 +45,7 @@ void renderTitlesHoleSelect(const bool locked);
 void renderTitlesWfPond(const int32_t fc);
 void renderTitlesTransitionLevelSplash(void);
 
+void renderGameTopper(void);
 void renderGameMarble(const int32_t fc);
 void renderGamePoot(const enum FSM_t fsm);
 void renderGameTurret(void);
@@ -54,4 +55,5 @@ void renderGamePops(const int32_t fc);
 void renderGameFountains(const int32_t fc);
 void renderGameBackground(void);
 void renderGameGutter(const int32_t fc);
+void renderGameScores(const int32_t fc);
 void renderGameTutorial(const int32_t fc, const enum FSM_t fsm);

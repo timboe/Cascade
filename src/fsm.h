@@ -40,7 +40,7 @@ enum FSM_t {
   kGameFSM_GutterToScores,
   kGameFSM_ScoresAnimation,
   kGameFSM_DisplayScores,
-  kGameFSM_ScoresToChooseHole,
+  kGameFSM_ScoresToTryAgain,
   kGameFSM_ScoresToSplash,
   kNFSMModes
 };
@@ -91,5 +91,5 @@ void FSMTurretLower(const bool newState);
 void FSMGutterToScores(const bool newState);
 void FSMScoresAnimation(const bool newState);
 void FSMDisplayScores(const bool newState);
-void FSMScoresToChooseHole(const bool newState);
+void FSMScoresToTryAgain(const bool newState);
 void FSMScoresToSplash(const bool newState);

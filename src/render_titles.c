@@ -146,9 +146,21 @@ void renderTitlesHoleSelect(const bool locked) {
   }
 }
 
+
+  // const int32_t parallaxPond = pfn - gameGetParalaxFactorNearForY(true, gutterY - DEVICE_PIX_Y); // Note: float -> int here. Hard = true
+  // const int32_t so = gameGetYOffset();
+
+  // if (so > gutterY + parallaxPond - DEVICE_PIX_Y) {
+  //   pd->graphics->drawBitmap(bitmapGetWfPond(fc), 0, gutterY + parallaxPond, kBitmapUnflipped);
+
+
 void renderTitlesWfPond(const int32_t fc) {
-  const float parallax = gameGetParalaxFactorNear(false) - gameGetParalaxFactorNearForY(false, DEVICE_PIX_Y*4); // Hard = false
-  pd->graphics->drawBitmap(bitmapGetWfPond(fc), 0, DEVICE_PIX_Y*4 + parallax, kBitmapUnflipped);
+  const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y*3 - 16); // Hard = false
+  pd->graphics->drawBitmap(bitmapGetWfPond(0, fc), 0, DEVICE_PIX_Y*4 + parallax, kBitmapUnflipped);
+  for (int i = 0; i < POND_WATER_TILES; ++i) {
+    const int16_t offset = (i * POND_WATER_HEIGHT);
+    pd->graphics->drawBitmap(bitmapGetWfPond(i, fc), 0, DEVICE_PIX_Y*4 + parallax + offset, kBitmapUnflipped);
+  }
 }
 
 void renderTitlesTransitionLevelSplash(void) {

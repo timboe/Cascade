@@ -517,15 +517,15 @@ void FSMScoresAnimation(const bool newState) {
 
 
 void FSMDisplayScores(const bool _newState) {
-  if (inputGetPressed(kButtonUp))   return FSMDo(kGameFSM_ScoresToChooseHole); // TODO apply some friction here, else move to Inputs
+  if (inputGetPressed(kButtonUp))   return FSMDo(kGameFSM_ScoresToTryAgain); // TODO apply some friction here, else move to Inputs
   if (inputGetPressed(kButtonDown)) return FSMDo(kGameFSM_ScoresToSplash);
 }
 
-void FSMScoresToChooseHole(const bool newState) {
+void FSMScoresToTryAgain(const bool newState) {
   static int16_t timer = 0;
   if (newState) { timer = 0; }
-  FSMDoCommonScrollTo(DEVICE_PIX_Y*5, DEVICE_PIX_Y*3, (float)timer/TIME_SCORE_TO_TITLE, EASE_SCORE_TO_TITLE);
-  if (timer++ == TIME_SCORE_TO_TITLE) { return FSMDo(kTitlesFSM_ChooseHole); }
+  FSMDoCommonScrollTo(DEVICE_PIX_Y*5, -DEVICE_PIX_Y - TURRET_RADIUS, (float)timer/TIME_SCORE_TO_TRY_AGAIN, EASE_SCORE_TO_TRY_AGAIN);
+  if (timer++ == TIME_SCORE_TO_TRY_AGAIN) { return FSMDo(kGameFSM_DisplaySplash); }
 }
 
 void FSMScoresToSplash(const bool newState) {

@@ -61,7 +61,7 @@ void inputHandleGame(const enum FSM_t fsm, const uint32_t buttonPressed) {
   } else if ((kButtonA == buttonPressed || kButtonDown == buttonPressed) && fsm == kGameFSM_DisplayScores) {
     FSMDo(kGameFSM_ScoresToSplash);
   } else if ((kButtonB == buttonPressed || kButtonUp == buttonPressed) && fsm == kGameFSM_DisplayScores) {
-    FSMDo(kGameFSM_ScoresToChooseHole);
+    FSMDo(kGameFSM_ScoresToTryAgain);
   }
 }
 

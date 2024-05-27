@@ -51,14 +51,14 @@ void FSMDo(const enum FSM_t transitionTo) {
     case kGameFSM_GutterToScores: return FSMGutterToScores(newState);
     case kGameFSM_ScoresAnimation: return FSMScoresAnimation(newState);
     case kGameFSM_DisplayScores: return FSMDisplayScores(newState);
-    case kGameFSM_ScoresToChooseHole: return FSMScoresToChooseHole(newState);
+    case kGameFSM_ScoresToTryAgain: return FSMScoresToTryAgain(newState);
     case kGameFSM_ScoresToSplash: return FSMScoresToSplash(newState);
     case kNFSMModes: pd->system->error("FSM error kNFSMModes"); return;
   }
 }
 
 enum GameMode_t FSMGetGameMode(void) { 
-  return ((m_FSM < kFSM_SPLIT_TitlesGame || m_FSM == kGameFSM_ScoresToChooseHole) ? kTitles : kGameWindow);
+  return (m_FSM < kFSM_SPLIT_TitlesGame ? kTitles : kGameWindow);
 }
 
 bool FSMGetBallInPlay(void) {

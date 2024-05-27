@@ -126,7 +126,10 @@ void IODoUpdatePreloading(void) {
     case 23: bitmapDoPreloadI(); break;
     case 24: bitmapDoPreloadJ(); break;
     case 25: bitmapDoPreloadK(); break;
-    case 26: bitmapDoPreloadL(); break;
+    case 26: bitmapDoPreloadL(0); break;
+    case 27: bitmapDoPreloadL(1); break;
+    case 28: bitmapDoPreloadL(2); break;
+    case 29: bitmapDoPreloadL(3); break; // POND_WATER_SIZE
   }
   const uint32_t after = pd->system->getCurrentTimeMilliseconds();
   pd->system->logToConsole("Preload %i took %i ms", (int)m_preloading, (int)(after - before));
@@ -134,7 +137,11 @@ void IODoUpdatePreloading(void) {
   ++m_preloading;
 }
 
+#ifdef WF_FIXED_BG
+uint16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole) { return 0; }
+#else
 uint16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole) { return m_hole_background[level][hole]; }
+#endif
 uint16_t IOGetWaterfallForeground(const uint16_t level, const uint16_t hole) { return m_hole_foreground[level][hole]; }
 
 uint16_t IOGetCurrentHoleWaterfallBackground(void) { return m_hole_background[m_level][m_hole]; }

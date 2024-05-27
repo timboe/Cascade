@@ -78,7 +78,7 @@ LCDBitmap* m_hexBitmap[MAX_PEG_SIZE][128];
 
 LCDBitmap* m_specialTextBitmap[(uint8_t)kNPegSpecial];
 
-LCDBitmap* m_wfPond[POND_WATER_FRAMES];
+LCDBitmap* m_wfPond[POND_WATER_TILES][POND_WATER_FRAMES];
 LCDBitmap* m_wfBg[N_WF];
 LCDBitmapTable* m_sheetWfFg[N_WF];
 LCDBitmapTable* m_waterSplashTable[N_SPLASHES];
@@ -217,7 +217,7 @@ LCDBitmap* bitmapGetUseTheCrank(void) { return m_useTheCrankBitmap; }
 
 LCDBitmap* bitmapGetTitleHeaderImage(void) { return m_headerImage; }
 
-LCDBitmap* bitmapGetWfPond(const int32_t fc) { return m_wfPond[fc/2 % POND_WATER_FRAMES]; }
+LCDBitmap* bitmapGetWfPond(const uint8_t n, const int32_t fc) { return m_wfPond[n % POND_WATER_TILES][fc/2 % POND_WATER_FRAMES]; }
 
 LCDBitmap* bitmapGetWfBg(const uint8_t wf) { return m_wfBg[wf % N_WF]; }
 
@@ -761,7 +761,6 @@ void bitmapDoPreloadA(void) {
   }
 
   m_fontRoobert24 = bitmapDoLoadFontAtPath("fonts/Roobert-24-Medium");
-  m_fontRoobert10 = bitmapDoLoadFontAtPath("fonts/Roobert-10-Bold");
   m_fontGreatvibes24 = bitmapDoLoadFontAtPath("fonts/GreatVibes-Regular-24");
   m_fontGreatvibes109 = bitmapDoLoadFontAtPath("fonts/GreatVibes-Regular-109");
   pd->graphics->setFont(m_fontGreatvibes24);
@@ -804,8 +803,10 @@ void bitmapDoPreloadC(void) {
 void bitmapDoPreloadD(void) {
   char text[128];
   for (int32_t i = 1; i < N_WF; ++i) { // Did 0 already as a critical load
+#ifndef WF_FIXED_BG
     snprintf(text, 128, "images/falls%i_bg", (int)i);
     m_wfBg[i] = bitmapDoLoadImageAtPath(text);
+#endif
     snprintf(text, 128, "images/falls%i_fg", (int)i);
     m_sheetWfFg[i] = bitmapDoLoadImageTableAtPath(text);
   }
@@ -993,11 +994,12 @@ void bitmapDoPreloadK(void) {
   }
 }
 
-void bitmapDoPreloadL(void) {
-  for (int i = 0; i < POND_WATER_FRAMES; ++i) {
-    m_wfPond[i] = pd->graphics->newBitmap(DEVICE_PIX_X, POND_WATER_HEIGHT, kColorBlack);
-  }
 #define N_POND_LINES 3
+void bitmapDoPreloadL(const uint8_t n) {
+  const uint16_t offset = POND_WATER_HEIGHT * n;
+  for (int i = 0; i < POND_WATER_FRAMES; ++i) {
+    m_wfPond[n][i] = pd->graphics->newBitmap(DEVICE_PIX_X, POND_WATER_HEIGHT, kColorBlack);
+  }
   int16_t x[POND_WATER_HEIGHT][N_POND_LINES];
   uint8_t w[POND_WATER_HEIGHT][N_POND_LINES];
   for (int line = 0; line < POND_WATER_HEIGHT; ++line) {
@@ -1005,21 +1007,21 @@ void bitmapDoPreloadL(void) {
     for (int n = 0; n < N_POND_LINES; ++n) { x[line][n] = -1; }
     for (int n = 0; n < nLines; ++n) { 
       x[line][n] = rand() % DEVICE_PIX_X;
-      w[line][n] = (rand() % POND_WATER_HEIGHT > line ? 1 : 2);
+      w[line][n] = (rand() % (POND_WATER_HEIGHT * POND_WATER_TILES) > (line + offset) ? 1 : 2);
     }
   }
   for (int t = 0; t < POND_WATER_FRAMES; ++t) {
-    pd->graphics->pushContext(m_wfPond[t]);
+    pd->graphics->pushContext(m_wfPond[n][t]);
     pd->graphics->setDrawMode(kDrawModeCopy);
     for (int line = 0; line < POND_WATER_HEIGHT; ++line) {
-      const float speed = line/128.0f + 0.1f;
-      const int width = MAX(line/4, 2);
+      const float speed = (line + offset)/256.0f + 0.1f;
+      const int width = MAX((line + offset)/6, 4);
       for (int n = 0; n < N_POND_LINES; ++n) {
         if (x[line][n] == -1) { continue; }
         const int x1 = x[line][n] + (t * speed);
         const int x2 = x1 + width;
-        for (int off = -16; off < 16; ++off) {
-          const int x3 = x1 + (POND_WATER_FRAMES * speed * off);
+        for (int xOff = -16; xOff < 16; ++xOff) {
+          const int x3 = x1 + (POND_WATER_FRAMES * speed * xOff);
           const int x4 = x3 + width;
           pd->graphics->drawLine(x3, line, x4, line, w[line][n], kColorWhite);
         }
@@ -1031,7 +1033,12 @@ void bitmapDoPreloadL(void) {
 
 void bitmapDoInit(void) {
   // Load critical bitmaps
+  m_fontRoobert10 = bitmapDoLoadFontAtPath("fonts/Roobert-10-Bold");
   m_headerImage = bitmapDoLoadImageAtPath("images/splash");
+#ifdef WF_FIXED_BG
+  m_wfBg[0] = bitmapDoLoadImageAtPath("images/falls3_bg"); // Set desired path
+#else
   m_wfBg[0] = bitmapDoLoadImageAtPath("images/falls0_bg");
+#endif
   m_sheetWfFg[0] = bitmapDoLoadImageTableAtPath("images/falls0_fg");
 }

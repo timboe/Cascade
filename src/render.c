@@ -19,7 +19,7 @@ uint8_t m_renderScale = 1;
 void renderTitles(const int32_t fc);
 void renderGame(const int32_t fc, const enum FSM_t fsm);
 
-void renderCommonBackground(void);
+void renderCommonBackground(const enum FSM_t fsm);
 
 void renderBackgroundDo(const int16_t bg, const int16_t fg, const uint16_t startID, const int16_t wfBgOff, const int16_t parallax, const uint16_t maxY);
 
@@ -83,7 +83,7 @@ void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) 
   pd->graphics->setBackgroundColor(kColorWhite);
 #endif // TAKE_SCREENSHOTS
 
-  renderCommonBackground();
+  renderCommonBackground(fsm);
 
   switch (gm) {
     case kTitles: renderTitles(fc); break;
@@ -116,10 +116,10 @@ void renderTitles(const int32_t fc) {
   if (so > DEVICE_PIX_Y && so <= DEVICE_PIX_Y*3) { renderTitlesLevelSelect(so == 2*DEVICE_PIX_Y); }
 
   // HOLE SELECT
-  if (so > DEVICE_PIX_Y*2 && so <= DEVICE_PIX_Y*4) { renderTitlesHoleSelect(so == 3*DEVICE_PIX_Y); }
+  if (so > DEVICE_PIX_Y*2 && so <= DEVICE_PIX_Y*5) { renderTitlesWfPond(fc); }
 
   // HOLE SELECT
-  if (so > DEVICE_PIX_Y*3 && so <= DEVICE_PIX_Y*5) { renderTitlesWfPond(fc); }
+  if (so > DEVICE_PIX_Y*2 && so <= DEVICE_PIX_Y*4) { renderTitlesHoleSelect(so == 3*DEVICE_PIX_Y); }
 
   // TRANSITION LEVEL SPLASH
   if (so > DEVICE_PIX_Y*4) { renderTitlesTransitionLevelSplash(); }
@@ -128,6 +128,17 @@ void renderTitles(const int32_t fc) {
 
 
 void renderGame(const int32_t fc, const enum FSM_t fsm) {
+
+  // DRAW TOPPER
+  renderGameTopper();
+
+  // DRAW SCORES
+  renderGameScores(fc);
+
+  if (fsm == kGameFSM_ScoresToTryAgain) {
+    return;
+  }
+
   // DRAW TURRET & TOP DECORATION
   renderGameTurret();
 
@@ -184,7 +195,7 @@ void renderBackgroundDo(const int16_t bg, const int16_t fg, const uint16_t start
   }
 }
 
-void renderCommonBackground(void) {
+void renderCommonBackground(const enum FSM_t fsm) {
 
 #ifdef TAKE_SCREENSHOTS
   if (screenShotGetInProgress()) { return; }
@@ -203,8 +214,11 @@ void renderCommonBackground(void) {
   pd->graphics->setLineCapStyle(kLineCapStyleRound);
   for (int i = 0; i < N_BACKLINES; ++i) {
     if (m_backLines[i].y - BACKLINE_HEIGHT < maxY) { continue; }
+    if (m_backLines[i].y + BACKLINE_HEIGHT < yOffset) { continue; }
     pd->graphics->drawLine(m_backLines[i].x, m_backLines[i].y, m_backLines[i].x, m_backLines[i].y + BACKLINE_HEIGHT, BACKLINE_WIDTH, kColorWhite);
   }
+
+  if (fsm == kGameFSM_ScoresToTryAgain) { return; }
 
   static float wfBgOffC = 0;
   if (!IOGetIsPreloading()) {
@@ -248,16 +262,5 @@ void renderCommonBackground(void) {
   //   0           , (DEVICE_PIX_Y*(i+0)),
   //   DEVICE_PIX_X, DEVICE_PIX_Y, kColorBlack);
   // }
-
-  if (FSMGetGameMode() == kGameWindow) {
-    const float minY = gameGetMinimumY(); 
-    if (gameGetYOffset() - minY < 0) {
-      pd->graphics->fillRect(0, minY - TURRET_RADIUS - 60, DEVICE_PIX_X, 60, kColorBlack); // mask in case of over-scroll
-      pd->graphics->drawBitmap(bitmapGetGameInfoTopper(), 0, minY - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
-    }
-    if (gameGetYOffset() <= -TURRET_RADIUS) { // Note no parallax here
-      pd->graphics->drawBitmap(bitmapGetLevelTitle(), 0, -DEVICE_PIX_Y - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
-    }
-  }
 
 }

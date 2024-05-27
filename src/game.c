@@ -31,7 +31,11 @@ void gameSetTurretBarrelAngle(const float angle) { m_turretBarrelAngle = angle; 
 float gameGetTurretBarrelAngle(void) { return m_turretBarrelAngle; }
 
 uint16_t gameGetPreviousWaterfallFg(void) { return m_previousWaterfallFg; }
+#ifdef WF_FIXED_BG
+uint16_t gameGetPreviousWaterfallBg(void) { return 0; }
+#else
 uint16_t gameGetPreviousWaterfallBg(void) { return m_previousWaterfallBg; }
+#endif
 void gameDoResetPreviousWaterfall(void) { 
   m_previousWaterfallFg = IOGetCurrentHoleWaterfallForeground();
   m_previousWaterfallBg = IOGetCurrentHoleWaterfallBackground();
@@ -160,7 +164,7 @@ float gameDoApplyYEasing(void) {
   m_vY *= SCREEN_FRIC;
   m_yOffset += m_vY;
 
-  const float scrollOffsetMax = IOGetCurrentHoleHeight() - DEVICE_PIX_Y + TURRET_RADIUS;
+  const float scrollOffsetMax = IOGetCurrentHoleHeight() - DEVICE_PIX_Y + OVERSCROLL_HEIGHT;
   const float soDiff = scrollOffsetMax - m_yOffset;
   if (soDiff < 0) {
     const float toAdd = soDiff * SCREEN_BBACK;

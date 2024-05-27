@@ -70,7 +70,7 @@ void physicsDoInit(void) {
   cpSpaceAddBody(m_space, m_ball[0]);
   physicsDoResetBall(0);
 
-  cpBody* walls = cpSpaceGetStaticBody(m_space);
+  cpBody* walls  = cpSpaceGetStaticBody(m_space);
   cpShape* top   = cpSegmentShapeNew(walls, cpv(0,            0), cpv(DEVICE_PIX_X, 0),  3.0f);
   cpShape* left  = cpSegmentShapeNew(walls, cpv(0,            0), cpv(0,            PHYSWALL_PIX_Y), 3.0f);
   cpShape* right = cpSegmentShapeNew(walls, cpv(DEVICE_PIX_X, 0), cpv(DEVICE_PIX_X, PHYSWALL_PIX_Y), 3.0f);

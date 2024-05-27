@@ -18,7 +18,7 @@ LCDFont* bitmapGetGreatVibes109(void);
 
 LCDBitmap* bitmapGetWfFg(const uint8_t wf, const uint8_t id);
 LCDBitmap* bitmapGetWfBg(const uint8_t wf);
-LCDBitmap* bitmapGetWfPond(const int32_t fc);
+LCDBitmap* bitmapGetWfPond(const uint8_t n, const int32_t fc);
 LCDBitmap* bitmapGetWaterSplash(const uint8_t id);
 LCDBitmap* bitmapGetFountain(const uint8_t f, const int id);
 
@@ -84,4 +84,4 @@ void bitmapDoPreloadH2(const uint8_t size);
 void bitmapDoPreloadI(void);
 void bitmapDoPreloadJ(void);
 void bitmapDoPreloadK(void);
-void bitmapDoPreloadL(void);
+void bitmapDoPreloadL(const uint8_t n);
