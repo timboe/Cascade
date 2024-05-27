@@ -153,46 +153,22 @@
       "type": 0
     },
     "StaticControl18": {
-      "shape": 1,
-      "x": 64,
-      "y": 44,
-      "angle": 45,
+      "shape": 2,
+      "x": 72,
+      "y": 57,
+      "angle": 30,
       "size": 0,
       "type": 1
     },
     "StaticControl19": {
-      "shape": 1,
-      "x": 20,
-      "y": 28,
-      "angle": 45,
+      "shape": 2,
+      "x": 15,
+      "y": 33,
+      "angle": 90,
       "size": 0,
       "type": 1
     },
     "StaticControl20": {
-      "shape": 1,
-      "x": 22,
-      "y": 76,
-      "angle": 45,
-      "size": 0,
-      "type": 1
-    },
-    "StaticControl21": {
-      "shape": 1,
-      "x": 62,
-      "y": 104,
-      "angle": 45,
-      "size": 0,
-      "type": 1
-    },
-    "StaticControl22": {
-      "shape": 1,
-      "x": 20,
-      "y": 138,
-      "angle": 45,
-      "size": 0,
-      "type": 1
-    },
-    "StaticControl23": {
       "shape": 0,
       "x": 252,
       "y": 224,
@@ -200,7 +176,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl24": {
+    "StaticControl21": {
       "shape": 0,
       "x": 232,
       "y": 244,
@@ -208,7 +184,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl25": {
+    "StaticControl22": {
       "shape": 0,
       "x": 212,
       "y": 264,
@@ -216,7 +192,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl26": {
+    "StaticControl23": {
       "shape": 0,
       "x": 192,
       "y": 284,
@@ -224,7 +200,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl27": {
+    "StaticControl24": {
       "shape": 0,
       "x": 172,
       "y": 304,
@@ -232,7 +208,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl28": {
+    "StaticControl25": {
       "shape": 0,
       "x": 152,
       "y": 324,
@@ -240,7 +216,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl29": {
+    "StaticControl26": {
       "shape": 0,
       "x": 132,
       "y": 344,
@@ -248,7 +224,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl30": {
+    "StaticControl27": {
       "shape": 0,
       "x": 112,
       "y": 364,
@@ -256,15 +232,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl31": {
-      "shape": 1,
-      "x": 66,
-      "y": 156,
-      "angle": 45,
-      "size": 0,
-      "type": 1
-    },
-    "StaticControl32": {
+    "StaticControl28": {
       "shape": 0,
       "x": 272,
       "y": 204,
@@ -272,7 +240,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl33": {
+    "StaticControl29": {
       "shape": 0,
       "x": 292,
       "y": 184,
@@ -280,7 +248,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl34": {
+    "StaticControl30": {
       "shape": 0,
       "x": 312,
       "y": 164,
@@ -288,7 +256,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl35": {
+    "StaticControl31": {
       "shape": 0,
       "x": 332,
       "y": 144,
@@ -296,7 +264,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl36": {
+    "StaticControl32": {
       "shape": 0,
       "x": 352,
       "y": 124,
@@ -304,7 +272,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl37": {
+    "StaticControl33": {
       "shape": 0,
       "x": 372,
       "y": 104,
@@ -312,7 +280,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl38": {
+    "StaticControl34": {
       "shape": 0,
       "x": 392,
       "y": 84,
@@ -320,7 +288,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl39": {
+    "StaticControl35": {
       "shape": 0,
       "x": 374,
       "y": 158,
@@ -328,7 +296,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl40": {
+    "StaticControl36": {
       "shape": 0,
       "x": 394,
       "y": 138,
@@ -336,7 +304,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl41": {
+    "StaticControl37": {
       "shape": 0,
       "x": 354,
       "y": 178,
@@ -344,7 +312,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl42": {
+    "StaticControl38": {
       "shape": 0,
       "x": 334,
       "y": 198,
@@ -352,7 +320,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl43": {
+    "StaticControl39": {
       "shape": 0,
       "x": 314,
       "y": 218,
@@ -360,7 +328,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl44": {
+    "StaticControl40": {
       "shape": 0,
       "x": 294,
       "y": 238,
@@ -368,7 +336,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl45": {
+    "StaticControl41": {
       "shape": 0,
       "x": 274,
       "y": 258,
@@ -376,7 +344,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl46": {
+    "StaticControl42": {
       "shape": 0,
       "x": 254,
       "y": 278,
@@ -384,7 +352,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl47": {
+    "StaticControl43": {
       "shape": 0,
       "x": 234,
       "y": 298,
@@ -392,7 +360,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl48": {
+    "StaticControl44": {
       "shape": 0,
       "x": 214,
       "y": 318,
@@ -400,7 +368,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl49": {
+    "StaticControl45": {
       "shape": 0,
       "x": 194,
       "y": 338,
@@ -408,7 +376,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl50": {
+    "StaticControl46": {
       "shape": 0,
       "x": 174,
       "y": 358,
@@ -416,7 +384,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl51": {
+    "StaticControl47": {
       "shape": 0,
       "x": 154,
       "y": 378,
@@ -424,7 +392,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl52": {
+    "StaticControl48": {
       "shape": 0,
       "x": 134,
       "y": 398,
@@ -432,7 +400,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl53": {
+    "StaticControl49": {
       "shape": 0,
       "x": 114,
       "y": 418,
@@ -440,7 +408,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl54": {
+    "StaticControl50": {
       "shape": 0,
       "x": 50,
       "y": 414,
@@ -448,7 +416,7 @@
       "size": 2,
       "type": 2
     },
-    "StaticControl55": {
+    "StaticControl51": {
       "shape": 1,
       "x": 126,
       "y": 168,
@@ -456,7 +424,7 @@
       "size": 1,
       "type": 0
     },
-    "StaticControl56": {
+    "StaticControl52": {
       "shape": 1,
       "x": 84,
       "y": 200,
@@ -464,15 +432,15 @@
       "size": 1,
       "type": 0
     },
-    "StaticControl57": {
+    "StaticControl53": {
       "shape": 1,
-      "x": 24,
-      "y": 194,
+      "x": 36,
+      "y": 201,
       "angle": 45,
       "size": 1,
       "type": 0
     },
-    "StaticControl58": {
+    "StaticControl54": {
       "shape": 1,
       "x": 52,
       "y": 250,
@@ -480,7 +448,7 @@
       "size": 2,
       "type": 0
     },
-    "StaticControl59": {
+    "StaticControl55": {
       "shape": 1,
       "x": 144,
       "y": 222,
@@ -488,7 +456,7 @@
       "size": 2,
       "type": 0
     },
-    "StaticControl60": {
+    "StaticControl56": {
       "shape": 1,
       "x": 112,
       "y": 282,
@@ -496,7 +464,7 @@
       "size": 2,
       "type": 0
     },
-    "StaticControl61": {
+    "StaticControl57": {
       "shape": 1,
       "x": 48,
       "y": 320,
@@ -504,7 +472,7 @@
       "size": 2,
       "type": 0
     },
-    "StaticControl62": {
+    "StaticControl58": {
       "shape": 0,
       "x": 96,
       "y": 76,
@@ -512,9 +480,41 @@
       "size": 0,
       "type": 0
     },
+    "StaticControl59": {
+      "shape": 2,
+      "x": 69,
+      "y": 105,
+      "angle": 30,
+      "size": 0,
+      "type": 1
+    },
+    "StaticControl60": {
+      "shape": 2,
+      "x": 69,
+      "y": 156,
+      "angle": 30,
+      "size": 0,
+      "type": 1
+    },
+    "StaticControl61": {
+      "shape": 2,
+      "x": 15,
+      "y": 84,
+      "angle": 90,
+      "size": 0,
+      "type": 1
+    },
+    "StaticControl62": {
+      "shape": 2,
+      "x": 18,
+      "y": 129,
+      "angle": 90,
+      "size": 0,
+      "type": 1
+    },
     "LinearControl1": {
       "shape": 0,
-      "x": 204,
+      "x": 186,
       "y": 82,
       "angle": 0,
       "size": 0,
@@ -545,7 +545,7 @@
         "type": 0
       },
       "LineContainer1": {
-        "lc_x": 360,
+        "lc_x": 376,
         "lc_y": 82
       }
     }
