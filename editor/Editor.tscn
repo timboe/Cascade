@@ -4,7 +4,7 @@
 [ext_resource type="Theme" uid="uid://mvm1lqkscosr" path="res://editor/theme/aestro.tres" id="1_3tosr"]
 [ext_resource type="StyleBox" uid="uid://cgsvf1qt0q4uy" path="res://background_style_box_flat.tres" id="2_gthnx"]
 [ext_resource type="Texture2D" uid="uid://b1kln5k6bph" path="res://foregrounds/falls2_fg-table-400-60.png" id="3_4cp5k"]
-[ext_resource type="Texture2D" path="res://backgrounds/falls2_bg.png" id="3_chff6"]
+[ext_resource type="Texture2D" uid="uid://dbmquo2p7io4d" path="res://backgrounds/falls2_bg.png" id="3_chff6"]
 [ext_resource type="Texture2D" uid="uid://b645rphiris4n" path="res://turretBody.png" id="3_u03i0"]
 [ext_resource type="Script" path="res://InputParser.gd" id="4_f0pyn"]
 [ext_resource type="Script" path="res://Save.gd" id="5_n4mgq"]
@@ -486,10 +486,16 @@ use_native_dialog = true
 unique_name_in_owner = true
 layout_mode = 2
 alignment = 1
-item_count = 1
+item_count = 4
 selected = 0
 popup/item_0/text = "Background 1"
 popup/item_0/id = 0
+popup/item_1/text = "Background 2"
+popup/item_1/id = 1
+popup/item_2/text = "Background 3"
+popup/item_2/id = 2
+popup/item_3/text = "Background 4"
+popup/item_3/id = 3
 
 [node name="Save" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
