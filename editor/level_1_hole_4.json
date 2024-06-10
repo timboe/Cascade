@@ -9,11 +9,11 @@
     "foreground": 0,
     "background": 0,
     "special": 5,
-    "height": 960,
+    "height": 300,
     "snap": 4,
-    "n_static": 18,
+    "n_static": 16,
     "n_elliptic": 0,
-    "n_linear": 1
+    "n_linear": 0
   },
   "body": {
     "StaticControl1": {
@@ -143,87 +143,6 @@
       "angle": 0,
       "size": 0,
       "type": 0
-    },
-    "StaticControl17": {
-      "shape": 0,
-      "x": 44,
-      "y": 932,
-      "angle": 30,
-      "size": 0,
-      "type": 0
-    },
-    "StaticControl18": {
-      "shape": 0,
-      "x": 360,
-      "y": 928,
-      "angle": 148,
-      "size": 0,
-      "type": 0
-    },
-    "LinearControl1": {
-      "shape": 0,
-      "x": 172,
-      "y": 128,
-      "angle": 0,
-      "size": 0,
-      "arc": 360,
-      "use_arc": true,
-      "speed": 0.5,
-      "easing": 0,
-      "n_pegs": 8,
-      "n_lines": 3,
-      "PegContainer1": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 1
-      },
-      "PegContainer2": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer3": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer4": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer5": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer6": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer7": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer8": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "LineContainer1": {
-        "lc_x": 56,
-        "lc_y": 916
-      },
-      "LineContainer2": {
-        "lc_x": 352,
-        "lc_y": 916
-      },
-      "LineContainer3": {
-        "lc_x": 240,
-        "lc_y": 128
-      }
     }
   }
 }
