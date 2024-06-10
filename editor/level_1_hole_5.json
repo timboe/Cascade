@@ -82,9 +82,9 @@
     },
     "StaticControl9": {
       "shape": 0,
-      "x": 28,
-      "y": 60,
-      "angle": 120,
+      "x": 34,
+      "y": 40,
+      "angle": 130,
       "size": 0,
       "type": 1
     },
