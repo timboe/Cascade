@@ -1032,7 +1032,7 @@ void bitmapDoPreloadM(const uint8_t n) {
         if (x[line][n] == -1) { continue; }
         const int x1 = x[line][n] + (t * speed);
         const int x2 = x1 + width;
-        for (int xOff = -18; xOff < 18; ++xOff) {
+        for (int xOff = -20; xOff < 18; ++xOff) {
           const int x3 = x1 + (POND_WATER_FRAMES * speed * xOff);
           const int x4 = x3 + width;
           pd->graphics->drawLine(x3, line, x4, line, w[line][n], kColorWhite);

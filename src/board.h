@@ -76,6 +76,7 @@ void boardDoSpecialBlast(void);
 
 enum PegSpecial_t boardGetCurrentSpecial(void);
 void boardDoClearSpecial(void);
+void boardDoClearSpecialCounter(void);
 enum PegSpecial_t boardDoAddSpecial(const bool activate);
 
 struct Peg_t* boardDoAddStatic(const struct StaticLoader_t* staticLoader);

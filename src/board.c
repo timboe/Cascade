@@ -13,6 +13,8 @@ float m_lastBurstLevel = 0.0f;
 
 enum PegSpecial_t m_special = kPegSpecialNotSpecial;
 
+uint8_t m_specialCounter = 0;
+
 /// ///
 
 float boardGetLastBurstLevel(void) { return m_lastBurstLevel; }
@@ -239,27 +241,30 @@ void boardDoClearSpecial(void) {
   m_special = kPegSpecialNotSpecial;
 }
 
+void boardDoClearSpecialCounter(void) {
+  m_specialCounter = 0;
+}
+
 enum PegSpecial_t boardDoAddSpecial(const bool activate) {
-  static uint8_t counter = 0;
   static enum PegSpecial_t toActivate = kPegSpecialNotSpecial;
 
   if (activate) {
 
-    if (counter) {
+    if (m_specialCounter) {
       m_special = toActivate;
-      --counter;
-      pd->system->logToConsole("activated %s, %i left", pegGetSpecialTxt(m_special), counter);
+      --m_specialCounter;
+      pd->system->logToConsole("activated %s, %i left", pegGetSpecialTxt(m_special), m_specialCounter);
     }
 
   } else {
 
-    if (!counter) { 
+    if (!m_specialCounter) { 
       toActivate = IOGetCurrentHoleSpecial();
       if (toActivate == kPegSpecialNotSpecial) { // Hole can request to have a random special
         toActivate = (rand() % (kNPegSpecial - 1)) + 1;
       }
     }
-    ++counter;
+    ++m_specialCounter;
 
   }
 

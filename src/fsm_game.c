@@ -132,6 +132,7 @@ void FSMDisplaySplash(const bool newState) {
     bitmapDoUpdateScoreHistogram();
     gameDoPopulateMenuGame();
     boardDoClear();
+    boardDoClearSpecialCounter();
     IODoLoadCurrentHole();
     physicsSetTimestepMultiplier(1.0f);
     gameDoResetPreviousWaterfall();
