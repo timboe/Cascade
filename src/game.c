@@ -25,7 +25,11 @@ float m_vY = 0;
 /// ///
 
 int32_t gameGetFrameCount() { return m_frameCount; }
-void gameDoResetFrameCount(void) { m_frameCount = 0; }
+
+void gameDoResetFrameCount(void) { 
+  m_frameCount = 0;
+  soundResetPling();
+}
 
 void gameSetTurretBarrelAngle(const float angle) { m_turretBarrelAngle = angle; }
 float gameGetTurretBarrelAngle(void) { return m_turretBarrelAngle; }
@@ -116,19 +120,19 @@ void menuOptionsCallbackResetHole(void* _unused) {
 
 void menuOptionsCallbackAudio(void* userData) {
   int value = pd->system->getMenuItemValue((PDMenuItem*)userData);
-  // if (value == 0) {
-  //   music(true);
-  //   soundDoSfx(true);
-  // } else if (value == 1) {
-  //   music(true);
-  //   soundDoSfx(false);
-  // } else if (value == 2) {
-  //   music(false);
-  //   soundDoSfx(true);
-  // } else {
-  //   music(false);
-  //   soundDoSfx(false);
-  // }
+  if (value == 0) {
+    soundSetDoMusic(true);
+    soundSetDoSfx(true);
+  } else if (value == 1) {
+    soundSetDoMusic(true);
+    soundSetDoSfx(false);
+  } else if (value == 2) {
+    soundSetDoMusic(false);
+    soundSetDoSfx(true);
+  } else {
+    soundSetDoMusic(false);
+    soundSetDoSfx(false);
+  }
 }
 
 void gameDoPopulateMenuTitlesPlayer(void) {

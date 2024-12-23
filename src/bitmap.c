@@ -80,7 +80,7 @@ LCDBitmap* m_specialTextBitmap[(uint8_t)kNPegSpecial];
 
 LCDBitmap* m_wfPond[POND_WATER_TILES][POND_WATER_FRAMES];
 LCDBitmap* m_wfBg[N_WF];
-LCDBitmapTable* m_sheetWfFg[16]; // N_WF + room for specials
+LCDBitmapTable* m_sheetWfFg[128]; // N_WF + room for specials
 LCDBitmapTable* m_waterSplashTable[N_SPLASHES];
 LCDBitmapTable* m_fountainTable[N_FOUNTAINS];
 LCDBitmapTable* m_chevronTable;
@@ -736,31 +736,31 @@ void bitmapDoUpdateHoleStatsBitmap(void) {
 void bitmapDoPreloadA(void) {
   m_useTheCrankBitmap = bitmapDoLoadImageAtPath("images/useTheCrank");
   m_ditherBitmap = bitmapDoLoadImageAtPath("images/dither");
-  m_holeTutorialBitmap = bitmapDoLoadImageAtPath("images/tutorial");
+  m_holeTutorialBitmap = bitmapDoLoadImageAtPath("images/tut/tutorial");
   //m_wfPond = bitmapDoLoadImageAtPath("images/falls_pond");
   m_cardBitmap = bitmapDoLoadImageAtPath("images/card");
   m_turretBody = bitmapDoLoadImageAtPath("images/turretBody");
 
-  m_turretBarrelTabel = bitmapDoLoadImageTableAtPath("images/turretBarrel");
-  m_waterSplashTable[0] = bitmapDoLoadImageTableAtPath("images/MarbleSplash0");
-  m_specialBlastTable = bitmapDoLoadImageTableAtPath("images/blast");
-  m_tutorialCrankRotateTable = bitmapDoLoadImageTableAtPath("images/crankClockwise");
-  m_tutorialCrankAngleTable = bitmapDoLoadImageTableAtPath("images/crankSpin");
-  m_tutorialButtonTable = bitmapDoLoadImageTableAtPath("images/buttonPressed");
-  m_tutorialDPadTable = bitmapDoLoadImageTableAtPath("images/dPad");
-  m_tutorialArrowsTable = bitmapDoLoadImageTableAtPath("images/tutorialPoint");
+  m_turretBarrelTabel = bitmapDoLoadImageTableAtPath("images/anim/turretBarrel");
+  m_waterSplashTable[0] = bitmapDoLoadImageTableAtPath("images/anim/MarbleSplash0");
+  m_specialBlastTable = bitmapDoLoadImageTableAtPath("images/anim/blast");
+  m_tutorialCrankRotateTable = bitmapDoLoadImageTableAtPath("images/tut/crankClockwise");
+  m_tutorialCrankAngleTable = bitmapDoLoadImageTableAtPath("images/tut/crankSpin");
+  m_tutorialButtonTable = bitmapDoLoadImageTableAtPath("images/tut/buttonPressed");
+  m_tutorialDPadTable = bitmapDoLoadImageTableAtPath("images/tut/dPad");
+  m_tutorialArrowsTable = bitmapDoLoadImageTableAtPath("images/tut/tutorialPoint");
   m_chevronTable =  bitmapDoLoadImageTableAtPath("images/chevron");
   char text[128];
   for (int i = 0; i < MAX_POPS; ++i) {
-    snprintf(text, 128, "images/Pop%i", i);
+    snprintf(text, 128, "images/anim/Pop%i", i);
     m_pegPopTable[i] =  bitmapDoLoadImageTableAtPath(text);
   }
   for (int i = 0; i < N_FOUNTAINS; ++i) {
-    snprintf(text, 128, "images/Fountain%i", i);
+    snprintf(text, 128, "images/anim/Fountain%i", i);
     m_fountainTable[i] =  bitmapDoLoadImageTableAtPath(text);
   }
   for (int i = 0; i < N_END_BLASTS; ++i) {
-    snprintf(text, 128, "images/Blast%i", i);
+    snprintf(text, 128, "images/anim/Blast%i", i);
     m_endBlastTable[i] =  bitmapDoLoadImageTableAtPath(text);
   }
 
@@ -808,14 +808,17 @@ void bitmapDoPreloadD(void) {
   char text[128];
   for (int32_t i = 1; i < N_WF; ++i) { // Did 0 already as a critical load
 #ifndef WF_FIXED_BG
-    snprintf(text, 128, "images/falls%i_bg", (int)i);
+    snprintf(text, 128, "images/falls_bg/falls%i_bg", (int)i);
     m_wfBg[i] = bitmapDoLoadImageAtPath(text);
 #endif
-    snprintf(text, 128, "images/falls%i_fg", (int)i);
+    snprintf(text, 128, "images/falls_fg/falls%i_fg", (int)i);
     m_sheetWfFg[i] = bitmapDoLoadImageTableAtPath(text);
   }
   // Special
-  m_sheetWfFg[10] = bitmapDoLoadImageTableAtPath("images/falls10_fg");
+  for (int32_t i = WF_SPECIAL_START; i < WF_SPECIAL_END; ++i) { 
+    snprintf(text, 128, "images/falls_fg/falls%i_fg", (int)i);
+    m_sheetWfFg[i] = bitmapDoLoadImageTableAtPath(text);
+  }
 }
 
 void bitmapDoPreloadE(void) {

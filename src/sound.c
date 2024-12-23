@@ -1,80 +1,93 @@
 #include "sound.h"
+#include "io.h"
 
-bool m_doSfx = false;
+bool m_doSfx = true;
+bool m_doMusic = true;
 
 bool m_hasMusic = true;
 
 int8_t m_trackPlaying = -1;
+int8_t m_wfPlaying = -1;
 
-FilePlayer* m_music[N_MUSIC_TRACKS + 1];
+uint8_t m_plingID = 0;
+int32_t m_plingTimer = 0;
 
-SamplePlayer* m_samplePlayer[kNSFX + 1]; // TODO remove these +1
-AudioSample* m_audioSample[kNSFX + 1];
+FilePlayer* m_music[N_MUSIC_TRACKS];
+FilePlayer* m_waterfalls[N_WF_TRACKS];
 
-void soundDoMusicStopped(SoundSource* c, void* userdata);
+SamplePlayer* m_samplePlayer[kNSFX];
+AudioSample* m_audioSample[kNSFX];
 
 /// ///
 
-void musicDoInit() {
+void soundResetPling() {
+  m_plingTimer = 0;
+}
+
+void soundSetDoMusic(const bool doit) {
   if (!m_hasMusic) return;
-  const bool musicOn = true;//(p->m_soundSettings & 1);
-  if (musicOn) {
-    if (m_trackPlaying == -1) {
-      pd->sound->fileplayer->play(m_music[0], 1);
-      m_trackPlaying = 0;
-    } else {
-      // music is already playing
+  m_doMusic = doit;
+  if (!m_doMusic) {
+    for (int32_t i = 0; i < N_WF_TRACKS; ++i) {
+      pd->sound->fileplayer->stop(m_waterfalls[i]);
     }
-  } else { // music off
-    if (m_trackPlaying == -1) {
-      // music is already off
-    } else {
-      #ifdef DEV
-      pd->system->logToConsole("Stopping %i", m_trackPlaying);
-      #endif
-      int8_t toStop = m_trackPlaying;
-      m_trackPlaying = -1; // Caution: there will be a callback
-      pd->sound->fileplayer->stop(m_music[toStop]);
+    for (int32_t i = 0; i < N_MUSIC_TRACKS; ++i) {
+      pd->sound->fileplayer->stop(m_music[i]);
     }
+    m_wfPlaying = -1;
+    m_trackPlaying = -1;
+  } else {
+    soundDoWaterfall( IOGetCurrentLevel() );
   }
 }
 
-void soundDoChooseMusic(const int8_t id) {
+void soundSetDoSfx(const bool doit) {
+  m_doSfx = doit;
+}
+
+void soundWaterfallDoInit() {
   if (!m_hasMusic) return;
-  if (m_trackPlaying == -1) {
-    // music is off
-    return;
-  } 
-  #ifdef DEV
-  pd->system->logToConsole("Stopping %i", m_trackPlaying);
-  #endif
-  const int8_t toStop = m_trackPlaying;
-  m_trackPlaying = -1; // Caution: there will be a callback
-  pd->sound->fileplayer->stop(m_music[toStop]);
-  pd->sound->fileplayer->play(m_music[id], 1); 
-  m_trackPlaying = id;
+  pd->sound->fileplayer->play(m_waterfalls[0], -1);
+  m_wfPlaying = 0;
 }
 
-void soundDoMusicStopped(SoundSource* _c, void* userdata) {
+void soundDoWaterfall(const uint8_t id) {
+  if (!m_hasMusic || (id % N_WF_TRACKS) == m_wfPlaying) return;
+  for (int32_t i = 0; i < N_WF_TRACKS; ++i) {
+    pd->sound->fileplayer->stop(m_waterfalls[i]);
+  }
+  m_wfPlaying = id % N_WF_TRACKS;
+  pd->sound->fileplayer->play(m_waterfalls[m_wfPlaying], -1);
+}
+
+void soundDoMusic() {
   if (!m_hasMusic) return;
-  if (m_trackPlaying == -1) {
-    return;
+  int8_t track = -1;
+  while (track == -1 || track == m_trackPlaying) {
+    track = rand() % N_MUSIC_TRACKS;
   }
-  int8_t next = m_trackPlaying;
-  while (next == m_trackPlaying) {
-    next = rand() % N_MUSIC_TRACKS;
+  m_trackPlaying = track;
+  for (int32_t i = 0; i < N_MUSIC_TRACKS; ++i) {
+    pd->sound->fileplayer->stop(m_music[i]);
   }
-  pd->sound->fileplayer->play(m_music[next], 1);
-  m_trackPlaying = next;
-}
-
-void soundDoUpdate() {
-  m_doSfx = false; //(p->m_soundSettings & 2);
+  pd->sound->fileplayer->play(m_music[m_trackPlaying], 1); 
 }
 
 void soundDoInit() {
 
-  // m_audioSample[kSfxDestroy] = pd->sound->sample->load("sounds/destroy");
+  m_audioSample[kPling1] = pd->sound->sample->load("fx/pling_1");
+  m_audioSample[kPling2] = pd->sound->sample->load("fx/pling_2");
+  m_audioSample[kPling3] = pd->sound->sample->load("fx/pling_3");
+  m_audioSample[kPling4] = pd->sound->sample->load("fx/pling_4");
+  m_audioSample[kPling5] = pd->sound->sample->load("fx/pling_5");
+  m_audioSample[kPling6] = pd->sound->sample->load("fx/pling_6");
+  m_audioSample[kPling7] = pd->sound->sample->load("fx/pling_7");
+
+  m_audioSample[kSplash1] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__1");
+  m_audioSample[kSplash2] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__2");
+  m_audioSample[kSplash3] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__3");
+  m_audioSample[kSplash4] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__4");
+  m_audioSample[kSplash5] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__5");
 
   for (int32_t i = 0; i < kNSFX; ++i) {
     m_samplePlayer[i] = pd->sound->sampleplayer->newPlayer();
@@ -82,23 +95,52 @@ void soundDoInit() {
   }
 
   m_hasMusic = true;
-  for (int32_t i = 0; i < N_MUSIC_TRACKS + 1; ++i) {
+  for (int32_t i = 0; i < N_MUSIC_TRACKS; ++i) {
     m_music[i] = pd->sound->fileplayer->newPlayer();
-    pd->sound->fileplayer->setBufferLength(m_music[i], 5.0f); 
     switch (i) {
-      case 0: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_music[i], "music/1"); break;
-      case 1: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_music[i], "music/2"); break;
-      case 2: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_music[i], "music/3"); break;
-      case 3: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_music[i], "music/4"); break;
-      case 4: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_music[i], "music/5"); break;
-      case 5: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_music[i], "music/6"); break;
+      case 0: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_music[i], "tracks/517962__doctor_dreamchip__doctor-dreamchip-lofi-keyboard-pack-rhodes80bpm-c-major-15"); break;
+      case 1: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_music[i], "tracks/517963__doctor_dreamchip__doctor-dreamchip-lofi-keyboard-pack-rhodes80bpm-c-major-14"); break;
+      case 2: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_music[i], "tracks/517964__doctor_dreamchip__doctor-dreamchip-lofi-keyboard-pack-rhodes80bpm-c-major-13"); break;
+      case 3: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_music[i], "tracks/517968__doctor_dreamchip__doctor-dreamchip-lofi-keyboard-pack-rhodes80bpm-c-major-7"); break;
+      case 4: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_music[i], "tracks/517969__doctor_dreamchip__doctor-dreamchip-lofi-keyboard-pack-rhodes80bpm-c-major-8"); break;
+      case 5: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_music[i], "tracks/517971__doctor_dreamchip__doctor-dreamchip-lofi-keyboard-pack-rhodes80bpm-c-major-3"); break;
+      case 6: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_music[i], "tracks/517974__doctor_dreamchip__doctor-dreamchip-lofi-keyboard-pack-rhodes80bpm-c-major-5"); break;
+      case 7: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_music[i], "tracks/517977__doctor_dreamchip__doctor-dreamchip-lofi-keyboard-pack-rhodes80bpm-c-major-4"); break;
+      case 8: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_music[i], "tracks/517979__doctor_dreamchip__doctor-dreamchip-lofi-keyboard-pack-rhodes80bpm-c-major-2"); break;
+      case 9: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_music[i], "tracks/517983__doctor_dreamchip__doctor-dreamchip-lofi-keyboard-pack-rhodes80bpm-c-major-23"); break;
+      case 10: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_music[i], "tracks/517985__doctor_dreamchip__doctor-dreamchip-lofi-keyboard-pack-rhodes80bpm-c-major-22"); break;
+      case 11: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_music[i], "tracks/517990__doctor_dreamchip__doctor-dreamchip-lofi-keyboard-pack-rhodes80bpm-c-major-9"); break;
     }
-    pd->sound->fileplayer->setFinishCallback(m_music[i], soundDoMusicStopped, NULL);
+    pd->sound->fileplayer->setBufferLength(m_music[i], 1.0f); 
   }
+
+  for (int32_t i = 0; i < N_WF_TRACKS; ++i) {
+    m_waterfalls[i] = pd->sound->fileplayer->newPlayer();
+    switch (i) {
+      case 0: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690211__nox_sound__ambiance_stream_big_seljalandsfoss_loop_stereo_02"); break;
+      case 1: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690213__nox_sound__ambiance_stream_light_skaftafell_loop_stereo_02"); break;
+      case 2: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690214__nox_sound__ambiance_stream_moderate_seljalandsfoss_loop_stereo"); break;
+      case 3: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690218__nox_sound__ambiance_stream_moderate_skogafoss_close_loop_stereo_02"); break;
+      case 4: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690221__nox_sound__ambiance_waterfall_big_seljalandsfoss_loop_stereo"); break;
+      case 5: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690224__nox_sound__ambiance_waterfall_big_skogafoss_loop_stereo"); break;
+    }
+    pd->sound->fileplayer->setBufferLength(m_waterfalls[i], 1.0f); 
+  }
+
 }
 
-void soundDoSfx(const enum SfxSample sample) {
+void soundDoSfx(enum SfxSample sample) {
   if (!m_doSfx) return;
+
+  if (sample == kPling1) {
+    if (m_plingTimer == 0 || (gameGetFrameCount() - m_plingTimer) > TICK_FREQUENCY) {
+      m_plingID = 0;
+    }
+    sample += m_plingID;
+    if (m_plingID < N_PLINGS-1) m_plingID++;
+    m_plingTimer = gameGetFrameCount();
+  }
+
   pd->sound->sampleplayer->play(m_samplePlayer[sample], 1, 1.0f);
 }
 

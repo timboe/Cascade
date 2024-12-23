@@ -8,6 +8,7 @@
 #include "bitmap.h"
 #include "io.h"
 #include "input.h"
+#include "sound.h"
 
 uint16_t m_ballStuckCounter[2] = {0}; // Keeping track of a stuck ball
 uint16_t m_ballCount = 0; // Keeping track of the current level score
@@ -331,6 +332,7 @@ void FSMWinningToast(const bool newState) {
   if (newState) {
     renderDoResetEndBlast();
     renderDoAddEndBlast(physicsGetBall(0));
+    soundDoMusic();
   }
 
   const float tsm = physicsGetTimestepMultiplier();

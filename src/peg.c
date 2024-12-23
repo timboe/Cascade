@@ -5,6 +5,7 @@
 #include "sshot.h"
 #include "util.h"
 #include "io.h"
+#include "sound.h"
 
 void pegDoUpdateAngle(struct Peg_t* p, const float angle);
 
@@ -301,6 +302,7 @@ void pegDoHit(struct Peg_t* p) {
   ) {
     p->state = kPegStateHit;
     FSMDoResetBallStuckCounter();
+    soundDoSfx(kPling1);
     if (p->type == kPegTypeRequired) {
       renderAddTrauma(TRAUMA_REQUIRED_HIT);
       renderAddFreeze(FREEZE_REQUIRED_HIT);

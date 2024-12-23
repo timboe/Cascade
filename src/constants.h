@@ -135,7 +135,17 @@
 
 #define N_WF 4
 
-#define N_MUSIC_TRACKS 5
+#define WF_SPECIAL_START 10
+#define WF_SPECIAL_END 20
+
+//
+
+#define N_PLINGS 7
+
+#define N_MUSIC_TRACKS 12
+
+#define N_WF_TRACKS 6
+
 
 // PHYSICS 
 

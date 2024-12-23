@@ -215,11 +215,13 @@ uint16_t IOGetNextHole(void) {
 
 void IODoPreviousLevel(void) { 
   m_level = IOGetPreviousLevel();
+  soundDoWaterfall(m_level);
   pd->system->logToConsole("Pre level called (player %i, level %i, hole %i)", (int)m_player+1, (int)m_level+1, (int)m_hole+1);
 }
 
 void IODoNextLevel(void) {
   m_level = IOGetNextLevel();
+  soundDoWaterfall(m_level);
   pd->system->logToConsole("Next level called (player %i, level %i, hole %i)", (int)m_player+1, (int)m_level+1, (int)m_hole+1);
 }
 
@@ -244,6 +246,7 @@ void IODoNextHoleWithLevelWrap(void) {
 void IOSetLevelHole(uint16_t level, uint16_t hole) {
   m_level = level;
   m_hole = hole;
+  soundDoWaterfall(m_level);
   pd->system->logToConsole("Set-level-hole called (player %i, level %i, hole %i)", (int)m_player+1, (int)m_level+1, (int)m_hole+1);
 }
 
@@ -273,6 +276,7 @@ void IODoGoToNextUnplayedLevel(void) {
   } else {
     m_level = 0;
     m_hole = 0;
+    soundDoWaterfall(m_level);
     pd->system->logToConsole("! No levels played - set to level 1 hole 1");
   }
 }

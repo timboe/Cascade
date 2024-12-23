@@ -2,15 +2,33 @@
 #include "game.h"
 
 enum SfxSample {
- kNSFX
+  kPling1,
+  kPling2,
+  kPling3, 
+  kPling4,
+  kPling5,
+  kPling6,
+  kPling7,
+  kSplash1,
+  kSplash2,
+  kSplash3,
+  kSplash4,
+  kSplash5,
+  kNSFX
 };
 
 void soundDoInit(void);
 
-void musicDoInit(void);
+void soundWaterfallDoInit(void);
 
-void soundDoUpdate(void);
+void soundResetPling(void);
 
-void soundDoChooseMusic(const int8_t id);
+void soundDoMusic(void);
 
-void soundDoSfx(const enum SfxSample sample);
+void soundDoWaterfall(const uint8_t id);
+
+void soundDoSfx(enum SfxSample sample);
+
+void soundSetDoMusic(const bool doit);
+
+void soundSetDoSfx(const bool doit) ;
