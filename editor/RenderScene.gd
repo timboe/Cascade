@@ -280,7 +280,7 @@ func _process(delta):
 		%BackgroundTexRect.position.y -= 60
 
 func do_reset():
-	print("reset")
+	#print("reset")
 	var ellipticPaths = get_tree().get_nodes_in_group("elliptic_pegs")
 	var linePaths = get_tree().get_nodes_in_group("line_pegs")
 	for ellipticPath in ellipticPaths:

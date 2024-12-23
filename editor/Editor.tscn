@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://cmuubbicvggs5"]
+[gd_scene load_steps=24 format=3 uid="uid://cmuubbicvggs5"]
 
 [ext_resource type="Script" path="res://RenderScene.gd" id="1_1f7cp"]
 [ext_resource type="Theme" uid="uid://mvm1lqkscosr" path="res://editor/theme/aestro.tres" id="1_3tosr"]
@@ -59,6 +59,15 @@ func _on_value_changed(newValue):
 	get_tree().call_group(\"y_sensitive\", \"new_max_y\", newValue + 50)
 "
 
+[sub_resource type="GDScript" id="GDScript_l1q87"]
+script/source = "extends HSlider
+
+func _on_value_changed(newValue):
+	$\"../ForegroundLabel\".text = \"Custom Foreground ID: \" + str(newValue)
+	$%Render.queue_redraw()
+
+"
+
 [sub_resource type="GDScript" id="GDScript_4ako0"]
 script/source = "extends HSlider
 
@@ -72,8 +81,10 @@ func _on_value_changed(new_value):
 script/source = "extends OptionButton
 
 func _on_item_selected(index):
+	print(\"_on_item_selected foreground\")
 	var id = get_item_id(index)
-	if id == 10: # custom
+	%ForegroundIDSlider.value = id
+	if id == 4: # custom
 		$FileDialog.visible = true
 		return
 	var res = load(\"res://foregrounds/falls\" + str(id) +  \"_fg-table-400-60.png\")
@@ -415,6 +426,20 @@ rounded = true
 tick_count = 12
 script = SubResource("GDScript_stxm2")
 
+[node name="ForegroundLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Custom Foreground ID: X"
+horizontal_alignment = 2
+
+[node name="ForegroundIDSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 50.0
+rounded = true
+script = SubResource("GDScript_l1q87")
+
 [node name="SnapLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -461,7 +486,7 @@ unique_name_in_owner = true
 layout_mode = 2
 alignment = 1
 item_count = 5
-selected = 0
+selected = 4
 popup/item_0/text = "Waterfall 1"
 popup/item_0/id = 0
 popup/item_1/text = "Waterfall 2"
@@ -471,7 +496,7 @@ popup/item_2/id = 2
 popup/item_3/text = "Waterfall 4"
 popup/item_3/id = 3
 popup/item_4/text = "CUSTOM"
-popup/item_4/id = 10
+popup/item_4/id = 4
 script = SubResource("GDScript_2y8hb")
 
 [node name="FileDialog" type="FileDialog" parent="HBox/RightScroll/Margin/RightVBox/Grid/Foreground"]
@@ -659,6 +684,7 @@ text = "PEGS"
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/HoleSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/HoleSlider" method="_on_value_changed"]
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/ParSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/ParSlider" method="_on_value_changed"]
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/HeightSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/HeightSlider" method="_on_value_changed"]
+[connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/ForegroundIDSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/ForegroundIDSlider" method="_on_value_changed"]
 [connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/EditorSnap" to="HBox/RightScroll/Margin/RightVBox/Grid/EditorSnap" method="_on_value_changed"]
 [connection signal="item_selected" from="HBox/RightScroll/Margin/RightVBox/Grid/Foreground" to="HBox/RightScroll/Margin/RightVBox/Grid/Foreground" method="_on_item_selected"]
 [connection signal="file_selected" from="HBox/RightScroll/Margin/RightVBox/Grid/Foreground/FileDialog" to="HBox/RightScroll/Margin/RightVBox/Grid/Foreground" method="_on_file_dialog_file_selected"]

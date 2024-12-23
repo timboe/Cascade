@@ -120,7 +120,12 @@ func restore_save(save_game : Dictionary) -> void:
 	%LevelSlider.value = save_game["header"]["level"] 
 	%HoleSlider.value = save_game["header"]["hole"]
 	%ParSlider.value = save_game["header"]["par"]
-	%Foreground.selected = save_game["header"]["foreground"]
+	%ForegroundIDSlider.value = save_game["header"]["foreground"]
+	if %ForegroundIDSlider.value >= 4:
+		%Foreground.selected = 4
+		print("Set selected to 4")
+	else:
+		%Foreground.selected = %ForegroundIDSlider.value
 	%Background.selected = save_game["header"]["background"]
 	%SpecialButton.selected = save_game["header"]["special"]
 	%HeightSlider.value = save_game["header"]["height"]
@@ -155,8 +160,13 @@ func restore_save(save_game : Dictionary) -> void:
 		var linear_instance = %RightVBox.find_child(linear_name, true, false)
 		populate_linear(save_game["body"][linear_name], linear_instance)
 		
-	%Foreground._on_item_selected(%Foreground.selected)
+	#%Foreground._on_item_selected(%Foreground.selected)
 	%Foreground._on_background_item_selected(%Background.selected)
+
+	var res = load("res://foregrounds/falls" + str(%ForegroundIDSlider.value) +  "_fg-table-400-60.png")
+	print("trying to load: ", res)
+	if res:
+		%ForegroundTexRect.texture = res
 	
 func _on_paste_button_pressed():
 	$PopupPanel/MarginContainer/VBoxContainer/TextImport.text = DisplayServer.clipboard_get()

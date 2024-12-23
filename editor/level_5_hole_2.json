@@ -1,12 +1,12 @@
 {
   "header": {
     "save_format": 1,
-    "name": "SUNFLOWER",
+    "name": "BURJ",
     "author": "",
     "level": 5,
     "hole": 2,
     "par": 3,
-    "foreground": 13,
+    "foreground": 3,
     "background": 0,
     "special": 0,
     "height": 550,

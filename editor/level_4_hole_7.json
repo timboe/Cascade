@@ -1,16 +1,16 @@
 {
   "header": {
     "save_format": 1,
-    "name": "",
-    "author": "GOTHIC",
+    "name": "DUNGEON",
+    "author": "",
     "level": 4,
     "hole": 7,
     "par": 3,
-    "foreground": 17,
+    "foreground": 3,
     "background": 0,
     "special": 0,
     "height": 480,
-    "snap": 4,
+    "snap": 5,
     "n_static": 33,
     "n_elliptic": 0,
     "n_linear": 0

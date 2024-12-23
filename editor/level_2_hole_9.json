@@ -6,11 +6,11 @@
     "level": 2,
     "hole": 9,
     "par": 6,
-    "foreground": 10,
+    "foreground": 11,
     "background": 3,
     "special": 5,
     "height": 600,
-    "snap": 4,
+    "snap": 3,
     "n_static": 54,
     "n_elliptic": 0,
     "n_linear": 0

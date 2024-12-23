@@ -1,0 +1,28 @@
+{
+  "header": {
+    "save_format": 1,
+    "name": "LIBERTY",
+    "author": "",
+    "level": 5,
+    "hole": 7,
+    "par": 3,
+    "foreground": 3,
+    "background": 0,
+    "special": 0,
+    "height": 240,
+    "snap": 4,
+    "n_static": 1,
+    "n_elliptic": 0,
+    "n_linear": 0
+  },
+  "body": {
+    "StaticControl1": {
+      "shape": 1,
+      "x": 296,
+      "y": 124,
+      "angle": 0,
+      "size": 0,
+      "type": 1
+    }
+  }
+}

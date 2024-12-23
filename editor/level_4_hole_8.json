@@ -1,12 +1,12 @@
 {
   "header": {
     "save_format": 1,
-    "name": "",
-    "author": "KISS",
+    "name": "PUMPKIN",
+    "author": "",
     "level": 4,
     "hole": 8,
     "par": 3,
-    "foreground": 18,
+    "foreground": 3,
     "background": 0,
     "special": 0,
     "height": 450,

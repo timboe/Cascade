@@ -1,12 +1,12 @@
 {
   "header": {
     "save_format": 1,
-    "name": "",
-    "author": "ERMINE",
+    "name": "ARMOR",
+    "author": "",
     "level": 4,
     "hole": 5,
     "par": 3,
-    "foreground": 15,
+    "foreground": 3,
     "background": 0,
     "special": 0,
     "height": 530,

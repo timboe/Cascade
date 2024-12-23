@@ -1,12 +1,12 @@
 {
   "header": {
     "save_format": 1,
-    "name": "",
-    "author": "MONA",
+    "name": "EIFEL",
+    "author": "",
     "level": 5,
     "hole": 1,
     "par": 3,
-    "foreground": 20,
+    "foreground": 3,
     "background": 0,
     "special": 0,
     "height": 790,

@@ -339,7 +339,7 @@
     },
     "LinearControl2": {
       "shape": 0,
-      "x": 220,
+      "x": 206,
       "y": 190,
       "angle": 180,
       "size": 0,
@@ -365,14 +365,14 @@
         "type": 0
       },
       "LineContainer1": {
-        "lc_x": 379,
+        "lc_x": 365,
         "lc_y": 190
       }
     },
     "LinearControl3": {
       "shape": 0,
-      "x": 200,
-      "y": 250,
+      "x": 192,
+      "y": 246,
       "angle": 210,
       "size": 0,
       "arc": 180,
@@ -402,14 +402,14 @@
         "type": 0
       },
       "LineContainer1": {
-        "lc_x": 370,
-        "lc_y": 350
+        "lc_x": 362,
+        "lc_y": 346
       }
     },
     "LinearControl4": {
       "shape": 0,
-      "x": 150,
-      "y": 286,
+      "x": 158,
+      "y": 280,
       "angle": 240,
       "size": 0,
       "arc": 180,
@@ -439,14 +439,14 @@
         "type": 0
       },
       "LineContainer1": {
-        "lc_x": 260,
-        "lc_y": 466
+        "lc_x": 268,
+        "lc_y": 460
       }
     },
     "LinearControl5": {
       "shape": 0,
-      "x": 88,
-      "y": 286,
+      "x": 82,
+      "y": 280,
       "angle": 120,
       "size": 0,
       "arc": 180,
@@ -476,13 +476,13 @@
         "type": 0
       },
       "LineContainer1": {
-        "lc_x": -22,
-        "lc_y": 466
+        "lc_x": -28,
+        "lc_y": 460
       }
     },
     "LinearControl6": {
       "shape": 0,
-      "x": 120,
+      "x": 122,
       "y": 298,
       "angle": 90,
       "size": 0,
@@ -513,7 +513,7 @@
         "type": 0
       },
       "LineContainer1": {
-        "lc_x": 120,
+        "lc_x": 122,
         "lc_y": 508
       }
     }

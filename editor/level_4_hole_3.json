@@ -1,116 +1,28 @@
 {
   "header": {
     "save_format": 1,
-    "name": "",
-    "author": "SHAPES",
+    "name": "SCREAM",
+    "author": "",
     "level": 4,
     "hole": 3,
     "par": 3,
-    "foreground": 13,
+    "foreground": 14,
     "background": 0,
     "special": 0,
-    "height": 400,
+    "height": 490,
     "snap": 4,
-    "n_static": 12,
+    "n_static": 1,
     "n_elliptic": 0,
     "n_linear": 0
   },
   "body": {
     "StaticControl1": {
       "shape": 0,
-      "x": 128,
-      "y": 320,
+      "x": 256,
+      "y": 160,
       "angle": 0,
-      "size": 2,
-      "type": 0
-    },
-    "StaticControl2": {
-      "shape": 0,
-      "x": 204,
-      "y": 320,
-      "angle": 0,
-      "size": 2,
-      "type": 0
-    },
-    "StaticControl3": {
-      "shape": 0,
-      "x": 280,
-      "y": 320,
-      "angle": 0,
-      "size": 2,
-      "type": 0
-    },
-    "StaticControl4": {
-      "shape": 0,
-      "x": 344,
-      "y": 332,
-      "angle": -90,
-      "size": 2,
-      "type": 0
-    },
-    "StaticControl5": {
-      "shape": 0,
-      "x": 296,
-      "y": 384,
-      "angle": 0,
-      "size": 2,
-      "type": 0
-    },
-    "StaticControl6": {
-      "shape": 0,
-      "x": 220,
-      "y": 384,
-      "angle": 0,
-      "size": 2,
-      "type": 0
-    },
-    "StaticControl7": {
-      "shape": 0,
-      "x": 144,
-      "y": 384,
-      "angle": 0,
-      "size": 2,
-      "type": 0
-    },
-    "StaticControl8": {
-      "shape": 0,
-      "x": 68,
-      "y": 172,
-      "angle": -90,
-      "size": 2,
-      "type": 0
-    },
-    "StaticControl9": {
-      "shape": 0,
-      "x": 68,
-      "y": 252,
-      "angle": -90,
-      "size": 2,
-      "type": 0
-    },
-    "StaticControl10": {
-      "shape": 0,
-      "x": 16,
-      "y": 184,
-      "angle": -90,
-      "size": 2,
-      "type": 0
-    },
-    "StaticControl11": {
-      "shape": 0,
-      "x": 16,
-      "y": 264,
-      "angle": -90,
-      "size": 2,
-      "type": 0
-    },
-    "StaticControl12": {
-      "shape": 2,
-      "x": 340,
-      "y": 144,
-      "angle": 0,
-      "size": 2,
-      "type": 0
+      "size": 0,
+      "type": 1
     }
   }
 }
