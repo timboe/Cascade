@@ -2,18 +2,19 @@
 #include "game.h"
 
 enum SfxSample {
-  kPling1,
-  kPling2,
-  kPling3, 
-  kPling4,
-  kPling5,
-  kPling6,
-  kPling7,
-  kSplash1,
-  kSplash2,
-  kSplash3,
-  kSplash4,
-  kSplash5,
+  kPlingSfx1,
+  kPlingSfx2,
+  kPlingSfx3, 
+  kPlingSfx4,
+  kPlingSfx5,
+  kPlingSfx6,
+  kPlingSfx7,
+  kSplashSfx1,
+  kSplashSfx2,
+  kSplashSfx3,
+  kSplashSfx4,
+  kSplashSfx5,
+  kPopSfx,
   kNSFX
 };
 

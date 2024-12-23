@@ -140,7 +140,8 @@
 
 //
 
-#define N_PLINGS 7
+#define N_PLINGS_SFX 7
+#define N_SPLASHES_SFX 5
 
 #define N_MUSIC_TRACKS 12
 

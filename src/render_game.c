@@ -5,6 +5,7 @@
 #include "peg.h"
 #include "sshot.h"
 #include "io.h"
+#include "sound.h"
 
 uint16_t m_ballPootRadius = 0.0f;
 
@@ -63,6 +64,7 @@ void renderDoTriggerSplash(const uint8_t ball, const int16_t x) {
   if (!m_ballSplashTimer[ball]) {
     m_ballSplashPos[ball] = x - POND_SPLASH_WIDTH/2;
     m_ballSplashTimer[ball] = 1;
+    soundDoSfx(kSplashSfx1);
   }
 }
 

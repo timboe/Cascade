@@ -1051,9 +1051,9 @@ void bitmapDoInit(void) {
   m_fontRoobert10 = bitmapDoLoadFontAtPath("fonts/Roobert-10-Bold");
   m_headerImage = bitmapDoLoadImageAtPath("images/splash");
 #ifdef WF_FIXED_BG
-  m_wfBg[0] = bitmapDoLoadImageAtPath("images/falls0_bg"); // Set desired path
+  m_wfBg[0] = bitmapDoLoadImageAtPath("images/falls_bg/falls0_bg"); // Set desired path
 #else
-  m_wfBg[0] = bitmapDoLoadImageAtPath("images/falls0_bg");
+  m_wfBg[0] = bitmapDoLoadImageAtPath("images/falls_bg/falls0_bg");
 #endif
-  m_sheetWfFg[0] = bitmapDoLoadImageTableAtPath("images/falls0_fg");
+  m_sheetWfFg[0] = bitmapDoLoadImageTableAtPath("images/falls_fg/falls0_fg");
 }

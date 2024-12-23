@@ -75,19 +75,21 @@ void soundDoMusic() {
 
 void soundDoInit() {
 
-  m_audioSample[kPling1] = pd->sound->sample->load("fx/pling_1");
-  m_audioSample[kPling2] = pd->sound->sample->load("fx/pling_2");
-  m_audioSample[kPling3] = pd->sound->sample->load("fx/pling_3");
-  m_audioSample[kPling4] = pd->sound->sample->load("fx/pling_4");
-  m_audioSample[kPling5] = pd->sound->sample->load("fx/pling_5");
-  m_audioSample[kPling6] = pd->sound->sample->load("fx/pling_6");
-  m_audioSample[kPling7] = pd->sound->sample->load("fx/pling_7");
+  m_audioSample[kPlingSfx1] = pd->sound->sample->load("fx/pling_1");
+  m_audioSample[kPlingSfx2] = pd->sound->sample->load("fx/pling_2");
+  m_audioSample[kPlingSfx3] = pd->sound->sample->load("fx/pling_3");
+  m_audioSample[kPlingSfx4] = pd->sound->sample->load("fx/pling_4");
+  m_audioSample[kPlingSfx5] = pd->sound->sample->load("fx/pling_5");
+  m_audioSample[kPlingSfx6] = pd->sound->sample->load("fx/pling_6");
+  m_audioSample[kPlingSfx7] = pd->sound->sample->load("fx/pling_7");
 
-  m_audioSample[kSplash1] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__1");
-  m_audioSample[kSplash2] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__2");
-  m_audioSample[kSplash3] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__3");
-  m_audioSample[kSplash4] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__4");
-  m_audioSample[kSplash5] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__5");
+  m_audioSample[kSplashSfx1] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__1");
+  m_audioSample[kSplashSfx2] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__2");
+  m_audioSample[kSplashSfx3] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__3");
+  m_audioSample[kSplashSfx4] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__4");
+  m_audioSample[kSplashSfx5] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__5");
+
+  m_audioSample[kPopSfx] = pd->sound->sample->load("fx/pop");
 
   for (int32_t i = 0; i < kNSFX; ++i) {
     m_samplePlayer[i] = pd->sound->sampleplayer->newPlayer();
@@ -132,13 +134,17 @@ void soundDoInit() {
 void soundDoSfx(enum SfxSample sample) {
   if (!m_doSfx) return;
 
-  if (sample == kPling1) {
-    if (m_plingTimer == 0 || (gameGetFrameCount() - m_plingTimer) > TICK_FREQUENCY) {
+  if (sample == kPlingSfx1) {
+    if (m_plingTimer == 0 || (gameGetFrameCount() - m_plingTimer) > TICK_FREQUENCY*2) {
       m_plingID = 0;
     }
     sample += m_plingID;
-    if (m_plingID < N_PLINGS-1) m_plingID++;
+    if (m_plingID < N_PLINGS_SFX-1) m_plingID++;
     m_plingTimer = gameGetFrameCount();
+  }
+
+  if (sample == kSplashSfx1) {
+    sample += rand() % N_SPLASHES_SFX;
   }
 
   pd->sound->sampleplayer->play(m_samplePlayer[sample], 1, 1.0f);

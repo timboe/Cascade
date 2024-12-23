@@ -302,7 +302,7 @@ void pegDoHit(struct Peg_t* p) {
   ) {
     p->state = kPegStateHit;
     FSMDoResetBallStuckCounter();
-    soundDoSfx(kPling1);
+    soundDoSfx(kPlingSfx1);
     if (p->type == kPegTypeRequired) {
       renderAddTrauma(TRAUMA_REQUIRED_HIT);
       renderAddFreeze(FREEZE_REQUIRED_HIT);
@@ -343,6 +343,7 @@ bool pegDoCheckBurst(struct Peg_t* p, const float y) {
     if (p->y >= y) {
       p->state = kPegStateRemoved;
       pegDoRemove(p);
+      soundDoSfx(kPopSfx);
       return true;
     }
   }
