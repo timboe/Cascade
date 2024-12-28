@@ -93,6 +93,7 @@ LCDBitmapTable* m_tutorialCrankAngleTable;
 LCDBitmapTable* m_tutorialButtonTable;
 LCDBitmapTable* m_tutorialDPadTable;
 LCDBitmapTable* m_tutorialArrowsTable;
+LCDBitmapTable* m_fwBkwIconTable;
 
 LCDFont* m_fontRoobert24;
 LCDFont* m_fontRoobert10;
@@ -259,6 +260,10 @@ LCDBitmap* bitmapGetTutorialDPad(const uint8_t id) {
 
 LCDBitmap* bitmapGetTutorialArrows(const uint8_t id) {
   return pd->graphics->getTableBitmap(m_tutorialArrowsTable, id % 2);
+}
+
+LCDBitmap* bitmapGetFwBkwIcon(const int8_t id) {
+  return pd->graphics->getTableBitmap(m_fwBkwIconTable, id % 3);
 }
 
 LCDBitmap* bitmapGetTitlePlayer(void) { return m_playerBitmap; }
@@ -751,6 +756,7 @@ void bitmapDoPreloadA(void) {
   m_tutorialDPadTable = bitmapDoLoadImageTableAtPath("images/tut/dPad");
   m_tutorialArrowsTable = bitmapDoLoadImageTableAtPath("images/tut/tutorialPoint");
   m_chevronTable =  bitmapDoLoadImageTableAtPath("images/chevron");
+  m_fwBkwIconTable = bitmapDoLoadImageTableAtPath("images/forwarbackward");
   char text[128];
   for (int i = 0; i < MAX_POPS; ++i) {
     snprintf(text, 128, "images/anim/Pop%i", i);

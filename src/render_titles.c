@@ -29,7 +29,7 @@ void renderTitlesHeader(const int32_t fc) {
   }
 }
 
-void renderTitlesPlayerSelect(const bool locked) {
+void renderTitlesPlayerSelect(const bool locked, const int32_t fc) {
   const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y); // Hard = true
 
   bitmapDoUpdateScoreCard();
@@ -56,9 +56,13 @@ void renderTitlesPlayerSelect(const bool locked) {
       NUMERAL_BUF, DEVICE_PIX_Y + NUMERAL_BUF + NUMERAL_PIX_Y + offY, kBitmapUnflipped);
     pd->graphics->clearClipRect();
   }
+
+  if (locked && (fc / TICK_FREQUENCY) % 2) {
+    pd->graphics->drawBitmap(bitmapGetFwBkwIcon(1), HALF_DEVICE_PIX_X - FW_BKW_WIDTH/2 - 4, DEVICE_PIX_Y*2 - FW_BKW_HEIGHT - FW_BKW_BUF, kBitmapUnflipped);
+  }
 }
 
-void renderTitlesLevelSelect(const bool locked) {
+void renderTitlesLevelSelect(const bool locked, const int32_t fc) {
   const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y*2); // Hard = true
 
   uint8_t digit0[3];
@@ -97,9 +101,14 @@ void renderTitlesLevelSelect(const bool locked) {
       DEVICE_PIX_X - (2*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF + NUMERAL_PIX_Y + offY, kBitmapUnflipped);
     pd->graphics->clearClipRect();
   }
+
+  if (locked && (fc / TICK_FREQUENCY) % 2) {
+    pd->graphics->drawBitmap(bitmapGetFwBkwIcon(0), 104/2 - FW_BKW_WIDTH/2, DEVICE_PIX_Y*2 + FW_BKW_BUF, kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetFwBkwIcon(1), 104/2 - FW_BKW_WIDTH/2, DEVICE_PIX_Y*3 - FW_BKW_BUF - FW_BKW_HEIGHT, kBitmapUnflipped);
+  }
 }
 
-void renderTitlesHoleSelect(const bool locked) {
+void renderTitlesHoleSelect(const bool locked, const int32_t fc) {
   const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y*3); // Hard = true
   static float offset = 0;
   LCDBitmap* bm = bitmapGetLevelPreview(IOGetCurrentLevel(), IOGetCurrentHole(), offset);
@@ -143,6 +152,11 @@ void renderTitlesHoleSelect(const bool locked) {
     pd->graphics->drawBitmap(digitBm[2],
       NUMERAL_BUF, (DEVICE_PIX_Y*3) + NUMERAL_BUF + NUMERAL_PIX_Y + offY, kBitmapUnflipped);
     pd->graphics->clearClipRect();
+  }
+
+  if (locked && (fc / TICK_FREQUENCY) % 2) {
+    pd->graphics->drawBitmap(bitmapGetFwBkwIcon(0), HALF_DEVICE_PIX_X - FW_BKW_WIDTH/2, DEVICE_PIX_Y*3 + FW_BKW_BUF, kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetFwBkwIcon(1), HALF_DEVICE_PIX_X - FW_BKW_WIDTH/2, DEVICE_PIX_Y*4 - FW_BKW_BUF - FW_BKW_HEIGHT, kBitmapUnflipped);
   }
 }
 

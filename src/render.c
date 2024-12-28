@@ -116,16 +116,16 @@ void renderTitles(const int32_t fc) {
   if (so < DEVICE_PIX_Y) { renderTitlesHeader(fc); }
 
   // PLAYER SELECT
-  if (so > 0 && so <= DEVICE_PIX_Y*2 ) { renderTitlesPlayerSelect(so == DEVICE_PIX_Y); }
+  if (so > 0 && so <= DEVICE_PIX_Y*2 ) { renderTitlesPlayerSelect(so == DEVICE_PIX_Y, fc); }
 
   // LEVEL SELECT
-  if (so > DEVICE_PIX_Y && so <= DEVICE_PIX_Y*3) { renderTitlesLevelSelect(so == 2*DEVICE_PIX_Y); }
+  if (so > DEVICE_PIX_Y && so <= DEVICE_PIX_Y*3) { renderTitlesLevelSelect(so == 2*DEVICE_PIX_Y, fc); }
 
   // HOLE SELECT
   if (so > DEVICE_PIX_Y*2 && so <= DEVICE_PIX_Y*5) { renderTitlesWfPond(fc); }
 
   // HOLE SELECT
-  if (so > DEVICE_PIX_Y*2 && so <= DEVICE_PIX_Y*4) { renderTitlesHoleSelect(so == 3*DEVICE_PIX_Y); }
+  if (so > DEVICE_PIX_Y*2 && so <= DEVICE_PIX_Y*4) { renderTitlesHoleSelect(so == 3*DEVICE_PIX_Y, fc); }
 
   // TRANSITION LEVEL SPLASH
   if (so > DEVICE_PIX_Y*4) { renderTitlesTransitionLevelSplash(); }

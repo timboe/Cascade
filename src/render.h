@@ -40,9 +40,9 @@ void renderSetNumeralOffset(const float no);
 void renderDoResetMarbleTrace(void);
 
 void renderTitlesHeader(const int32_t fc);
-void renderTitlesPlayerSelect(const bool locked);
-void renderTitlesLevelSelect(const bool locked);
-void renderTitlesHoleSelect(const bool locked);
+void renderTitlesPlayerSelect(const bool locked, const int32_t fc);
+void renderTitlesLevelSelect(const bool locked, const int32_t fc);
+void renderTitlesHoleSelect(const bool locked, const int32_t fc);
 void renderTitlesWfPond(const int32_t fc);
 void renderTitlesTransitionLevelSplash(void);
 

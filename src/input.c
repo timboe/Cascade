@@ -39,14 +39,14 @@ void inputHandleTitles(const enum FSM_t fsm, const uint32_t buttonPressed) {
     FSMDo(kTitlesFSM_TitlesToChoosePlayer);
     return;
   }
-  if (kButtonA == buttonPressed) {
+  if (kButtonB == buttonPressed) {
     switch (fsm) {
       case kTitlesFSM_ChoosePlayer: FSMDo(kTitlesFSM_ChoosePlayerToChooseLevel); return;
       case kTitlesFSM_ChooseLevel: FSMDo(kTitlesFSM_ChooseLevelToChooseHole); return;
       case kTitlesFSM_ChooseHole: FSMDo(kTitlesFSM_ChooseHoleToSplash); return;
       default: break;
     }
-  } else if (kButtonB == buttonPressed) {
+  } else if (kButtonA == buttonPressed) {
     switch (fsm) {
       case kTitlesFSM_ChooseLevel: FSMDo(kTitlesFSM_ChooseLevelToChoosePlayer); return;
       case kTitlesFSM_ChooseHole: FSMDo(kTitlesFSM_ChooseHoleToChooseLevel); return;
@@ -58,9 +58,9 @@ void inputHandleTitles(const enum FSM_t fsm, const uint32_t buttonPressed) {
 void inputHandleGame(const enum FSM_t fsm, const uint32_t buttonPressed) {
   if (kButtonA == buttonPressed && (fsm == kGameFSM_AimMode || fsm == kGameFSM_TutorialScrollUp)) {
     FSMDo(kGameFSM_AimModeScrollToTop);
-  } else if (kButtonA == buttonPressed && fsm == kGameFSM_DisplayScores) {
-    FSMDo(kGameFSM_ScoresToSplash);
   } else if (kButtonB == buttonPressed && fsm == kGameFSM_DisplayScores) {
+    FSMDo(kGameFSM_ScoresToSplash);
+  } else if (kButtonA == buttonPressed && fsm == kGameFSM_DisplayScores) {
     FSMDo(kGameFSM_ScoresToTryAgain);
   }
 }
