@@ -82,78 +82,78 @@
     },
     "StaticControl9": {
       "shape": 2,
-      "x": 189,
-      "y": 549,
+      "x": 207,
+      "y": 540,
       "angle": 44,
       "size": 0,
       "type": 0
     },
     "StaticControl10": {
       "shape": 2,
-      "x": 246,
-      "y": 591,
+      "x": 261,
+      "y": 555,
       "angle": 89,
       "size": 0,
       "type": 0
     },
     "StaticControl11": {
       "shape": 2,
-      "x": 297,
-      "y": 594,
+      "x": 285,
+      "y": 597,
       "angle": 131,
       "size": 0,
       "type": 0
     },
     "StaticControl12": {
       "shape": 2,
-      "x": 342,
-      "y": 603,
+      "x": 333,
+      "y": 594,
       "angle": 131,
       "size": 0,
       "type": 0
     },
     "StaticControl13": {
       "shape": 2,
-      "x": 198,
-      "y": 603,
+      "x": 207,
+      "y": 600,
       "angle": 131,
       "size": 0,
       "type": 0
     },
     "StaticControl14": {
       "shape": 2,
-      "x": 117,
-      "y": 597,
+      "x": 96,
+      "y": 564,
       "angle": 131,
       "size": 0,
       "type": 0
     },
     "StaticControl15": {
       "shape": 2,
-      "x": 69,
-      "y": 606,
+      "x": 66,
+      "y": 600,
       "angle": 157,
       "size": 0,
       "type": 0
     },
     "StaticControl16": {
       "shape": 2,
-      "x": 57,
-      "y": 561,
+      "x": 63,
+      "y": 540,
       "angle": 195,
       "size": 0,
       "type": 0
     },
     "StaticControl17": {
       "shape": 2,
-      "x": 18,
-      "y": 591,
+      "x": 27,
+      "y": 567,
       "angle": 195,
       "size": 0,
       "type": 0
     },
     "LinearControl1": {
-      "shape": 1,
+      "shape": 2,
       "x": 150,
       "y": 82,
       "angle": 0,
@@ -287,7 +287,7 @@
     },
     "LinearControl2": {
       "shape": 0,
-      "x": 210,
+      "x": 198,
       "y": 81,
       "angle": 60,
       "size": 0,
@@ -323,13 +323,13 @@
         "type": 0
       },
       "LineContainer1": {
-        "lc_x": 370,
+        "lc_x": 358,
         "lc_y": 361
       }
     },
     "LinearControl3": {
       "shape": 0,
-      "x": 231,
+      "x": 213,
       "y": 6,
       "angle": 60,
       "size": 0,
@@ -360,7 +360,7 @@
         "type": 0
       },
       "LineContainer1": {
-        "lc_x": 381,
+        "lc_x": 363,
         "lc_y": 276
       }
     },

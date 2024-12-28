@@ -100,9 +100,11 @@ func _input(event):
 				else:
 					print("No Clone button for ", dragNode, " ", clone)
 			if event.keycode == KEY_DELETE :
-				dragNode.find_child("Remove", true, false)._on_pressed()
-				get_tree().get_root().set_input_as_handled()
-				dragNode = null
+				var toRemove = dragNode.find_child("Remove", true, false)
+				if toRemove:
+					toRemove._on_pressed()
+					get_tree().get_root().set_input_as_handled()
+					dragNode = null
 					
 	if event is InputEventMouseButton:
 		if (event.button_index == 1 || event.button_index == 2) and event.pressed and event.position.x < PLAYDATE_WIDTH:

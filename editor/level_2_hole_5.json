@@ -177,14 +177,14 @@
       "type": 0
     },
     "LinearControl1": {
-      "shape": 1,
+      "shape": 0,
       "x": 60,
       "y": -20,
-      "angle": 0,
+      "angle": 90,
       "size": 0,
       "arc": 360,
-      "use_arc": true,
-      "speed": 1,
+      "use_arc": false,
+      "speed": 0.700000000000001,
       "easing": 4,
       "n_pegs": 5,
       "n_lines": 3,
@@ -215,11 +215,11 @@
       },
       "LineContainer1": {
         "lc_x": 60,
-        "lc_y": 530
+        "lc_y": 618
       },
       "LineContainer2": {
         "lc_x": -30,
-        "lc_y": 530
+        "lc_y": 618
       },
       "LineContainer3": {
         "lc_x": -30,
@@ -227,13 +227,13 @@
       }
     },
     "LinearControl2": {
-      "shape": 1,
+      "shape": 0,
       "x": 30,
       "y": -20,
-      "angle": 0,
+      "angle": 90,
       "size": 0,
       "arc": 360,
-      "use_arc": true,
+      "use_arc": false,
       "speed": 0.600000000000001,
       "easing": 4,
       "n_pegs": 5,
@@ -265,11 +265,11 @@
       },
       "LineContainer1": {
         "lc_x": 30,
-        "lc_y": 530
+        "lc_y": 618
       },
       "LineContainer2": {
         "lc_x": -90,
-        "lc_y": 530
+        "lc_y": 618
       },
       "LineContainer3": {
         "lc_x": -90,
@@ -374,13 +374,13 @@
       }
     },
     "LinearControl4": {
-      "shape": 1,
+      "shape": 0,
       "x": 370,
       "y": -20,
-      "angle": 0,
+      "angle": 90,
       "size": 0,
       "arc": 360,
-      "use_arc": true,
+      "use_arc": false,
       "speed": 0.600000000000001,
       "easing": 4,
       "n_pegs": 5,
@@ -412,11 +412,11 @@
       },
       "LineContainer1": {
         "lc_x": 370,
-        "lc_y": 540
+        "lc_y": 618
       },
       "LineContainer2": {
         "lc_x": 490,
-        "lc_y": 540
+        "lc_y": 618
       },
       "LineContainer3": {
         "lc_x": 490,
@@ -424,14 +424,14 @@
       }
     },
     "LinearControl5": {
-      "shape": 1,
+      "shape": 0,
       "x": 339,
       "y": -20,
-      "angle": 0,
+      "angle": 90,
       "size": 0,
       "arc": 360,
-      "use_arc": true,
-      "speed": 0.9,
+      "use_arc": false,
+      "speed": 0.700000000000001,
       "easing": 4,
       "n_pegs": 6,
       "n_lines": 3,
@@ -467,11 +467,11 @@
       },
       "LineContainer1": {
         "lc_x": 339,
-        "lc_y": 540
+        "lc_y": 618
       },
       "LineContainer2": {
         "lc_x": 459,
-        "lc_y": 540
+        "lc_y": 618
       },
       "LineContainer3": {
         "lc_x": 459,

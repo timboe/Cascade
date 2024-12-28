@@ -9,7 +9,7 @@
     "foreground": 12,
     "background": 0,
     "special": 0,
-    "height": 790,
+    "height": 750,
     "snap": 4,
     "n_static": 15,
     "n_elliptic": 1,
@@ -30,7 +30,7 @@
       "y": 128,
       "angle": -90,
       "size": 1,
-      "type": 0
+      "type": 1
     },
     "StaticControl3": {
       "shape": 1,
@@ -54,7 +54,7 @@
       "y": 276,
       "angle": -90,
       "size": 1,
-      "type": 0
+      "type": 1
     },
     "StaticControl6": {
       "shape": 1,
@@ -102,7 +102,7 @@
       "y": 420,
       "angle": -90,
       "size": 1,
-      "type": 0
+      "type": 1
     },
     "StaticControl12": {
       "shape": 1,
@@ -137,10 +137,10 @@
       "type": 0
     },
     "EllipticControl1": {
-      "shape": 1,
+      "shape": 0,
       "x": 0,
       "y": 396,
-      "angle": 0,
+      "angle": 90,
       "size": 0,
       "arc": 360,
       "use_arc": true,

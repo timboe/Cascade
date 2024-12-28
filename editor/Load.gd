@@ -121,8 +121,8 @@ func restore_save(save_game : Dictionary) -> void:
 	%HoleSlider.value = save_game["header"]["hole"]
 	%ParSlider.value = save_game["header"]["par"]
 	%ForegroundIDSlider.value = save_game["header"]["foreground"]
-	if %ForegroundIDSlider.value >= 4:
-		%Foreground.selected = 4
+	if %ForegroundIDSlider.value >= 10:
+		%Foreground.selected = 10
 		print("Set selected to 4")
 	else:
 		%Foreground.selected = %ForegroundIDSlider.value

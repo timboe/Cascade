@@ -680,7 +680,7 @@
       "size": 2,
       "arc": 360,
       "use_arc": false,
-      "speed": 0.600000000000001,
+      "speed": 0.450000000000001,
       "easing": 3,
       "n_pegs": 6,
       "n_lines": 3,
@@ -720,11 +720,11 @@
       },
       "LineContainer2": {
         "lc_x": 430,
-        "lc_y": 620
+        "lc_y": 698
       },
       "LineContainer3": {
         "lc_x": -30,
-        "lc_y": 620
+        "lc_y": 698
       }
     },
     "LinearControl30": {
@@ -735,7 +735,7 @@
       "size": 2,
       "arc": 360,
       "use_arc": false,
-      "speed": 0.600000000000001,
+      "speed": 0.550000000000001,
       "easing": 3,
       "n_pegs": 6,
       "n_lines": 3,
@@ -775,11 +775,11 @@
       },
       "LineContainer2": {
         "lc_x": 430,
-        "lc_y": 620
+        "lc_y": 698
       },
       "LineContainer3": {
         "lc_x": -30,
-        "lc_y": 620
+        "lc_y": 698
       }
     }
   }

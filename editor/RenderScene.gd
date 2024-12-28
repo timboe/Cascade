@@ -213,8 +213,8 @@ func render_line_path(linePath : Control):
 		var x_off = line_container.find_child("XOffText").value
 		var y_off = line_container.find_child("YOffText").value
 		line_path_array.push_back(Vector2(x+x_off, y+y_off))
-		if (y+y_off) > %HeightSlider.value + 50:
-			line_container.find_child("YOffText").value = %HeightSlider.value - y + 50
+		if (y+y_off) > %HeightSlider.value + 128:
+			line_container.find_child("YOffText").value = %HeightSlider.value - y + 128
 	line_path_array.push_back(Vector2(x,y))
 	
 	var line_path_lengths : Array
