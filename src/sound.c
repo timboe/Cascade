@@ -6,6 +6,8 @@ bool m_doMusic = true;
 
 bool m_hasMusic = true;
 
+bool m_doingExplosion = false;
+
 int8_t m_trackPlaying = -1;
 int8_t m_wfPlaying = -1;
 
@@ -20,8 +22,13 @@ AudioSample* m_audioSample[kNSFX];
 
 /// ///
 
+void soundSetDoingExplosion(const bool expOn) {
+  m_doingExplosion = expOn;
+}
+
 void soundResetPling() {
   m_plingTimer = 0;
+  m_doingExplosion = false; // backup
 }
 
 void soundSetDoMusic(const bool doit) {
@@ -135,6 +142,9 @@ void soundDoSfx(enum SfxSample sample) {
   if (!m_doSfx) return;
 
   if (sample == kPlingSfx1) {
+    if (m_doingExplosion) {
+      return; // Disable plings during the explosion
+    }
     if (m_plingTimer == 0 || (gameGetFrameCount() - m_plingTimer) > TICK_FREQUENCY*2) {
       m_plingID = 0;
     }

@@ -228,13 +228,19 @@ void renderGameBoard(const int32_t fc) {
     }
   }
 
-  if (m_blastPos.x) { // Draw blast graphic
+  if (m_blastPos.x) { // Draw explosion graphic
     m_blastFrame++;
-    if (m_blastFrame / 4 == SPECIAL_BLAST_FRAMES) {
+    const uint8_t animFrame = m_blastFrame / 4;
+    if (animFrame == 1 && !pd->system->getReduceFlashing()) { // Flash
+      pd->graphics->setDrawMode(kDrawModeInverted);
+      pd->graphics->fillRect(0, 0, DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
+    }
+    if (animFrame == SPECIAL_BLAST_FRAMES) { // Explosion blast is over
       m_blastPos = cpvzero;
+      soundSetDoingExplosion(false);
     } else {
       pd->graphics->setDrawMode(kDrawModeCopy);
-      pd->graphics->drawBitmap(bitmapGetSpecialBlast(m_blastFrame / 4), m_blastPos.x - SPECIAL_BLAST_RADIUS, m_blastPos.y - SPECIAL_BLAST_RADIUS, kBitmapUnflipped);
+      pd->graphics->drawBitmap(bitmapGetSpecialBlast(animFrame), m_blastPos.x - SPECIAL_BLAST_RADIUS, m_blastPos.y - SPECIAL_BLAST_RADIUS, kBitmapUnflipped);
     }
   }
 

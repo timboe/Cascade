@@ -326,6 +326,7 @@ void pegDoHit(struct Peg_t* p) {
       boardDoSpecialBlast();
       renderAddTrauma(TRAUMA_BLAST_HIT);
       renderDoAddSpecialBlast(p->cpBody);
+      soundSetDoingExplosion(true);
     }
   }
   if (p->state == kPegStateHit && FSMGet() == kGameFSM_WinningToast) {

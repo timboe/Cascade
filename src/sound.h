@@ -32,4 +32,6 @@ void soundDoSfx(enum SfxSample sample);
 
 void soundSetDoMusic(const bool doit);
 
-void soundSetDoSfx(const bool doit) ;
+void soundSetDoSfx(const bool doit);
+
+void soundSetDoingExplosion(const bool expOn);
