@@ -26,50 +26,50 @@
     },
     "StaticControl2": {
       "shape": 2,
-      "x": 96,
+      "x": 100,
       "y": 124,
       "angle": 0,
-      "size": 2,
+      "size": 1,
       "type": 0
     },
     "StaticControl3": {
       "shape": 2,
-      "x": 68,
+      "x": 72,
       "y": 316,
       "angle": 0,
-      "size": 2,
+      "size": 1,
       "type": 0
     },
     "StaticControl4": {
       "shape": 2,
-      "x": 120,
+      "x": 124,
       "y": 448,
       "angle": 0,
-      "size": 2,
+      "size": 1,
       "type": 0
     },
     "StaticControl5": {
       "shape": 2,
-      "x": 120,
+      "x": 124,
       "y": 448,
       "angle": -180,
-      "size": 2,
+      "size": 0,
       "type": 0
     },
     "StaticControl6": {
       "shape": 2,
-      "x": 96,
+      "x": 100,
       "y": 124,
       "angle": -180,
-      "size": 2,
+      "size": 0,
       "type": 0
     },
     "StaticControl7": {
       "shape": 2,
-      "x": 68,
+      "x": 72,
       "y": 316,
       "angle": -180,
-      "size": 2,
+      "size": 0,
       "type": 0
     },
     "EllipticControl1": {

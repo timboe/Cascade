@@ -9,7 +9,7 @@
     "foreground": 13,
     "background": 0,
     "special": 0,
-    "height": 920,
+    "height": 890,
     "snap": 4,
     "n_static": 25,
     "n_elliptic": 0,
@@ -18,7 +18,7 @@
   "body": {
     "StaticControl1": {
       "shape": 2,
-      "x": 332,
+      "x": 336,
       "y": 144,
       "angle": 0,
       "size": 1,
@@ -26,10 +26,10 @@
     },
     "StaticControl2": {
       "shape": 2,
-      "x": 332,
+      "x": 336,
       "y": 144,
       "angle": 60,
-      "size": 1,
+      "size": 0,
       "type": 0
     },
     "StaticControl3": {
@@ -130,11 +130,11 @@
     },
     "StaticControl15": {
       "shape": 1,
-      "x": 268,
+      "x": 272,
       "y": 792,
       "angle": 0,
       "size": 0,
-      "type": 0
+      "type": 1
     },
     "StaticControl16": {
       "shape": 2,
@@ -194,11 +194,11 @@
     },
     "StaticControl23": {
       "shape": 1,
-      "x": 96,
+      "x": 100,
       "y": 284,
       "angle": 0,
       "size": 0,
-      "type": 0
+      "type": 1
     },
     "StaticControl24": {
       "shape": 1,
@@ -211,10 +211,10 @@
     "StaticControl25": {
       "shape": 1,
       "x": 168,
-      "y": 560,
+      "y": 556,
       "angle": 0,
       "size": 0,
-      "type": 0
+      "type": 1
     },
     "LinearControl1": {
       "shape": 1,
