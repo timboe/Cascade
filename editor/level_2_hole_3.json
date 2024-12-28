@@ -162,7 +162,7 @@
     },
     "StaticControl19": {
       "shape": 2,
-      "x": 372,
+      "x": 363,
       "y": 541,
       "angle": 0,
       "size": 1,
@@ -210,7 +210,7 @@
     },
     "StaticControl25": {
       "shape": 2,
-      "x": 38,
+      "x": 39,
       "y": 600,
       "angle": 0,
       "size": 1,
@@ -330,7 +330,7 @@
     },
     "StaticControl40": {
       "shape": 0,
-      "x": 34,
+      "x": 36,
       "y": 265,
       "angle": 1,
       "size": 0,
@@ -434,7 +434,7 @@
     },
     "StaticControl53": {
       "shape": 0,
-      "x": 33,
+      "x": 34,
       "y": 469,
       "angle": 20,
       "size": 0,

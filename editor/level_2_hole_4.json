@@ -251,7 +251,7 @@
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 2
+        "type": 0
       },
       "LineContainer1": {
         "lc_x": 40,
@@ -603,7 +603,7 @@
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 2
+        "type": 0
       },
       "LineContainer1": {
         "lc_x": 360,
@@ -735,7 +735,7 @@
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 2
       },
       "LineContainer1": {
         "lc_x": 80,
@@ -1109,7 +1109,7 @@
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 2
       },
       "LineContainer1": {
         "lc_x": 320,
