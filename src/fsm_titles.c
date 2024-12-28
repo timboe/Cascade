@@ -41,7 +41,7 @@ float FSMCommonCrankNumeral(float* progress) {
 
 void FSMDisplayTitles(const bool newState) {
   if (newState) { 
-    gameDoPopulateMenuTitles();
+    // noop
   }
   if (!pd->system->isCrankDocked() && !IOGetIsPreloading()) {
     return FSMDo(kTitlesFSM_TitlesToChoosePlayer);

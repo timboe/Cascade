@@ -273,7 +273,7 @@ void renderGameFountains(const int32_t fc) {
 void renderGameTopper(void) {
   const float minY = gameGetMinimumY(); 
   const float yOff = gameGetYOffset();
-  if (yOff - minY < 0) {
+  if (yOff - minY < 0 && FSMGet() != kGameFSM_ScoresToTryAgain) {
     pd->graphics->fillRect(0, minY - TURRET_RADIUS - 60, DEVICE_PIX_X, 60, kColorBlack); // mask in case of over-scroll
     pd->graphics->drawBitmap(bitmapGetGameInfoTopper(), 0, minY - TURRET_RADIUS, kBitmapUnflipped); //Note no parallax here
   }

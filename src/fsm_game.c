@@ -362,7 +362,7 @@ void FSMBallGutter(const bool newState) {
   if (newState) {
     if (special == kPegSpecialMultiball) {
       physicsDoRemoveSecondBall();
-    } else if (special == kPegSpecialSecondTry) {
+    } else if (special == kPegSpecialSecondTry && boardGetRequiredPegsInPlay()) {
       physicsDoSecondTryBall();
       boardDoClearSpecial();
       gameSetYOffset(gameGetMinimumY(), true);
@@ -517,8 +517,11 @@ void FSMScoresAnimation(const bool newState) {
   bool moving = false;
   for (int i = 0; i < activeBalls; ++i) {
     float floorY = BUF + ((maxBallsToShow - 1 - i)*2*BALL_RADIUS);
-    if (py[i] >= floorY) {
+    if (py[i] > floorY) {
       py[i] = floorY;
+      soundDoSfx(kBallClinkSfx);
+    } else if (py[i] == floorY) {
+      // noop
     } else {
       vy[i] += HISTO_BALL_ACCELERATION;
       py[i] += vy[i];

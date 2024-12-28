@@ -59,6 +59,7 @@ void soundWaterfallDoInit() {
 }
 
 void soundDoWaterfall(const uint8_t id) {
+  pd->system->logToConsole("soundDoWaterfall called for %i", (int)id);
   if (!m_hasMusic || (id % N_WF_TRACKS) == m_wfPlaying) return;
   for (int32_t i = 0; i < N_WF_TRACKS; ++i) {
     pd->sound->fileplayer->stop(m_waterfalls[i]);
@@ -97,8 +98,8 @@ void soundDoInit() {
   m_audioSample[kSplashSfx5] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__5");
 
   m_audioSample[kPopSfx] = pd->sound->sample->load("fx/pop");
-
   m_audioSample[kExplosionSfx] = pd->sound->sample->load("fx/explosion");
+  m_audioSample[kBallClinkSfx] = pd->sound->sample->load("fx/ballClink");
 
   for (int32_t i = 0; i < kNSFX; ++i) {
     m_samplePlayer[i] = pd->sound->sampleplayer->newPlayer();

@@ -433,7 +433,8 @@ void bitmapDoUpdateScoreHistogram(void) {
   int16_t balls[MAX_HOLES] = {0};
   int16_t par[MAX_HOLES] = {0};
   for (int hole = 0; hole < MAX_HOLES;  ++hole) {
-    balls[hole] = IOGetScore(IOGetCurrentLevel(), hole);
+    const int16_t score = IOGetScore(IOGetCurrentLevel(), hole);;
+    balls[hole] = score > maxHistoBalls ? maxHistoBalls : score;
     par[hole] = IOGetPar(IOGetCurrentLevel(), hole);
   }
   // This will be animated in instead

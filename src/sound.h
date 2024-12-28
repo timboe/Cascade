@@ -16,6 +16,7 @@ enum SfxSample {
   kSplashSfx5,
   kPopSfx,
   kExplosionSfx,
+  kBallClinkSfx,
   kNSFX
 };
 

@@ -97,6 +97,7 @@ float IOGetPreloadingProgress(void) {
 
 void IODonePreloading(void) {
   soundWaterfallDoInit();
+  gameDoPopulateMenuTitles();
 }
 
 void IODoUpdatePreloading(void) {
@@ -264,6 +265,7 @@ void IOSetCurrentHoleScore(const uint16_t score) {
 
 void IODoGoToNextUnplayedLevel(void) {
   bool found = false;
+  uint16_t incomingLevel = m_level;
   // Find highest played level number
   for (int l = MAX_LEVELS-1; l >= 0; --l) {
     for (int h = MAX_HOLES-1; h >= 0; --h) {
@@ -278,6 +280,8 @@ void IODoGoToNextUnplayedLevel(void) {
   }
   if (found) {
     IODoNextHoleWithLevelWrap();
+    // Update the waterfall sfx here as it will only automatically trigger if ticking over from hole 9 to 0
+    if (m_level != incomingLevel) { soundDoWaterfall(m_level); }
   } else {
     m_level = 0;
     m_hole = 0;
