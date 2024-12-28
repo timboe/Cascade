@@ -12,6 +12,7 @@ uint16_t m_requiredPegsInPlay = 0;
 float m_lastBurstLevel = 0.0f;
 
 enum PegSpecial_t m_special = kPegSpecialNotSpecial;
+enum PegSpecial_t m_specialToActivate = kPegSpecialNotSpecial;
 
 uint8_t m_specialCounter = 0;
 
@@ -19,13 +20,23 @@ uint8_t m_specialCounter = 0;
 
 float boardGetLastBurstLevel(void) { return m_lastBurstLevel; }
 
-int16_t boardGetRequiredPegsInPlay(void) { return m_requiredPegsInPlay; }
+uint16_t boardGetRequiredPegsInPlay(void) { return m_requiredPegsInPlay; }
+
+uint16_t boardGetRequiredPegsHit(void) { return boardGetRequiredPegsTotal() - m_requiredPegsInPlay; }
 
 void boardDoRequiredPegHit(void) { --m_requiredPegsInPlay; }
 
-int16_t boardGetSpecialPegsInPlay(void) { // This is not often needed and is not cached
-  int16_t count = 0;
-  for (int i = 0; i < m_nPegs; ++i) {
+uint16_t boardGetRequiredPegsTotal(void) { // This is not often needed and is not cached
+  uint16_t count = 0;
+  for (uint16_t i = 0; i < m_nPegs; ++i) {
+    if (boardGetPeg(i)->type == kPegTypeRequired) { ++count; }
+  }
+  return count;
+}
+
+uint16_t boardGetSpecialPegsInPlay(void) { // This is not often needed and is not cached
+  uint16_t count = 0;
+  for (uint16_t i = 0; i < m_nPegs; ++i) {
     if (boardGetPeg(i)->type == kPegTypeSpecial && boardGetPeg(i)->state == kPegStateActive) { ++count; }
   }
   return count;
@@ -58,7 +69,6 @@ void boardDoSpecialBlast(void) {
   }
 }
 
-
 void boardDoAddWheel(const struct EllipticLoader_t* ellipticLoader) {
   for (int i = 0; i < ellipticLoader->nPegs; ++i) {
     if (ellipticLoader->types[i] == kPegTypeMissing) { continue; }
@@ -75,7 +85,9 @@ void boardDoAddWheel(const struct EllipticLoader_t* ellipticLoader) {
     pegSetMotionEasing(p, ellipticLoader->easing);
     pegSetMotionDoArcAngle(p, ellipticLoader->useArc);
     pegSetMotionEllipse(p, ellipticLoader->a, ellipticLoader->b);
-    if (ellipticLoader->types[i] == kPegTypeRequired) { ++m_requiredPegsInPlay; }
+    if (ellipticLoader->types[i] == kPegTypeRequired) { 
+      ++m_requiredPegsInPlay;
+    }
     pegSetType(p, ellipticLoader->types[i]);
   }
 }
@@ -95,7 +107,9 @@ void boardDoAddLinear(const struct LinearLoader_t* linearLoader) {
     pegSetMotionOffset(p, angleOffset + linearLoader->maxAngle);
     pegSetMotionEasing(p, linearLoader->easing);
     pegSetMotionDoArcAngle(p, linearLoader->useArc);
-    if (linearLoader->types[i] == kPegTypeRequired) { ++m_requiredPegsInPlay; }
+    if (linearLoader->types[i] == kPegTypeRequired) { 
+      ++m_requiredPegsInPlay;
+    }
     pegSetType(p, linearLoader->types[i]);
     for (int j = 0; j < linearLoader->nLines; ++j) {
       pegAddMotionPath(p, linearLoader->pathX[j], linearLoader->pathY[j]);
@@ -108,7 +122,9 @@ struct Peg_t* boardDoAddStatic(const struct StaticLoader_t* staticLoader) {
   struct Peg_t* p = pegFromPool();
   pegDoInit(p, staticLoader->shape, staticLoader->x, staticLoader->y, staticLoader->angle, staticLoader->size);
   pegSetMotionStatic(p);
-  if (staticLoader->type == kPegTypeRequired) { ++m_requiredPegsInPlay; }
+  if (staticLoader->type == kPegTypeRequired) { 
+    ++m_requiredPegsInPlay;
+  }
   pegSetType(p, staticLoader->type);
   return p;
 }
@@ -213,6 +229,9 @@ void boardDoClear(void) {
   }
   m_nPegs = 0;
   m_requiredPegsInPlay = 0;
+  m_specialCounter = 0;
+  m_special = kPegSpecialNotSpecial;
+  m_specialToActivate = kPegSpecialNotSpecial;
 }
 
 
@@ -241,17 +260,12 @@ void boardDoClearSpecial(void) {
   m_special = kPegSpecialNotSpecial;
 }
 
-void boardDoClearSpecialCounter(void) {
-  m_specialCounter = 0;
-}
-
 enum PegSpecial_t boardDoAddSpecial(const bool activate) {
-  static enum PegSpecial_t toActivate = kPegSpecialNotSpecial;
 
   if (activate) {
 
     if (m_specialCounter) {
-      m_special = toActivate;
+      m_special = m_specialToActivate;
       --m_specialCounter;
       pd->system->logToConsole("activated %s, %i left", pegGetSpecialTxt(m_special), m_specialCounter);
     }
@@ -259,14 +273,14 @@ enum PegSpecial_t boardDoAddSpecial(const bool activate) {
   } else {
 
     if (!m_specialCounter) { 
-      toActivate = IOGetCurrentHoleSpecial();
-      if (toActivate == kPegSpecialNotSpecial) { // Hole can request to have a random special
-        toActivate = (rand() % (kNPegSpecial - 1)) + 1;
+      m_specialToActivate = IOGetCurrentHoleSpecial();
+      if (m_specialToActivate == kPegSpecialNotSpecial) { // Hole can request to have a random special
+        m_specialToActivate = (rand() % (kNPegSpecial - 1)) + 1;
       }
     }
     ++m_specialCounter;
 
   }
 
-  return toActivate;
+  return m_specialToActivate;
 }

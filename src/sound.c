@@ -54,7 +54,7 @@ void soundSetDoSfx(const bool doit) {
 
 void soundWaterfallDoInit() {
   if (!m_hasMusic) return;
-  pd->sound->fileplayer->play(m_waterfalls[0], -1);
+  pd->sound->fileplayer->play(m_waterfalls[0], 0);
   m_wfPlaying = 0;
 }
 
@@ -64,7 +64,7 @@ void soundDoWaterfall(const uint8_t id) {
     pd->sound->fileplayer->stop(m_waterfalls[i]);
   }
   m_wfPlaying = id % N_WF_TRACKS;
-  pd->sound->fileplayer->play(m_waterfalls[m_wfPlaying], -1);
+  pd->sound->fileplayer->play(m_waterfalls[m_wfPlaying], 0);
 }
 
 void soundDoMusic() {
@@ -98,6 +98,8 @@ void soundDoInit() {
 
   m_audioSample[kPopSfx] = pd->sound->sample->load("fx/pop");
 
+  m_audioSample[kExplosionSfx] = pd->sound->sample->load("fx/explosion");
+
   for (int32_t i = 0; i < kNSFX; ++i) {
     m_samplePlayer[i] = pd->sound->sampleplayer->newPlayer();
     pd->sound->sampleplayer->setSample(m_samplePlayer[i], m_audioSample[i]);
@@ -123,6 +125,7 @@ void soundDoInit() {
     pd->sound->fileplayer->setBufferLength(m_music[i], 1.0f); 
   }
 
+  const float WF_VOLUMES[] = {0.25f, 0.25f, 0.25f, 0.25f, 0.25f, 0.25f};
   for (int32_t i = 0; i < N_WF_TRACKS; ++i) {
     m_waterfalls[i] = pd->sound->fileplayer->newPlayer();
     switch (i) {
@@ -133,6 +136,7 @@ void soundDoInit() {
       case 4: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690221__nox_sound__ambiance_waterfall_big_seljalandsfoss_loop_stereo"); break;
       case 5: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690224__nox_sound__ambiance_waterfall_big_skogafoss_loop_stereo"); break;
     }
+    pd->sound->fileplayer->setVolume(m_waterfalls[i], WF_VOLUMES[i], WF_VOLUMES[i]);
     pd->sound->fileplayer->setBufferLength(m_waterfalls[i], 1.0f); 
   }
 

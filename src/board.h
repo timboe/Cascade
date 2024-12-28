@@ -66,9 +66,13 @@ float boardGetLastBurstLevel(void);
 uint16_t boardGetNPegs(void);
 struct Peg_t* boardGetPeg(const uint16_t i);
 
-int16_t boardGetRequiredPegsInPlay(void);
+uint16_t boardGetRequiredPegsHit(void);
 
-int16_t boardGetSpecialPegsInPlay(void);
+uint16_t boardGetRequiredPegsTotal(void);
+
+uint16_t boardGetRequiredPegsInPlay(void);
+
+uint16_t boardGetSpecialPegsInPlay(void);
 
 void boardDoRequiredPegHit(void);
 
@@ -76,7 +80,6 @@ void boardDoSpecialBlast(void);
 
 enum PegSpecial_t boardGetCurrentSpecial(void);
 void boardDoClearSpecial(void);
-void boardDoClearSpecialCounter(void);
 enum PegSpecial_t boardDoAddSpecial(const bool activate);
 
 struct Peg_t* boardDoAddStatic(const struct StaticLoader_t* staticLoader);

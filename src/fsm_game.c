@@ -107,13 +107,13 @@ void FSMCommonTurretScrollAndBounceBack(const bool allowScroll) {
 
 bool FSMCommonMarbleFire(uint16_t* timer) {
   float progress = getEasing(EASE_MARBLE_FIRE, (float)(*timer)/TIME_FIRE_MARBLE);
-  if ((*timer) >= TIME_FIRE_MARBLE || (progress > 0.5f && !inputGetPressed(kButtonA))) { // Fire
+  if ((*timer) >= TIME_FIRE_MARBLE || (progress > 0.5f && !inputGetPressed(kButtonB))) { // Fire
     physicsDoResetBall(0);
     physicsDoLaunchBall(progress);
     ++m_ballCount;
     if (boardGetCurrentSpecial() == kPegSpecialMultiball) { physicsDoAddSecondBall(); }
     return true;
-  } else if (inputGetPressed(kButtonA)) { // Arm
+  } else if (inputGetPressed(kButtonB)) { // Arm
     (*timer)++;
   } else if (*timer > 0) { // Reset
     (*timer) = 0;
@@ -133,7 +133,6 @@ void FSMDisplaySplash(const bool newState) {
     bitmapDoUpdateScoreHistogram();
     gameDoPopulateMenuGame();
     boardDoClear();
-    boardDoClearSpecialCounter();
     IODoLoadCurrentHole();
     physicsSetTimestepMultiplier(1.0f);
     gameDoResetPreviousWaterfall();
@@ -434,11 +433,20 @@ void FSMTurretLower(const bool newState) {
     endY = gameGetMinimumY();
     //
     int32_t minY = 10000;
-    for (uint32_t i = 0; i < MAX_PEGS; ++i) {
-      const struct Peg_t* p = boardGetPeg(i);
-      //pd->system->logToConsole("peg %i state=%i (1==active), shape=%i (rect,ball,tri), doMinY=%i y=%f minY=%f", i, p->state, p->shape, p->doMinY, p->y, p->minY);
-      if (p->state == kPegStateActive && p->doMinY && p->minY < minY) {
-        minY = p->minY;
+    // pd->system->logToConsole("req pegs hit = %i", boardGetRequiredPegsHit());
+    // pd->system->logToConsole("req pegs total = %i", boardGetRequiredPegsTotal());
+    // pd->system->logToConsole("req pegs in play = %i", boardGetRequiredPegsInPlay());
+    if (boardGetRequiredPegsHit() == 0) {
+      // No required pegs hit yet, don't move down yet
+      minY = 0;
+    } else {
+      // At least one required peg hit, move down
+      for (uint32_t i = 0; i < MAX_PEGS; ++i) {
+        const struct Peg_t* p = boardGetPeg(i);
+        //pd->system->logToConsole("peg %i state=%i (1==active), type=%i (1==req), shape=%i (rect,ball,tri), y=%f minY=%f", i, p->state, p->type, p->shape, p->y, p->minY);
+        if (p->state == kPegStateActive && p->type == kPegTypeRequired && p->minY < minY) {
+          minY = p->minY;
+        }
       }
     }
     if (minY > (DEVICE_PIX_Y/2) && !IOGetIsTutorial()) { 

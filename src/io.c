@@ -95,6 +95,10 @@ float IOGetPreloadingProgress(void) {
   return m_preloading / (float)PRELOADING_STEPS;
 }
 
+void IODonePreloading(void) {
+  soundWaterfallDoInit();
+}
+
 void IODoUpdatePreloading(void) {
   if (!IOGetIsPreloading()) { return; }
 
@@ -136,6 +140,7 @@ void IODoUpdatePreloading(void) {
   pd->system->logToConsole("Preload %i took %i ms", (int)m_preloading, (int)(after - before));
 
   ++m_preloading;
+  if (!IOGetIsPreloading()) { IODonePreloading(); }
 }
 
 #ifdef WF_FIXED_BG

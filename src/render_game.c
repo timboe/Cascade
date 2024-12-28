@@ -233,7 +233,7 @@ void renderGameBoard(const int32_t fc) {
     const uint8_t animFrame = m_blastFrame / 4;
     if (animFrame == 1 && !pd->system->getReduceFlashing()) { // Flash
       pd->graphics->setDrawMode(kDrawModeInverted);
-      pd->graphics->fillRect(0, 0, DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
+      pd->graphics->fillRect(0, gameGetYOffset(), DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
     }
     if (animFrame == SPECIAL_BLAST_FRAMES) { // Explosion blast is over
       m_blastPos = cpvzero;
@@ -346,7 +346,7 @@ void renderGameTutorial(const int32_t fc, const enum FSM_t fsm) {
     } else {
       pd->graphics->drawBitmap(bitmapGetTutorialCrankRotate(fc / fast), 20, 20 + yOff, kBitmapFlippedX);
     }
-    pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 2 ? 1 : 3) , HALF_DEVICE_PIX_X + 20, 60 + yOff, kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 2 ? 0 : 2) , HALF_DEVICE_PIX_X + 20, 60 + yOff, kBitmapUnflipped);
 
   } else if (fsm == kGameFSM_TutorialFireMarble) {
 
@@ -359,7 +359,7 @@ void renderGameTutorial(const int32_t fc, const enum FSM_t fsm) {
       if (f > 4) f = 4 - (f - 4);
       pd->graphics->drawBitmap(bitmapGetTutorialCrankAngle(f), 20, 65 + yOff, kBitmapUnflipped);
     }
-    pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 2 ? 0 : 2) , HALF_DEVICE_PIX_X + 20, 60 + yOff, kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 2 ? 1 : 3) , HALF_DEVICE_PIX_X + 20, 60 + yOff, kBitmapUnflipped);
 
   } else if (fsm == kGameFSM_TutorialGetSpecial) {
 

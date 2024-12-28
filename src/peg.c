@@ -51,7 +51,6 @@ void pegDoInit(struct Peg_t* p, const enum PegShape_t s, const float x, const fl
   p->x = x;
   p->y = y;
   p->minY = y;
-  p->doMinY = true;
   p->angle = a;
   p->iAngle = radToByte(a);
   p->speed = 1.0f;
@@ -130,7 +129,6 @@ void pegSetType(struct Peg_t* p, const enum PegType_t type) {
     p->radius = HEX_MAX*scale;
     pegDoAddedShape(p);
   } else { // Required
-    p->doMinY = true;
     p->bitmap = bitmapGetPeg(p);
   }
 }
@@ -227,7 +225,6 @@ void pegDoUpdate(struct Peg_t* p) {
     cpBodySetVelocity(p->cpBody, cpvzero);
     // No need for more updates
     p->motion = kPegMotionStatic;
-    p->doMinY = true; 
     //pd->system->logToConsole("Peg changing to static at y=%f minY=%f", p->y, p->minY);
   } else {
     cpBodySetVelocity(p->cpBody, cpv((p->x - pos.x)/TIMESTEP, (p->y - pos.y)/TIMESTEP));
@@ -244,7 +241,6 @@ void pegDoUpdate(struct Peg_t* p) {
 
 void pegSetMotionSpeed(struct Peg_t* p, const float s) { 
   p->speed = s;
-  p->doMinY = false;
   p->minY = 10000.0; // Force recomputation
 }
 
@@ -327,6 +323,7 @@ void pegDoHit(struct Peg_t* p) {
       renderAddTrauma(TRAUMA_BLAST_HIT);
       renderDoAddSpecialBlast(p->cpBody);
       soundSetDoingExplosion(true);
+      soundDoSfx(kExplosionSfx);
     }
   }
   if (p->state == kPegStateHit && FSMGet() == kGameFSM_WinningToast) {
