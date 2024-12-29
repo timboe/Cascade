@@ -146,8 +146,8 @@
     },
     "StaticControl17": {
       "shape": 2,
-      "x": 27,
-      "y": 567,
+      "x": 30,
+      "y": 570,
       "angle": 195,
       "size": 0,
       "type": 0
@@ -408,7 +408,7 @@
     },
     "LinearControl5": {
       "shape": 0,
-      "x": 0,
+      "x": 3,
       "y": 297,
       "angle": 60,
       "size": 0,
@@ -444,7 +444,7 @@
         "type": 0
       },
       "LineContainer1": {
-        "lc_x": 160,
+        "lc_x": 163,
         "lc_y": 577
       }
     }
