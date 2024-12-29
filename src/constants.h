@@ -39,6 +39,10 @@
 #define NUMERAL_PIX_Y 160
 #define NUMERAL_BUF 40
 
+#define FW_BKW_HEIGHT 52
+#define FW_BKW_WIDTH 43
+#define FW_BKW_BUF 16
+
 #define TITLETEXT_HEIGHT 32
 
 #define STENCIL_WIPE_N 30

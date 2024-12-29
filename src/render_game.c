@@ -115,6 +115,7 @@ void renderGameMarble(const int32_t fc) {
   }
 
   const int32_t gutterY = IOGetCurrentHoleHeight();
+  const float yOff = gameGetYOffset();
   const float pfn = gameGetParalaxFactorNear(true);
   const int32_t parallaxPond = pfn - gameGetParalaxFactorNearForY(true, gutterY - DEVICE_PIX_Y);
 
@@ -139,6 +140,11 @@ void renderGameMarble(const int32_t fc) {
       pd->graphics->setDrawMode(kDrawModeInverted);
       pd->graphics->drawBitmap(bitmapGetMarble(), pos.x - BALL_RADIUS, pos.y - BALL_RADIUS, kBitmapUnflipped);
       pd->graphics->setDrawMode(kDrawModeCopy);
+
+      // Over-top
+      if (pos.y < yOff) {
+        pd->graphics->drawBitmap(bitmapGetFwBkwIcon(2), pos.x - FW_BKW_WIDTH/2, yOff, kBitmapUnflipped);
+      }
     }
   }
 
@@ -153,6 +159,7 @@ void renderGameMarble(const int32_t fc) {
       ++m_ballSplashTimer[i];
     }
   }
+
 }
 
 void renderGamePoot(const enum FSM_t fsm) {
