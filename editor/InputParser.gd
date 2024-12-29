@@ -49,6 +49,7 @@ func move_peg(peg : Control, v : Vector2) -> void:
 		y_off_text.value = v.y - parent_y
 	
 func rotate_peg(peg : Control, delta : float) -> void:
+	if not peg: return
 	var angle = peg.find_child("AngleText")
 	if not angle: return
 	angle.value += delta
@@ -76,17 +77,25 @@ func _input(event):
 		if event.pressed and dragNode:
 			var snap = %EditorSnap.value
 			if event.keycode == KEY_UP :
-				dragNode.find_child("YText", true, false).value -= snap
-				get_tree().get_root().set_input_as_handled()
+				var n = dragNode.find_child("YText", true, false)
+				if n:
+					n.value -= snap
+					get_tree().get_root().set_input_as_handled()
 			if event.keycode == KEY_DOWN :
-				dragNode.find_child("YText", true, false).value += snap
-				get_tree().get_root().set_input_as_handled()
+				var n = dragNode.find_child("YText", true, false)
+				if n:
+					n.value += snap
+					get_tree().get_root().set_input_as_handled()
 			if event.keycode == KEY_LEFT :
-				dragNode.find_child("XText", true, false).value -= snap
-				get_tree().get_root().set_input_as_handled()
+				var n = dragNode.find_child("XText", true, false)
+				if n:
+					n.value -= snap
+					get_tree().get_root().set_input_as_handled()
 			if event.keycode == KEY_RIGHT :
-				dragNode.find_child("XText", true, false).value += snap
-				get_tree().get_root().set_input_as_handled()
+				var n = dragNode.find_child("XText", true, false)
+				if n:
+					n.value += snap
+					get_tree().get_root().set_input_as_handled()
 			if event.keycode == KEY_C :
 				var searchFrom = dragNode.find_parent("LinearControl*")
 				if not searchFrom:
