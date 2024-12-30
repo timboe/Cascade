@@ -8,7 +8,7 @@
     "par": 3,
     "foreground": 2,
     "background": 0,
-    "special": 0,
+    "special": 5,
     "height": 500,
     "snap": 4,
     "n_static": 7,
@@ -138,7 +138,7 @@
       "easing": 0,
       "a": 112,
       "b": 112,
-      "n_pegs": 16,
+      "n_pegs": 10,
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
@@ -185,36 +185,6 @@
         "type": 0
       },
       "PegContainer10": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer11": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer12": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer13": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer14": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer15": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer16": {
         "shape_override": 0,
         "size_override": 0,
         "type": 0
@@ -232,7 +202,7 @@
       "easing": 0,
       "a": 160,
       "b": 160,
-      "n_pegs": 16,
+      "n_pegs": 11,
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
@@ -284,31 +254,6 @@
         "type": 0
       },
       "PegContainer11": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer12": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer13": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer14": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer15": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer16": {
         "shape_override": 0,
         "size_override": 0,
         "type": 0
@@ -326,7 +271,7 @@
       "easing": 0,
       "a": 208,
       "b": 208,
-      "n_pegs": 16,
+      "n_pegs": 12,
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
@@ -360,7 +305,7 @@
       "PegContainer7": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 2
       },
       "PegContainer8": {
         "shape_override": 0,
@@ -370,7 +315,7 @@
       "PegContainer9": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 2
+        "type": 0
       },
       "PegContainer10": {
         "shape_override": 0,
@@ -383,26 +328,6 @@
         "type": 0
       },
       "PegContainer12": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer13": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer14": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer15": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer16": {
         "shape_override": 0,
         "size_override": 0,
         "type": 0
