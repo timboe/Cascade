@@ -134,7 +134,10 @@ void FSMChooseLevelToChoosePlayer(const bool newState) {
 
 void FSMChooseHole(const bool newState) {
   static float progress = 0.0f;
-  if (newState) progress = 0.0f;
+  if (newState) {
+    progress = 0.0f;
+    gameDoPopulateMenuTitles();
+  }
   const float status = FSMCommonCrankNumeral(&progress);
   if (status > 0) {
     IODoPreviousHole(); // Ordering important

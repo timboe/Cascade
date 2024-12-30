@@ -8,6 +8,14 @@
 #define MAX(a,b) ((a) > (b) ? a : b)
 #define MIN(a,b) ((a) < (b) ? a : b)
 
+/// ///
+
+#define N_WF_FG 10
+#define N_WF_BG 4
+
+#define WF_SPECIAL_START 10
+#define WF_SPECIAL_END 20
+
 // DIMENSIONS
 
 #define TICK_FREQUENCY 50
@@ -31,9 +39,14 @@
 
 #define WFSHEET_SIZE_X 1
 #define WFSHEET_SIZE_Y 12
+#define CUSTOM_WFSHEET_SIZE_Y 16
+
+#define FIRST_CUSTOM_WF_ID 10
+#define CUSTOM_WF_ID_GREATWAVE 11
 
 // Comment line to disable
 //#define WF_FIXED_BG 1
+
 
 #define NUMERAL_PIX_X 128
 #define NUMERAL_PIX_Y 160
@@ -135,16 +148,11 @@
 #define POP_ANIM_FRAMES 16
 #define POP_ANIM_HWIDTH 32
 
-/// ///
 
-#define N_WF 4
-
-#define WF_SPECIAL_START 10
-#define WF_SPECIAL_END 20
 
 //
 
-#define N_PLINGS_SFX 7
+#define N_PLINGS_SFX 16
 #define N_SPLASHES_SFX 5
 
 #define N_MUSIC_TRACKS 12

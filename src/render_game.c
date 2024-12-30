@@ -177,7 +177,7 @@ void renderGameTurret(void) {
     return;
   }
   pd->graphics->drawLine(0, minY+1, DEVICE_PIX_X, minY+1, 2, kColorWhite);
-  pd->graphics->drawBitmap(bitmapGetTurretBody(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY,  kBitmapUnflipped);
+  pd->graphics->drawBitmap(bitmapGetTurretBody(boardGetCurrentSpecial()), DEVICE_PIX_X/2 - TURRET_RADIUS, minY,  kBitmapUnflipped);
 #ifndef TAKE_SCREENSHOTS
   pd->graphics->drawBitmap(bitmapGetTurretBarrel(), DEVICE_PIX_X/2 - TURRET_RADIUS, minY, kBitmapUnflipped);
 #endif
@@ -242,9 +242,11 @@ void renderGameBoard(const int32_t fc) {
       pd->graphics->setDrawMode(kDrawModeInverted);
       pd->graphics->fillRect(0, gameGetYOffset(), DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
     }
+    if (animFrame == 4) {
+      soundSetDoingExplosion(false);
+    }
     if (animFrame == SPECIAL_BLAST_FRAMES) { // Explosion blast is over
       m_blastPos = cpvzero;
-      soundSetDoingExplosion(false);
     } else {
       pd->graphics->setDrawMode(kDrawModeCopy);
       pd->graphics->drawBitmap(bitmapGetSpecialBlast(animFrame), m_blastPos.x - SPECIAL_BLAST_RADIUS, m_blastPos.y - SPECIAL_BLAST_RADIUS, kBitmapUnflipped);
@@ -324,8 +326,15 @@ void renderGameScores(const int32_t fc) {
     }
 
     if (FSMGet() >= kGameFSM_DisplayScores) {
-      pd->graphics->drawBitmap(bitmapGetChevron((fc / (TICK_FREQUENCY/2)) % 3), DEVICE_PIX_X - 2*BUF - 96, DEVICE_PIX_Y*5 + BUF, kBitmapFlippedY);
-      pd->graphics->drawBitmap(bitmapGetChevron((fc / (TICK_FREQUENCY/2)) % 3), DEVICE_PIX_X - 2*BUF - 96, DEVICE_PIX_Y*6 - 96 - BUF, kBitmapUnflipped);
+      #define C_OFF (96 + 0)
+      // add 16 if adding arrows too
+      pd->graphics->drawBitmap(bitmapGetChevron((fc / (TICK_FREQUENCY/2)) % 3), DEVICE_PIX_X - 2*BUF - C_OFF, DEVICE_PIX_Y*5 + BUF, kBitmapFlippedY);
+      pd->graphics->drawBitmap(bitmapGetChevron((fc / (TICK_FREQUENCY/2)) % 3), DEVICE_PIX_X - 2*BUF - C_OFF, DEVICE_PIX_Y*6 - C_OFF - BUF, kBitmapUnflipped);
+    
+      // if ((fc / TICK_FREQUENCY) % 2) {
+      //   pd->graphics->drawBitmap(bitmapGetFwBkwIcon(0), DEVICE_PIX_X - FW_BKW_WIDTH - 8, DEVICE_PIX_Y*5 + FW_BKW_BUF, kBitmapUnflipped);
+      //   pd->graphics->drawBitmap(bitmapGetFwBkwIcon(1), DEVICE_PIX_X - FW_BKW_WIDTH - 8, DEVICE_PIX_Y*6 - FW_BKW_BUF - FW_BKW_HEIGHT, kBitmapUnflipped);
+      // }
     }
   }
 

@@ -12,10 +12,10 @@ void IODoSave(void);
 
 void IOResetPlayerSave(const uint16_t player);
 
-uint16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole);
+int16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole);
 uint16_t IOGetWaterfallForeground(const uint16_t level, const uint16_t hole);
 
-uint16_t IOGetCurrentHoleWaterfallBackground(const enum GameMode_t gm);
+int16_t IOGetCurrentHoleWaterfallBackground(const enum GameMode_t gm);
 uint16_t IOGetCurrentHoleWaterfallForeground(const enum GameMode_t gm);
 
 uint16_t IOGetCurrentPlayer(void);

@@ -15,6 +15,8 @@ uint16_t m_ballCount = 0; // Keeping track of the current level score
 
 cpVect m_finalRequiredPos; // Position of the final required ped on the board
 
+bool m_vetoCloseUp = false; // If we break out of close up, then don't do it again on this ball
+
 void FSMCommonTurretScrollAndBounceBack(const bool allowScroll);
 
 bool FSMCommonFocusOnLowestBallInPlay(const enum PegSpecial_t special);
@@ -107,16 +109,26 @@ void FSMCommonTurretScrollAndBounceBack(const bool allowScroll) {
 
 bool FSMCommonMarbleFire(uint16_t* timer) {
   float progress = getEasing(EASE_MARBLE_FIRE, (float)(*timer)/TIME_FIRE_MARBLE);
+  static bool once = false;
   if ((*timer) >= TIME_FIRE_MARBLE || (progress > 0.5f && !inputGetPressed(kButtonB))) { // Fire
     physicsDoResetBall(0);
     physicsDoLaunchBall(progress);
     ++m_ballCount;
     if (boardGetCurrentSpecial() == kPegSpecialMultiball) { physicsDoAddSecondBall(); }
+    once = false;
+    soundStopSfx(kChargeSfx);
+    soundDoSfx(kPootSfx);
     return true;
   } else if (inputGetPressed(kButtonB)) { // Arm
     (*timer)++;
+    if (!once) {
+      once = true;
+      soundDoSfx(kChargeSfx);
+    }
   } else if (*timer > 0) { // Reset
     (*timer) = 0;
+    once = false;
+    soundStopSfx(kChargeSfx);
   }
   renderSetMarblePootCircle((uint16_t)(progress * TURRET_RADIUS));
   return false;
@@ -209,6 +221,7 @@ void FSMAimMode(const bool newState) {
     gameDoResetFrameCount();
     renderDoResetTriggerSplash();
     timer = 0;
+    m_vetoCloseUp = false;
   }
   //
   FSMCommonTurretScrollAndBounceBack(true);
@@ -258,10 +271,12 @@ void FSMBallInPlay(const bool newState) {
       }
     }
     // Check for distance to final peg
-    for (int i = 0; i < MAX_BALLS; ++i) {
-      if (i == 1 && special != kPegSpecialMultiball) { break; }
-      cpVect ballPos = cpBodyGetPosition(physicsGetBall(i));
-      if (cpvdist(m_finalRequiredPos, ballPos) < FINAL_PEG_SLOWMO_RADIUS)  { return FSMDo(kGameFSM_CloseUp); }
+    if (!m_vetoCloseUp) {
+      for (int i = 0; i < MAX_BALLS; ++i) {
+        if (i == 1 && special != kPegSpecialMultiball) { break; }
+        cpVect ballPos = cpBodyGetPosition(physicsGetBall(i));
+        if (cpvdist(m_finalRequiredPos, ballPos) < FINAL_PEG_SLOWMO_RADIUS)  { return FSMDo(kGameFSM_CloseUp); }
+      }
     }
   } else if (bgrpip == 0) { // Or straight to toast if zero left
     return FSMDo(kGameFSM_WinningToast);
@@ -288,14 +303,18 @@ void FSMBallStuck(const bool newState) {
 
 void FSMCloseUp(const bool newState) {
   const enum PegSpecial_t special = boardGetCurrentSpecial();
+  static float timer = 0.0f;
   if (newState) {
     renderSetScale(2);
     physicsSetTimestepMultiplier(0.2f);
+    soundDoSfx(kDrumRollSfx1);
+    timer = 0.0f;
   }
 
   cpVect ballPos[2];
   ballPos[0] = cpBodyGetPosition(physicsGetBall(0));
   ballPos[1] = cpBodyGetPosition(physicsGetBall(1));
+  timer += 1.0f / TICK_FREQUENCY;
 
   int8_t whichBall = -1;
   for (int i = 0; i < MAX_BALLS; ++i) {
@@ -306,11 +325,16 @@ void FSMCloseUp(const bool newState) {
     }
   }
 
-  const bool stuck = FSMCommonGetIsBallStuck(special);
+  if (timer >= 10.0f) {
+    m_vetoCloseUp = true;
+  }
+
+  const bool stuck = FSMCommonGetIsBallStuck(special) || m_vetoCloseUp;
 
   if (stuck || whichBall == -1 || !boardGetRequiredPegsInPlay()) {
     renderSetScale(1);
     gameSetXOffset(0);
+    soundStopSfx(kDrumRollSfx1);
     if (stuck) {
       physicsSetTimestepMultiplier(1.0f);
       FSMDo(kGameFSM_BallStuck);
@@ -332,6 +356,7 @@ void FSMWinningToast(const bool newState) {
     renderDoResetEndBlast();
     renderDoAddEndBlast(physicsGetBall(0));
     soundDoMusic();
+    soundDoSfx(kDrumRollSfx2);
   }
 
   const float tsm = physicsGetTimestepMultiplier();
@@ -366,6 +391,7 @@ void FSMBallGutter(const bool newState) {
       physicsDoSecondTryBall();
       boardDoClearSpecial();
       gameSetYOffset(gameGetMinimumY(), true);
+      soundDoSfx(kTeleportSfx);
       return FSMDo(kGameFSM_BallInPlay);
     }
     boardDoClearSpecial();
@@ -449,8 +475,14 @@ void FSMTurretLower(const bool newState) {
         }
       }
     }
+    // Start from the top if the top peg is within the top 1/2 of the play area
     if (minY > (DEVICE_PIX_Y/2) && !IOGetIsTutorial()) { 
       endY = minY - (DEVICE_PIX_Y/2);
+    }
+    // Don't go below one screen height from the gutter
+    const uint16_t maxY = IOGetCurrentHoleHeight() - DEVICE_PIX_Y;
+    if (endY > maxY) {
+      endY = maxY;
     }
     if (startY == endY) {
       progress = 1.0f;
@@ -530,7 +562,7 @@ void FSMScoresAnimation(const bool newState) {
     renderSetMarbleFallY(i, py[i]);
     // pd->system->logToConsole("kGameFSM_ScoresAnimation, i %i y %f",i, py[i]);
   }
-  if (timer++ % TIME_BALL_DROP_DELAY == 0 && activeBalls < ballsToShow) { activeBalls++; }
+  if (++timer % TIME_BALL_DROP_DELAY == 0 && activeBalls < ballsToShow) { activeBalls++; }
   if (!moving) return FSMDo(kGameFSM_DisplayScores);
 }
 

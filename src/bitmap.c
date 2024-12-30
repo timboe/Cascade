@@ -2,6 +2,7 @@
 #include "input.h"
 #include "util.h"
 #include "io.h"
+#include "peg.h"
 
 enum RenderColor_t {
   kRenderColorWhite,
@@ -57,7 +58,6 @@ LCDBitmap* m_stencilWipeBitmap[STENCIL_WIPE_N];
 
 // Game
 
-LCDBitmap* m_turretBody;
 LCDBitmap* m_turretBarrel[8][256];
 LCDBitmapTable* m_turretBarrelTabel;
 LCDBitmap* m_infoTopperBitmap;
@@ -79,7 +79,7 @@ LCDBitmap* m_hexBitmap[MAX_PEG_SIZE][128];
 LCDBitmap* m_specialTextBitmap[(uint8_t)kNPegSpecial];
 
 LCDBitmap* m_wfPond[POND_WATER_TILES][POND_WATER_FRAMES];
-LCDBitmap* m_wfBg[N_WF];
+LCDBitmap* m_wfBg[N_WF_BG];
 LCDBitmapTable* m_sheetWfFg[128]; // N_WF + room for specials
 LCDBitmapTable* m_waterSplashTable[N_SPLASHES];
 LCDBitmapTable* m_fountainTable[N_FOUNTAINS];
@@ -94,6 +94,7 @@ LCDBitmapTable* m_tutorialButtonTable;
 LCDBitmapTable* m_tutorialDPadTable;
 LCDBitmapTable* m_tutorialArrowsTable;
 LCDBitmapTable* m_fwBkwIconTable;
+LCDBitmapTable* m_turretBodyTable;
 
 LCDFont* m_fontRoobert24;
 LCDFont* m_fontRoobert10;
@@ -266,6 +267,10 @@ LCDBitmap* bitmapGetFwBkwIcon(const int8_t id) {
   return pd->graphics->getTableBitmap(m_fwBkwIconTable, id % 3);
 }
 
+LCDBitmap* bitmapGetTurretBody(const int8_t id) {
+  return pd->graphics->getTableBitmap(m_turretBodyTable, id % kNPegSpecial);
+}
+
 LCDBitmap* bitmapGetTitlePlayer(void) { return m_playerBitmap; }
 
 LCDBitmap* bitmapGetTitleLevel(void) { return m_levelBitmap; }
@@ -326,8 +331,6 @@ LCDBitmap* bitmapGetMarble(void) { return m_marbleBitmap; }
 LCDBitmap* bitmapGetNumeral(const int8_t n) { return m_numeralBitmap[n % 10]; }
 
 LCDBitmap* bitmapGetStencilWipe(const int8_t n) { return m_stencilWipeBitmap[n % STENCIL_WIPE_N]; }
-
-LCDBitmap* bitmapGetTurretBody(void) { return m_turretBody; }
 
 LCDBitmap* bitmapGetGameInfoTopper(void) { return m_infoTopperBitmap; }
 
@@ -745,7 +748,6 @@ void bitmapDoPreloadA(void) {
   m_holeTutorialBitmap = bitmapDoLoadImageAtPath("images/tut/tutorial");
   //m_wfPond = bitmapDoLoadImageAtPath("images/falls_pond");
   m_cardBitmap = bitmapDoLoadImageAtPath("images/card");
-  m_turretBody = bitmapDoLoadImageAtPath("images/turretBody");
 
   m_turretBarrelTabel = bitmapDoLoadImageTableAtPath("images/anim/turretBarrel");
   m_waterSplashTable[0] = bitmapDoLoadImageTableAtPath("images/anim/MarbleSplash0");
@@ -757,6 +759,7 @@ void bitmapDoPreloadA(void) {
   m_tutorialArrowsTable = bitmapDoLoadImageTableAtPath("images/tut/tutorialPoint");
   m_chevronTable =  bitmapDoLoadImageTableAtPath("images/chevron");
   m_fwBkwIconTable = bitmapDoLoadImageTableAtPath("images/forwarbackward");
+  m_turretBodyTable = bitmapDoLoadImageTableAtPath("images/turretBody");
   char text[128];
   for (int i = 0; i < MAX_POPS; ++i) {
     snprintf(text, 128, "images/anim/Pop%i", i);
@@ -813,11 +816,7 @@ void bitmapDoPreloadC(void) {
 
 void bitmapDoPreloadD(void) {
   char text[128];
-  for (int32_t i = 1; i < N_WF; ++i) { // Did 0 already as a critical load
-#ifndef WF_FIXED_BG
-    snprintf(text, 128, "images/falls_bg/falls%i_bg", (int)i);
-    m_wfBg[i] = bitmapDoLoadImageAtPath(text);
-#endif
+  for (int32_t i = 1; i < N_WF_FG; ++i) { // Did 0 already as a critical load
     snprintf(text, 128, "images/falls_fg/falls%i_fg", (int)i);
     m_sheetWfFg[i] = bitmapDoLoadImageTableAtPath(text);
   }
@@ -826,6 +825,12 @@ void bitmapDoPreloadD(void) {
     snprintf(text, 128, "images/falls_fg/falls%i_fg", (int)i);
     m_sheetWfFg[i] = bitmapDoLoadImageTableAtPath(text);
   }
+#ifndef WF_FIXED_BG
+  for (int32_t i = 1; i < N_WF_BG; ++i) { // Did 0 already as a critical load
+    snprintf(text, 128, "images/falls_bg/falls%i_bg", (int)i);
+    m_wfBg[i] = bitmapDoLoadImageAtPath(text);
+  }
+#endif
 }
 
 void bitmapDoPreloadE(void) {

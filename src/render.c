@@ -6,11 +6,13 @@
 #include "fsm.h"
 #include "board.h"
 #include "sshot.h"
+#include "sound.h"
 
 float m_trauma = 0.0f, m_decay = 0.0f;
 float m_cTraumaAngle = 0.0f, m_sTraumaAngle;
 
 cpVect m_backLines[N_BACKLINES];
+bool m_backLinesWhoosh[N_BACKLINES];
 
 uint16_t m_freeze = 0;
 
@@ -21,7 +23,7 @@ void renderGame(const int32_t fc, const enum FSM_t fsm);
 
 void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm);
 
-void renderBackgroundDo(const int16_t bg, const int16_t fg, const uint16_t startID, const int16_t wfBgOff, const int16_t parallax, const uint16_t maxY);
+void renderBackgroundDo(const int16_t bg, const int16_t fg, const uint16_t startID, const int16_t wfBgOff, const int16_t parallax, const uint16_t wfSheetSizeY, const uint16_t maxY);
 
 /// ///
 
@@ -32,6 +34,7 @@ void renderDoUpdateBacklines(void) {
   for (int i = 0; i < N_BACKLINES; ++i) {
     do {
       m_backLines[i] = cpv( 16 * (( rand() % ((DEVICE_PIX_X/16)-1) )+1), start + (i * step));
+      m_backLinesWhoosh[i] = false;
     } while (i > 0 && m_backLines[i].x == m_backLines[i-1].x );
   }
 }
@@ -186,15 +189,17 @@ void renderGame(const int32_t fc, const enum FSM_t fsm) {
 #endif
 }
 
-void renderBackgroundDo(const int16_t bg, const int16_t fg, const uint16_t startID, const int16_t wfBgOff, const int16_t parallax, const uint16_t maxY) {
-  for (int i = startID; i < (startID+6); ++i) {  // Background
-    const int16_t y = (WF_DIVISION_PIX_Y * i) - wfBgOff + parallax;
-    if (i >= WFSHEET_SIZE_Y + 1 || y > maxY) break;
-    pd->graphics->drawBitmap(bitmapGetWfBg(bg), 0/*WF_BG_OFFSET[bg]*/, y, kBitmapUnflipped);
+void renderBackgroundDo(const int16_t bg, const int16_t fg, const uint16_t startID, const int16_t wfBgOff, const int16_t parallax, const uint16_t wfSheetSizeY, const uint16_t maxY) {
+  if (bg != -1) {
+    for (int i = startID; i < (startID+6); ++i) {  // Background
+      const int16_t y = (WF_DIVISION_PIX_Y * i) - wfBgOff + parallax;
+      if (i >= wfSheetSizeY + 1 || y > maxY) break;
+      pd->graphics->drawBitmap(bitmapGetWfBg(bg), 0/*WF_BG_OFFSET[bg]*/, y, kBitmapUnflipped);
+    }
   }
   for (int i = startID; i < (startID+5); ++i) { // Foreground
     const int16_t y = (WF_DIVISION_PIX_Y * i) + parallax;
-    if (i >= WFSHEET_SIZE_Y || y > maxY) break;
+    if (i >= wfSheetSizeY || y > maxY) break;
     pd->graphics->drawBitmap(bitmapGetWfFg(fg, i), 0, y, kBitmapUnflipped);
   }
 }
@@ -205,15 +210,16 @@ void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm) {
   if (screenShotGetInProgress()) { return; }
 #endif
 
-  const uint8_t prevWfBg = gameGetPreviousWaterfallBg();
+  const int8_t prevWfBg = gameGetPreviousWaterfallBg();
   const uint8_t prevWfFg = gameGetPreviousWaterfallFg();
 
-  const uint8_t currentWfBg = IOGetCurrentHoleWaterfallBackground(gm); 
+  const int8_t currentWfBg = IOGetCurrentHoleWaterfallBackground(gm); 
   const uint8_t currentWfFg = IOGetCurrentHoleWaterfallForeground(gm);
 
   const int32_t yOffset = gameGetYOffset();
   const uint16_t chh = IOGetCurrentHoleHeight();
   const uint16_t maxY = (FSMGetGameMode() == kTitles ? (WF_MAX_HEIGHT * DEVICE_PIX_Y) : chh);
+  const uint16_t wfSheetSize = currentWfFg < FIRST_CUSTOM_WF_ID ? WFSHEET_SIZE_Y : CUSTOM_WFSHEET_SIZE_Y;
   const bool locked = (yOffset % DEVICE_PIX_Y == 0);
   const int32_t parallax = (currentWfFg >= 10 ? 0 : gameGetParalaxFactorFar(false)); // Note: float -> int here. Hard=false
   const int32_t startOffset = yOffset - parallax;
@@ -226,6 +232,10 @@ void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm) {
     if (m_backLines[i].y - BACKLINE_HEIGHT < maxY && fsm != kGameFSM_ScoresToTryAgain) { continue; }
     if (m_backLines[i].y + BACKLINE_HEIGHT < yOffset) { continue; }
     pd->graphics->drawLine(m_backLines[i].x, m_backLines[i].y, m_backLines[i].x, m_backLines[i].y + BACKLINE_HEIGHT, BACKLINE_WIDTH, kColorWhite);
+    if (!m_backLinesWhoosh[i]) {
+      m_backLinesWhoosh[i] = true;
+      soundDoSfx(kWhooshSfx1);
+    }
   }
 
   if (fsm == kGameFSM_ScoresToTryAgain) { return; }
@@ -237,7 +247,7 @@ void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm) {
   const int16_t wfBgOff = WF_DIVISION_PIX_Y - ((int)wfBgOffC % WF_DIVISION_PIX_Y); 
 
   // Draw "previous" waterfall (will become current once gameDoResetPreviousWaterfall is called)
-  renderBackgroundDo(prevWfBg, prevWfFg, startID, wfBgOff, parallax, maxY);
+  renderBackgroundDo(prevWfBg, prevWfFg, startID, wfBgOff, parallax, wfSheetSize, maxY);
 
   // Animate in new waterfall
   if (currentWfFg != prevWfFg || currentWfBg != prevWfBg) {
@@ -245,14 +255,14 @@ void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm) {
     if (locked) {
       static uint16_t timer = 0;
       pd->graphics->setStencilImage(bitmapGetStencilWipe(timer), 0);
-      renderBackgroundDo(currentWfBg, currentWfFg, startID, wfBgOff, parallax, maxY);
+      renderBackgroundDo(currentWfBg, currentWfFg, startID, wfBgOff, parallax, wfSheetSize, maxY);
       pd->graphics->setStencilImage(NULL, 0);
       if (++timer == STENCIL_WIPE_N) {
         gameDoResetPreviousWaterfall();
         timer = 0;
       }
     } else {
-      renderBackgroundDo(currentWfBg, currentWfFg, startID, wfBgOff, parallax, maxY);
+      renderBackgroundDo(currentWfBg, currentWfFg, startID, wfBgOff, parallax, wfSheetSize, maxY);
     }
   }
 

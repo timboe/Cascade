@@ -28,6 +28,7 @@ LCDBitmap* bitmapGetNumeral(const int8_t n);
 LCDBitmap* bitmapGetStencilWipe(const int8_t n);
 LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int16_t offset);
 LCDBitmap* bitmapGetFwBkwIcon(const int8_t id);
+LCDBitmap* bitmapGetTurretBody(const int8_t id);
 
 LCDBitmap* bitmapGetTutorialCrankRotate(const uint8_t id);
 LCDBitmap* bitmapGetTutorialCrankAngle(const uint8_t id);
@@ -46,7 +47,6 @@ LCDBitmap* bitmapGetTitleHoleName(void);
 LCDBitmap* bitmapGetTitleHoleTutorial(void);
 LCDBitmap* bitmapGetTitleScoreCard(void);
 
-LCDBitmap* bitmapGetTurretBody(void);
 LCDBitmap* bitmapGetTurretBarrel(void);
 LCDBitmap* bitmapGetGameInfoTopper(void);
 LCDBitmap* bitmapGetLevelTitle(void);

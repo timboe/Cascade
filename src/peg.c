@@ -298,37 +298,42 @@ void pegDoHit(struct Peg_t* p) {
   ) {
     p->state = kPegStateHit;
     FSMDoResetBallStuckCounter();
-    soundDoSfx(kPlingSfx1);
-    if (p->type == kPegTypeRequired) {
-      renderAddTrauma(TRAUMA_REQUIRED_HIT);
-      renderAddFreeze(FREEZE_REQUIRED_HIT);
-      boardDoRequiredPegHit();
-    } else if (p->type == kPegTypeSpecial) {
-      renderAddTrauma(TRAUMA_SPECIAL_HIT);
-      renderAddFreeze(FREEZE_SPECIAL_HIT);
-      const enum PegSpecial_t special = boardDoAddSpecial(false); // activate = false
-      renderDoAddSpecial(p->cpBody, special);
-    } else {
-      renderAddTrauma(TRAUMA_PEG_HIT);
-      renderAddFreeze(FREEZE_PEG_HIT);
-    }
     //
     const enum PegSpecial_t special = boardGetCurrentSpecial();
     if (special == kPegSpecialMultiball && !physicsGetSecondBallInPlay()) {
       physicsSetSecondBallInPlay();
+      soundDoSfx(kSplitSfx);
     } else if (special == kPegSpecialBlast) {
       // pd->system->logToConsole("BLAST");
       boardDoClearSpecial(); // Do this first, it's going to recurse!
+      soundSetDoingExplosion(true); // Also do this first - we don't want to play these sfx
       boardDoSpecialBlast();
       renderAddTrauma(TRAUMA_BLAST_HIT);
       renderDoAddSpecialBlast(p->cpBody);
-      soundSetDoingExplosion(true);
       soundDoSfx(kExplosionSfx);
+    }
+    //
+    if (p->type == kPegTypeRequired) {
+      renderAddTrauma(TRAUMA_REQUIRED_HIT);
+      renderAddFreeze(FREEZE_REQUIRED_HIT);
+      boardDoRequiredPegHit();
+      if (FSMGet() != kGameFSM_WinningToast) { soundDoSfx(kDingSfx1); }
+    } else if (p->type == kPegTypeSpecial) {
+      renderAddTrauma(TRAUMA_SPECIAL_HIT);
+      renderAddFreeze(FREEZE_SPECIAL_HIT);
+      const enum PegSpecial_t special = boardDoAddSpecial(/*activate = */false);
+      renderDoAddSpecial(p->cpBody, special);
+      if (FSMGet() != kGameFSM_WinningToast) { soundDoSfx(kDingSfx1); } // TODO Make unique?
+    } else {
+      renderAddTrauma(TRAUMA_PEG_HIT);
+      renderAddFreeze(FREEZE_PEG_HIT);
+      if (FSMGet() != kGameFSM_WinningToast) { soundDoSfx(kPlingSfx1); }
     }
   }
   if (p->state == kPegStateHit && FSMGet() == kGameFSM_WinningToast) {
     p->queueRemove = true; // Can't remove in the middle of a physics callback
     p->popFrame = 0;
+    soundDoSfx(kPopSfx);
   }
   // pd->system->logToConsole("bam!");
 }

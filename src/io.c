@@ -145,13 +145,21 @@ void IODoUpdatePreloading(void) {
 }
 
 #ifdef WF_FIXED_BG
-uint16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole) { return 0; }
+int16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole) { 
+  return 0;
+}
 #else
-uint16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole) { return m_hole_background[level][hole]; }
+int16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole) { 
+  // TODO - bake this in to the levels?
+  if (IOGetWaterfallForeground(level,hole) < FIRST_CUSTOM_WF_ID || IOGetWaterfallForeground(level,hole) == CUSTOM_WF_ID_GREATWAVE) { 
+    return m_hole_background[level][hole];
+  }
+  return -1;
+}
 #endif
 uint16_t IOGetWaterfallForeground(const uint16_t level, const uint16_t hole) { return m_hole_foreground[level][hole]; }
 
-uint16_t IOGetCurrentHoleWaterfallBackground(const enum GameMode_t gm) { 
+int16_t IOGetCurrentHoleWaterfallBackground(const enum GameMode_t gm) { 
   return IOGetWaterfallBackground(m_level, (gm == kTitles ? 0 : m_hole));
 }
 
