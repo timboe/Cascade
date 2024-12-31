@@ -11,9 +11,9 @@
     "special": 0,
     "height": 500,
     "snap": 4,
-    "n_static": 44,
+    "n_static": 39,
     "n_elliptic": 0,
-    "n_linear": 0
+    "n_linear": 5
   },
   "body": {
     "StaticControl1": {
@@ -178,53 +178,13 @@
     },
     "StaticControl21": {
       "shape": 0,
-      "x": 324,
-      "y": 344,
-      "angle": 90,
-      "size": 0,
-      "type": 0
-    },
-    "StaticControl22": {
-      "shape": 0,
-      "x": 324,
-      "y": 380,
-      "angle": 90,
-      "size": 0,
-      "type": 0
-    },
-    "StaticControl23": {
-      "shape": 0,
-      "x": 324,
-      "y": 424,
-      "angle": 90,
-      "size": 1,
-      "type": 2
-    },
-    "StaticControl24": {
-      "shape": 2,
-      "x": 292,
-      "y": 428,
-      "angle": 30,
-      "size": 0,
-      "type": 0
-    },
-    "StaticControl25": {
-      "shape": 2,
-      "x": 356,
-      "y": 424,
-      "angle": -30,
-      "size": 0,
-      "type": 0
-    },
-    "StaticControl26": {
-      "shape": 0,
       "x": 76,
       "y": 352,
       "angle": -60,
       "size": 0,
       "type": 1
     },
-    "StaticControl27": {
+    "StaticControl22": {
       "shape": 0,
       "x": 104,
       "y": 300,
@@ -232,7 +192,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl28": {
+    "StaticControl23": {
       "shape": 0,
       "x": 132,
       "y": 252,
@@ -240,7 +200,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl29": {
+    "StaticControl24": {
       "shape": 0,
       "x": 160,
       "y": 204,
@@ -248,7 +208,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl30": {
+    "StaticControl25": {
       "shape": 0,
       "x": 188,
       "y": 152,
@@ -256,7 +216,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl31": {
+    "StaticControl26": {
       "shape": 0,
       "x": 220,
       "y": 104,
@@ -264,7 +224,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl32": {
+    "StaticControl27": {
       "shape": 0,
       "x": 52,
       "y": 292,
@@ -272,7 +232,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl33": {
+    "StaticControl28": {
       "shape": 0,
       "x": 136,
       "y": 344,
@@ -280,7 +240,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl34": {
+    "StaticControl29": {
       "shape": 0,
       "x": 188,
       "y": 432,
@@ -288,7 +248,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl35": {
+    "StaticControl30": {
       "shape": 0,
       "x": 44,
       "y": 200,
@@ -296,7 +256,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl36": {
+    "StaticControl31": {
       "shape": 0,
       "x": 176,
       "y": 272,
@@ -304,7 +264,7 @@
       "size": 0,
       "type": 1
     },
-    "StaticControl37": {
+    "StaticControl32": {
       "shape": 0,
       "x": 276,
       "y": 212,
@@ -312,7 +272,7 @@
       "size": 0,
       "type": 1
     },
-    "StaticControl38": {
+    "StaticControl33": {
       "shape": 0,
       "x": 96,
       "y": 104,
@@ -320,7 +280,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl39": {
+    "StaticControl34": {
       "shape": 0,
       "x": 144,
       "y": 128,
@@ -328,7 +288,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl40": {
+    "StaticControl35": {
       "shape": 0,
       "x": 44,
       "y": 88,
@@ -336,7 +296,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl41": {
+    "StaticControl36": {
       "shape": 0,
       "x": 228,
       "y": 176,
@@ -344,7 +304,7 @@
       "size": 0,
       "type": 1
     },
-    "StaticControl42": {
+    "StaticControl37": {
       "shape": 0,
       "x": 312,
       "y": 256,
@@ -352,7 +312,7 @@
       "size": 0,
       "type": 1
     },
-    "StaticControl43": {
+    "StaticControl38": {
       "shape": 0,
       "x": 220,
       "y": 308,
@@ -360,13 +320,123 @@
       "size": 0,
       "type": 1
     },
-    "StaticControl44": {
+    "StaticControl39": {
       "shape": 0,
       "x": 96,
       "y": 224,
       "angle": 32,
       "size": 0,
       "type": 0
+    },
+    "LinearControl1": {
+      "shape": 2,
+      "x": 292,
+      "y": 392,
+      "angle": 30,
+      "size": 0,
+      "arc": 360,
+      "use_arc": false,
+      "speed": 1,
+      "easing": 3,
+      "n_pegs": 1,
+      "n_lines": 1,
+      "PegContainer1": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "LineContainer1": {
+        "lc_x": 292,
+        "lc_y": 452
+      }
+    },
+    "LinearControl2": {
+      "shape": 2,
+      "x": 356,
+      "y": 392,
+      "angle": -30,
+      "size": 0,
+      "arc": 360,
+      "use_arc": false,
+      "speed": 1,
+      "easing": 3,
+      "n_pegs": 1,
+      "n_lines": 1,
+      "PegContainer1": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "LineContainer1": {
+        "lc_x": 356,
+        "lc_y": 452
+      }
+    },
+    "LinearControl3": {
+      "shape": 2,
+      "x": 324,
+      "y": 400,
+      "angle": 30,
+      "size": 0,
+      "arc": 360,
+      "use_arc": false,
+      "speed": 1,
+      "easing": 3,
+      "n_pegs": 1,
+      "n_lines": 1,
+      "PegContainer1": {
+        "shape_override": 0,
+        "size_override": 2,
+        "type": 2
+      },
+      "LineContainer1": {
+        "lc_x": 324,
+        "lc_y": 444
+      }
+    },
+    "LinearControl4": {
+      "shape": 0,
+      "x": 324,
+      "y": 364,
+      "angle": 90,
+      "size": 0,
+      "arc": 360,
+      "use_arc": false,
+      "speed": 1,
+      "easing": 3,
+      "n_pegs": 1,
+      "n_lines": 1,
+      "PegContainer1": {
+        "shape_override": 0,
+        "size_override": 1,
+        "type": 0
+      },
+      "LineContainer1": {
+        "lc_x": 324,
+        "lc_y": 380
+      }
+    },
+    "LinearControl5": {
+      "shape": 0,
+      "x": 324,
+      "y": 328,
+      "angle": 90,
+      "size": 0,
+      "arc": 360,
+      "use_arc": false,
+      "speed": 1,
+      "easing": 3,
+      "n_pegs": 1,
+      "n_lines": 1,
+      "PegContainer1": {
+        "shape_override": 0,
+        "size_override": 1,
+        "type": 0
+      },
+      "LineContainer1": {
+        "lc_x": 324,
+        "lc_y": 344
+      }
     }
   }
 }
