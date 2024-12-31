@@ -18,6 +18,7 @@ uint16_t IOGetWaterfallForeground(const uint16_t level, const uint16_t hole);
 int16_t IOGetCurrentHoleWaterfallBackground(const enum GameMode_t gm);
 uint16_t IOGetCurrentHoleWaterfallForeground(const enum GameMode_t gm);
 
+void IOSetPlayer(uint16_t player);
 uint16_t IOGetCurrentPlayer(void);
 
 void IODoPreviousPlayer(void);
@@ -36,6 +37,8 @@ void IODoGoToNextUnplayedLevel(void);
 uint16_t IOGetCurrentHole(void);
 uint16_t IOGetPreviousHole(void);
 uint16_t IOGetNextHole(void);
+
+bool IOIsCredits(void);
 
 void IOGetLevelStatistics(const uint16_t level, uint16_t* score, uint16_t* par);
 void IOGetHoleStatistics(const uint16_t level, uint16_t hole, uint16_t* score, uint16_t* par);

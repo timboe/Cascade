@@ -39,14 +39,14 @@ void inputHandleTitles(const enum FSM_t fsm, const uint32_t buttonPressed) {
     FSMDo(kTitlesFSM_TitlesToChoosePlayer);
     return;
   }
-  if (kButtonB == buttonPressed) {
+  if (kButtonA == buttonPressed) {
     switch (fsm) {
       case kTitlesFSM_ChoosePlayer: FSMDo(kTitlesFSM_ChoosePlayerToChooseLevel); return;
       case kTitlesFSM_ChooseLevel: FSMDo(kTitlesFSM_ChooseLevelToChooseHole); return;
-      case kTitlesFSM_ChooseHole: FSMDo(kTitlesFSM_ChooseHoleToSplash); return;
+      case kTitlesFSM_ChooseHole: FSMDo(kTitlesFSM_ChooseHoleToLevelTitle); return;
       default: break;
     }
-  } else if (kButtonA == buttonPressed) {
+  } else if (kButtonB == buttonPressed) {
     switch (fsm) {
       case kTitlesFSM_ChooseLevel: FSMDo(kTitlesFSM_ChooseLevelToChoosePlayer); return;
       case kTitlesFSM_ChooseHole: FSMDo(kTitlesFSM_ChooseHoleToChooseLevel); return;

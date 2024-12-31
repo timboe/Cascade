@@ -52,6 +52,7 @@ enum SfxSample {
   kWhooshSfx2,
   kWhooshSfx3,
   kWhooshSfx4,
+  kRelocateTurretSfx,
   kNSFX
 };
 
@@ -62,6 +63,8 @@ void soundWaterfallDoInit(void);
 void soundResetPling(void);
 
 void soundDoMusic(void);
+
+void soundPlayMusic(const uint8_t id);
 
 void soundDoWaterfall(const uint8_t id);
 

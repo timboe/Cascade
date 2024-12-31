@@ -9,6 +9,7 @@
 #include "io.h"
 #include "input.h"
 #include "sound.h"
+#include "patterns.h"
 
 uint16_t m_ballStuckCounter[2] = {0}; // Keeping track of a stuck ball
 uint16_t m_ballCount = 0; // Keeping track of the current level score
@@ -136,36 +137,41 @@ bool FSMCommonMarbleFire(uint16_t* timer) {
 
 ////////////////////////////////        ////////////////////////////////
 
-void FSMDisplaySplash(const bool newState) {
+void FSMDisplayLevelTitle(const bool newState) {
   static uint16_t timer = 0;
+  static uint16_t timeToWait = 0;
   if (newState) {
     const uint32_t before = pd->system->getCurrentTimeMilliseconds(); 
     timer = 0;
+    timeToWait = IOIsCredits() ? TIME_DISPLAY_SPLASH*5 : TIME_DISPLAY_SPLASH;
     gameSetYOffset(-DEVICE_PIX_Y - TURRET_RADIUS, true);
     bitmapDoUpdateScoreHistogram();
-    gameDoPopulateMenuGame();
+    if (!IOIsCredits()) { gameDoPopulateMenuGame(); }
     boardDoClear();
     IODoLoadCurrentHole();
     physicsSetTimestepMultiplier(1.0f);
     gameDoResetPreviousWaterfall();
     renderDoUpdateBacklines();
+    physicsDoResetBall(0);
     const uint32_t after = pd->system->getCurrentTimeMilliseconds();
     pd->system->logToConsole("Hole loading took %i ms", (int)(after - before));
   }
-  if (timer++ == TIME_DISPLAY_SPLASH) return FSMDo(kGameFSM_SplashToStart);
+  if (timer++ == timeToWait) return FSMDo(kGameFSM_LevelTitleToStart);
 }
 
-void FSMSplashToStart(const bool newState) {
+void FSMLevelTitleToStart(const bool newState) {
   static uint16_t timer = 0;
   if (newState) {
     timer = 0;
     m_ballCount = 0;
     gameSetMinimumY(0);
+    soundDoSfx(kWhooshSfx1);
   }
   float progress = getEasing(EASE_SPLASH_TO_GAME, 1.0f - (float)timer/TIME_SPLASH_TO_GAME);
   gameSetYOffset((-DEVICE_PIX_Y - TURRET_RADIUS) * progress, true);
   if (timer++ == TIME_SPLASH_TO_GAME) { 
     if (IOGetIsTutorial()) { return FSMDo(kGameFSM_TutorialScrollDown); }
+    else if (IOIsCredits()) { return FSMDo(kGameFSM_PlayCredits); }
     else { return FSMDo(kGameFSM_AimMode); }
   }
 }
@@ -240,6 +246,42 @@ void FSMAimModeScrollToTop(const bool newState) {
     if (IOGetIsTutorial() && m_ballCount == 0) { return FSMDo(kGameFSM_TutorialFireMarble); }
     else return FSMDo(kGameFSM_AimMode);
   }
+}
+
+void FSMPlayCredits(const bool newState) {
+  static float progress = 0.0f;
+  static float pause = 0.0f;
+  if (newState) {
+    progress = gameGetYOffset();
+    pause = 0.0f;
+    renderDoResetMarbleTrace();
+    gameDoResetFrameCount();
+    renderDoResetTriggerSplash();
+    physicsDoResetBall(0);
+    gameSetTurretBarrelAngle(90.0f + 45.0f);
+    physicsDoLaunchBall(1.0f);
+  }
+
+  if (progress >= gameGetMinimumY() + IOGetCurrentHoleHeight() - DEVICE_PIX_Y/3) {
+    pause += 1.0f / TICK_FREQUENCY;
+    physicsDoResetBall(0);
+    if (pause >= 5.0f) {
+      renderSetFadeLevel( ((int8_t)pause - 5.0f) < FADE_LEVELS-1 ? ((int8_t)pause - 5.0f) : FADE_LEVELS-1 );
+      if (pause >= 5.0f + (float)FADE_LEVELS) {
+        return FSMDo(kTitlesFSM_DisplayTitlesWFadeIn);
+      }
+    }
+    return;
+  }
+
+  cpVect ballPos = cpBodyGetPosition(physicsGetBall(0));
+  const bool gutterd = (ballPos.y > IOGetCurrentHoleHeight() + BALL_RADIUS);
+  if (gutterd) { physicsDoSecondTryBall(); }
+
+  progress += 0.25f;
+  progress += inputGetCrankChanged() * CRANK_SCROLL_MODIFIER;
+  if (progress < gameGetMinimumY()) { progress = gameGetMinimumY(); }
+  gameSetYOffset(progress, false);
 }
 
 void FSMBallInPlay(const bool newState) {
@@ -426,6 +468,8 @@ void FSMGutterToTurret(const bool newState) {
     height_mod = (float)(DEVICE_PIX_Y * WF_MAX_HEIGHT) / IOGetCurrentHoleHeight();
     //
     boardDoAddSpecial(true); // Activate
+    physicsDoResetBall(0);
+    soundDoSfx(kWhooshSfx1);
   }
   //
   FSMCommonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
@@ -489,6 +533,7 @@ void FSMTurretLower(const bool newState) {
     } else {
       speed = 100.0f / (endY - startY);
       if (speed < 1.0f) speed = 1.0f;
+      soundDoSfx(kRelocateTurretSfx);
     }
     // pd->system->logToConsole("speed is %f", speed);
   }
@@ -518,6 +563,7 @@ void FSMGutterToScores(const bool newState) {
     timer = 0;
     origin = gameGetYOffset();
     renderSetMarbleFallN(0);
+    soundDoSfx(kWhooshSfx1);
   }
   FSMDoCommonScrollTo(origin, DEVICE_PIX_Y*5, (float)timer/TIME_GUTTER_TO_SCORE, EASE_GUTTER_TO_SCORE);
   if (timer++ == TIME_GUTTER_TO_SCORE) { return FSMDo(kGameFSM_ScoresAnimation); }
@@ -588,9 +634,10 @@ void FSMScoresToTryAgain(const bool newState) {
   if (newState) { 
     timer = 0;
     start = gameGetYOffset();
+    soundDoSfx(kWhooshSfx1);
   }
   FSMDoCommonScrollTo(start, -DEVICE_PIX_Y - TURRET_RADIUS, (float)timer/TIME_SCORE_TO_TRY_AGAIN, EASE_SCORE_TO_TRY_AGAIN);
-  if (timer++ == TIME_SCORE_TO_TRY_AGAIN) { return FSMDo(kGameFSM_DisplaySplash); }
+  if (timer++ == TIME_SCORE_TO_TRY_AGAIN) { return FSMDo(kGameFSM_DisplayLevelTitle); }
 }
 
 void FSMScoresToSplash(const bool newState) {
@@ -599,12 +646,33 @@ void FSMScoresToSplash(const bool newState) {
   if (newState) {
     timer = 0;
     start = gameGetYOffset();
+    soundDoSfx(kWhooshSfx1);
     IODoNextHoleWithLevelWrap();
+    if (!IOGetCurrentLevel() && !IOGetCurrentHole()) {
+      // We've wrapped! Show credits!
+      return FSMDo(kGameFSM_ToGameCreditsTitle);
+    }
     bitmapDoUpdateLevelTitle();
     bitmapDoUpdateGameInfoTopper();
-    pd->system->logToConsole("kGameFSM_ScoresToSplash");
+    // pd->system->logToConsole("kGameFSM_ScoresToSplash");
   }
-  FSMDoCommonScrollTo(start, DEVICE_PIX_Y*6, (float)timer/TIME_SCORE_TO_SPLASH, EASE_SCORE_TO_SPLASH);
-  if (timer++ == TIME_SCORE_TO_SPLASH) { return FSMDo(kGameFSM_DisplaySplash); }
+  FSMDoCommonScrollTo(start, DEVICE_PIX_Y*6, (float)timer/TIME_SCORE_TO_LEVELTITLE, EASE_SCORE_TO_SPLASH);
+  if (timer++ == TIME_SCORE_TO_LEVELTITLE) { return FSMDo(kGameFSM_DisplayLevelTitle); }
 }
 
+void FSMToGameCreditsTitle(const bool newState) { // Note: Separate Game and Title versions of this
+  static int16_t timer = 0;
+  static float start = 0;
+  if (newState) {
+    IOSetLevelHole(MAX_LEVELS, 0); // Enabled credits mode.
+    bitmapDoUpdateGameInfoTopper();
+    bitmapDoUpdateLevelTitle();
+    timer = 0;
+    start = gameGetYOffset();
+    pd->system->removeAllMenuItems();
+  }
+  FSMDoCommonScrollTo(start, -DEVICE_PIX_Y - TURRET_RADIUS, (float)timer/TIME_SCORE_TO_TRY_AGAIN, EASE_SCORE_TO_TRY_AGAIN);
+  if (timer++ == TIME_SCORE_TO_TRY_AGAIN) { 
+    return FSMDo(kGameFSM_DisplayLevelTitle);
+  }
+}

@@ -7,19 +7,23 @@
 #include "board.h"
 #include "sshot.h"
 #include "sound.h"
+#include "patterns.h"
 
 float m_trauma = 0.0f, m_decay = 0.0f;
 float m_cTraumaAngle = 0.0f, m_sTraumaAngle;
 
 cpVect m_backLines[N_BACKLINES];
-bool m_backLinesWhoosh[N_BACKLINES];
 
 uint16_t m_freeze = 0;
 
 uint8_t m_renderScale = 1;
 
+int8_t m_fadeLevel = -1;
+
 void renderTitles(const int32_t fc);
 void renderGame(const int32_t fc, const enum FSM_t fsm);
+
+void renderFade(void); 
 
 void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm);
 
@@ -34,12 +38,13 @@ void renderDoUpdateBacklines(void) {
   for (int i = 0; i < N_BACKLINES; ++i) {
     do {
       m_backLines[i] = cpv( 16 * (( rand() % ((DEVICE_PIX_X/16)-1) )+1), start + (i * step));
-      m_backLinesWhoosh[i] = false;
     } while (i > 0 && m_backLines[i].x == m_backLines[i-1].x );
   }
 }
 
 void renderSetScale(const uint8_t scale) { m_renderScale = scale; }
+
+void renderSetFadeLevel(const int8_t fadeLevel) { m_fadeLevel = fadeLevel; }
 
 void renderAddFreeze(const uint16_t amount) { 
   m_freeze += amount;
@@ -100,6 +105,8 @@ void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) 
     case kNGameModes: break;
   }
 
+  if (m_fadeLevel >= 0) { renderFade(); }
+
   // Draw FPS indicator (dbg only)
 #ifdef DEV
   bool screenShotVeto = false;
@@ -142,15 +149,17 @@ void renderGame(const int32_t fc, const enum FSM_t fsm) {
   // DRAW SCORES
   renderGameScores(fc);
 
-  if (fsm == kGameFSM_ScoresToTryAgain) {
+  if (fsm == kGameFSM_ScoresToTryAgain || fsm == kGameFSM_ToGameCreditsTitle) {
     return;
   }
 
-  // DRAW TURRET & TOP DECORATION
-  renderGameTurret();
+  if (!IOIsCredits()) {
+    // DRAW TURRET & TOP DECORATION
+    renderGameTurret();
 
-  // DRAW TRAJECTORY
-  renderGameTrajectory();
+    // DRAW TRAJECTORY
+    renderGameTrajectory();
+  }
 
   // DRAW GUTTER
   renderGameGutter(fc);
@@ -232,13 +241,9 @@ void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm) {
     if (m_backLines[i].y - BACKLINE_HEIGHT < maxY && fsm != kGameFSM_ScoresToTryAgain) { continue; }
     if (m_backLines[i].y + BACKLINE_HEIGHT < yOffset) { continue; }
     pd->graphics->drawLine(m_backLines[i].x, m_backLines[i].y, m_backLines[i].x, m_backLines[i].y + BACKLINE_HEIGHT, BACKLINE_WIDTH, kColorWhite);
-    if (!m_backLinesWhoosh[i]) {
-      m_backLinesWhoosh[i] = true;
-      soundDoSfx(kWhooshSfx1);
-    }
   }
 
-  if (fsm == kGameFSM_ScoresToTryAgain) { return; }
+  if (fsm == kGameFSM_ScoresToTryAgain || fsm == kGameFSM_ToGameCreditsTitle) { return; }
 
   static float wfBgOffC = 0;
   if (!IOGetIsPreloading()) {
@@ -278,4 +283,9 @@ void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm) {
   //   DEVICE_PIX_X, DEVICE_PIX_Y, kColorBlack);
   // }
 
+}
+
+void renderFade(void) {
+  LCDPattern* p = (LCDPattern*) kFadePattern[m_fadeLevel % FADE_LEVELS];
+  pd->graphics->fillRect(0, gameGetYOffset(), DEVICE_PIX_X, DEVICE_PIX_Y, (uintptr_t) p);
 }

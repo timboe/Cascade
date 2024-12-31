@@ -144,7 +144,7 @@ void physicsDoResetBall(uint8_t n) {
   cpShapeSetElasticity(m_ballShape[n], ELASTICITY);
 }
 
-void physicsDoUpdate(const int32_t fc, const enum FSM_t fsm) {
+void physicsDoUpdate(const int32_t fc) {
   // TODO https://chipmunk-physics.net/forum/viewtopic.php?t=3032
   cpSpaceStep(m_space, m_timestep);
   

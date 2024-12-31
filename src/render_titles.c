@@ -10,9 +10,17 @@ void renderSetNumeralOffset(float no) { m_numeralOffset = no; }
 
 void renderTitlesHeader(const int32_t fc) {
   bitmapSetRoobert10();
+  const uint16_t vX = DEVICE_PIX_X-32, vY = 4, nameX = 8, nameY = 4;
+  pd->graphics->setDrawMode(kDrawModeFillWhite);
+  for (int8_t xM = -2; xM < 4; xM += 2) {
+    for (int8_t yM = -2; yM < 4; yM += 2) {
+      pd->graphics->drawText(VERSION, 8, kUTF8Encoding, vX + xM, vY + yM);
+      pd->graphics->drawText("Tim Martin, 2025", 32, kUTF8Encoding, nameX + xM, nameY + yM);
+    }
+  }
   pd->graphics->setDrawMode(kDrawModeFillBlack);
-  pd->graphics->drawText(VERSION, 8, kUTF8Encoding, 8, DEVICE_PIX_Y-16);
-  pd->graphics->drawText("Tim Martin, 2024", 32, kUTF8Encoding, 8, 4);
+  pd->graphics->drawText(VERSION, 8, kUTF8Encoding, vX, vY);
+  pd->graphics->drawText("Tim Martin, 2024", 32, kUTF8Encoding, nameX, nameY);
   pd->graphics->setDrawMode(kDrawModeCopy);
   pd->graphics->drawBitmap(bitmapGetTitleHeaderImage(), 0, 0, kBitmapUnflipped);
 
@@ -155,18 +163,10 @@ void renderTitlesHoleSelect(const bool locked, const int32_t fc) {
   }
 
   if (locked && (fc / TICK_FREQUENCY) % 2) {
-    pd->graphics->drawBitmap(bitmapGetFwBkwIcon(0), HALF_DEVICE_PIX_X - FW_BKW_WIDTH/2, DEVICE_PIX_Y*3 + FW_BKW_BUF, kBitmapUnflipped);
-    pd->graphics->drawBitmap(bitmapGetFwBkwIcon(1), HALF_DEVICE_PIX_X - FW_BKW_WIDTH/2, DEVICE_PIX_Y*4 - FW_BKW_BUF - FW_BKW_HEIGHT, kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetFwBkwIcon(0), HALF_DEVICE_PIX_X - FW_BKW_WIDTH/2 - 8, DEVICE_PIX_Y*3 + FW_BKW_BUF, kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetFwBkwIcon(1), HALF_DEVICE_PIX_X - FW_BKW_WIDTH/2 - 8, DEVICE_PIX_Y*4 - FW_BKW_BUF - FW_BKW_HEIGHT, kBitmapUnflipped);
   }
 }
-
-
-  // const int32_t parallaxPond = pfn - gameGetParalaxFactorNearForY(true, gutterY - DEVICE_PIX_Y); // Note: float -> int here. Hard = true
-  // const int32_t so = gameGetYOffset();
-
-  // if (so > gutterY + parallaxPond - DEVICE_PIX_Y) {
-  //   pd->graphics->drawBitmap(bitmapGetWfPond(fc), 0, gutterY + parallaxPond, kBitmapUnflipped);
-
 
 void renderTitlesWfPond(const int32_t fc) {
   const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y*3 - 16); // Hard = false
