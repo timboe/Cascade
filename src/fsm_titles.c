@@ -5,6 +5,8 @@
 #include "bitmap.h"
 #include "io.h"
 #include "input.h"
+#include "sound.h"
+#include "patterns.h"
 
 float FSMCommonCrankNumeral(float* progress);
 
@@ -41,10 +43,29 @@ float FSMCommonCrankNumeral(float* progress) {
 
 void FSMDisplayTitles(const bool newState) {
   if (newState) { 
-    // noop
+    IOSetLevelHole(0, 0);
+    IOSetPlayer(0);
+    gameSetYOffset(0, true);
   }
   if (!pd->system->isCrankDocked() && !IOGetIsPreloading()) {
     return FSMDo(kTitlesFSM_TitlesToChoosePlayer);
+  }
+}
+
+void FSMDisplayTitlesWFadeIn(const bool newState) {
+  static int8_t progress = FADE_LEVELS - 1;
+  if (newState) {
+    IOSetLevelHole(0, 0);
+    IOSetPlayer(0);
+    gameSetYOffset(0, true);
+    progress = FADE_LEVELS - 1;
+  }
+  if (gameGetFrameCount() % TICK_FREQUENCY / 2 == 0) {
+    --progress;
+  }
+  renderSetFadeLevel(progress);
+  if (progress == -1) {
+    return FSMDo(kTitlesFSM_DisplayTitles);
   }
 }
 
@@ -52,6 +73,7 @@ void FSMTitlesToChoosePlayer(const bool newState) {
   static int16_t timer = 0;
   if (newState) { 
     timer = 0;
+    soundDoSfx(kWhooshSfx1);
   }
   // pd->system->logToConsole("Timer %i which is progress %f", timer, (float)timer/TIME_TITLE_TRANSITION);
   FSMDoCommonScrollTo(0, DEVICE_PIX_Y, (float)timer/TIME_TITLE_TRANSITION, EASE_TITLE_DOWNWARDS);
@@ -86,6 +108,8 @@ void FSMChoosePlayerToChooseLevel(const bool newState) {
     renderSetNumeralOffset(0.0f);
     bitmapDoUpdateLevelStatsBitmap();
     gameDoResetPreviousWaterfall();
+    gameDoPopulateMenuTitles();
+    soundDoSfx(kWhooshSfx1);
   }
   FSMDoCommonScrollTo(DEVICE_PIX_Y, DEVICE_PIX_Y*2, (float)timer/TIME_TITLE_TRANSITION, EASE_TITLE_DOWNWARDS);
   if (timer++ == TIME_TITLE_TRANSITION) { return FSMDo(kTitlesFSM_ChooseLevel); }
@@ -117,6 +141,7 @@ void FSMChooseLevelToChooseHole(const bool newState) {
     timer = 0;
     renderSetNumeralOffset(0.0f);
     bitmapDoUpdateHoleStatsBitmap();
+    soundDoSfx(kWhooshSfx1);
   }
   FSMDoCommonScrollTo(DEVICE_PIX_Y*2, DEVICE_PIX_Y*3, (float)timer/TIME_TITLE_TRANSITION, EASE_TITLE_DOWNWARDS);
   if (timer++ == TIME_TITLE_TRANSITION) { return FSMDo(kTitlesFSM_ChooseHole); }
@@ -127,6 +152,7 @@ void FSMChooseLevelToChoosePlayer(const bool newState) {
   if (newState) {
     timer = 0;
     renderSetNumeralOffset(0.0f);
+    soundDoSfx(kWhooshSfx1);
   }
   FSMDoCommonScrollTo(DEVICE_PIX_Y*2, DEVICE_PIX_Y, (float)timer/TIME_TITLE_TRANSITION, EASE_TITLE_UPWARDS);
   if (timer++ == TIME_TITLE_TRANSITION) { return FSMDo(kTitlesFSM_ChoosePlayer); }
@@ -148,16 +174,17 @@ void FSMChooseHole(const bool newState) {
   }
 }
 
-void FSMChooseHoleToSplash(const bool newState) {
+void FSMChooseHoleToLevelTitle(const bool newState) {
   static int16_t timer = 0;
   if (newState) {
     timer = 0;
     renderSetNumeralOffset(0.0f);
     bitmapDoUpdateGameInfoTopper();
     bitmapDoUpdateLevelTitle(); 
+    soundDoSfx(kWhooshSfx1);
   }
-  FSMDoCommonScrollTo(DEVICE_PIX_Y*3, DEVICE_PIX_Y*5, (float)timer/TIME_TITLE_HOLE_TO_SPLASH, EASE_TITLE_HOLE_TO_SPLASH);
-  if (timer++ == TIME_TITLE_HOLE_TO_SPLASH) { return FSMDo(kGameFSM_DisplaySplash); }
+  FSMDoCommonScrollTo(DEVICE_PIX_Y*3, DEVICE_PIX_Y*5, (float)timer/TIME_TITLE_HOLE_TO_LEVELTITLE, EASE_TITLE_HOLE_TO_SPLASH);
+  if (timer++ == TIME_TITLE_HOLE_TO_LEVELTITLE) { return FSMDo(kGameFSM_DisplayLevelTitle); }
 }
 
 void FSMChooseHoleToChooseLevel(const bool newState) {
@@ -166,7 +193,32 @@ void FSMChooseHoleToChooseLevel(const bool newState) {
     timer = 0;
     renderSetNumeralOffset(0.0f);
     gameDoResetPreviousWaterfall();
+    soundDoSfx(kWhooshSfx1);
   }
   FSMDoCommonScrollTo(DEVICE_PIX_Y*3, DEVICE_PIX_Y*2, (float)timer/TIME_TITLE_TRANSITION, EASE_TITLE_UPWARDS);
   if (timer++ == TIME_TITLE_TRANSITION) { return FSMDo(kTitlesFSM_ChooseLevel); }
+}
+
+void FSMToTitlesCreditsTitle(const bool newState) {  // Note: Separate Game and Title versions of this
+  static int16_t timer = 0;
+  static int16_t origin = 0;
+  static bool once = false;
+  if (newState) {
+    timer = 0;
+    once = false;
+    origin = gameGetYOffset(); // Allow for a custom origin as "do credits" might be called from either screen
+    soundDoSfx(kWhooshSfx1);
+  }
+  if (!once && gameGetYOffset() > DEVICE_PIX_Y*4) {
+    once = true;
+    IOSetLevelHole(MAX_LEVELS, 0); // Enabled credits mode. Delay this until the level select is no longer visible
+    renderSetNumeralOffset(0.0f);
+    bitmapDoUpdateGameInfoTopper();
+    bitmapDoUpdateLevelTitle(); 
+  } 
+  FSMDoCommonScrollTo(origin, DEVICE_PIX_Y*5, (float)timer/TIME_TITLE_HOLE_TO_LEVELTITLE, EASE_TITLE_HOLE_TO_SPLASH);
+  if (timer++ == TIME_TITLE_HOLE_TO_LEVELTITLE) { 
+    soundPlayMusic(10);
+    return FSMDo(kGameFSM_DisplayLevelTitle);
+  }
 }

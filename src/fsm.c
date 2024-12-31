@@ -22,6 +22,7 @@ void FSMDo(const enum FSM_t transitionTo) {
   switch (m_FSM) {
     case kFSM_INITIAL: return;
     case kTitlesFSM_DisplayTitles: return FSMDisplayTitles(newState);
+    case kTitlesFSM_DisplayTitlesWFadeIn: return FSMDisplayTitlesWFadeIn(newState);
     case kTitlesFSM_TitlesToChoosePlayer: return FSMTitlesToChoosePlayer(newState);
     case kTitlesFSM_ChoosePlayer: return FSMChoosePlayer(newState);
     case kTitlesFSM_ChoosePlayerToChooseLevel: return FSMChoosePlayerToChooseLevel(newState);
@@ -29,11 +30,12 @@ void FSMDo(const enum FSM_t transitionTo) {
     case kTitlesFSM_ChooseLevelToChooseHole: return FSMChooseLevelToChooseHole(newState);
     case kTitlesFSM_ChooseLevelToChoosePlayer: return FSMChooseLevelToChoosePlayer(newState);
     case kTitlesFSM_ChooseHole: return FSMChooseHole(newState);
-    case kTitlesFSM_ChooseHoleToSplash: return FSMChooseHoleToSplash(newState);
+    case kTitlesFSM_ChooseHoleToLevelTitle: return FSMChooseHoleToLevelTitle(newState);
     case kTitlesFSM_ChooseHoleToChooseLevel: return FSMChooseHoleToChooseLevel(newState);
+    case kTitlesFSM_ToTitleCreditsTitle: return FSMToTitlesCreditsTitle(newState);
     case kFSM_SPLIT_TitlesGame: pd->system->error("FSM error kFSM_SPLIT_TitlesGame"); return;
-    case kGameFSM_DisplaySplash: return FSMDisplaySplash(newState);
-    case kGameFSM_SplashToStart: return FSMSplashToStart(newState);
+    case kGameFSM_DisplayLevelTitle: return FSMDisplayLevelTitle(newState);
+    case kGameFSM_LevelTitleToStart: return FSMLevelTitleToStart(newState);
     case kGameFSM_TutorialScrollDown: return FSMTutorialScrollDown(newState);
     case kGameFSM_TutorialScrollUp: return FSMTutorialScrollUp(newState);
     case kGameFSM_TutorialFireMarble: return FSMTutorialFireMarble(newState);
@@ -42,6 +44,7 @@ void FSMDo(const enum FSM_t transitionTo) {
     case kGameFSM_AimMode: return FSMAimMode(newState);
     case kGameFSM_AimModeScrollToTop: return FSMAimModeScrollToTop(newState);
     case kGameFSM_BallInPlay: return FSMBallInPlay(newState);
+    case kGameFSM_PlayCredits: return FSMPlayCredits(newState);
     case kGameFSM_BallStuck: return FSMBallStuck(newState);
     case kGameFSM_CloseUp: return FSMCloseUp(newState);
     case kGameFSM_WinningToast: return FSMWinningToast(newState);
@@ -53,6 +56,7 @@ void FSMDo(const enum FSM_t transitionTo) {
     case kGameFSM_DisplayScores: return FSMDisplayScores(newState);
     case kGameFSM_ScoresToTryAgain: return FSMScoresToTryAgain(newState);
     case kGameFSM_ScoresToSplash: return FSMScoresToSplash(newState);
+    case kGameFSM_ToGameCreditsTitle: return FSMToGameCreditsTitle(newState);
     case kNFSMModes: pd->system->error("FSM error kNFSMModes"); return;
   }
 }

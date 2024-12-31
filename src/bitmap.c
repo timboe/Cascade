@@ -167,6 +167,20 @@ void bitmapDoUpdateLevelTitle(void) {
   pd->graphics->clearBitmap(m_levelTitleBitmap, kColorBlack);
   pd->graphics->pushContext(m_levelTitleBitmap);
   char text[128];
+  
+  if (IOIsCredits()) {
+    pd->graphics->setDrawMode(kDrawModeInverted);
+    pd->graphics->drawBitmap(m_headerImage, 0, 0, kBitmapUnflipped);
+    snprintf(text, 128, "BY TIM MARTIN");
+    const int32_t w2 = pd->graphics->getTextWidth(bitmapGetRoobert24(), text, 128, kUTF8Encoding, 0);
+    bitmapSetRoobert24(); 
+    pd->graphics->setDrawMode(kDrawModeFillWhite);
+    const uint16_t yC = 128+64;
+    pd->graphics->drawText(text, 128, kUTF8Encoding, DEVICE_PIX_X/2 - w2/2, yC);
+    pd->graphics->popContext();
+    return;
+  }
+
   const bool hasTitle = (strlen(IOGetCurrentHoleName()) > 0);
   uint16_t yA = 0;
   uint16_t yB = 0;
@@ -198,6 +212,7 @@ void bitmapDoUpdateLevelTitle(void) {
 
 void bitmapDoUpdateGameInfoTopper(void) {
   pd->graphics->clearBitmap(m_infoTopperBitmap, kColorBlack);
+  if (IOIsCredits()) { return; }
   pd->graphics->pushContext(m_infoTopperBitmap);
   char text[128];
   snprintf(text, 128, "%i~%i", (int)IOGetCurrentLevel() + 1, (int)IOGetCurrentHole() + 1);
@@ -825,6 +840,9 @@ void bitmapDoPreloadD(void) {
     snprintf(text, 128, "images/falls_fg/falls%i_fg", (int)i);
     m_sheetWfFg[i] = bitmapDoLoadImageTableAtPath(text);
   }
+  // Credits
+  snprintf(text, 128, "images/falls_fg/falls100_fg");
+  m_sheetWfFg[100] = bitmapDoLoadImageTableAtPath(text);
 #ifndef WF_FIXED_BG
   for (int32_t i = 1; i < N_WF_BG; ++i) { // Did 0 already as a critical load
     snprintf(text, 128, "images/falls_bg/falls%i_bg", (int)i);
@@ -1062,10 +1080,6 @@ void bitmapDoInit(void) {
   // Load critical bitmaps
   m_fontRoobert10 = bitmapDoLoadFontAtPath("fonts/Roobert-10-Bold");
   m_headerImage = bitmapDoLoadImageAtPath("images/splash");
-#ifdef WF_FIXED_BG
-  m_wfBg[0] = bitmapDoLoadImageAtPath("images/falls_bg/falls0_bg"); // Set desired path
-#else
   m_wfBg[0] = bitmapDoLoadImageAtPath("images/falls_bg/falls0_bg");
-#endif
   m_sheetWfFg[0] = bitmapDoLoadImageTableAtPath("images/falls_fg/falls0_fg");
 }

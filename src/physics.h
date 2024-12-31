@@ -5,7 +5,7 @@
 
 void physicsDoInit(void);
 
-void physicsDoUpdate(const int32_t fc, const enum FSM_t fsm);
+void physicsDoUpdate(const int32_t fc);
 
 void physicsSetTimestepMultiplier(const float tsm);
 float physicsGetTimestepMultiplier(void);

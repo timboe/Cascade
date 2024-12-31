@@ -20,6 +20,8 @@ FilePlayer* m_waterfalls[N_WF_TRACKS];
 SamplePlayer* m_samplePlayer[kNSFX];
 AudioSample* m_audioSample[kNSFX];
 
+void musicStopped(SoundSource* _unused, void* _unused2);
+
 /// ///
 
 void soundSetDoingExplosion(const bool expOn) {
@@ -66,6 +68,7 @@ void soundDoWaterfall(const uint8_t id) {
   }
   m_wfPlaying = id % N_WF_TRACKS;
   pd->sound->fileplayer->play(m_waterfalls[m_wfPlaying], 0);
+  pd->system->logToConsole("soundDoWaterfall playing %i", (int)m_wfPlaying);
 }
 
 void soundDoMusic() {
@@ -79,6 +82,15 @@ void soundDoMusic() {
     pd->sound->fileplayer->stop(m_music[i]);
   }
   pd->sound->fileplayer->play(m_music[m_trackPlaying], 1); 
+}
+
+void musicStopped(SoundSource* _unused, void* _unused2) {
+  if (!m_hasMusic) return;
+  if (IOIsCredits()) { soundDoMusic(); }
+}
+
+void soundPlayMusic(const uint8_t id) {
+  pd->sound->fileplayer->play(m_music[id % N_MUSIC_TRACKS], 1);
 }
 
 void soundDoInit() {
@@ -137,6 +149,7 @@ void soundDoInit() {
   m_audioSample[kSplitSfx] = pd->sound->sample->load("fx/ballSplit");
   m_audioSample[kChargeSfx] = pd->sound->sample->load("fx/587620__chungus43a__8-bit-laser-charging");
   m_audioSample[kPootSfx] = pd->sound->sample->load("fx/441373__matrixxx__heavy-artillery-shot");
+  m_audioSample[kRelocateTurretSfx] =  pd->sound->sample->load("fx/134935__ztrees1__whoosh");
 
   for (int32_t i = 0; i < kNSFX; ++i) {
     m_samplePlayer[i] = pd->sound->sampleplayer->newPlayer();
@@ -160,6 +173,7 @@ void soundDoInit() {
       case 10: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_music[i], "tracks/517985__doctor_dreamchip__doctor-dreamchip-lofi-keyboard-pack-rhodes80bpm-c-major-22"); break;
       case 11: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_music[i], "tracks/517990__doctor_dreamchip__doctor-dreamchip-lofi-keyboard-pack-rhodes80bpm-c-major-9"); break;
     }
+    pd->sound->fileplayer->setFinishCallback(m_music[i], musicStopped, NULL);
     pd->sound->fileplayer->setBufferLength(m_music[i], 1.0f); 
   }
 

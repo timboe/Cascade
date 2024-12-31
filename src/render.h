@@ -25,6 +25,8 @@ void renderDoResetTriggerSplash(void);
 
 void renderDoAddSpecialBlast(cpBody* body);
 
+void renderSetFadeLevel(const int8_t fadeLevel);
+
 void renderDoAddEndBlast(cpBody* body);
 void renderDoResetEndBlast(void);
 cpVect renderGetLastEndBlast(void);

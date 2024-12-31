@@ -71,7 +71,7 @@ int gameLoop(void* _data) {
       }
     } 
     inputSetCrankAngle(180.0f);
-    FSMDo(kGameFSM_DisplaySplash); // To load the level
+    FSMDo(kGameFSM_DisplayLevelTitle); // To load the level
     FSMDo(kGameFSM_AimMode); // To be rendering the level
     boardDoUpdate(); // To have called update at least once on elliptic and line peg paths
     screenShotInit();
@@ -89,7 +89,7 @@ int gameLoop(void* _data) {
   if (!renderGetSubFreeze()) {
     if (gm == kGameWindow) { // TODO eliminate me
       boardDoUpdate();
-      physicsDoUpdate(m_frameCount, fsm);
+      physicsDoUpdate(m_frameCount);
     }
     renderDo(m_frameCount, fsm, gm);
     ++m_frameCount;
@@ -115,7 +115,13 @@ void menuOptionsCallbackResetHole(void* _unused) {
   pd->system->logToConsole("menuOptionsCallbackResetHole");
   // TODO - insert a fade out or wipe here?
   physicsSetTimestepMultiplier(1.0f);
-  FSMDo(kGameFSM_DisplaySplash);
+  FSMDo(kGameFSM_DisplayLevelTitle);
+}
+
+void menuOptionsCallbackCredits(void* _unused) {
+  pd->system->logToConsole("menuOptionsCallbackCredits");
+  FSMDo(kTitlesFSM_ToTitleCreditsTitle);
+  pd->system->removeAllMenuItems();
 }
 
 void menuOptionsCallbackAudio(void* userData) {
@@ -147,7 +153,7 @@ void gameDoPopulateMenuTitles(void) {
   static const char* options[] = {"music+sfx", "music", "sfx", "none"};
   PDMenuItem* menu = pd->system->addOptionsMenuItem("audio", options, 4, menuOptionsCallbackAudio, NULL);
   pd->system->setMenuItemUserdata(menu, (void*) menu); // User data is a pointer to the menu itself
-  pd->system->addMenuItem("credits", NULL, (void*)1);
+  pd->system->addMenuItem("credits", menuOptionsCallbackCredits, NULL);
 }
 
 void gameDoPopulateMenuGame() {

@@ -56,14 +56,15 @@ uint16_t m_hole = 0;
 const uint16_t SAVE_SIZE_V1 = sizeof(uint32_t) * SAVE_FORMAT_1_MAX_PLAYERS * SAVE_FORMAT_1_MAX_LEVELS * SAVE_FORMAT_1_MAX_HOLES;
 uint32_t m_persistent_data[SAVE_FORMAT_1_MAX_PLAYERS][SAVE_FORMAT_1_MAX_LEVELS][SAVE_FORMAT_1_MAX_HOLES] = {0};
 
+// The +1 is to allow for credits
 #define MAX_CHARACTERS 32
-uint16_t m_hole_par[MAX_LEVELS][MAX_HOLES] = {0};
-uint16_t m_hole_height[MAX_LEVELS][MAX_HOLES] = {0};
-uint16_t m_hole_foreground[MAX_LEVELS][MAX_HOLES] = {0};
-uint16_t m_hole_background[MAX_LEVELS][MAX_HOLES] = {0};
-enum PegSpecial_t m_hole_special[MAX_LEVELS][MAX_HOLES] = {0};
-char m_hole_name[MAX_LEVELS][MAX_HOLES][MAX_CHARACTERS] = {0};
-char m_hole_author[MAX_LEVELS][MAX_HOLES][MAX_CHARACTERS] = {0};
+uint16_t m_hole_par[MAX_LEVELS+1][MAX_HOLES] = {0};
+uint16_t m_hole_height[MAX_LEVELS+1][MAX_HOLES] = {0};
+uint16_t m_hole_foreground[MAX_LEVELS+1][MAX_HOLES] = {0};
+uint16_t m_hole_background[MAX_LEVELS+1][MAX_HOLES] = {0};
+enum PegSpecial_t m_hole_special[MAX_LEVELS+1][MAX_HOLES] = {0};
+char m_hole_name[MAX_LEVELS+1][MAX_HOLES][MAX_CHARACTERS] = {0};
+char m_hole_author[MAX_LEVELS+1][MAX_HOLES][MAX_CHARACTERS] = {0};
 
 int IODoRead(void* userdata, uint8_t* buf, int bufsize);
 
@@ -88,6 +89,8 @@ void IODidDecodeLevel(json_decoder* jd, const char* key, json_value value);
 void* IOFinishDecodeLevel(json_decoder* jd, const char* key, json_value_type type);
 
 /// ///
+
+bool IOIsCredits(void) { return m_level == MAX_LEVELS; }
 
 bool IOGetIsPreloading(void) { return m_preloading != PRELOADING_STEPS; }
 
@@ -195,6 +198,7 @@ bool IOGetIsTutorial(void) { return (m_level == 0 && m_hole == 0); }
 uint16_t IOGetCurrentLevel(void) { return m_level; }
 
 uint16_t IOGetPreviousLevel(void) {
+  if (IOIsCredits()) { return MAX_LEVELS; }
   int16_t level = m_level;
   while (true) {
     if (--level < 0) { level += MAX_LEVELS; }
@@ -204,6 +208,7 @@ uint16_t IOGetPreviousLevel(void) {
 }
 
 uint16_t IOGetNextLevel(void) {
+  if (IOIsCredits()) { return MAX_LEVELS; }
   int16_t level = m_level;
   while (true) {
     level = (level + 1) % MAX_LEVELS;
@@ -213,6 +218,7 @@ uint16_t IOGetNextLevel(void) {
 }
 
 uint16_t IOGetPreviousHole(void) {
+  if (IOIsCredits()) { return 0; }
   int16_t hole = m_hole;
   while (true) {
     if (--hole < 0) { hole += MAX_HOLES; }
@@ -222,6 +228,7 @@ uint16_t IOGetPreviousHole(void) {
 }
 
 uint16_t IOGetNextHole(void) {
+  if (IOIsCredits()) { return 0; }
   int16_t hole = (m_hole + 1) % MAX_HOLES;
   if (m_hole_par[m_level][hole]) return hole;
   return 0;
@@ -255,6 +262,10 @@ void IODoNextHoleWithLevelWrap(void) {
     IODoNextLevel();
     pd->system->logToConsole("Note: level wrap just activated");
   }
+}
+
+void IOSetPlayer(uint16_t player) {
+  m_player = player;
 }
 
 void IOSetLevelHole(uint16_t level, uint16_t hole) {
@@ -378,18 +389,19 @@ void IODidDecodeScan(json_decoder* jd, const char* key, json_value value) {
   } else if (strcmp(key, "author") == 0) {
     strcpy(m_hole_author[m_level][m_hole], json_stringValue(value)); 
   } else if (strcmp(key, "level") == 0 && json_intValue(value)-1 != m_level) {
-    pd->system->error("IODidDecodeScan LEVEL MISSMATCH %i %i", json_intValue(value)-1, (int)m_level);
+    pd->system->logToConsole("IODidDecodeScan WARNING LEVEL MISSMATCH got:%i expecting:%i", json_intValue(value)-1, (int)m_level);
   } else if (strcmp(key, "hole") == 0 && json_intValue(value)-1 != m_hole) {
-    pd->system->error("IODidDecodeScan HOLE MISSMATCH %i %i", json_intValue(value)-1, (int)m_hole);
+    pd->system->logToConsole("IODidDecodeScan HOLE MISSMATCH got:%i expecting:%i", json_intValue(value)-1, (int)m_hole);
   }
 }
 
 void IODoScanLevels() {
   char filePath[128];
-  for (int32_t l = 0; l < MAX_LEVELS; ++l) {
+  for (int32_t l = 0; l < MAX_LEVELS+1; ++l) {
     m_level = l;
     for (int32_t h = 0; h < MAX_HOLES; ++h) {
       m_hole = h;
+      if (l == MAX_LEVELS && h) { continue; } // Only one "credits" hole
       // snprintf(filePath, 128, "levels/fall_%i_hole_%i.json", 1, 1);
       snprintf(filePath, 128, "holes/level_%i_hole_%i.json", (int)l+1, (int)h+1);
       SDFile* file = pd->file->open(filePath, kFileRead);
@@ -424,10 +436,8 @@ void IODoScanLevels() {
     pd->system->logToConsole("No save-game data at %s", SAVE_FORMAT_1_NAME);
   }
 
-
-  pd->system->logToConsole("TESTING setting player 2 to have finished l=1 h=1 with 5 shots");
-  m_persistent_data[1][0][0] = 5;
-
+  // pd->system->logToConsole("TESTING setting player 2 to have finished l=1 h=1 with 5 shots");
+  // m_persistent_data[1][0][0] = 5;
 }
 
 ////
@@ -627,9 +637,7 @@ void* IOFinishDecodeLevel(json_decoder* jd, const char* key, json_value_type typ
     return NULL;
   }
 
-    // pd->system->logToConsole("FINISH DECODE %s ", key);
-
-
+  // pd->system->logToConsole("FINISH DECODE %s ", key);
   return NULL;
 }
 
@@ -664,8 +672,8 @@ void IODoLoadCurrentHole() {
   pd->json->decode(&jd, (json_reader){ .read = IODoRead, .userdata = file }, NULL);
   int status = pd->file->close(file);
 
-  // Check playable
-  if (boardGetRequiredPegsInPlay() == 0 || boardGetNPegs() == 0) {
+  // Check playable (does not apply to the credits, however)
+  if (m_level != MAX_LEVELS && (boardGetRequiredPegsInPlay() == 0 || boardGetNPegs() == 0)) {
     boardDoClear();
     boardDoTestLevel();
     pd->system->logToConsole("Unplayable! Load test level!");

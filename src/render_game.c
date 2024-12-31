@@ -142,7 +142,7 @@ void renderGameMarble(const int32_t fc) {
       pd->graphics->setDrawMode(kDrawModeCopy);
 
       // Over-top
-      if (pos.y < yOff) {
+      if (pos.y < yOff && !IOIsCredits()) {
         pd->graphics->drawBitmap(bitmapGetFwBkwIcon(2), pos.x - FW_BKW_WIDTH/2, yOff, kBitmapUnflipped);
       }
     }
