@@ -338,18 +338,18 @@
     },
     "StaticControl41": {
       "shape": 2,
-      "x": 72,
-      "y": 308,
+      "x": 76,
+      "y": 316,
       "angle": -14,
-      "size": 1,
+      "size": 2,
       "type": 1
     },
     "StaticControl42": {
       "shape": 2,
       "x": 336,
-      "y": 304,
+      "y": 312,
       "angle": 10,
-      "size": 1,
+      "size": 2,
       "type": 1
     },
     "StaticControl43": {

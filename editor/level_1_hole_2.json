@@ -358,7 +358,7 @@
       "y": 178,
       "angle": 61,
       "size": 0,
-      "type": 1
+      "type": 0
     },
     "StaticControl44": {
       "shape": 2,
@@ -366,7 +366,7 @@
       "y": 178,
       "angle": 61,
       "size": 0,
-      "type": 1
+      "type": 0
     },
     "StaticControl45": {
       "shape": 2,
