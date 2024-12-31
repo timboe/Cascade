@@ -262,7 +262,6 @@ void renderGamePops(const int32_t fc) {
     if (p->popFrame >= 0 && p->popFrame < POP_ANIM_FRAMES) {
       LCDBitmap* bm = bitmapGetPegPop(p);
       pd->graphics->drawBitmap(bm, p->x - POP_ANIM_HWIDTH, p->y - POP_ANIM_HWIDTH, kBitmapUnflipped);
-      // pd->system->logToConsole("!! %i : %i %i (%f, %f)", i, p->popAnim, p->popFrame, p->x - POP_ANIM_HWIDTH, p->y - POP_ANIM_HWIDTH);
       if (fc % 2 == 0) { p->popFrame++; }
     }
   }

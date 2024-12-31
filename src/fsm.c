@@ -1,5 +1,6 @@
 #include "game.h"
 #include "fsm.h"
+#include "sound.h"
 
 enum FSM_t m_FSM = (enum FSM_t)0;
 
@@ -16,7 +17,9 @@ void FSMDo(const enum FSM_t transitionTo) {
   bool newState = (m_FSM != transitionTo);
   if (newState) { 
     m_FSM = transitionTo;
+    #ifdef DEV
     pd->system->logToConsole("State change %i", (int)transitionTo);
+    #endif
   }
 
   switch (m_FSM) {
@@ -30,17 +33,21 @@ void FSMDo(const enum FSM_t transitionTo) {
     case kTitlesFSM_ChooseLevelToChooseHole: return FSMChooseLevelToChooseHole(newState);
     case kTitlesFSM_ChooseLevelToChoosePlayer: return FSMChooseLevelToChoosePlayer(newState);
     case kTitlesFSM_ChooseHole: return FSMChooseHole(newState);
+    case kTitlesFSM_ChooseHoleWFadeIn: return FSMChooseHoleWFadeIn(newState);
     case kTitlesFSM_ChooseHoleToLevelTitle: return FSMChooseHoleToLevelTitle(newState);
     case kTitlesFSM_ChooseHoleToChooseLevel: return FSMChooseHoleToChooseLevel(newState);
     case kTitlesFSM_ToTitleCreditsTitle: return FSMToTitlesCreditsTitle(newState);
     case kFSM_SPLIT_TitlesGame: pd->system->error("FSM error kFSM_SPLIT_TitlesGame"); return;
     case kGameFSM_DisplayLevelTitle: return FSMDisplayLevelTitle(newState);
+    case kGameFSM_DisplayLevelTitleWFadeIn: return FSMDisplayLevelTitleWFadeIn(newState);
     case kGameFSM_LevelTitleToStart: return FSMLevelTitleToStart(newState);
     case kGameFSM_TutorialScrollDown: return FSMTutorialScrollDown(newState);
     case kGameFSM_TutorialScrollUp: return FSMTutorialScrollUp(newState);
     case kGameFSM_TutorialFireMarble: return FSMTutorialFireMarble(newState);
     case kGameFSM_TutorialGetSpecial: return FSMTutorialGetSpecial(newState);
     case kGameFSM_TutorialGetRequired: return FSMTutorialGetRequired(newState);
+    case kGameFSM_GameFadeOutQuit: return FSMGameFadeOutQuit(newState);
+    case kGameFSM_GameFadeOutReset: return FSMGameFadeOutReset(newState);
     case kGameFSM_AimMode: return FSMAimMode(newState);
     case kGameFSM_AimModeScrollToTop: return FSMAimModeScrollToTop(newState);
     case kGameFSM_BallInPlay: return FSMBallInPlay(newState);

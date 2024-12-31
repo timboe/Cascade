@@ -99,33 +99,49 @@ int gameLoop(void* _data) {
 }
 
 void menuOptionsCallbackResetSave(void* toReset) {
+  #ifdef DEV
   pd->system->logToConsole("menuOptionsCallbackResetSave %i", (uintptr_t)toReset);
+  #endif
   IOResetPlayerSave((uintptr_t)toReset);
 }
 
 void menuOptionsCallbackQuitHole(void* _unused) {
+  #ifdef DEV
   pd->system->logToConsole("menuOptionsCallbackQuitHole");
-  // TODO - insert a fade out or wipe here?
-  gameSetYOffset(DEVICE_PIX_Y*3, true);
+  #endif
   physicsSetTimestepMultiplier(1.0f);
-  FSMDo(kTitlesFSM_ChooseHole);
+  renderSetScale(1);
+  gameSetXOffset(0);
+  soundStopSfx(kDrumRollSfx1);
+  pd->system->removeAllMenuItems();
+  FSMDo(kGameFSM_GameFadeOutQuit);
 }
 
 void menuOptionsCallbackResetHole(void* _unused) {
+  #ifdef DEV
   pd->system->logToConsole("menuOptionsCallbackResetHole");
-  // TODO - insert a fade out or wipe here?
+  #endif
   physicsSetTimestepMultiplier(1.0f);
-  FSMDo(kGameFSM_DisplayLevelTitle);
+  renderSetScale(1);
+  gameSetXOffset(0);
+  soundStopSfx(kDrumRollSfx1);
+  pd->system->removeAllMenuItems();
+  FSMDo(kGameFSM_GameFadeOutReset);
 }
 
 void menuOptionsCallbackCredits(void* _unused) {
+  #ifdef DEV
   pd->system->logToConsole("menuOptionsCallbackCredits");
-  FSMDo(kTitlesFSM_ToTitleCreditsTitle);
+  #endif
   pd->system->removeAllMenuItems();
+  FSMDo(kTitlesFSM_ToTitleCreditsTitle);
 }
 
 void menuOptionsCallbackAudio(void* userData) {
   int value = pd->system->getMenuItemValue((PDMenuItem*)userData);
+  #ifdef DEV
+  pd->system->logToConsole("menuOptionsCallbackAudio %i", value);
+  #endif
   if (value == 0) {
     soundSetDoMusic(true);
     soundSetDoSfx(true);

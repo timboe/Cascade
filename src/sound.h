@@ -39,7 +39,9 @@ enum SfxSample {
   kSplashSfx3,
   kSplashSfx4,
   kSplashSfx5,
-  kPopSfx,
+  kPopSfx1,
+  kPopSfx2,
+  kPopSfx3,
   kExplosionSfx,
   kBallClinkSfx,
   kDrumRollSfx1,
@@ -53,6 +55,8 @@ enum SfxSample {
   kWhooshSfx3,
   kWhooshSfx4,
   kRelocateTurretSfx,
+  kTumblerClickSfx,
+  kCrankClickSfx,
   kNSFX
 };
 

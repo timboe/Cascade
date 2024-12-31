@@ -117,6 +117,9 @@ void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) 
     pd->system->drawFPS(0, 0);
   }
 #endif // DEV
+
+  pd->system->drawFPS(0, 0);
+  
 }
 
 void renderTitles(const int32_t fc) {
@@ -238,7 +241,7 @@ void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm) {
 
   pd->graphics->setLineCapStyle(kLineCapStyleRound);
   for (int i = 0; i < N_BACKLINES; ++i) {
-    if (m_backLines[i].y - BACKLINE_HEIGHT < maxY && fsm != kGameFSM_ScoresToTryAgain) { continue; }
+    if (m_backLines[i].y - BACKLINE_HEIGHT < maxY && !(fsm == kGameFSM_ScoresToTryAgain || fsm == kGameFSM_ToGameCreditsTitle)) { continue; }
     if (m_backLines[i].y + BACKLINE_HEIGHT < yOffset) { continue; }
     pd->graphics->drawLine(m_backLines[i].x, m_backLines[i].y, m_backLines[i].x, m_backLines[i].y + BACKLINE_HEIGHT, BACKLINE_WIDTH, kColorWhite);
   }

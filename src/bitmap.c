@@ -491,7 +491,6 @@ void bitmapDoUpdateScoreHistogram(void) {
 
   pd->graphics->setDrawMode(kDrawModeCopy);
   for (int i = 0; i < MAX_HOLES; ++i) {
-    pd->system->logToConsole("for hole %i the histo will draw %i balls", i+1, balls[i]);
     for (int j = 1; j <= balls[i]; j++) {
       pd->graphics->drawBitmap(m_marbleBitmap, BUF + BALL_RADIUS/2 + i*3*BALL_RADIUS, BUF + (maxHistoBalls - j)*2*BALL_RADIUS, kBitmapUnflipped);
     }

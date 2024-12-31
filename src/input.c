@@ -11,6 +11,7 @@
 PDButtons m_current;
 float m_crankAngle = 0;
 float m_crankChanged = 0;
+uint8_t m_crankNoiseAngle = 0;
 
 void inputHandleTitles(const enum FSM_t fsm, const uint32_t buttonPressed);
 void inputHandleGame(const enum FSM_t fsm, const uint32_t buttonPressed);
@@ -18,6 +19,11 @@ void inputHandleGame(const enum FSM_t fsm, const uint32_t buttonPressed);
 void inputHandlerClick(const enum FSM_t fsm, const enum GameMode_t gm, uint32_t buttonPressed);
 
 /// ///
+
+void inputDoInit(void) {
+  m_crankAngle = pd->system->getCrankAngle();
+  m_crankNoiseAngle = (uint8_t)( m_crankAngle / CRANK_NOISE_ANGLE);
+}
 
 bool inputGetPressed(const PDButtons b) { return m_current & b; }
 bool inputGetPressedAny(void) { return m_current; }
@@ -78,4 +84,7 @@ void inputDoHandle(const enum FSM_t fsm,const enum GameMode_t gm) {
 
   m_crankChanged = pd->system->getCrankChange();
   m_crankAngle = pd->system->getCrankAngle();
+
+  if ( (uint8_t)( m_crankAngle / CRANK_NOISE_ANGLE) != m_crankNoiseAngle) { soundDoSfx(kCrankClickSfx); }
+  m_crankNoiseAngle = (uint8_t)( m_crankAngle / CRANK_NOISE_ANGLE);
 }

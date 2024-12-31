@@ -59,7 +59,6 @@ void screenShotDo() {
 }
 
 void screenShotInit(void) {
-  // pd->system->logToConsole("ssInit frame %i", gameGetFrameCount());
   char filePath[128];
   snprintf(filePath, 128, "level_%i_hole_%i.bmp", IOGetCurrentLevel()+1, IOGetCurrentHole()+1);
   m_imageFile = pd->file->open(filePath, kFileWrite);

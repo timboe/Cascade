@@ -61,14 +61,15 @@ void soundWaterfallDoInit() {
 }
 
 void soundDoWaterfall(const uint8_t id) {
+  #ifdef DEV
   pd->system->logToConsole("soundDoWaterfall called for %i", (int)id);
+  #endif
   if (!m_hasMusic || (id % N_WF_TRACKS) == m_wfPlaying) return;
   for (int32_t i = 0; i < N_WF_TRACKS; ++i) {
     pd->sound->fileplayer->stop(m_waterfalls[i]);
   }
   m_wfPlaying = id % N_WF_TRACKS;
   pd->sound->fileplayer->play(m_waterfalls[m_wfPlaying], 0);
-  pd->system->logToConsole("soundDoWaterfall playing %i", (int)m_wfPlaying);
 }
 
 void soundDoMusic() {
@@ -140,7 +141,9 @@ void soundDoInit() {
   m_audioSample[kWhooshSfx3] = pd->sound->sample->load("fx/682473__simosc__whoosh");
   m_audioSample[kWhooshSfx4] = pd->sound->sample->load("fx/682473__simosc__whoosh");
 
-  m_audioSample[kPopSfx] = pd->sound->sample->load("fx/pop");
+  m_audioSample[kPopSfx1] = pd->sound->sample->load("fx/613608__pellepyb__pop-sound__1");
+  m_audioSample[kPopSfx2] = pd->sound->sample->load("fx/613608__pellepyb__pop-sound__2");
+  m_audioSample[kPopSfx3] = pd->sound->sample->load("fx/613608__pellepyb__pop-sound__3");
   m_audioSample[kExplosionSfx] = pd->sound->sample->load("fx/explosion");
   m_audioSample[kBallClinkSfx] = pd->sound->sample->load("fx/ballClink");
   m_audioSample[kDrumRollSfx1] = pd->sound->sample->load("fx/705223__therandomsoundbyte2637__snare-drum-buzz-and-cymbal__1");
@@ -150,6 +153,8 @@ void soundDoInit() {
   m_audioSample[kChargeSfx] = pd->sound->sample->load("fx/587620__chungus43a__8-bit-laser-charging");
   m_audioSample[kPootSfx] = pd->sound->sample->load("fx/441373__matrixxx__heavy-artillery-shot");
   m_audioSample[kRelocateTurretSfx] =  pd->sound->sample->load("fx/134935__ztrees1__whoosh");
+  m_audioSample[kTumblerClickSfx] =  pd->sound->sample->load("fx/tumblerClick");
+  m_audioSample[kCrankClickSfx] =  pd->sound->sample->load("fx/crankClick");
 
   for (int32_t i = 0; i < kNSFX; ++i) {
     m_samplePlayer[i] = pd->sound->sampleplayer->newPlayer();
@@ -213,6 +218,8 @@ void soundDoSfx(enum SfxSample sample) {
     sample += offset;
   } else if (sample == kSplashSfx1) {
     sample += rand() % N_SPLASHES_SFX;
+  } else if (sample == kPopSfx1) {
+    sample += rand() % N_POPS_SFX;
   }
 
   pd->sound->sampleplayer->play(m_samplePlayer[sample], 1, 1.0f);

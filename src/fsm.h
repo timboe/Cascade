@@ -19,17 +19,21 @@ enum FSM_t {
   kTitlesFSM_ChooseLevelToChooseHole,
   kTitlesFSM_ChooseLevelToChoosePlayer,
   kTitlesFSM_ChooseHole,
+  kTitlesFSM_ChooseHoleWFadeIn,
   kTitlesFSM_ChooseHoleToLevelTitle,
   kTitlesFSM_ChooseHoleToChooseLevel,
   kTitlesFSM_ToTitleCreditsTitle,
   kFSM_SPLIT_TitlesGame,
   kGameFSM_DisplayLevelTitle,
+  kGameFSM_DisplayLevelTitleWFadeIn,
   kGameFSM_LevelTitleToStart,
   kGameFSM_TutorialScrollDown,
   kGameFSM_TutorialScrollUp,
   kGameFSM_TutorialFireMarble,
   kGameFSM_TutorialGetSpecial,
   kGameFSM_TutorialGetRequired,
+  kGameFSM_GameFadeOutQuit,
+  kGameFSM_GameFadeOutReset,
   kGameFSM_AimMode,
   kGameFSM_AimModeScrollToTop,
   kGameFSM_BallInPlay, // START OF BALL-IN-PLAY
@@ -74,17 +78,21 @@ void FSMChooseLevel(const bool newState);
 void FSMChooseLevelToChooseHole(const bool newState);
 void FSMChooseLevelToChoosePlayer(const bool newState);
 void FSMChooseHole(const bool newState);
+void FSMChooseHoleWFadeIn(const bool newState);
 void FSMChooseHoleToLevelTitle(const bool newState);
 void FSMChooseHoleToChooseLevel(const bool newState);
 void FSMToTitlesCreditsTitle(const bool newState);
 
 void FSMDisplayLevelTitle(const bool newState);
+void FSMDisplayLevelTitleWFadeIn(const bool newState);
 void FSMLevelTitleToStart(const bool newState);
 void FSMTutorialScrollDown(const bool newState);
 void FSMTutorialScrollUp(const bool newState);
 void FSMTutorialFireMarble(const bool newState);
 void FSMTutorialGetSpecial(const bool newState);
 void FSMTutorialGetRequired(const bool newState);
+void FSMGameFadeOutQuit(const bool newState);
+void FSMGameFadeOutReset(const bool newState);
 void FSMAimMode(const bool newState);
 void FSMAimModeScrollToTop(const bool newState);
 void FSMPlayCredits(const bool newState);

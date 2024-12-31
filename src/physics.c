@@ -147,10 +147,15 @@ void physicsDoResetBall(uint8_t n) {
 void physicsDoUpdate(const int32_t fc) {
   // TODO https://chipmunk-physics.net/forum/viewtopic.php?t=3032
   cpSpaceStep(m_space, m_timestep);
+  const bool twoBalls = (boardGetCurrentSpecial() == kPegSpecialMultiball);
   
-  const cpVect pos = cpBodyGetPosition(m_ball[0]);
-  if (pos.x < 4) { cpBodySetPosition(m_ball[0], cpv(4, pos.y)); }
-  else if (pos.x > DEVICE_PIX_X - 4) { cpBodySetPosition(m_ball[0], cpv(DEVICE_PIX_X - 4, pos.y)); }
+  cpVect pos[2];
+  for (uint8_t b = 0; b < 2; ++b) {
+    if (b == 1 && !twoBalls) { continue; }
+    pos[b] = cpBodyGetPosition(m_ball[b]);
+    if (pos[b].x < 4) { cpBodySetPosition(m_ball[b], cpv(4, pos[b].y)); }
+    else if (pos[b].x > DEVICE_PIX_X - 4) { cpBodySetPosition(m_ball[b], cpv(DEVICE_PIX_X - 4, pos[b].y)); }
+  }
 
   if (FSMGetIsAimMode()) {
     const int i = (boardGetCurrentSpecial() == kPegSpecialAim ? fc % (PREDICTION_TRACE_LEN*2) : fc % PREDICTION_TRACE_LEN);
@@ -158,17 +163,15 @@ void physicsDoUpdate(const int32_t fc) {
       physicsDoResetBall(0);
       physicsDoLaunchBall(1.0f);
     }
-    renderSetMarbleTrace(i, pos.x, pos.y);
+    renderSetMarbleTrace(i, pos[0].x, pos[0].y);
   }
 
-  m_physicsGetMotionTrailX[0][fc % MOTION_TRAIL_LEN] = pos.x;
-  m_physicsGetMotionTrailY[0][fc % MOTION_TRAIL_LEN] = pos.y;
+  m_physicsGetMotionTrailX[0][fc % MOTION_TRAIL_LEN] = pos[0].x;
+  m_physicsGetMotionTrailY[0][fc % MOTION_TRAIL_LEN] = pos[0].y;
 
-  if (boardGetCurrentSpecial() == kPegSpecialAim) {
-    const cpVect pos2 = cpBodyGetPosition(m_ball[1]);
-    m_physicsGetMotionTrailX[1][fc % MOTION_TRAIL_LEN] = pos2.x;
-    m_physicsGetMotionTrailY[1][fc % MOTION_TRAIL_LEN] = pos2.y;
-
+  if (twoBalls) {
+    m_physicsGetMotionTrailX[1][fc % MOTION_TRAIL_LEN] = pos[1].x;
+    m_physicsGetMotionTrailY[1][fc % MOTION_TRAIL_LEN] = pos[1].y;
     if (!m_secondBallInPlay) { physicsDoResetBall(1); }
   }
 

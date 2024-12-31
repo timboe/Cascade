@@ -141,8 +141,9 @@ void IODoUpdatePreloading(void) {
     case 30: bitmapDoPreloadM(3); break; // POND_WATER_SIZE
   }
   const uint32_t after = pd->system->getCurrentTimeMilliseconds();
+  #ifdef DEV
   pd->system->logToConsole("Preload %i took %i ms", (int)m_preloading, (int)(after - before));
-
+  #endif
   ++m_preloading;
   if (!IOGetIsPreloading()) { IODonePreloading(); }
 }
@@ -175,13 +176,17 @@ uint16_t IOGetCurrentPlayer(void) { return m_player; }
 void IODoPreviousPlayer(void) {
   if (!m_player) { m_player = MAX_PLAYERS - 1; }
   else --m_player;
+  #ifdef DEV
   pd->system->logToConsole("Now player %i - got to unplayed hole", (int)m_player+1);
+  #endif
   IODoGoToNextUnplayedLevel();
 }
 
 void IODoNextPlayer(void) {
   m_player = (m_player + 1) % MAX_PLAYERS;
+  #ifdef DEV
   pd->system->logToConsole("Now player %i - got to unplayed hole", (int)m_player+1);
+  #endif
   IODoGoToNextUnplayedLevel();
 }
 
@@ -237,30 +242,40 @@ uint16_t IOGetNextHole(void) {
 void IODoPreviousLevel(void) { 
   m_level = IOGetPreviousLevel();
   soundDoWaterfall(m_level);
+  #ifdef DEV
   pd->system->logToConsole("Pre level called (player %i, level %i, hole %i)", (int)m_player+1, (int)m_level+1, (int)m_hole+1);
+  #endif
 }
 
 void IODoNextLevel(void) {
   m_level = IOGetNextLevel();
   soundDoWaterfall(m_level);
+  #ifdef DEV
   pd->system->logToConsole("Next level called (player %i, level %i, hole %i)", (int)m_player+1, (int)m_level+1, (int)m_hole+1);
+  #endif
 }
 
 void IODoPreviousHole(void) { 
   m_hole = IOGetPreviousHole();
+  #ifdef DEV
   pd->system->logToConsole("Prev hole called (player %i, level %i, hole %i)", (int)m_player+1, (int)m_level+1, (int)m_hole+1);
+  #endif
 }
 
 void IODoNextHole(void) {
   m_hole = IOGetNextHole();
+  #ifdef DEV
   pd->system->logToConsole("Next hole called (player %i, level %i, hole %i)", (int)m_player+1, (int)m_level+1, (int)m_hole+1);
+  #endif
 }
 
 void IODoNextHoleWithLevelWrap(void) {
   IODoNextHole();
   if (m_hole == 0) { 
     IODoNextLevel();
+    #ifdef DEV
     pd->system->logToConsole("Note: level wrap just activated");
+    #endif
   }
 }
 
@@ -272,7 +287,9 @@ void IOSetLevelHole(uint16_t level, uint16_t hole) {
   m_level = level;
   m_hole = hole;
   soundDoWaterfall(m_level);
+  #ifdef DEV
   pd->system->logToConsole("Set-level-hole called (player %i, level %i, hole %i)", (int)m_player+1, (int)m_level+1, (int)m_hole+1);
+  #endif
 }
 
 void IOSetCurrentHoleScore(const uint16_t score) {
@@ -305,7 +322,9 @@ void IODoGoToNextUnplayedLevel(void) {
     m_level = 0;
     m_hole = 0;
     soundDoWaterfall(m_level);
+    #ifdef DEV
     pd->system->logToConsole("! No levels played - set to level 1 hole 1");
+    #endif
   }
 }
 
@@ -358,7 +377,9 @@ void IODoWrite(void* userdata, const char* str, int len) {
 }
 
 void IODecodeError(json_decoder* jd, const char* error, int linenum) {
+  #ifdef DEV
   pd->system->logToConsole("decode error line %i: %s", linenum, error);
+  #endif
   FSMDo(kTitlesFSM_DisplayTitles);
 }
 
@@ -389,9 +410,13 @@ void IODidDecodeScan(json_decoder* jd, const char* key, json_value value) {
   } else if (strcmp(key, "author") == 0) {
     strcpy(m_hole_author[m_level][m_hole], json_stringValue(value)); 
   } else if (strcmp(key, "level") == 0 && json_intValue(value)-1 != m_level) {
+    #ifdef DEV
     pd->system->logToConsole("IODidDecodeScan WARNING LEVEL MISSMATCH got:%i expecting:%i", json_intValue(value)-1, (int)m_level);
+    #endif
   } else if (strcmp(key, "hole") == 0 && json_intValue(value)-1 != m_hole) {
+    #ifdef DEV
     pd->system->logToConsole("IODidDecodeScan HOLE MISSMATCH got:%i expecting:%i", json_intValue(value)-1, (int)m_hole);
+    #endif
   }
 }
 
@@ -418,7 +443,9 @@ void IODoScanLevels() {
         .didDecodeTableValue = IODidDecodeScan,
         .shouldDecodeTableValueForKey = IOShouldDecodeScan
       };
+      #ifdef DEV
       pd->system->logToConsole("decoding header for level %i hole %i", m_level, m_hole);
+      #endif
       pd->json->decode(&jd, (json_reader){ .read = IODoRead, .userdata = file }, NULL);
       int status = pd->file->close(file);
     }
@@ -431,13 +458,15 @@ void IODoScanLevels() {
   SDFile* file = pd->file->open(filePath, kFileReadData);
   if (file) { // Load save data
     int result = pd->file->read(file, m_persistent_data, SAVE_SIZE_V1);
+    #ifdef DEV
     pd->system->logToConsole("Reading %i bytes of save data, result %i", SAVE_SIZE_V1, result);
+    #endif
   } else {
+    #ifdef DEV
     pd->system->logToConsole("No save-game data at %s", SAVE_FORMAT_1_NAME);
+    #endif
   }
 
-  // pd->system->logToConsole("TESTING setting player 2 to have finished l=1 h=1 with 5 shots");
-  // m_persistent_data[1][0][0] = 5;
 }
 
 ////
@@ -651,7 +680,9 @@ void IODoLoadCurrentHole() {
     SDFile* file = pd->file->open(filePath, kFileReadData);
   }
   if (!file) {
+    #ifdef DEV
     pd->system->error("IODoLoadCurrentHole CANNOT FIND LEVEL %i %i", (int)m_level+1, (int)m_hole+1);
+    #endif
     FSMDo(kTitlesFSM_DisplayTitles);
     return;
   }
@@ -676,7 +707,9 @@ void IODoLoadCurrentHole() {
   if (m_level != MAX_LEVELS && (boardGetRequiredPegsInPlay() == 0 || boardGetNPegs() == 0)) {
     boardDoClear();
     boardDoTestLevel();
+    #ifdef DEV
     pd->system->logToConsole("Unplayable! Load test level!");
+    #endif
   }
 
 }
@@ -688,7 +721,9 @@ void IODoSave() {
   snprintf(filePath, 128, SAVE_FORMAT_1_NAME);
   SDFile* file = pd->file->open(filePath, kFileWrite);
   const int wrote = pd->file->write(file, m_persistent_data, SAVE_SIZE_V1);
+  #ifdef DEV
   pd->system->logToConsole("SAVE wrote %i bytes, expected to write %i bytes", wrote, SAVE_SIZE_V1);
+  #endif
   pd->file->close(file);
 }
 

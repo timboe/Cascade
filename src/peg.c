@@ -225,7 +225,6 @@ void pegDoUpdate(struct Peg_t* p) {
     cpBodySetVelocity(p->cpBody, cpvzero);
     // No need for more updates
     p->motion = kPegMotionStatic;
-    //pd->system->logToConsole("Peg changing to static at y=%f minY=%f", p->y, p->minY);
   } else {
     cpBodySetVelocity(p->cpBody, cpv((p->x - pos.x)/TIMESTEP, (p->y - pos.y)/TIMESTEP));
   }
@@ -304,7 +303,6 @@ void pegDoHit(struct Peg_t* p) {
       physicsSetSecondBallInPlay();
       soundDoSfx(kSplitSfx);
     } else if (special == kPegSpecialBlast) {
-      // pd->system->logToConsole("BLAST");
       boardDoClearSpecial(); // Do this first, it's going to recurse!
       soundSetDoingExplosion(true); // Also do this first - we don't want to play these sfx
       boardDoSpecialBlast();
@@ -333,9 +331,8 @@ void pegDoHit(struct Peg_t* p) {
   if (p->state == kPegStateHit && FSMGet() == kGameFSM_WinningToast) {
     p->queueRemove = true; // Can't remove in the middle of a physics callback
     p->popFrame = 0;
-    soundDoSfx(kPopSfx);
+    soundDoSfx(kPopSfx1);
   }
-  // pd->system->logToConsole("bam!");
 }
 
 bool pegDoCheckBurst(struct Peg_t* p, const float y) {
@@ -346,7 +343,7 @@ bool pegDoCheckBurst(struct Peg_t* p, const float y) {
     if (p->y >= y) {
       p->state = kPegStateRemoved;
       pegDoRemove(p);
-      soundDoSfx(kPopSfx);
+      soundDoSfx(kPopSfx1);
       return true;
     }
   }

@@ -1,0 +1,60 @@
+{
+  "header": {
+    "save_format": 1,
+    "name": "CREDITS",
+    "author": "",
+    "level": 100,
+    "hole": 1,
+    "par": 1,
+    "foreground": 100,
+    "background": 0,
+    "special": 0,
+    "height": 960,
+    "snap": 4,
+    "n_static": 5,
+    "n_elliptic": 0,
+    "n_linear": 0
+  },
+  "body": {
+    "StaticControl1": {
+      "shape": 2,
+      "x": 200,
+      "y": 76,
+      "angle": 0,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl2": {
+      "shape": 2,
+      "x": 216,
+      "y": 184,
+      "angle": 0,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl3": {
+      "shape": 2,
+      "x": 92,
+      "y": 156,
+      "angle": 0,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl4": {
+      "shape": 2,
+      "x": 52,
+      "y": 228,
+      "angle": 0,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl5": {
+      "shape": 2,
+      "x": 164,
+      "y": 244,
+      "angle": 0,
+      "size": 0,
+      "type": 0
+    }
+  }
+}

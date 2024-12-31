@@ -43,9 +43,9 @@ float FSMCommonCrankNumeral(float* progress) {
 
 void FSMDisplayTitles(const bool newState) {
   if (newState) { 
-    IOSetLevelHole(0, 0);
-    IOSetPlayer(0);
-    gameSetYOffset(0, true);
+    // Don't set level & hole here - it will trigger the music too early (in preloading)
+    // Good to keep this a noop if possible
+    // Reset can go in FSMDisplayTitlesWFadeIn
   }
   if (!pd->system->isCrankDocked() && !IOGetIsPreloading()) {
     return FSMDo(kTitlesFSM_TitlesToChoosePlayer);
@@ -60,13 +60,9 @@ void FSMDisplayTitlesWFadeIn(const bool newState) {
     gameSetYOffset(0, true);
     progress = FADE_LEVELS - 1;
   }
-  if (gameGetFrameCount() % TICK_FREQUENCY / 2 == 0) {
-    --progress;
-  }
+  if (gameGetFrameCount() % TICK_FREQUENCY / 2 == 0) { --progress; }
   renderSetFadeLevel(progress);
-  if (progress == -1) {
-    return FSMDo(kTitlesFSM_DisplayTitles);
-  }
+  if (progress == -1) { return FSMDo(kTitlesFSM_DisplayTitles); }
 }
 
 void FSMTitlesToChoosePlayer(const bool newState) {
@@ -75,7 +71,6 @@ void FSMTitlesToChoosePlayer(const bool newState) {
     timer = 0;
     soundDoSfx(kWhooshSfx1);
   }
-  // pd->system->logToConsole("Timer %i which is progress %f", timer, (float)timer/TIME_TITLE_TRANSITION);
   FSMDoCommonScrollTo(0, DEVICE_PIX_Y, (float)timer/TIME_TITLE_TRANSITION, EASE_TITLE_DOWNWARDS);
   if (timer++ == TIME_TITLE_TRANSITION) { return FSMDo(kTitlesFSM_ChoosePlayer); }
 }
@@ -92,12 +87,18 @@ void FSMChoosePlayer(const bool newState) {
   const float status = FSMCommonCrankNumeral(&progress);
   if      (status > 0) {
     gameDoResetPreviousWaterfall();
+    #ifdef DEV
     pd->system->logToConsole("^^^^^^^^^^^^^^");
+    #endif
     IODoPreviousPlayer();
+    soundDoSfx(kTumblerClickSfx);
   } else if (status < 0) {
     gameDoResetPreviousWaterfall();
+    #ifdef DEV
     pd->system->logToConsole("vvvvvvvvvvvvv");
+    #endif
     IODoNextPlayer();
+    soundDoSfx(kTumblerClickSfx);
   }
 }
 
@@ -127,11 +128,13 @@ void FSMChooseLevel(const bool newState) {
     // IODoPreviousLevel();
     IOSetLevelHole(IOGetPreviousLevel(), 0);
     bitmapDoUpdateLevelStatsBitmap();
+    soundDoSfx(kTumblerClickSfx);
   } else if (status < 0) {
     gameDoResetPreviousWaterfall();
     // IODoNextLevel();
     IOSetLevelHole(IOGetNextLevel(), 0);
     bitmapDoUpdateLevelStatsBitmap();
+    soundDoSfx(kTumblerClickSfx);
   }
 }
 
@@ -168,10 +171,23 @@ void FSMChooseHole(const bool newState) {
   if (status > 0) {
     IODoPreviousHole(); // Ordering important
     bitmapDoUpdateHoleStatsBitmap();
+    soundDoSfx(kTumblerClickSfx);
   } else if (status < 0) {
     IODoNextHole();
     bitmapDoUpdateHoleStatsBitmap();
+    soundDoSfx(kTumblerClickSfx);
   }
+}
+
+void FSMChooseHoleWFadeIn(const bool newState) {
+  static int8_t progress = FADE_LEVELS - 1;
+  if (newState) {
+    gameSetYOffset(DEVICE_PIX_Y*3, /*force = */true);
+    progress = FADE_LEVELS - 1;
+  }
+  if (gameGetFrameCount() % (TICK_FREQUENCY / FADE_LEVELS) == 0) { --progress; }
+  renderSetFadeLevel(progress);
+  if (progress == -1) { return FSMDo(kTitlesFSM_ChooseHole); }
 }
 
 void FSMChooseHoleToLevelTitle(const bool newState) {
@@ -180,7 +196,7 @@ void FSMChooseHoleToLevelTitle(const bool newState) {
     timer = 0;
     renderSetNumeralOffset(0.0f);
     bitmapDoUpdateGameInfoTopper();
-    bitmapDoUpdateLevelTitle(); 
+    bitmapDoUpdateLevelTitle();
     soundDoSfx(kWhooshSfx1);
   }
   FSMDoCommonScrollTo(DEVICE_PIX_Y*3, DEVICE_PIX_Y*5, (float)timer/TIME_TITLE_HOLE_TO_LEVELTITLE, EASE_TITLE_HOLE_TO_SPLASH);
@@ -205,9 +221,9 @@ void FSMToTitlesCreditsTitle(const bool newState) {  // Note: Separate Game and 
   static bool once = false;
   if (newState) {
     timer = 0;
+    soundDoSfx(kWhooshSfx1);
     once = false;
     origin = gameGetYOffset(); // Allow for a custom origin as "do credits" might be called from either screen
-    soundDoSfx(kWhooshSfx1);
   }
   if (!once && gameGetYOffset() > DEVICE_PIX_Y*4) {
     once = true;
@@ -215,7 +231,7 @@ void FSMToTitlesCreditsTitle(const bool newState) {  // Note: Separate Game and 
     renderSetNumeralOffset(0.0f);
     bitmapDoUpdateGameInfoTopper();
     bitmapDoUpdateLevelTitle(); 
-  } 
+  }
   FSMDoCommonScrollTo(origin, DEVICE_PIX_Y*5, (float)timer/TIME_TITLE_HOLE_TO_LEVELTITLE, EASE_TITLE_HOLE_TO_SPLASH);
   if (timer++ == TIME_TITLE_HOLE_TO_LEVELTITLE) { 
     soundPlayMusic(10);

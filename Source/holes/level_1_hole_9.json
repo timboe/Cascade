@@ -1,0 +1,338 @@
+{
+  "header": {
+    "save_format": 1,
+    "name": "KINETIC",
+    "author": "",
+    "level": 1,
+    "hole": 9,
+    "par": 3,
+    "foreground": 0,
+    "background": 0,
+    "special": 0,
+    "height": 360,
+    "snap": 4,
+    "n_static": 0,
+    "n_elliptic": 4,
+    "n_linear": 2
+  },
+  "body": {
+    "EllipticControl1": {
+      "shape": 0,
+      "x": 112,
+      "y": 124,
+      "angle": 0,
+      "size": 0,
+      "arc": 360,
+      "use_arc": true,
+      "speed": 1,
+      "easing": 0,
+      "a": 32,
+      "b": 32,
+      "n_pegs": 6,
+      "PegContainer1": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 1
+      },
+      "PegContainer2": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer3": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer4": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer5": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer6": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      }
+    },
+    "EllipticControl2": {
+      "shape": 0,
+      "x": 272,
+      "y": 256,
+      "angle": 90,
+      "size": 0,
+      "arc": 360,
+      "use_arc": true,
+      "speed": -1,
+      "easing": 0,
+      "a": 32,
+      "b": 32,
+      "n_pegs": 6,
+      "PegContainer1": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 1
+      },
+      "PegContainer2": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer3": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer4": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer5": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer6": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      }
+    },
+    "EllipticControl3": {
+      "shape": 2,
+      "x": 288,
+      "y": 128,
+      "angle": 90,
+      "size": 0,
+      "arc": 360,
+      "use_arc": true,
+      "speed": 1,
+      "easing": 0,
+      "a": 32,
+      "b": 32,
+      "n_pegs": 6,
+      "PegContainer1": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 1
+      },
+      "PegContainer2": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer3": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer4": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer5": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer6": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      }
+    },
+    "EllipticControl4": {
+      "shape": 2,
+      "x": 124,
+      "y": 256,
+      "angle": 30,
+      "size": 0,
+      "arc": 360,
+      "use_arc": true,
+      "speed": -1,
+      "easing": 0,
+      "a": 32,
+      "b": 32,
+      "n_pegs": 6,
+      "PegContainer1": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 1
+      },
+      "PegContainer2": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer3": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer4": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer5": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer6": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      }
+    },
+    "LinearControl1": {
+      "shape": 1,
+      "x": 28,
+      "y": 80,
+      "angle": 0,
+      "size": 0,
+      "arc": 360,
+      "use_arc": true,
+      "speed": 0.25,
+      "easing": 6,
+      "n_pegs": 6,
+      "n_lines": 7,
+      "PegContainer1": {
+        "shape_override": 0,
+        "size_override": 2,
+        "type": 1
+      },
+      "PegContainer2": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer3": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer4": {
+        "shape_override": 0,
+        "size_override": 2,
+        "type": 2
+      },
+      "PegContainer5": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer6": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "LineContainer1": {
+        "lc_x": 108,
+        "lc_y": 48
+      },
+      "LineContainer2": {
+        "lc_x": 188,
+        "lc_y": 80
+      },
+      "LineContainer3": {
+        "lc_x": 188,
+        "lc_y": 300
+      },
+      "LineContainer4": {
+        "lc_x": 268,
+        "lc_y": 332
+      },
+      "LineContainer5": {
+        "lc_x": 348,
+        "lc_y": 300
+      },
+      "LineContainer6": {
+        "lc_x": 348,
+        "lc_y": 190
+      },
+      "LineContainer7": {
+        "lc_x": 28,
+        "lc_y": 190
+      }
+    },
+    "LinearControl2": {
+      "shape": 1,
+      "x": 372,
+      "y": 80,
+      "angle": 0,
+      "size": 0,
+      "arc": 360,
+      "use_arc": true,
+      "speed": 0.25,
+      "easing": 6,
+      "n_pegs": 6,
+      "n_lines": 7,
+      "PegContainer1": {
+        "shape_override": 0,
+        "size_override": 2,
+        "type": 1
+      },
+      "PegContainer2": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer3": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer4": {
+        "shape_override": 0,
+        "size_override": 2,
+        "type": 2
+      },
+      "PegContainer5": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer6": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "LineContainer1": {
+        "lc_x": 292,
+        "lc_y": 48
+      },
+      "LineContainer2": {
+        "lc_x": 212,
+        "lc_y": 80
+      },
+      "LineContainer3": {
+        "lc_x": 212,
+        "lc_y": 300
+      },
+      "LineContainer4": {
+        "lc_x": 132,
+        "lc_y": 332
+      },
+      "LineContainer5": {
+        "lc_x": 52,
+        "lc_y": 300
+      },
+      "LineContainer6": {
+        "lc_x": 52,
+        "lc_y": 190
+      },
+      "LineContainer7": {
+        "lc_x": 372,
+        "lc_y": 190
+      }
+    }
+  }
+}

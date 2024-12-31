@@ -8,6 +8,7 @@
 #include "sound.h"
 #include "fsm.h"
 #include "io.h"
+#include "input.h"
 
 #ifdef _WINDLL
 __declspec(dllexport)
@@ -18,6 +19,7 @@ static void init(void) {
   bitmapDoInit();
   soundDoInit();
   physicsDoInit();
+  inputDoInit();
   FSMDo(kTitlesFSM_DisplayTitles);
 }
 

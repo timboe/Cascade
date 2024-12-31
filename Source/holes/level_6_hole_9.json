@@ -1,0 +1,28 @@
+{
+  "header": {
+    "save_format": 1,
+    "name": "6-9",
+    "author": "",
+    "level": 6,
+    "hole": 9,
+    "par": 3,
+    "foreground": 5,
+    "background": 0,
+    "special": 0,
+    "height": 960,
+    "snap": 4,
+    "n_static": 1,
+    "n_elliptic": 0,
+    "n_linear": 0
+  },
+  "body": {
+    "StaticControl1": {
+      "shape": 1,
+      "x": 96,
+      "y": 68,
+      "angle": 0,
+      "size": 0,
+      "type": 1
+    }
+  }
+}

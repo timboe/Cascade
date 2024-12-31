@@ -111,7 +111,8 @@ void FSMCommonTurretScrollAndBounceBack(const bool allowScroll) {
 bool FSMCommonMarbleFire(uint16_t* timer) {
   float progress = getEasing(EASE_MARBLE_FIRE, (float)(*timer)/TIME_FIRE_MARBLE);
   static bool once = false;
-  if ((*timer) >= TIME_FIRE_MARBLE || (progress > 0.5f && !inputGetPressed(kButtonB))) { // Fire
+  if ((*timer) >= TIME_FIRE_MARBLE || (progress > MIN_TURRET_CHARGE_TO_FIRE && !inputGetPressed(kButtonB))) { // Fire
+    // physicsSetTimestepMultiplier(0.2f); // testing
     physicsDoResetBall(0);
     physicsDoLaunchBall(progress);
     ++m_ballCount;
@@ -153,10 +154,23 @@ void FSMDisplayLevelTitle(const bool newState) {
     gameDoResetPreviousWaterfall();
     renderDoUpdateBacklines();
     physicsDoResetBall(0);
+    #ifdef DEV
     const uint32_t after = pd->system->getCurrentTimeMilliseconds();
     pd->system->logToConsole("Hole loading took %i ms", (int)(after - before));
+    #endif
   }
   if (timer++ == timeToWait) return FSMDo(kGameFSM_LevelTitleToStart);
+}
+
+void FSMDisplayLevelTitleWFadeIn(const bool newState) {
+  static int8_t progress = FADE_LEVELS - 1;
+  if (newState) {
+    gameSetYOffset(-DEVICE_PIX_Y - TURRET_RADIUS, /*force = */true);
+    progress = FADE_LEVELS - 1;
+  }
+  if (gameGetFrameCount() % (TICK_FREQUENCY / FADE_LEVELS) == 0) { --progress; }
+  renderSetFadeLevel(progress);
+  if (progress == -1) { return FSMDo(kGameFSM_DisplayLevelTitle); }
 }
 
 void FSMLevelTitleToStart(const bool newState) {
@@ -218,6 +232,22 @@ void FSMTutorialGetSpecial(const bool newState) {
 
 void FSMTutorialGetRequired(const bool newState) {
   return FSMTutorialFireMarble(newState); // Functionally identical
+}
+
+void FSMGameFadeOutQuit(const bool newState) {
+  static int8_t progress = 0;
+  if (newState) { progress = 0; }
+  if (gameGetFrameCount() % (TICK_FREQUENCY / FADE_LEVELS) == 0) { ++progress; }
+  if (progress == FADE_LEVELS) { return FSMDo(kTitlesFSM_ChooseHoleWFadeIn); }
+  renderSetFadeLevel(progress);
+}
+
+void FSMGameFadeOutReset(const bool newState) {
+  static int8_t progress = 0;
+  if (newState) { progress = 0; }
+  if (gameGetFrameCount() % (TICK_FREQUENCY / FADE_LEVELS) == 0) { ++progress; }
+  if (progress == FADE_LEVELS) { return FSMDo(kGameFSM_DisplayLevelTitleWFadeIn); }
+  renderSetFadeLevel(progress);
 }
 
 void FSMAimMode(const bool newState) {
@@ -440,7 +470,6 @@ void FSMBallGutter(const bool newState) {
     vY = cpBodyGetVelocity(physicsGetBall(0)).y;
     pause = TICK_FREQUENCY / 2;
   }
-  // pd->system->logToConsole("v %f so %f", vY, gameGetYOffset());
   if (vY > 0.01f) {
     gameSetYOffset(gameGetYOffset() + (vY * TIMESTEP), true);
     vY *= 0.5f;
@@ -460,6 +489,7 @@ void FSMGutterToTurret(const bool newState) {
   static float height_mod = 0.0f;
   if (newState) {
     progress = 0.0f;
+    // soundDoSfx(kWhooshSfx1); // better without?
     startY = gameGetYOffset();
     endY = gameGetMinimumY();
     // Take less time overall when we get lower down
@@ -469,7 +499,6 @@ void FSMGutterToTurret(const bool newState) {
     //
     boardDoAddSpecial(true); // Activate
     physicsDoResetBall(0);
-    soundDoSfx(kWhooshSfx1);
   }
   //
   FSMCommonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
@@ -484,7 +513,6 @@ void FSMGutterToTurret(const bool newState) {
   const float popLevel = tarIOGetPartial + (DEVICE_PIX_Y * easedProgress);
   boardDoBurstPegs(popLevel);
   //
-  // pd->system->logToConsole("end sweep active target %f, pop %f",target, popLevel);
   if (progress >= 1) {
     gameSetYOffset(endY, true);
     boardDoBurstPegs(0);
@@ -503,9 +531,6 @@ void FSMTurretLower(const bool newState) {
     endY = gameGetMinimumY();
     //
     int32_t minY = 10000;
-    // pd->system->logToConsole("req pegs hit = %i", boardGetRequiredPegsHit());
-    // pd->system->logToConsole("req pegs total = %i", boardGetRequiredPegsTotal());
-    // pd->system->logToConsole("req pegs in play = %i", boardGetRequiredPegsInPlay());
     if (boardGetRequiredPegsHit() == 0) {
       // No required pegs hit yet, don't move down yet
       minY = 0;
@@ -513,7 +538,6 @@ void FSMTurretLower(const bool newState) {
       // At least one required peg hit, move down
       for (uint32_t i = 0; i < MAX_PEGS; ++i) {
         const struct Peg_t* p = boardGetPeg(i);
-        //pd->system->logToConsole("peg %i state=%i (1==active), type=%i (1==req), shape=%i (rect,ball,tri), y=%f minY=%f", i, p->state, p->type, p->shape, p->y, p->minY);
         if (p->state == kPegStateActive && p->type == kPegTypeRequired && p->minY < minY) {
           minY = p->minY;
         }
@@ -535,7 +559,6 @@ void FSMTurretLower(const bool newState) {
       if (speed < 1.0f) speed = 1.0f;
       soundDoSfx(kRelocateTurretSfx);
     }
-    // pd->system->logToConsole("speed is %f", speed);
   }
   //
   FSMCommonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
@@ -546,7 +569,6 @@ void FSMTurretLower(const bool newState) {
   gameSetYOffset(progressY, true);
   gameSetMinimumY(progressY);
   //
-  // pd->system->logToConsole("end sweep active target %f, pop %f",target, popLevel);
   if (progress >= 1) {
     gameSetYOffset(endY, true);
     gameSetMinimumY(endY);
@@ -589,7 +611,6 @@ void FSMScoresAnimation(const bool newState) {
       renderSetMarbleFallY(i, py[i]);
     }
     IOSetCurrentHoleScore(m_ballCount);
-    // pd->system->logToConsole("kGameFSM_ScoresAnimation, ballsToShow %i. Current hole score is %i", ballsToShow, IOGetCurrentHoleScore());
   }
   //
   bool moving = false;
@@ -606,7 +627,6 @@ void FSMScoresAnimation(const bool newState) {
       moving = true;
     }
     renderSetMarbleFallY(i, py[i]);
-    // pd->system->logToConsole("kGameFSM_ScoresAnimation, i %i y %f",i, py[i]);
   }
   if (++timer % TIME_BALL_DROP_DELAY == 0 && activeBalls < ballsToShow) { activeBalls++; }
   if (!moving) return FSMDo(kGameFSM_DisplayScores);
@@ -654,7 +674,6 @@ void FSMScoresToSplash(const bool newState) {
     }
     bitmapDoUpdateLevelTitle();
     bitmapDoUpdateGameInfoTopper();
-    // pd->system->logToConsole("kGameFSM_ScoresToSplash");
   }
   FSMDoCommonScrollTo(start, DEVICE_PIX_Y*6, (float)timer/TIME_SCORE_TO_LEVELTITLE, EASE_SCORE_TO_SPLASH);
   if (timer++ == TIME_SCORE_TO_LEVELTITLE) { return FSMDo(kGameFSM_DisplayLevelTitle); }
@@ -668,6 +687,7 @@ void FSMToGameCreditsTitle(const bool newState) { // Note: Separate Game and Tit
     bitmapDoUpdateGameInfoTopper();
     bitmapDoUpdateLevelTitle();
     timer = 0;
+    soundDoSfx(kWhooshSfx1);
     start = gameGetYOffset();
     pd->system->removeAllMenuItems();
   }

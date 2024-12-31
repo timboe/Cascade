@@ -211,7 +211,6 @@ void boardDoTestLevel(void) {
   //   linearLoader.easing = (enum EasingFunction_t) rand() % kNEasingFunctions;
   //   linearLoader.speed = 0.1f * ((rand() % 10) + 1); 
   //   linearLoader.size = rand() % MAX_PEG_SIZE;
-  //   pd->system->logToConsole("add path");
   //   boardDoAddLinear(&linearLoader);    
   // }
 
@@ -267,7 +266,6 @@ enum PegSpecial_t boardDoAddSpecial(const bool activate) {
     if (m_specialCounter) {
       m_special = m_specialToActivate;
       --m_specialCounter;
-      pd->system->logToConsole("activated %s, %i left", pegGetSpecialTxt(m_special), m_specialCounter);
     }
 
   } else {

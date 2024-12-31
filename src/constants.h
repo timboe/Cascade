@@ -1,5 +1,5 @@
 
-#define DEV 1
+//#define DEV 1
 
 //#define TAKE_SCREENSHOTS 1
 
@@ -133,6 +133,8 @@
 #define EASE_SCORE_TO_TRY_AGAIN kEaseInOutSine
 #define EASE_SCORE_TO_SPLASH kEaseOutSine
 
+#define MIN_TURRET_CHARGE_TO_FIRE 0.25f
+
 // PEGS
 
 #define MAX_PEGS 256
@@ -154,11 +156,13 @@
 
 #define N_PLINGS_SFX 16
 #define N_SPLASHES_SFX 5
+#define N_POPS_SFX 3
 
 #define N_MUSIC_TRACKS 12
 
 #define N_WF_TRACKS 6
 
+#define CRANK_NOISE_ANGLE 30.0f
 
 // PHYSICS 
 
