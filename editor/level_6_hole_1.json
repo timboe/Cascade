@@ -1,10 +1,10 @@
 {
   "header": {
     "save_format": 1,
-    "name": "GIRAFFE",
+    "name": "TREE",
     "author": "",
     "level": 6,
-    "hole": 6,
+    "hole": 1,
     "par": 3,
     "foreground": 5,
     "background": 0,
