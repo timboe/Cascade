@@ -34,7 +34,7 @@
     },
     "StaticControl3": {
       "shape": 2,
-      "x": 252,
+      "x": 264,
       "y": 346,
       "angle": 0,
       "size": 1,
@@ -42,8 +42,8 @@
     },
     "StaticControl4": {
       "shape": 2,
-      "x": 252,
-      "y": 348,
+      "x": 264,
+      "y": 346,
       "angle": 180,
       "size": 0,
       "type": 0
@@ -130,16 +130,16 @@
     },
     "StaticControl15": {
       "shape": 2,
-      "x": 168,
-      "y": 402,
+      "x": 174,
+      "y": 400,
       "angle": 0,
       "size": 1,
       "type": 0
     },
     "StaticControl16": {
       "shape": 2,
-      "x": 168,
-      "y": 402,
+      "x": 174,
+      "y": 400,
       "angle": 180,
       "size": 0,
       "type": 0
@@ -408,8 +408,8 @@
     },
     "LinearControl4": {
       "shape": 0,
-      "x": 158,
-      "y": 280,
+      "x": 162,
+      "y": 278,
       "angle": 240,
       "size": 0,
       "arc": 180,
@@ -439,13 +439,13 @@
         "type": 0
       },
       "LineContainer1": {
-        "lc_x": 268,
-        "lc_y": 460
+        "lc_x": 272,
+        "lc_y": 458
       }
     },
     "LinearControl5": {
       "shape": 0,
-      "x": 82,
+      "x": 88,
       "y": 280,
       "angle": 120,
       "size": 0,
@@ -476,7 +476,7 @@
         "type": 0
       },
       "LineContainer1": {
-        "lc_x": -28,
+        "lc_x": -22,
         "lc_y": 460
       }
     },
