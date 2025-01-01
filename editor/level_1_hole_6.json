@@ -269,27 +269,27 @@
       "PegContainer8": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       },
       "PegContainer9": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       },
       "PegContainer10": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       },
       "PegContainer11": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       },
       "PegContainer12": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       }
     },
     "EllipticControl3": {
