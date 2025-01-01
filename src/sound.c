@@ -155,6 +155,7 @@ void soundDoInit() {
   m_audioSample[kRelocateTurretSfx] =  pd->sound->sample->load("fx/134935__ztrees1__whoosh");
   m_audioSample[kTumblerClickSfx] =  pd->sound->sample->load("fx/tumblerClick");
   m_audioSample[kCrankClickSfx] =  pd->sound->sample->load("fx/crankClick");
+  m_audioSample[kFizzleSfx] =  pd->sound->sample->load("fx/133448__chaosportal__cigarette-sizzle-01");
 
   for (int32_t i = 0; i < kNSFX; ++i) {
     m_samplePlayer[i] = pd->sound->sampleplayer->newPlayer();
@@ -200,7 +201,7 @@ void soundDoInit() {
 }
 
 void soundDoSfx(enum SfxSample sample) {
-  if (!m_doSfx) return;
+  if (!m_doSfx || IOGetIsPreloading()) return;
 
   if (sample == kPlingSfx1 || sample == kDingSfx1) {
     if (m_doingExplosion) {

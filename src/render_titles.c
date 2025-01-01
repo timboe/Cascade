@@ -84,8 +84,10 @@ void renderTitlesLevelSelect(const bool locked, const int32_t fc) {
   digit1[2] = (IOGetNextLevel() + 1) % 10;
   float offY = (NUMERAL_PIX_Y / 2) * m_numeralOffset;
 
-  pd->graphics->drawBitmap(bitmapGetTitleLevel(), DEVICE_PIX_X - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF + parallax, kBitmapUnflipped);
-  pd->graphics->drawBitmap(bitmapGetTitleLevelStats(), DEVICE_PIX_X - (2*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF + NUMERAL_PIX_Y + parallax, kBitmapUnflipped);
+  pd->graphics->drawBitmap(bitmapGetTitleLevel(), 
+    DEVICE_PIX_X - (2*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF - TITLETEXT_HEIGHT + parallax, kBitmapUnflipped);
+  pd->graphics->drawBitmap(bitmapGetTitleLevelStats(), 
+    DEVICE_PIX_X - (2*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF + NUMERAL_PIX_Y + parallax, kBitmapUnflipped);
   if (!locked) {
     pd->graphics->drawBitmap(bitmapGetNumeral(digit0[1]),
       DEVICE_PIX_X - (2*NUMERAL_PIX_X) - NUMERAL_BUF, (DEVICE_PIX_Y*2) + NUMERAL_BUF + parallax, kBitmapUnflipped);

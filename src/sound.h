@@ -42,6 +42,7 @@ enum SfxSample {
   kPopSfx1,
   kPopSfx2,
   kPopSfx3,
+  kFizzleSfx,
   kExplosionSfx,
   kBallClinkSfx,
   kDrumRollSfx1,
