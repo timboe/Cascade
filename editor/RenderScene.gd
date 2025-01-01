@@ -170,7 +170,11 @@ func render_elliptic_path(ellipticPath : Control):
 			shape_peg = custom_shape-1
 		if custom_size:
 			size_peg = custom_size-1
-		timeText.value = timeText.value + (speed * (1.0/30.0))
+		var t = timeText.value 
+		t = t + (speed * (1.0/30.0))
+		if t < 0:
+			t += 2*PI
+		timeText.value = t
 		var x_peg : float = x + (a * cos(timeText.value))
 		var y_peg : float = y + (b * sin(timeText.value))
 		var draw_angle : float
