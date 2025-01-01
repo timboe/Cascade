@@ -17,6 +17,7 @@ uint16_t m_ballCount = 0; // Keeping track of the current level score
 cpVect m_finalRequiredPos; // Position of the final required ped on the board
 
 bool m_vetoCloseUp = false; // If we break out of close up, then don't do it again on this ball
+uint16_t m_fizzleTimer = 0; // Prevent going straight back in to close up
 
 void FSMCommonTurretScrollAndBounceBack(const bool allowScroll);
 
@@ -167,6 +168,7 @@ void FSMDisplayLevelTitleWFadeIn(const bool newState) {
   if (newState) {
     gameSetYOffset(-DEVICE_PIX_Y - TURRET_RADIUS, /*force = */true);
     progress = FADE_LEVELS - 1;
+    soundDoSfx(kWhooshSfx1);
   }
   if (gameGetFrameCount() % (TICK_FREQUENCY / FADE_LEVELS) == 0) { --progress; }
   renderSetFadeLevel(progress);
@@ -258,6 +260,7 @@ void FSMAimMode(const bool newState) {
     renderDoResetTriggerSplash();
     timer = 0;
     m_vetoCloseUp = false;
+    m_fizzleTimer = 0;
   }
   //
   FSMCommonTurretScrollAndBounceBack(true);
@@ -315,12 +318,14 @@ void FSMPlayCredits(const bool newState) {
 }
 
 void FSMBallInPlay(const bool newState) {
+  static int16_t finalPegID = -1;
   const enum PegSpecial_t special = boardGetCurrentSpecial();
   if (newState) {
     FSMDoResetBallStuckCounter();
     renderSetMarblePootCircle(0);
     m_finalRequiredPos.x = 0;
     m_finalRequiredPos.y = 0;
+    finalPegID = -1;
   }
   // Focus on ball, check gutter
   const bool guttered = FSMCommonFocusOnLowestBallInPlay(special);
@@ -331,19 +336,22 @@ void FSMBallInPlay(const bool newState) {
   // Ball close -> to close up
   const int16_t bgrpip = boardGetRequiredPegsInPlay();
   if (bgrpip == 1) {
-    // Locate and cache final peg
-    if (!m_finalRequiredPos.y) {
+    if (m_fizzleTimer) { --m_fizzleTimer; }
+    // Locate final peg (it may be moving)
+    if (finalPegID == -1) { // Cache this
       for (int i = 0; i < boardGetNPegs(); ++i) {
         const struct Peg_t* p = boardGetPeg(i);
         if (p->type == kPegTypeRequired && p->state == kPegStateActive) {
-          m_finalRequiredPos.x = p->x;
-          m_finalRequiredPos.y = p->y;
+          finalPegID = i;
           break;
         }
       }
     }
+    const struct Peg_t* p = boardGetPeg(finalPegID);
+    m_finalRequiredPos.x = p->x;
+    m_finalRequiredPos.y = p->y;
     // Check for distance to final peg
-    if (!m_vetoCloseUp) {
+    if (!m_vetoCloseUp && !m_fizzleTimer) {
       for (int i = 0; i < MAX_BALLS; ++i) {
         if (i == 1 && special != kPegSpecialMultiball) { break; }
         cpVect ballPos = cpBodyGetPosition(physicsGetBall(i));
@@ -397,23 +405,24 @@ void FSMCloseUp(const bool newState) {
     }
   }
 
-  if (timer >= 10.0f) {
-    m_vetoCloseUp = true;
-  }
-
+  if (timer >= 10.0f) { m_vetoCloseUp = true; }
   const bool stuck = FSMCommonGetIsBallStuck(special) || m_vetoCloseUp;
 
   if (stuck || whichBall == -1 || !boardGetRequiredPegsInPlay()) {
     renderSetScale(1);
     gameSetXOffset(0);
     soundStopSfx(kDrumRollSfx1);
+    m_fizzleTimer = FIZZLE_TIME; // Irrelevent if going to wining toast
     if (stuck) {
       physicsSetTimestepMultiplier(1.0f);
+      soundDoSfx(kFizzleSfx);
       FSMDo(kGameFSM_BallStuck);
     } else if (whichBall == -1) {
       physicsSetTimestepMultiplier(1.0f);
+      soundDoSfx(kFizzleSfx);
       return FSMDo(kGameFSM_BallInPlay);
     } else {
+      soundDoSfx(kDrumRollSfx2);
       return FSMDo(kGameFSM_WinningToast);
     }
   }
@@ -428,7 +437,6 @@ void FSMWinningToast(const bool newState) {
     renderDoResetEndBlast();
     renderDoAddEndBlast(physicsGetBall(0));
     soundDoMusic();
-    soundDoSfx(kDrumRollSfx2);
   }
 
   const float tsm = physicsGetTimestepMultiplier();

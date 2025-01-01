@@ -654,7 +654,8 @@ void bitmapDoUpdateScoreCard(void) {
   {
     char text[128];
     int16_t tot = totPar - totScore;
-    if (tot > 0) { snprintf(text, 128, "%i OVER PAR", tot); }
+    if (!totScore) { snprintf(text, 128, "0 HOLES PLAYED"); }
+    else if (tot > 0) { snprintf(text, 128, "%i OVER PAR", tot); }
     else if (tot < 0) { snprintf(text, 128, "%i UNDER PAR", tot*-1); }
     else { snprintf(text, 128, "EQUAL TO PAR"); }
     const int32_t w = pd->graphics->getTextWidth(bitmapGetRoobert10(), text, 128, kUTF8Encoding, 0);
@@ -970,21 +971,17 @@ void bitmapDoPreloadJ(void) {
 
   //
 
-  LCDBitmap* tempBitmap = pd->graphics->newBitmap(NUMERAL_PIX_Y, TITLETEXT_HEIGHT, kColorClear);
-  pd->graphics->pushContext(tempBitmap);
-  bitmapSetRoobert24();
-  const int32_t w1 = pd->graphics->getTextWidth(bitmapGetRoobert24(), "LEVEL", 128, kUTF8Encoding, 0);
-  pd->graphics->setDrawMode(kDrawModeFillBlack);
-  bitmapDoDrawOutlineText("LEVEL", 128, NUMERAL_PIX_Y/2 - w1/2, 0, 2);
-  pd->graphics->popContext();
-
-  m_levelBitmap = pd->graphics->newBitmap(TITLETEXT_HEIGHT, NUMERAL_PIX_Y, kColorClear);
+  m_levelBitmap = pd->graphics->newBitmap(NUMERAL_PIX_X*2, TITLETEXT_HEIGHT, kColorClear);
   pd->graphics->pushContext(m_levelBitmap);
-  pd->graphics->drawRotatedBitmap(tempBitmap, TITLETEXT_HEIGHT/2, NUMERAL_PIX_Y/2, 90.0f, 0.5f, 0.5f, 1.0f, 1.0f);
+  bitmapSetRoobert24();
+  const int32_t w1 = pd->graphics->getTextWidth(bitmapGetRoobert24(), "ROUND", 128, kUTF8Encoding, 0);
+  pd->graphics->setDrawMode(kDrawModeFillBlack);
+  bitmapDoDrawOutlineText("ROUND", 128, NUMERAL_PIX_X - w1/2, 0, 2);
   pd->graphics->popContext();
 
   //
 
+  LCDBitmap* tempBitmap = pd->graphics->newBitmap(NUMERAL_PIX_Y, TITLETEXT_HEIGHT, kColorClear);
   pd->graphics->clearBitmap(tempBitmap, kColorClear);
   pd->graphics->pushContext(tempBitmap);
   bitmapSetRoobert24();

@@ -184,6 +184,7 @@ void FSMChooseHoleWFadeIn(const bool newState) {
   if (newState) {
     gameSetYOffset(DEVICE_PIX_Y*3, /*force = */true);
     progress = FADE_LEVELS - 1;
+    soundDoSfx(kWhooshSfx1);
   }
   if (gameGetFrameCount() % (TICK_FREQUENCY / FADE_LEVELS) == 0) { --progress; }
   renderSetFadeLevel(progress);

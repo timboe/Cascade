@@ -263,10 +263,9 @@ enum PegSpecial_t boardDoAddSpecial(const bool activate) {
 
   if (activate) {
 
-    if (m_specialCounter) {
-      m_special = m_specialToActivate;
-      --m_specialCounter;
-    }
+    if (m_specialCounter) { --m_specialCounter; } 
+    else                  { m_specialToActivate = kPegSpecialNotSpecial; }
+    m_special = m_specialToActivate;
 
   } else {
 

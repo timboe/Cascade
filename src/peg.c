@@ -157,11 +157,10 @@ void pegDoUpdate(struct Peg_t* p) {
     return;
   }
 
-
   const float tsm = physicsGetTimestepMultiplier();
   p->time += (TIMESTEP * tsm * p->speed);
   if (p->time >= M_2PIf) { p->time -= M_2PIf; } // Keep this one bounded
-  else if (p->time < -M_2PIf) { p->time += M_2PIf; } // Speed might be -ve
+  else if (p->time < 0) { p->time += M_2PIf; } // Speed might be -ve
 
   if (p->motion == kPegMotionStatic) {
 
@@ -169,12 +168,17 @@ void pegDoUpdate(struct Peg_t* p) {
 
   } else if (p->motion == kPegMotionEllipse) {
 
-    const float easing = getEasing(p->easing, p->time / M_2PIf) * M_2PIf;
-    p->x = p->pathX[0] + (p->a * cosf(easing));
-    p->y = p->pathY[0] + (p->b * sinf(easing));
-    if (p->doArcAngle) {
-      pegDoUpdateAngle(p, easing + p->angle );
-    }
+    // Think this is broken, especially the angle bit. TODO - fix easing for ellipse?
+    // const float easing = getEasing(p->easing, p->time / M_2PIf) * M_2PIf;
+    // p->x = p->pathX[0] + (p->a * cosf(easing));
+    // p->y = p->pathY[0] + (p->b * sinf(easing));
+    // if (p->doArcAngle) {
+    //   pegDoUpdateAngle(p, easing + p->angle );
+    // }
+    p->x = p->pathX[0] + (p->a * cosf(p->time));
+    p->y = p->pathY[0] + (p->b * sinf(p->time));
+    if (p->doArcAngle) { pegDoUpdateAngle(p, p->time + p->angle ); }
+
 
   } else if (p->motion == kPegMotionPath) {
 
@@ -225,6 +229,7 @@ void pegDoUpdate(struct Peg_t* p) {
     cpBodySetVelocity(p->cpBody, cpvzero);
     // No need for more updates
     p->motion = kPegMotionStatic;
+    pegSetMotionStatic(p);
   } else {
     cpBodySetVelocity(p->cpBody, cpv((p->x - pos.x)/TIMESTEP, (p->y - pos.y)/TIMESTEP));
   }
@@ -290,6 +295,7 @@ void pegDoMotionPathFinalise(struct Peg_t* p) {
 }
 
 void pegDoHit(struct Peg_t* p) {
+  const bool winToast = (FSMGet() == kGameFSM_WinningToast);
   if (p->state == kPegStateActive 
     && FSMGetBallInPlay()
     && p->y < IOGetCurrentHoleHeight()
@@ -303,8 +309,8 @@ void pegDoHit(struct Peg_t* p) {
       physicsSetSecondBallInPlay();
       soundDoSfx(kSplitSfx);
     } else if (special == kPegSpecialBlast) {
-      boardDoClearSpecial(); // Do this first, it's going to recurse!
-      soundSetDoingExplosion(true); // Also do this first - we don't want to play these sfx
+      boardDoClearSpecial(); // Do this first, it's going to recurse when we start to hit pegs in the explosion radius!
+      soundSetDoingExplosion(true); // Also do this first - we don't want to play the ping sfx from all of the hit pegs
       boardDoSpecialBlast();
       renderAddTrauma(TRAUMA_BLAST_HIT);
       renderDoAddSpecialBlast(p->cpBody);
@@ -315,20 +321,20 @@ void pegDoHit(struct Peg_t* p) {
       renderAddTrauma(TRAUMA_REQUIRED_HIT);
       renderAddFreeze(FREEZE_REQUIRED_HIT);
       boardDoRequiredPegHit();
-      if (FSMGet() != kGameFSM_WinningToast) { soundDoSfx(kDingSfx1); }
+      if (!winToast) { soundDoSfx(kDingSfx1); }
     } else if (p->type == kPegTypeSpecial) {
       renderAddTrauma(TRAUMA_SPECIAL_HIT);
       renderAddFreeze(FREEZE_SPECIAL_HIT);
       const enum PegSpecial_t special = boardDoAddSpecial(/*activate = */false);
       renderDoAddSpecial(p->cpBody, special);
-      if (FSMGet() != kGameFSM_WinningToast) { soundDoSfx(kDingSfx1); } // TODO Make unique?
+      if (!winToast) { soundDoSfx(kDingSfx1); } // TODO Make unique?
     } else {
       renderAddTrauma(TRAUMA_PEG_HIT);
       renderAddFreeze(FREEZE_PEG_HIT);
-      if (FSMGet() != kGameFSM_WinningToast) { soundDoSfx(kPlingSfx1); }
+      if (!winToast) { soundDoSfx(kPlingSfx1); }
     }
   }
-  if (p->state == kPegStateHit && FSMGet() == kGameFSM_WinningToast) {
+  if (p->state == kPegStateHit && winToast) {
     p->queueRemove = true; // Can't remove in the middle of a physics callback
     p->popFrame = 0;
     soundDoSfx(kPopSfx1);

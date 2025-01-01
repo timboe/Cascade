@@ -119,7 +119,7 @@ void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) 
 #endif // DEV
 
   pd->system->drawFPS(0, 0);
-  
+
 }
 
 void renderTitles(const int32_t fc) {
@@ -129,7 +129,7 @@ void renderTitles(const int32_t fc) {
   if (so < DEVICE_PIX_Y) { renderTitlesHeader(fc); }
 
   // PLAYER SELECT
-  if (so > 0 && so <= DEVICE_PIX_Y*2 ) { renderTitlesPlayerSelect(so == DEVICE_PIX_Y, fc); }
+  if (so > 0 && so < DEVICE_PIX_Y*2 ) { renderTitlesPlayerSelect(so == DEVICE_PIX_Y, fc); }
 
   // LEVEL SELECT
   if (so > DEVICE_PIX_Y && so <= DEVICE_PIX_Y*3) { renderTitlesLevelSelect(so == 2*DEVICE_PIX_Y, fc); }
