@@ -1,5 +1,6 @@
 #include "sound.h"
 #include "io.h"
+#include "board.h"
 
 bool m_doSfx = true;
 bool m_doMusic = true;
@@ -156,6 +157,8 @@ void soundDoInit() {
   m_audioSample[kTumblerClickSfx] =  pd->sound->sample->load("fx/tumblerClick");
   m_audioSample[kCrankClickSfx] =  pd->sound->sample->load("fx/crankClick");
   m_audioSample[kFizzleSfx] =  pd->sound->sample->load("fx/133448__chaosportal__cigarette-sizzle-01");
+  m_audioSample[kBoingSfx1] =  pd->sound->sample->load("fx/201260__empraetorius__water-bottle-boing__1");
+  m_audioSample[kBoingSfx2] =  pd->sound->sample->load("fx/201260__empraetorius__water-bottle-boing__2");
 
   for (int32_t i = 0; i < kNSFX; ++i) {
     m_samplePlayer[i] = pd->sound->sampleplayer->newPlayer();
@@ -213,6 +216,7 @@ void soundDoSfx(enum SfxSample sample) {
     sample += m_plingID;
     if (m_plingID < N_PLINGS_SFX-1) m_plingID++;
     m_plingTimer = gameGetFrameCount();
+    if (boardGetCurrentSpecial() == kPegSpecialBounce) { sample = rand() % 2 ? kBoingSfx1 : kBoingSfx2; }
   } else  if (sample == kWhooshSfx1) { // Round robin
     static uint8_t offset = 0;
     offset = (offset + 1) % 4;
