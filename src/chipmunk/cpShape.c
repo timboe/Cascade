@@ -68,6 +68,7 @@ cpShapeFree(cpShape *shape)
 {
 	if(shape){
 		cpShapeDestroy(shape);
+		// pdxlog("< M-FREE (shape)");
 		cpfree(shape);
 	}
 }
@@ -285,6 +286,7 @@ cpShapesCollide(const cpShape *a, const cpShape *b)
 cpCircleShape *
 cpCircleShapeAlloc(void)
 {
+	// pdxlog("> M-ALLOC (circle shape)");
 	return (cpCircleShape *)cpcalloc(1, sizeof(cpCircleShape));
 }
 
@@ -372,6 +374,7 @@ cpCircleShapeGetRadius(const cpShape *shape)
 cpSegmentShape *
 cpSegmentShapeAlloc(void)
 {
+	// pdxlog("> M-ALLOC (segment shape)");
 	return (cpSegmentShape *)cpcalloc(1, sizeof(cpSegmentShape));
 }
 

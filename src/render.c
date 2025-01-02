@@ -107,18 +107,14 @@ void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) 
 
   if (m_fadeLevel >= 0) { renderFade(); }
 
-  // Draw FPS indicator (dbg only)
-#ifdef DEV
+  // Draw FPS indicator
+#ifdef SHOW_FPS
   bool screenShotVeto = false;
 #ifdef TAKE_SCREENSHOTS
   screenShotVeto = screenShotGetInProgress();
 #endif // TAKE_SCREENSHOTS
-  if (ALWAYS_FPS && !screenShotVeto) {
-    pd->system->drawFPS(0, 0);
-  }
-#endif // DEV
-
-  pd->system->drawFPS(0, 0);
+  if (!screenShotVeto) { pd->system->drawFPS(0, 0); }
+#endif // SHOW_FPS
 
 }
 
@@ -132,13 +128,13 @@ void renderTitles(const int32_t fc) {
   if (so > 0 && so < DEVICE_PIX_Y*2 ) { renderTitlesPlayerSelect(so == DEVICE_PIX_Y, fc); }
 
   // LEVEL SELECT
-  if (so > DEVICE_PIX_Y && so <= DEVICE_PIX_Y*3) { renderTitlesLevelSelect(so == 2*DEVICE_PIX_Y, fc); }
+  if (so > DEVICE_PIX_Y && so < DEVICE_PIX_Y*3) { renderTitlesLevelSelect(so == 2*DEVICE_PIX_Y, fc); }
 
   // HOLE SELECT
-  if (so > DEVICE_PIX_Y*2 && so <= DEVICE_PIX_Y*5) { renderTitlesWfPond(fc); }
+  if (so > DEVICE_PIX_Y*2 && so < DEVICE_PIX_Y*5) { renderTitlesWfPond(fc); }
 
   // HOLE SELECT
-  if (so > DEVICE_PIX_Y*2 && so <= DEVICE_PIX_Y*4) { renderTitlesHoleSelect(so == 3*DEVICE_PIX_Y, fc); }
+  if (so > DEVICE_PIX_Y*2 && so < DEVICE_PIX_Y*4) { renderTitlesHoleSelect(so == 3*DEVICE_PIX_Y, fc); }
 
   // TRANSITION LEVEL SPLASH
   if (so > DEVICE_PIX_Y*4) { renderTitlesTransitionLevelSplash(); }

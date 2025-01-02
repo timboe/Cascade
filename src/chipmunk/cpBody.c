@@ -27,6 +27,7 @@
 cpBody*
 cpBodyAlloc(void)
 {
+	// pdxlog("> M-ALLOC (body)");
 	return (cpBody *)cpcalloc(1, sizeof(cpBody));
 }
 
@@ -96,6 +97,7 @@ cpBodyFree(cpBody *body)
 {
 	if(body){
 		cpBodyDestroy(body);
+		// pdxlog("< M-FREE (body)");
 		cpfree(body);
 	}
 }

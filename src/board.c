@@ -50,7 +50,13 @@ void boardDoInit(void) {
   // m_special = kPegSpecialBlast; // TESTING
 }
 
-struct Peg_t* pegFromPool(void) { return &m_pegs[m_nPegs++]; }
+struct Peg_t* boardNewPegFromPool(void) { 
+  if (m_nPegs == MAX_PEGS) { 
+    pd->system->error("Run out of pegs!");
+    return NULL;
+  }
+  return &m_pegs[m_nPegs++];
+}
 
 struct Peg_t* boardGetPeg(const uint16_t i) { return &m_pegs[i]; }
 
@@ -71,8 +77,10 @@ void boardDoSpecialBlast(void) {
 
 void boardDoAddWheel(const struct EllipticLoader_t* ellipticLoader) {
   for (int i = 0; i < ellipticLoader->nPegs; ++i) {
+    // pd->system->logToConsole("+++ boardDoAddWheel %i of %i", i, ellipticLoader->nPegs); 
     if (ellipticLoader->types[i] == kPegTypeMissing) { continue; }
-    struct Peg_t* p = pegFromPool();
+    struct Peg_t* p = boardNewPegFromPool();
+    if (!p) continue;
     enum PegShape_t shape = ellipticLoader->shape;
     // -1 in the overrides is because 0 here represents Inherit, and all othher enums are incremented by 1
     if (ellipticLoader->shapeOverride[i]) { shape = (enum PegShape_t) ellipticLoader->shapeOverride[i] - 1; }
@@ -85,18 +93,17 @@ void boardDoAddWheel(const struct EllipticLoader_t* ellipticLoader) {
     pegSetMotionEasing(p, ellipticLoader->easing);
     pegSetMotionDoArcAngle(p, ellipticLoader->useArc);
     pegSetMotionEllipse(p, ellipticLoader->a, ellipticLoader->b);
-    if (ellipticLoader->types[i] == kPegTypeRequired) { 
-      ++m_requiredPegsInPlay;
-    }
+    if (ellipticLoader->types[i] == kPegTypeRequired) { ++m_requiredPegsInPlay; }
     pegSetType(p, ellipticLoader->types[i]);
   }
 }
 
-
 void boardDoAddLinear(const struct LinearLoader_t* linearLoader) {
   for (int i = 0; i < linearLoader->nPegs; ++i) {
+    // pd->system->logToConsole("+++ boardDoAddLinear %i of %i", i, linearLoader->nPegs); 
     if (linearLoader->types[i] == kPegTypeMissing) { continue; }
-    struct Peg_t* p = pegFromPool();
+    struct Peg_t* p = boardNewPegFromPool();
+    if (!p) continue;
     enum PegShape_t shape = linearLoader->shape;
     if (linearLoader->shapeOverride[i]) { shape = (enum PegShape_t) linearLoader->shapeOverride[i] - 1; }
     uint8_t size = linearLoader->size;
@@ -107,11 +114,10 @@ void boardDoAddLinear(const struct LinearLoader_t* linearLoader) {
     pegSetMotionOffset(p, angleOffset + linearLoader->maxAngle);
     pegSetMotionEasing(p, linearLoader->easing);
     pegSetMotionDoArcAngle(p, linearLoader->useArc);
-    if (linearLoader->types[i] == kPegTypeRequired) { 
-      ++m_requiredPegsInPlay;
-    }
+    if (linearLoader->types[i] == kPegTypeRequired) { ++m_requiredPegsInPlay; }
     pegSetType(p, linearLoader->types[i]);
     for (int j = 0; j < linearLoader->nLines; ++j) {
+      // pd->system->logToConsole("  +++ mp %i of %i: %i %i", j, linearLoader->nLines, linearLoader->pathX[j], linearLoader->pathY[j]);
       pegAddMotionPath(p, linearLoader->pathX[j], linearLoader->pathY[j]);
     }
     pegDoMotionPathFinalise(p);
@@ -119,12 +125,11 @@ void boardDoAddLinear(const struct LinearLoader_t* linearLoader) {
 }
 
 struct Peg_t* boardDoAddStatic(const struct StaticLoader_t* staticLoader) {
-  struct Peg_t* p = pegFromPool();
+  struct Peg_t* p = boardNewPegFromPool();
+  if (!p) { return NULL; }
   pegDoInit(p, staticLoader->shape, staticLoader->x, staticLoader->y, staticLoader->angle, staticLoader->size);
   pegSetMotionStatic(p);
-  if (staticLoader->type == kPegTypeRequired) { 
-    ++m_requiredPegsInPlay;
-  }
+  if (staticLoader->type == kPegTypeRequired) { ++m_requiredPegsInPlay; }
   pegSetType(p, staticLoader->type);
   return p;
 }
@@ -232,7 +237,6 @@ void boardDoClear(void) {
   m_special = kPegSpecialNotSpecial;
   m_specialToActivate = kPegSpecialNotSpecial;
 }
-
 
 void boardDoBurstPegs(const float yLevel) {
   m_lastBurstLevel = yLevel;

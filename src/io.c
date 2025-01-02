@@ -390,32 +390,33 @@ int IOShouldDecodeScan(json_decoder* jd, const char* key) {
 }
 
 void IODidDecodeScan(json_decoder* jd, const char* key, json_value value) {
+  const int valueI = json_intValue(value);
   // pd->system->logToConsole("IODidDecodeScan deode %s", key);
   if (strcmp(key, "par") == 0) {
-    m_hole_par[m_level][m_hole] = json_intValue(value);
+    m_hole_par[m_level][m_hole] = valueI;
     // pd->system->logToConsole("m_hole_par[%i][%i] = %i", m_level, m_hole, m_hole_par[m_level][m_hole]);
   } else if (strcmp(key, "foreground") == 0) {
-    m_hole_foreground[m_level][m_hole] = json_intValue(value);
+    m_hole_foreground[m_level][m_hole] = valueI;
     // pd->system->logToConsole("m_hole_foreground[%i][%i] = %i", m_level, m_hole, m_hole_foreground[m_level][m_hole]);
   } else if (strcmp(key, "background") == 0) {
-    m_hole_background[m_level][m_hole] = json_intValue(value);
+    m_hole_background[m_level][m_hole] = valueI;
     // pd->system->logToConsole("m_hole_background[%i][%i] = %i", m_level, m_hole, m_hole_background[m_level][m_hole]);
   } else if (strcmp(key, "special") == 0) {
-    m_hole_special[m_level][m_hole] = (enum PegSpecial_t) json_intValue(value);
+    m_hole_special[m_level][m_hole] = (enum PegSpecial_t) valueI;
   } else if (strcmp(key, "height") == 0) {
-    m_hole_height[m_level][m_hole] = json_intValue(value);
+    m_hole_height[m_level][m_hole] = valueI;
   } else if (strcmp(key, "name") == 0) {
     strcpy(m_hole_name[m_level][m_hole], json_stringValue(value)); 
     // pd->system->logToConsole("decoded name %s", m_hole_name[m_level][m_hole]);
   } else if (strcmp(key, "author") == 0) {
     strcpy(m_hole_author[m_level][m_hole], json_stringValue(value)); 
-  } else if (strcmp(key, "level") == 0 && json_intValue(value)-1 != m_level) {
+  } else if (strcmp(key, "level") == 0 && valueI-1 != m_level) {
     #ifdef DEV
-    pd->system->logToConsole("IODidDecodeScan WARNING LEVEL MISSMATCH got:%i expecting:%i", json_intValue(value)-1, (int)m_level);
+    pd->system->logToConsole("IODidDecodeScan WARNING LEVEL MISSMATCH got:%i expecting:%i", valueI-1, (int)m_level);
     #endif
-  } else if (strcmp(key, "hole") == 0 && json_intValue(value)-1 != m_hole) {
+  } else if (strcmp(key, "hole") == 0 && valueI-1 != m_hole) {
     #ifdef DEV
-    pd->system->logToConsole("IODidDecodeScan HOLE MISSMATCH got:%i expecting:%i", json_intValue(value)-1, (int)m_hole);
+    pd->system->logToConsole("IODidDecodeScan HOLE MISSMATCH got:%i expecting:%i", valueI-1, (int)m_hole);
     #endif
   }
 }
@@ -496,133 +497,159 @@ void IOWillDecodeLevel(json_decoder* jd, const char* key, json_value_type type) 
 }
 
 void IODidDecodeLevel(json_decoder* jd, const char* key, json_value value) {
+  const int valueI = json_intValue(value);
+  const float valueF = json_floatValue(value);
 
   if (strcmp(key, "shape") == 0) {
+    // pd->system->logToConsole("IODDL - shape - DT:%i = %i", m_decodeType, valueI);
     switch (m_decodeType) {
-      case kDecodeStatic: m_static.shape = (enum PegShape_t) json_intValue(value); return;
-      case kDecodeElliptic: m_elliptic.shape = (enum PegShape_t) json_intValue(value); return;
-      case kDecodeLinear: m_linear.shape = (enum PegShape_t) json_intValue(value); return;
+      case kDecodeStatic:   m_static.shape   = (enum PegShape_t) valueI; return;
+      case kDecodeElliptic: m_elliptic.shape = (enum PegShape_t) valueI; return;
+      case kDecodeLinear:   m_linear.shape   = (enum PegShape_t) valueI; return;
     }
   }
 
   if (strcmp(key, "shape_override") == 0) {
+  // pd->system->logToConsole("IODDL - shape_override - DT:%i cID:%i = %i", m_decodeType, m_pegContainerID, valueI);
     switch (m_decodeType) {
-      case kDecodeStatic: return;
-      case kDecodeElliptic: m_elliptic.shapeOverride[m_pegContainerID] = json_intValue(value); return;
-      case kDecodeLinear: m_linear.shapeOverride[m_pegContainerID] = json_intValue(value); return;
+      case kDecodeStatic:   pd->system->error("Static shape_override?"); return;
+      case kDecodeElliptic: m_elliptic.shapeOverride[m_pegContainerID] = valueI; return;
+      case kDecodeLinear:   m_linear.shapeOverride[m_pegContainerID]   = valueI; return;
     }
   }
 
   if (strcmp(key, "n_pegs") == 0) {
+    // pd->system->logToConsole("IODDL - n_pegs - DT:%i = %i", m_decodeType, valueI);
     switch (m_decodeType) {
-      case kDecodeStatic: return;
-      case kDecodeElliptic: m_elliptic.nPegs = json_intValue(value); return;
-      case kDecodeLinear: m_linear.nPegs = json_intValue(value); return;
+      case kDecodeStatic:   pd->system->error("Static n_pegs?"); return;
+      case kDecodeElliptic: m_elliptic.nPegs = valueI; return;
+      case kDecodeLinear:   m_linear.nPegs   = valueI; return;
     }
   }
 
   if (strcmp(key, "n_lines") == 0) {
-    m_linear.nLines = json_intValue(value); return;
+    // pd->system->logToConsole("IODDL - n_lines = %i", valueI);
+    m_linear.nLines = valueI;
+    return;
   }
 
   if (strcmp(key, "x") == 0) {
+    // pd->system->logToConsole("IODDL - x - DT:%i = %i", m_decodeType, valueI);
     switch (m_decodeType) {
-      case kDecodeStatic: m_static.x = json_intValue(value); return;
-      case kDecodeElliptic: m_elliptic.x = json_intValue(value); return;
-      case kDecodeLinear: m_linear.x = json_intValue(value); return;
+      case kDecodeStatic:   m_static.x   = valueI; return;
+      case kDecodeElliptic: m_elliptic.x = valueI; return;
+      case kDecodeLinear:   m_linear.x   = valueI; return;
     }
   }
 
   if (strcmp(key, "y") == 0) {
+    // pd->system->logToConsole("IODDL - y - DT:%i = %i", m_decodeType, valueI);
     switch (m_decodeType) {
-      case kDecodeStatic: m_static.y = json_intValue(value); return;
-      case kDecodeElliptic: m_elliptic.y = json_intValue(value); return;
-      case kDecodeLinear: m_linear.y = json_intValue(value); return;
+      case kDecodeStatic:   m_static.y   = valueI; return;
+      case kDecodeElliptic: m_elliptic.y = valueI; return;
+      case kDecodeLinear:   m_linear.y   = valueI; return;
     }
   }
 
   if (strcmp(key, "lc_x") == 0) {
-    m_linear.pathX[m_lineContainerID] = json_intValue(value); return;
+    // pd->system->logToConsole("IODDL - lc_x - lID:%i = %i", m_lineContainerID, valueI);
+    m_linear.pathX[m_lineContainerID] = valueI;
+    return;
   }
 
   if (strcmp(key, "lc_y") == 0) {
-    m_linear.pathY[m_lineContainerID] = json_intValue(value); return;
+    // pd->system->logToConsole("IODDL - lc_x - lID:%i = %i", m_lineContainerID, valueI);
+    m_linear.pathY[m_lineContainerID] = valueI;
+    return;
   }
 
   if (strcmp(key, "a") == 0) {
-    m_elliptic.a = json_intValue(value); return;
+    // pd->system->logToConsole("IODDL - a = %i", valueI);
+    m_elliptic.a = valueI;
+    return;
   }
 
   if (strcmp(key, "b") == 0) {
-    m_elliptic.b = json_intValue(value); return;
+    // pd->system->logToConsole("IODDL - b = %i", valueI);
+    m_elliptic.b = valueI;
+    return;
   }
 
   if (strcmp(key, "angle") == 0) {
-    int v = json_intValue(value);
+    int v = valueI;
     if (v < 0) { v += 360; } // Needed for device only, why?
+    // pd->system->logToConsole("IODDL - angle - DT:%i = %i (degToRad %f)", m_decodeType, v, degToRad(v));
     switch (m_decodeType) {
-      case kDecodeStatic: m_static.angle = degToRad(v); return;
+      case kDecodeStatic:   m_static.angle = degToRad(v); return;
       case kDecodeElliptic: m_elliptic.angle = degToRad(v); return;
-      case kDecodeLinear: m_linear.angle = degToRad(v); return;
+      case kDecodeLinear:   m_linear.angle = degToRad(v); return;
     }
   }
 
   if (strcmp(key, "arc") == 0) {
+    // pd->system->logToConsole("IODDL - arc - DT:%i = %i (degToRad %f)", m_decodeType, valueI, degToRad(valueI));
     switch (m_decodeType) {
-      case kDecodeStatic: return;
-      case kDecodeElliptic: m_elliptic.maxAngle = degToRad(json_intValue(value)); return;
-      case kDecodeLinear: m_linear.maxAngle = degToRad(json_intValue(value)); return;
+      case kDecodeStatic:   pd->system->error("Static arc?"); return;
+      case kDecodeElliptic: m_elliptic.maxAngle = degToRad(valueI); return;
+      case kDecodeLinear:   m_linear.maxAngle   = degToRad(valueI); return;
     }
   }
 
   if (strcmp(key, "use_arc") == 0) {
+    // pd->system->logToConsole("IODDL - use_arc - DT:%i = %i", m_decodeType, valueI);
     switch (m_decodeType) {
-      case kDecodeStatic: return;
-      case kDecodeElliptic: m_elliptic.useArc = json_intValue(value); return;
-      case kDecodeLinear: m_linear.useArc = json_intValue(value); return;
+      case kDecodeStatic:   pd->system->error("Static use_arc?"); return;
+      case kDecodeElliptic: m_elliptic.useArc = valueI; return;
+      case kDecodeLinear:   m_linear.useArc   = valueI; return;
     }
   }
 
   if (strcmp(key, "speed") == 0) {
+    // pd->system->logToConsole("IODDL - speed - DT:%i = %f", m_decodeType, valueF);
     switch (m_decodeType) {
-      case kDecodeStatic: return;
-      case kDecodeElliptic: m_elliptic.speed = json_floatValue(value); return;
-      case kDecodeLinear: m_linear.speed = json_floatValue(value); return;
+      case kDecodeStatic:   pd->system->error("Static speed?"); return;
+      case kDecodeElliptic: m_elliptic.speed = valueF; return;
+      case kDecodeLinear:   m_linear.speed   = valueF; return;
     }
   }
 
   if (strcmp(key, "size") == 0) {
+    // pd->system->logToConsole("IODDL - size - DT:%i = %i", m_decodeType, valueI);
     switch (m_decodeType) {
-      case kDecodeStatic: m_static.size = json_intValue(value); return;
-      case kDecodeElliptic: m_elliptic.size = json_intValue(value); return;
-      case kDecodeLinear: m_linear.size = json_intValue(value); return;
+      case kDecodeStatic:   m_static.size   = valueI; return;
+      case kDecodeElliptic: m_elliptic.size = valueI; return;
+      case kDecodeLinear:   m_linear.size   = valueI; return;
     }
   }
 
   if (strcmp(key, "size_override") == 0) {
+    // pd->system->logToConsole("IODDL - size_override - DT:%i cID:%i = %i", m_decodeType, m_pegContainerID, valueI);
     switch (m_decodeType) {
-      case kDecodeStatic: ; return;
-      case kDecodeElliptic: m_elliptic.sizeOverride[m_pegContainerID] = json_intValue(value); return;
-      case kDecodeLinear: m_linear.sizeOverride[m_pegContainerID] = json_intValue(value); return;
+      case kDecodeStatic:   pd->system->error("Static size_override?"); return;
+      case kDecodeElliptic: m_elliptic.sizeOverride[m_pegContainerID] = valueI; return;
+      case kDecodeLinear:   m_linear.sizeOverride[m_pegContainerID]   = valueI; return;
     }
   }
 
   if (strcmp(key, "type") == 0) {
+    // pd->system->logToConsole("IODDL - type - DT:%i cID:%i = %i", m_decodeType, m_pegContainerID, valueI);
     switch (m_decodeType) {
-      case kDecodeStatic: m_static.type = (enum PegType_t) json_intValue(value); return;
-      case kDecodeElliptic: m_elliptic.types[m_pegContainerID] = (enum PegType_t) json_intValue(value); return;
-      case kDecodeLinear: m_linear.types[m_pegContainerID] = (enum PegType_t) json_intValue(value); return;
+      case kDecodeStatic:   m_static.type                      = (enum PegType_t) valueI; return;
+      case kDecodeElliptic: m_elliptic.types[m_pegContainerID] = (enum PegType_t) valueI; return;
+      case kDecodeLinear:   m_linear.types[m_pegContainerID]   = (enum PegType_t) valueI; return;
     }
   }
 
   if (strcmp(key, "easing") == 0) {
+    // pd->system->logToConsole("IODDL - easing - DT:%i = %i", m_decodeType, valueI);
     switch (m_decodeType) {
-      case kDecodeStatic: return;
-      case kDecodeElliptic: m_elliptic.easing = (enum EasingFunction_t)json_intValue(value); return;
-      case kDecodeLinear: m_linear.easing = (enum EasingFunction_t)json_intValue(value); return;
+      case kDecodeStatic:   pd->system->error("Static easing?"); return;
+      case kDecodeElliptic: m_elliptic.easing = (enum EasingFunction_t)valueI; return;
+      case kDecodeLinear:   m_linear.easing   = (enum EasingFunction_t)valueI; return;
     }
   }
 
+  // pd->system->logToConsole("IODDL - NOT HANDLED %s = %i", key, valueI);
 }
 
 
@@ -633,6 +660,7 @@ void* IOFinishDecodeLevel(json_decoder* jd, const char* key, json_value_type typ
     // pd->system->logToConsole("IOFinishDecodeLevel %s", m_nameStatic);
     m_staticID++;
     snprintf(m_nameStatic, 128, "StaticControl%i", (int)m_staticID+1);
+    memset(&m_static, 0, sizeof(struct StaticLoader_t));
     return NULL;
   }
 
@@ -641,6 +669,7 @@ void* IOFinishDecodeLevel(json_decoder* jd, const char* key, json_value_type typ
     // pd->system->logToConsole("IOFinishDecodeLevel %s", m_nameElliptic);
     m_ellipticID++;
     snprintf(m_nameElliptic, 128, "EllipticControl%i", (int)m_ellipticID+1);
+    memset(&m_elliptic, 0, sizeof(struct EllipticLoader_t));
     return NULL;
   }
 
@@ -649,6 +678,7 @@ void* IOFinishDecodeLevel(json_decoder* jd, const char* key, json_value_type typ
     // pd->system->logToConsole("IOFinishDecodeLevel %s", m_nameLinear);
     m_linearID++;
     snprintf(m_nameLinear, 128, "LinearControl%i", (int)m_linearID+1);
+    memset(&m_linear, 0, sizeof(struct LinearLoader_t));
     return NULL;
   }
 
@@ -695,10 +725,13 @@ void IODoLoadCurrentHole() {
 
   m_staticID = 0;
   snprintf(m_nameStatic, 128, "StaticControl%i", (int)m_staticID+1);
+  memset(&m_static, 0, sizeof(struct StaticLoader_t));
   m_ellipticID = 0;
   snprintf(m_nameElliptic, 128, "EllipticControl%i", (int)m_ellipticID+1);
+  memset(&m_elliptic, 0, sizeof(struct EllipticLoader_t));
   m_linearID = 0;
   snprintf(m_nameLinear, 128, "LinearControl%i", (int)m_linearID+1);
+  memset(&m_linear, 0, sizeof(struct LinearLoader_t));
 
   pd->json->decode(&jd, (json_reader){ .read = IODoRead, .userdata = file }, NULL);
   int status = pd->file->close(file);

@@ -183,6 +183,8 @@ void FSMChooseHoleWFadeIn(const bool newState) {
   static int8_t progress = FADE_LEVELS - 1;
   if (newState) {
     gameSetYOffset(DEVICE_PIX_Y*3, /*force = */true);
+    renderSetNumeralOffset(0.0f);
+    bitmapDoUpdateHoleStatsBitmap();
     progress = FADE_LEVELS - 1;
     soundDoSfx(kWhooshSfx1);
   }

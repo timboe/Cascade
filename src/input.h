@@ -6,6 +6,7 @@ void inputDoInit(void);
 
 void inputDoHandle(const enum FSM_t fsm, const enum GameMode_t gm);
 
+bool inputGetReleased(const PDButtons b);
 bool inputGetPressed(const PDButtons b);
 bool inputGetPressedAny(void);
 

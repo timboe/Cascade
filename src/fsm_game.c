@@ -15,6 +15,7 @@ uint16_t m_ballStuckCounter[2] = {0}; // Keeping track of a stuck ball
 uint16_t m_ballCount = 0; // Keeping track of the current level score
 
 cpVect m_finalRequiredPos; // Position of the final required ped on the board
+int16_t m_finalPegID = -1;
 
 bool m_vetoCloseUp = false; // If we break out of close up, then don't do it again on this ball
 uint16_t m_fizzleTimer = 0; // Prevent going straight back in to close up
@@ -22,6 +23,8 @@ uint16_t m_fizzleTimer = 0; // Prevent going straight back in to close up
 void FSMCommonTurretScrollAndBounceBack(const bool allowScroll);
 
 bool FSMCommonFocusOnLowestBallInPlay(const enum PegSpecial_t special);
+
+uint8_t FSMCommonMarbleFire(uint16_t* timer);
 
 /// ///
 
@@ -109,10 +112,11 @@ void FSMCommonTurretScrollAndBounceBack(const bool allowScroll) {
   gameSetTurretBarrelAngle(angle);
 }
 
-bool FSMCommonMarbleFire(uint16_t* timer) {
+uint8_t FSMCommonMarbleFire(uint16_t* timer) {
   float progress = getEasing(EASE_MARBLE_FIRE, (float)(*timer)/TIME_FIRE_MARBLE);
   static bool once = false;
-  if ((*timer) >= TIME_FIRE_MARBLE || (progress > MIN_TURRET_CHARGE_TO_FIRE && !inputGetPressed(kButtonB))) { // Fire
+  const bool buttonPressed = (inputGetPressed(kButtonB) || inputGetPressed(kButtonA));
+  if ((*timer) >= TIME_FIRE_MARBLE || (progress > MIN_TURRET_CHARGE_TO_FIRE && !buttonPressed)) { // Fire
     // physicsSetTimestepMultiplier(0.2f); // testing
     physicsDoResetBall(0);
     physicsDoLaunchBall(progress);
@@ -121,8 +125,8 @@ bool FSMCommonMarbleFire(uint16_t* timer) {
     once = false;
     soundStopSfx(kChargeSfx);
     soundDoSfx(kPootSfx);
-    return true;
-  } else if (inputGetPressed(kButtonB)) { // Arm
+    return 1;
+  } else if (buttonPressed) { // Arm
     (*timer)++;
     if (!once) {
       once = true;
@@ -132,9 +136,11 @@ bool FSMCommonMarbleFire(uint16_t* timer) {
     (*timer) = 0;
     once = false;
     soundStopSfx(kChargeSfx);
+    // If we were holding A then we want to scroll to the top, different return value
+    if (inputGetReleased(kButtonA)) { return 2; }
   }
   renderSetMarblePootCircle((uint16_t)(progress * TURRET_RADIUS));
-  return false;
+  return 0;
 }
 
 ////////////////////////////////        ////////////////////////////////
@@ -206,6 +212,8 @@ void FSMTutorialScrollUp(const bool newState) {
   static uint16_t timer = 0;
   if (newState) { timer = 0; }
 
+  if (inputGetReleased(kButtonA)) { return FSMDo(kGameFSM_AimModeScrollToTop); }
+
   FSMCommonTurretScrollAndBounceBack(true); // allow control = true
   if (gameGetYOffset() < 4) { ++timer; }
   if (timer > TICK_FREQUENCY/2) { FSMDo(kGameFSM_TutorialFireMarble); }
@@ -224,8 +232,9 @@ void FSMTutorialFireMarble(const bool newState) {
   //
   FSMCommonTurretScrollAndBounceBack(false); // allow control = FALSE is tutorial only
   //
-  const bool fired = FSMCommonMarbleFire(&timer); 
-  if (fired) { FSMDo(kGameFSM_BallInPlay); }
+  const uint8_t fired = FSMCommonMarbleFire(&timer); 
+  if      (fired == 1) { FSMDo(kGameFSM_BallInPlay); }
+  else if (fired == 2) { FSMDo(kGameFSM_AimModeScrollToTop); }
 }
 
 void FSMTutorialGetSpecial(const bool newState) {
@@ -265,8 +274,9 @@ void FSMAimMode(const bool newState) {
   //
   FSMCommonTurretScrollAndBounceBack(true);
   //
-  const bool fired = FSMCommonMarbleFire(&timer); 
-  if (fired) { FSMDo(kGameFSM_BallInPlay); }
+  const uint8_t fired = FSMCommonMarbleFire(&timer); 
+  if      (fired == 1) { FSMDo(kGameFSM_BallInPlay); }
+  else if (fired == 2) { FSMDo(kGameFSM_AimModeScrollToTop); }
 }
 
 void FSMAimModeScrollToTop(const bool newState) {
@@ -318,14 +328,13 @@ void FSMPlayCredits(const bool newState) {
 }
 
 void FSMBallInPlay(const bool newState) {
-  static int16_t finalPegID = -1;
   const enum PegSpecial_t special = boardGetCurrentSpecial();
   if (newState) {
     FSMDoResetBallStuckCounter();
     renderSetMarblePootCircle(0);
     m_finalRequiredPos.x = 0;
     m_finalRequiredPos.y = 0;
-    finalPegID = -1;
+    m_finalPegID = -1;
   }
   // Focus on ball, check gutter
   const bool guttered = FSMCommonFocusOnLowestBallInPlay(special);
@@ -338,16 +347,16 @@ void FSMBallInPlay(const bool newState) {
   if (bgrpip == 1) {
     if (m_fizzleTimer) { --m_fizzleTimer; }
     // Locate final peg (it may be moving)
-    if (finalPegID == -1) { // Cache this
+    if (m_finalPegID == -1) { // Cache this
       for (int i = 0; i < boardGetNPegs(); ++i) {
         const struct Peg_t* p = boardGetPeg(i);
         if (p->type == kPegTypeRequired && p->state == kPegStateActive) {
-          finalPegID = i;
+          m_finalPegID = i;
           break;
         }
       }
     }
-    const struct Peg_t* p = boardGetPeg(finalPegID);
+    const struct Peg_t* p = boardGetPeg(m_finalPegID);
     m_finalRequiredPos.x = p->x;
     m_finalRequiredPos.y = p->y;
     // Check for distance to final peg
@@ -396,6 +405,10 @@ void FSMCloseUp(const bool newState) {
   ballPos[1] = cpBodyGetPosition(physicsGetBall(1));
   timer += 1.0f / TICK_FREQUENCY;
 
+  const struct Peg_t* p = boardGetPeg(m_finalPegID);
+  m_finalRequiredPos.x = p->x;
+  m_finalRequiredPos.y = p->y;
+
   int8_t whichBall = -1;
   for (int i = 0; i < MAX_BALLS; ++i) {
     if (i == 1 && special != kPegSpecialMultiball) { break; }
@@ -416,7 +429,7 @@ void FSMCloseUp(const bool newState) {
     if (stuck) {
       physicsSetTimestepMultiplier(1.0f);
       soundDoSfx(kFizzleSfx);
-      FSMDo(kGameFSM_BallStuck);
+      return FSMDo(kGameFSM_BallStuck);
     } else if (whichBall == -1) {
       physicsSetTimestepMultiplier(1.0f);
       soundDoSfx(kFizzleSfx);
@@ -519,6 +532,7 @@ void FSMGutterToTurret(const bool newState) {
   //
   // const float popLevel = (startY + DEVICE_PIX_Y) * easedProgress;
   const float popLevel = tarIOGetPartial + (DEVICE_PIX_Y * easedProgress);
+  // pd->system->logToConsole("FSMGutterToTurret FC %i: boardDoBurstPegs pop level %f", gameGetFrameCount(), popLevel);
   boardDoBurstPegs(popLevel);
   //
   if (progress >= 1) {
@@ -540,15 +554,16 @@ void FSMTurretLower(const bool newState) {
     //
     int32_t minY = 10000;
     if (boardGetRequiredPegsHit() == 0) {
-      // No required pegs hit yet, don't move down yet
-      minY = 0;
-    } else {
-      // At least one required peg hit, move down
+      // No required pegs hit yet, mave down the top active peg (required, or not)
       for (uint32_t i = 0; i < MAX_PEGS; ++i) {
         const struct Peg_t* p = boardGetPeg(i);
-        if (p->state == kPegStateActive && p->type == kPegTypeRequired && p->minY < minY) {
-          minY = p->minY;
-        }
+        if (p->state == kPegStateActive && p->minY < minY) { minY = p->minY; }
+      }
+    } else {
+      // At least one required peg hit, move down to next required peg
+      for (uint32_t i = 0; i < MAX_PEGS; ++i) {
+        const struct Peg_t* p = boardGetPeg(i);
+        if (p->state == kPegStateActive && p->type == kPegTypeRequired && p->minY < minY) { minY = p->minY; }
       }
     }
     // Start from the top if the top peg is within the top 1/2 of the play area

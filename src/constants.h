@@ -1,9 +1,9 @@
 
-//#define DEV 1
+#define DEV 1
 
 //#define TAKE_SCREENSHOTS 1
 
-#define ALWAYS_FPS 1
+#define SHOW_FPS 1
 
 #define MAX(a,b) ((a) > (b) ? a : b)
 #define MIN(a,b) ((a) < (b) ? a : b)
@@ -106,6 +106,8 @@
 #define TIME_SCORE_TO_LEVELTITLE (BASE_TIME)
 
 #define FIZZLE_TIME (BASE_TIME*4)
+
+#define SCORECARD_TIMESTEPS 4
 
 // JUICE
 

@@ -8,7 +8,7 @@
 #include "board.h"
 #include "sshot.h"
 
-PDButtons m_current;
+PDButtons m_current, m_pushed, m_released;
 float m_crankAngle = 0;
 float m_crankChanged = 0;
 uint8_t m_crankNoiseAngle = 0;
@@ -25,6 +25,7 @@ void inputDoInit(void) {
   m_crankNoiseAngle = (uint8_t)( m_crankAngle / CRANK_NOISE_ANGLE);
 }
 
+bool inputGetReleased(const PDButtons b) { return m_released & b; }
 bool inputGetPressed(const PDButtons b) { return m_current & b; }
 bool inputGetPressedAny(void) { return m_current; }
 
@@ -62,25 +63,21 @@ void inputHandleTitles(const enum FSM_t fsm, const uint32_t buttonPressed) {
 }
 
 void inputHandleGame(const enum FSM_t fsm, const uint32_t buttonPressed) {
-  if (kButtonA == buttonPressed && (fsm == kGameFSM_AimMode || fsm == kGameFSM_TutorialScrollUp)) {
-    FSMDo(kGameFSM_AimModeScrollToTop);
-  } else if (kButtonB == buttonPressed && fsm == kGameFSM_DisplayScores) {
-    FSMDo(kGameFSM_ScoresToSplash);
-  } else if (kButtonA == buttonPressed && fsm == kGameFSM_DisplayScores) {
-    FSMDo(kGameFSM_ScoresToTryAgain);
+  if (fsm == kGameFSM_DisplayScores) {
+    if      (kButtonB == buttonPressed) { FSMDo(kGameFSM_ScoresToSplash);   }
+    else if (kButtonA == buttonPressed) { FSMDo(kGameFSM_ScoresToTryAgain); }
   }
 }
 
 void inputDoHandle(const enum FSM_t fsm,const enum GameMode_t gm) {
-  PDButtons current, pushed, released = 0;
-  pd->system->getButtonState(&m_current, &pushed, &released);
+  pd->system->getButtonState(&m_current, &m_pushed, &m_released);
 
-  if (released & kButtonUp) inputHandlerClick(fsm, gm, kButtonUp);
-  if (released & kButtonRight) inputHandlerClick(fsm, gm, kButtonRight);
-  if (released & kButtonDown) inputHandlerClick(fsm, gm, kButtonDown);
-  if (released & kButtonLeft) inputHandlerClick(fsm, gm, kButtonLeft);
-  if (released & kButtonB) inputHandlerClick(fsm, gm, kButtonB);
-  if (released & kButtonA) inputHandlerClick(fsm, gm, kButtonA);
+  if (m_released & kButtonUp) inputHandlerClick(fsm, gm, kButtonUp);
+  if (m_released & kButtonRight) inputHandlerClick(fsm, gm, kButtonRight);
+  if (m_released & kButtonDown) inputHandlerClick(fsm, gm, kButtonDown);
+  if (m_released & kButtonLeft) inputHandlerClick(fsm, gm, kButtonLeft);
+  if (m_released & kButtonB) inputHandlerClick(fsm, gm, kButtonB);
+  if (m_released & kButtonA) inputHandlerClick(fsm, gm, kButtonA);
 
   m_crankChanged = pd->system->getCrankChange();
   m_crankAngle = pd->system->getCrankAngle();

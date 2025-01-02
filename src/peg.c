@@ -19,6 +19,9 @@ void pegDoAddedShape(struct Peg_t* p);
 
 void pegDoAddBody(struct Peg_t* p) {
   p->cpBody = cpBodyNewKinematic();
+  // pd->system->logToConsole("DBG do ADD-BODY           for peg %i with cpBody %i. This is shape:%i, motion:%i, type:%i, state:%i", 
+  //   p->id, p->cpBody,
+  //   p->shape, p->motion, p->type, p->state);
   cpBodySetPosition(p->cpBody, cpv(p->x, p->y));
   cpBodySetAngle(p->cpBody, p->a);
   cpBodySetUserData(p->cpBody, (void*)p);
@@ -32,6 +35,9 @@ void pegDoAddedShape(struct Peg_t* p) {
   cpShapeSetFriction(p->cpShape, FRICTION);
   cpShapeSetElasticity(p->cpShape, ELASTICITY);
   cpSpaceAddShape(physicsGetSpace(), p->cpShape);
+  // pd->system->logToConsole("DBG do ADD-SHAPE-TO-SPACE for peg %i with cpBody %i and cpshape %i. This is shape:%i, motion:%i, type:%i, state:%i", 
+  //   p->id, p->cpBody, p->cpShape,
+  //   p->shape, p->motion, p->type, p->state);
 }
 
 void pegDoInit(struct Peg_t* p, const enum PegShape_t s, const float x, const float y, const float a, const uint8_t size) {
@@ -64,9 +70,15 @@ void pegDoInit(struct Peg_t* p, const enum PegShape_t s, const float x, const fl
   pegDoAddBody(p);
   if (s == kPegShapeBall) {
     p->cpShape = cpCircleShapeNew(p->cpBody, BALL_RADIUS*scale, cpvzero);
+    // pd->system->logToConsole("DBG do ADD-SHAPE          for peg %i with cpBody %i and cpShape %i (circle). This is shape:%i, motion:%i, type:%i, state:%i", 
+    //   p->id, p->cpBody, p->cpShape,
+    //   p->shape, p->motion, p->type, p->state);
     p->radius = BALL_RADIUS*scale;
   } else if (s == kPegShapeRect) {
     p->cpShape = cpBoxShapeNew(p->cpBody, BOX_HWIDTH*scale, BOX_HALF_HEIGHT*scale, 0.0f);
+    // pd->system->logToConsole("DBG do ADD-SHAPE          for peg %i with cpBody %i and cpShape %i (box). This is shape:%i, motion:%i, type:%i, state:%i", 
+    //   p->id, p->cpBody, p->cpShape,
+    //   p->shape, p->motion, p->type, p->state);
     p->radius = BOX_HALF_MAX*scale;
   } else if (s == kPegShapeTri) {
     cpVect verts[3];
@@ -78,6 +90,9 @@ void pegDoInit(struct Peg_t* p, const enum PegShape_t s, const float x, const fl
       verts[p].y = (TRI_WIDTH/2) * scale * cosf(angle);
     }
     p->cpShape = cpPolyShapeNew(p->cpBody, 3, verts, cpTransformIdentity, 0.0f);
+    // pd->system->logToConsole("DBG do ADD-SHAPE          for peg %i with cpBody %i and cpShape %i (poly). This is shape:%i, motion:%i, type:%i, state:%i", 
+    //   p->id, p->cpBody, p->cpShape,
+    //   p->shape, p->motion, p->type, p->state);
     p->radius = TRI_MAX*scale;
   } else {    
     pd->system->error("Error pegDoInit called with unknown peg shape");
@@ -98,6 +113,9 @@ void pegDoClear(struct Peg_t* p) {
 
 void pegDoRemove(struct Peg_t* p) {
   p->queueRemove = false;
+  // pd->system->logToConsole("DBG do REMOVE             for peg %i with cpBody %i and cpShape %i. This is shape:%i, motion:%i, type:%i, state:%i", 
+    // p->id, p->cpBody, p->cpShape,
+    // p->shape, p->motion, p->type, p->state);
   if (p->cpBody) {
     cpSpaceRemoveBody(physicsGetSpace(), p->cpBody);
     cpBodyFree(p->cpBody);
@@ -108,11 +126,12 @@ void pegDoRemove(struct Peg_t* p) {
     cpShapeFree(p->cpShape);
     p->cpShape = NULL;
   }
+  // pd->system->logToConsole("DBG done remove");
 }
 
 void pegSetType(struct Peg_t* p, const enum PegType_t type) {
   if (type == kPegTypeNormal) { return; }
-  p->type = type;
+  p->type = type; // TODO - before the return?
   if (type == kPegTypeSpecial) {
     pegDoRemove(p); // Update physics object
     pegDoAddBody(p);
@@ -126,6 +145,9 @@ void pegSetType(struct Peg_t* p, const enum PegType_t type) {
       verts[p].y = (HEX_WIDTH/2) * scale * cosf(angle);
     }
     p->cpShape = cpPolyShapeNew(p->cpBody, 6, verts, cpTransformIdentity, 0.0f);
+    // pd->system->logToConsole("DBG do ADD-SHAPE (spesh)  for peg %i with cpBody %i and cpShape %i (poly). This is shape:%i, motion:%i, type:%i, state:%i", 
+    //   p->id, p->cpBody, p->cpShape,
+    //   p->shape, p->motion, p->type, p->state);
     p->radius = HEX_MAX*scale;
     pegDoAddedShape(p);
   } else { // Required
@@ -284,6 +306,7 @@ void pegAddMotionPath(struct Peg_t* p, const int16_t x, const int16_t y) {
     const uint8_t prv = cur - 1;
     p->pathLength[prv] = len(p->pathX[cur], p->pathX[prv], p->pathY[cur], p->pathY[prv]);
     p->totPathLength += p->pathLength[prv];
+    // pd->system->logToConsole("     cur=%i, prev len:%f, tot len:%f", cur, p->pathLength[prv], p->totPathLength);
   }
   p->pathSteps++;
 }
@@ -345,11 +368,15 @@ bool pegDoCheckBurst(struct Peg_t* p, const float y) {
   if (p->state == kPegStateHit) {
     if (p->popFrame == -1 && p->y >= y - POP_EARLY_Y) {
       p->popFrame = 0;
+      soundDoSfx(kPopSfx1);
+      // pd->system->logToConsole("DBG do pop peg %i", p->id);
     }
     if (p->y >= y) {
+      // pd->system->logToConsole("DBG do REMOVE peg %i with cpBody %i and cpShape %i. This is shape:%i, motion:%i, type:%i, state:%i", 
+      //   p->id, p->cpBody, p->cpShape,
+      //   p->shape, p->motion, p->type, p->state);
       p->state = kPegStateRemoved;
       pegDoRemove(p);
-      soundDoSfx(kPopSfx1);
       return true;
     }
   }

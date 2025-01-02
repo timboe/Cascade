@@ -213,7 +213,13 @@ void soundDoSfx(enum SfxSample sample) {
     if (m_plingTimer == 0 || (gameGetFrameCount() - m_plingTimer) > TICK_FREQUENCY*2) {
       m_plingID = 0;
     }
+
+    //TODO try and match the pitches better
+    if (sample == kDingSfx1 && m_plingID >= 2) { sample -= 2; }
+    else if (sample == kDingSfx1 && m_plingID >= 1) { sample -= 1; }
+
     sample += m_plingID;
+
     if (m_plingID < N_PLINGS_SFX-1) m_plingID++;
     m_plingTimer = gameGetFrameCount();
     if (boardGetCurrentSpecial() == kPegSpecialBounce) { sample = rand() % 2 ? kBoingSfx1 : kBoingSfx2; }

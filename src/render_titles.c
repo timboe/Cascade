@@ -40,7 +40,7 @@ void renderTitlesHeader(const int32_t fc) {
 void renderTitlesPlayerSelect(const bool locked, const int32_t fc) {
   const float parallax = gameGetParalaxFactorNear(true) - gameGetParalaxFactorNearForY(true, DEVICE_PIX_Y); // Hard = true
 
-  bitmapDoUpdateScoreCard();
+  if (fc % SCORECARD_TIMESTEPS == 0) { bitmapDoUpdateScoreCard(); }
   pd->graphics->drawBitmap(bitmapGetTitleScoreCard(), HALF_DEVICE_PIX_X - 5*BUF/2, DEVICE_PIX_Y + 3*BUF/4, kBitmapUnflipped);
 
   uint8_t digit[3];

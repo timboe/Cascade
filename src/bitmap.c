@@ -44,13 +44,14 @@ LCDBitmap* m_holeAuthorBitmap;
 LCDBitmap* m_holeNameBitmap;
 LCDBitmap* m_holeTutorialBitmap;
 
+LCDBitmap* m_scoreCardBitmapBackground;
 LCDBitmap* m_scoreCardBitmap;
 
 LCDBitmap* m_useTheCrankBitmap;
 
 LCDBitmap* m_ditherBitmap;
 
-LCDBitmap* m_previewBitmap[MAX_LEVELS][MAX_HOLES] = {0};
+LCDBitmap* m_previewBitmap;
 LCDBitmap* m_previewBitmapWindow;
 LCDBitmap* m_previewBitmapStencil;
 
@@ -112,6 +113,8 @@ void bitmapDoDrawOutlineText(const char text[], const uint16_t textSize, int16_t
 void bitmapDoDrawRotatedRect(const float x, const float y, const float w2, const float h2, const int16_t iAngle, const enum RenderColor_t rc);
 
 void bitmapDoDrawRotatedPoly(const uint8_t corners, const float x, const float y, const float w2, const float h2, const int16_t iAngle, const enum RenderColor_t rc);
+
+void bitmapDoScoreCardBackground(void);
 
 /// ///
 
@@ -308,21 +311,39 @@ LCDBitmap* bitmapGetTitleScoreCard(void) { return m_scoreCardBitmap; }
 
 LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int16_t offset) {
   pd->graphics->clearBitmap(m_previewBitmapWindow, kColorClear);
-  if (!m_previewBitmap[level][hole]) { return m_previewBitmapWindow; }
+
+  if (!IOGetPar(level, hole)) { return m_previewBitmapWindow; } // No level
+
+  static int16_t cachedLevel = -1, cachedHole = -1;
+  if (cachedLevel != level || cachedHole != hole) {
+    cachedLevel = level;
+    cachedHole = hole;
+    if (m_previewBitmap) {
+      pd->graphics->freeBitmap(m_previewBitmap);
+      m_previewBitmap = NULL;
+    }
+    char text[128];
+    snprintf(text, 128, "images/holes/level_%i_hole_%i", level+1, hole+1);
+    m_previewBitmap = pd->graphics->loadBitmap(text, NULL);
+  }
+
+  if (!m_previewBitmap) { return m_previewBitmapWindow; } // No image
+
   pd->graphics->pushContext(m_previewBitmapWindow);
   pd->graphics->setStencilImage(m_previewBitmapStencil, 0);
   pd->graphics->setDrawMode(kDrawModeInverted);
   if (IOGetCurrentHoleHeight() <= DEVICE_PIX_Y*2) {
     offset = (DEVICE_PIX_Y - (IOGetCurrentHoleHeight()/2)) / 2;
-    pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, offset, kBitmapUnflipped);
+    pd->graphics->drawBitmap(m_previewBitmap, 0, offset, kBitmapUnflipped);
   } else {
     offset = offset % (IOGetCurrentHoleHeight()/2);
-    pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, -offset, kBitmapUnflipped);
-    pd->graphics->drawBitmap(m_previewBitmap[level][hole], 0, -offset + (IOGetCurrentHoleHeight()/2), kBitmapUnflipped);
+    pd->graphics->drawBitmap(m_previewBitmap, 0, -offset, kBitmapUnflipped);
+    pd->graphics->drawBitmap(m_previewBitmap, 0, -offset + (IOGetCurrentHoleHeight()/2), kBitmapUnflipped);
   }
   pd->graphics->setDrawMode(kDrawModeCopy);
   pd->graphics->setStencilImage(NULL, 0);
   pd->graphics->popContext();
+
   return m_previewBitmapWindow;
 }
 
@@ -499,54 +520,14 @@ void bitmapDoUpdateScoreHistogram(void) {
   pd->graphics->popContext();
 }
 
-void bitmapDoUpdateScoreCard(void) {
-
-  uint16_t rounds[MAX_LEVELS] = {-1};
-  uint16_t holesPlayed[MAX_LEVELS] = {0};
-  uint16_t holesTotal[MAX_LEVELS] = {0};
-  uint16_t pars[MAX_LEVELS] = {0};
-  uint16_t scores[MAX_LEVELS] = {0};
-  uint16_t totPar = 0;
-  uint16_t totScore = 0;
-  uint16_t d = 0;
-  for (int l = 0; l < MAX_LEVELS; ++l) {
-    uint16_t par = 0;
-    uint16_t score = 0;
-    uint16_t played = 0;
-    uint16_t total = 0;
-    for (int h = 0; h < MAX_HOLES; ++h) {
-      const uint16_t p = IOGetPar(l, h);
-      const uint16_t s = IOGetScore(l, h);
-      par += p;
-      score += s;
-      if (p) { total++; }
-      if (p && s) { 
-        played++;
-        totPar += p;
-        totScore += s;
-      } 
-    }
-    //
-    if (!played && d) { continue; }
-    if (total != played) { score = 0; }
-    //
-    rounds[d] = l;
-    holesPlayed[d] = played;
-    holesTotal[d] = total;
-    pars[d] = par;
-    scores[d] = score;
-    ++d;
-  }
-
-
-  pd->graphics->clearBitmap(m_scoreCardBitmap, kColorClear);
-  pd->graphics->pushContext(m_scoreCardBitmap);
-
-  const uint8_t PIXX = 17;
-  const uint8_t PIXY = 16;
-  const uint8_t N_MAX = 7;
-  const uint8_t TBAR = 56;
-  const uint8_t BBAR = 11*PIXY + PIXY/2;
+#define PIXX 17
+#define PIXY 16
+#define TBAR 56
+#define BBAR (11*PIXY + PIXY/2)
+#define N_MAX 7
+// This bit doesn't change
+void bitmapDoScoreCardBackground(void) {
+  pd->graphics->pushContext(m_scoreCardBitmapBackground);
 
   int points[12] = {
     1*PIXX,  TBAR - (3*PIXY),
@@ -602,12 +583,58 @@ void bitmapDoUpdateScoreCard(void) {
   }
   pd->graphics->freeBitmap(tempBitmap);
 
+  pd->graphics->popContext();
+}
+
+void bitmapDoUpdateScoreCard(void) {
+  bitmapSetRoobert10();
+  uint16_t rounds[MAX_LEVELS] = {-1};
+  uint16_t holesPlayed[MAX_LEVELS] = {0};
+  uint16_t holesTotal[MAX_LEVELS] = {0};
+  uint16_t pars[MAX_LEVELS] = {0};
+  uint16_t scores[MAX_LEVELS] = {0};
+  uint16_t totPar = 0;
+  uint16_t totScore = 0;
+  uint16_t d = 0;
+  for (int l = 0; l < MAX_LEVELS; ++l) {
+    uint16_t par = 0;
+    uint16_t score = 0;
+    uint16_t played = 0;
+    uint16_t total = 0;
+    for (int h = 0; h < MAX_HOLES; ++h) {
+      const uint16_t p = IOGetPar(l, h);
+      const uint16_t s = IOGetScore(l, h);
+      par += p;
+      score += s;
+      if (p) { total++; }
+      if (p && s) { 
+        played++;
+        totPar += p;
+        totScore += s;
+      } 
+    }
+    //
+    if (!played && d) { continue; }
+    if (total != played) { score = 0; }
+    //
+    rounds[d] = l;
+    holesPlayed[d] = played;
+    holesTotal[d] = total;
+    pars[d] = par;
+    scores[d] = score;
+    ++d;
+  }
+
+  pd->graphics->clearBitmap(m_scoreCardBitmap, kColorClear);
+  pd->graphics->pushContext(m_scoreCardBitmap);
+  pd->graphics->drawBitmap(m_scoreCardBitmapBackground, 0, 0, kBitmapUnflipped);
+
   uint32_t start = 0;
   uint32_t stop = d;
   uint16_t yOff = 0;
 
   static uint32_t timer = 0;
-  ++timer;
+  timer += SCORECARD_TIMESTEPS/2;
 
   // Scroll mode
   if (d > N_MAX) {
@@ -761,7 +788,6 @@ void bitmapDoPreloadA(void) {
   m_useTheCrankBitmap = bitmapDoLoadImageAtPath("images/useTheCrank");
   m_ditherBitmap = bitmapDoLoadImageAtPath("images/dither");
   m_holeTutorialBitmap = bitmapDoLoadImageAtPath("images/tut/tutorial");
-  //m_wfPond = bitmapDoLoadImageAtPath("images/falls_pond");
   m_cardBitmap = bitmapDoLoadImageAtPath("images/card");
 
   m_turretBarrelTabel = bitmapDoLoadImageTableAtPath("images/anim/turretBarrel");
@@ -800,7 +826,8 @@ void bitmapDoPreloadA(void) {
 
   m_levelStatsBitmap = pd->graphics->newBitmap(NUMERAL_PIX_X*2, TITLETEXT_HEIGHT, kColorClear);
 
-  m_scoreCardBitmap = pd->graphics->newBitmap(HALF_DEVICE_PIX_X + 32, DEVICE_PIX_Y, kColorClear);
+  m_scoreCardBitmap           = pd->graphics->newBitmap(HALF_DEVICE_PIX_X + 32, DEVICE_PIX_Y, kColorClear);
+  m_scoreCardBitmapBackground = pd->graphics->newBitmap(HALF_DEVICE_PIX_X + 32, DEVICE_PIX_Y, kColorClear);
 
   m_holeStatsBitmap[0] = pd->graphics->newBitmap(NUMERAL_PIX_X, TITLETEXT_HEIGHT, kColorClear);
   m_holeStatsBitmap[1] = pd->graphics->newBitmap(NUMERAL_PIX_X + (2*NUMERAL_BUF), TITLETEXT_HEIGHT, kColorClear);
@@ -854,14 +881,7 @@ void bitmapDoPreloadD(void) {
 void bitmapDoPreloadE(void) {
   m_previewBitmapWindow = pd->graphics->newBitmap(HALF_DEVICE_PIX_X, DEVICE_PIX_Y, kColorClear);
   m_previewBitmapStencil = bitmapDoLoadImageAtPath("images/previewBorder");
-  char text[128];
-  for (int l = 0; l < MAX_LEVELS; ++l) {
-    for (int h = 0; h < MAX_HOLES; ++h) {
-      if (!IOGetPar(l,h)) { continue; } // No level
-      snprintf(text, 128, "images/holes/level_%i_hole_%i", l+1, h+1);
-      m_previewBitmap[l][h] = pd->graphics->loadBitmap(text, NULL);
-    }
-  }
+  bitmapDoScoreCardBackground(); // (unrelated)
 }
 
 void bitmapDoPreloadF(void) {
@@ -1078,4 +1098,5 @@ void bitmapDoInit(void) {
   m_headerImage = bitmapDoLoadImageAtPath("images/splash");
   m_wfBg[0] = bitmapDoLoadImageAtPath("images/falls_bg/falls0_bg");
   m_sheetWfFg[0] = bitmapDoLoadImageTableAtPath("images/falls_fg/falls0_fg");
+  m_previewBitmap = NULL;
 }

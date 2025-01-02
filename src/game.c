@@ -47,6 +47,8 @@ void gameDoResetPreviousWaterfall(void) {
 
 int gameLoop(void* _data) {
   pd->graphics->setBackgroundColor(kColorBlack);
+  // if (FSMGet() == kGameFSM_GutterToTurret) pd->system->logToConsole(">>> gameLoop FC (loop start) %i", gameGetFrameCount());
+
 
 #ifdef TAKE_SCREENSHOTS
   if (screenShotGetInProgress()) {
@@ -95,6 +97,7 @@ int gameLoop(void* _data) {
     ++m_frameCount;
   }
 
+  // if (FSMGet() == kGameFSM_GutterToTurret) pd->system->logToConsole("<<< gameLoop FC (loop end) %i", gameGetFrameCount());
   return 1;
 }
 

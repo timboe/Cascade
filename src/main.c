@@ -26,8 +26,8 @@ static void init(void) {
 int eventHandler(PlaydateAPI* pd, PDSystemEvent event, uint32_t arg) {
   switch (event) {
     case kEventInit:;
-      pdxlog("EH: init");
       setPDPtr(pd);
+      pdxlog("EH: init");
       init();
       pd->display->setRefreshRate(TICK_FREQUENCY);
       pd->system->setUpdateCallback(gameLoop, NULL);

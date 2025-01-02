@@ -25,6 +25,7 @@
 cpPolyShape *
 cpPolyShapeAlloc(void)
 {
+	// pdxlog("> M-ALLOC (poly shape)");
 	return (cpPolyShape *)cpcalloc(1, sizeof(cpPolyShape));
 }
 
@@ -32,6 +33,7 @@ static void
 cpPolyShapeDestroy(cpPolyShape *poly)
 {
 	if(poly->count > CP_POLY_SHAPE_INLINE_ALLOC){
+		// pdxlog("< M-FREE (poly shape)");
 		cpfree(poly->planes);
 	}
 }

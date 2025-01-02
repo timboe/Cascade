@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include "pdxalloc.h"
+#include "constants.h"
 
 PlaydateAPI* pd = NULL;
 
