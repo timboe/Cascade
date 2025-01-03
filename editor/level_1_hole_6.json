@@ -156,7 +156,7 @@
       "easing": 0,
       "a": 100,
       "b": 100,
-      "n_pegs": 12,
+      "n_pegs": 16,
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
@@ -205,7 +205,7 @@
       "PegContainer10": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 3
+        "type": 0
       },
       "PegContainer11": {
         "shape_override": 0,
@@ -213,6 +213,26 @@
         "type": 0
       },
       "PegContainer12": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer13": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 3
+      },
+      "PegContainer14": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer15": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer16": {
         "shape_override": 0,
         "size_override": 0,
         "type": 0
@@ -224,13 +244,13 @@
       "y": 220,
       "angle": 90,
       "size": 0,
-      "arc": 200,
+      "arc": 300,
       "use_arc": true,
       "speed": -0.5,
       "easing": 0,
       "a": 115,
       "b": 115,
-      "n_pegs": 12,
+      "n_pegs": 16,
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
@@ -269,27 +289,47 @@
       "PegContainer8": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 1
+        "type": 0
       },
       "PegContainer9": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 1
+        "type": 0
       },
       "PegContainer10": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 1
+        "type": 0
       },
       "PegContainer11": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 1
+        "type": 0
       },
       "PegContainer12": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 1
+        "type": 0
+      },
+      "PegContainer13": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer14": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer15": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer16": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
       }
     },
     "EllipticControl3": {
@@ -304,7 +344,7 @@
       "easing": 0,
       "a": 190,
       "b": 190,
-      "n_pegs": 6,
+      "n_pegs": 10,
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
@@ -331,6 +371,26 @@
         "type": 0
       },
       "PegContainer6": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer7": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer8": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer9": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer10": {
         "shape_override": 0,
         "size_override": 0,
         "type": 0
