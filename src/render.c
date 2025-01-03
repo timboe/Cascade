@@ -198,6 +198,9 @@ void renderGame(const int32_t fc, const enum FSM_t fsm) {
 }
 
 void renderBackgroundDo(const int16_t bg, const int16_t fg, const uint16_t startID, const int16_t wfBgOff, const int16_t parallax, const uint16_t wfSheetSizeY, const uint16_t maxY) {
+  // pd->system->logToConsole("renderBackgroundDo for bg:%i fg:%i startID:%i wfBgOff:%i parallax:%i wfSheetSizeY:%i maxY:%i",
+  //   bg, fg, startID, wfBgOff, parallax, wfSheetSizeY, maxY);
+
   if (bg != -1) {
     for (int i = startID; i < (startID+6); ++i) {  // Background
       const int16_t y = (WF_DIVISION_PIX_Y * i) - wfBgOff + parallax;
@@ -255,6 +258,7 @@ void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm) {
 
   // Animate in new waterfall
   if (currentWfFg != prevWfFg || currentWfBg != prevWfBg) {
+    // pd->system->logToConsole("Doing animation");
 
     if (locked) {
       static uint16_t timer = 0;

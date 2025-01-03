@@ -195,7 +195,7 @@ void FSMLevelTitleToStart(const bool newState) {
     timer = 0;
     m_ballCount = 0;
     gameSetMinimumY(0);
-    soundDoSfx(kWhooshSfx1);
+    // soundDoSfx(kWhooshSfx1); // Doesn't fit here
   }
   float progress = getEasing(EASE_SPLASH_TO_GAME, 1.0f - (float)timer/TIME_SPLASH_TO_GAME);
   gameSetYOffset((-DEVICE_PIX_Y - TURRET_RADIUS) * progress, true);

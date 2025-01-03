@@ -24,10 +24,13 @@ https://thenounproject.com/icon/d-pad-1273656/
 
 https://thenounproject.com/icon/army-chevron-4942716/
 
+https://thenounproject.com/icon/eye-7431853/
+
 
 https://unsplash.com/photos/waterfalls-surrounded-with-green-leafed-trees-during-daytime-NWrye3NRrKw
 https://ditherit.com/ Error + Stucki + Serpentine
 https://www.gingerbeardman.com/canvas-dither/ Disabled + Stucki
+paint.net FS plugin (BEST)
 
 https://unsplash.com/photos/photo-of-waterfalls-OE6qLhRHhhs
 pain.net FS dither + delete white areas

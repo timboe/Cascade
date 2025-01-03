@@ -1077,14 +1077,16 @@ void bitmapDoPreloadM(const uint8_t n) {
     for (int line = 0; line < POND_WATER_HEIGHT; line += 2) {
       const float speed = (line + offset)/256.0f + 0.1f;
       const int width = MAX((line + offset)/6, 4);
-      for (int n = 0; n < N_POND_LINES; ++n) {
-        if (x[line][n] == -1) { continue; }
-        const int x1 = x[line][n] + (t * speed);
+      for (int n2 = 0; n2 < N_POND_LINES; ++n2) {
+        if (x[line][n2] == -1) { continue; }
+        const int x1 = x[line][n2] + (t * speed);
         const int x2 = x1 + width;
         for (int xOff = -20; xOff < 18; ++xOff) {
-          const int x3 = x1 + (POND_WATER_FRAMES * speed * xOff);
-          const int x4 = x3 + width;
-          pd->graphics->drawLine(x3, line, x4, line, w[line][n], kColorWhite);
+          int x3 = x1 + (POND_WATER_FRAMES * speed * xOff);
+          int x4 = x3 + width;
+          if (x3 < 0) { x3 = 0; }
+          if (x4 > DEVICE_PIX_X) { x4 = DEVICE_PIX_X; }
+          pd->graphics->drawLine(x3, line, x4, line, w[line][n2], kColorWhite);
         }
       }
     }

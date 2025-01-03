@@ -9,19 +9,24 @@ float m_numeralOffset = 0.0;
 void renderSetNumeralOffset(float no) { m_numeralOffset = no; }
 
 void renderTitlesHeader(const int32_t fc) {
-  bitmapSetRoobert10();
-  const uint16_t vX = DEVICE_PIX_X-32, vY = 4, nameX = 8, nameY = 4;
-  pd->graphics->setDrawMode(kDrawModeFillWhite);
-  for (int8_t xM = -2; xM < 4; xM += 2) {
-    for (int8_t yM = -2; yM < 4; yM += 2) {
-      pd->graphics->drawText(VERSION, 8, kUTF8Encoding, vX + xM, vY + yM);
-      pd->graphics->drawText("Tim Martin, 2025", 32, kUTF8Encoding, nameX + xM, nameY + yM);
+  const uint16_t yOff = gameGetYOffset();
+  if (yOff <= 14) { // NOTE: Very picky about rendering off-screen. Fine-tuned to avoid 'inverted rect in LCD_addUpdateRect()!'
+    const int16_t vX = DEVICE_PIX_X-32, vY = 4, nameX = 8, nameY = 4;
+    bitmapSetRoobert10();
+    #define CREATOR "© Tim Martin, 2025"
+    pd->graphics->setDrawMode(kDrawModeFillWhite);
+    for (int16_t xM = -2; xM < 4; xM += 2) {
+      for (int16_t yM = -2; yM < 4; yM += 2) {
+        pd->graphics->drawText(VERSION, 8, kUTF8Encoding, vX + xM, vY + yM);
+        pd->graphics->drawText(CREATOR, 32, kUTF8Encoding, nameX + xM, nameY + yM);
+      }
     }
+    pd->graphics->setDrawMode(kDrawModeCopy);
+    pd->graphics->drawText(VERSION, 8, kUTF8Encoding, vX, vY);
+    pd->graphics->drawText(CREATOR, 32, kUTF8Encoding, nameX, nameY);
+    // pd->system->logToConsole("rendering at %i %i when yOff is %i", nameX, nameY, yOff);
   }
-  pd->graphics->setDrawMode(kDrawModeFillBlack);
-  pd->graphics->drawText(VERSION, 8, kUTF8Encoding, vX, vY);
-  pd->graphics->drawText("Tim Martin, 2024", 32, kUTF8Encoding, nameX, nameY);
-  pd->graphics->setDrawMode(kDrawModeCopy);
+  
   pd->graphics->drawBitmap(bitmapGetTitleHeaderImage(), 0, 0, kBitmapUnflipped);
 
   if (IOGetIsPreloading()) {
@@ -31,7 +36,7 @@ void renderTitlesHeader(const int32_t fc) {
     pd->graphics->drawLine(DEVICE_PIX_X/4, (4*DEVICE_PIX_Y)/5, (3*DEVICE_PIX_X)/4, (4*DEVICE_PIX_Y)/5, TITLETEXT_HEIGHT, kColorBlack);
     pd->graphics->drawLine(DEVICE_PIX_X/4, (4*DEVICE_PIX_Y)/5, x2, (4*DEVICE_PIX_Y)/5, TITLETEXT_HEIGHT/2, kColorWhite);
   } else {
-    if (pd->system->isCrankDocked() && (fc / (TICK_FREQUENCY / 2)) % 2) { 
+    if (pd->system->isCrankDocked() && !yOff && (fc / (TICK_FREQUENCY / 2)) % 2) { 
       pd->graphics->drawBitmap(bitmapGetUseTheCrank(), DEVICE_PIX_X - 88, DEVICE_PIX_Y - 51 - 16, kBitmapUnflipped);
     }
   }

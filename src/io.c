@@ -74,6 +74,8 @@ void IODecodeError(json_decoder* jd, const char* error, int linenum);
 
 void IODoScanLevels(void);
 
+void IOWriteCustomLevelInstructions(void);
+
 ///
 
 int IOShouldDecodeScan(json_decoder* jd, const char* key);
@@ -428,7 +430,6 @@ void IODoScanLevels() {
     for (int32_t h = 0; h < MAX_HOLES; ++h) {
       m_hole = h;
       if (l == MAX_LEVELS && h) { continue; } // Only one "credits" hole
-      // snprintf(filePath, 128, "levels/fall_%i_hole_%i.json", 1, 1);
       snprintf(filePath, 128, "holes/level_%i_hole_%i.json", (int)l+1, (int)h+1);
       SDFile* file = pd->file->open(filePath, kFileRead);
       if (!file) {
@@ -437,7 +438,7 @@ void IODoScanLevels() {
         SDFile* file = pd->file->open(filePath, kFileReadData);
       }
       if (!file) {
-        break;
+        continue;
       }
       static json_decoder jd = {
         .decodeError = IODecodeError,
@@ -467,6 +468,8 @@ void IODoScanLevels() {
     pd->system->logToConsole("No save-game data at %s", SAVE_FORMAT_1_NAME);
     #endif
   }
+
+  IOWriteCustomLevelInstructions();
 
 }
 
@@ -703,9 +706,10 @@ void* IOFinishDecodeLevel(json_decoder* jd, const char* key, json_value_type typ
 void IODoLoadCurrentHole() {
   char filePath[128];
   snprintf(filePath, 128, "holes/level_%i_hole_%i.json", (int)m_level+1, (int)m_hole+1);
+  // Always give preference to the built in levels first
   SDFile* file = pd->file->open(filePath, kFileRead);
   if (!file) {
-    // Look for user-supplied levels instead
+    // Otherwise, look for user-supplied levels instead
     snprintf(filePath, 128, "level_%i_hole_%i.json", (int)m_level+1, (int)m_hole+1);
     SDFile* file = pd->file->open(filePath, kFileReadData);
   }
@@ -745,6 +749,21 @@ void IODoLoadCurrentHole() {
     #endif
   }
 
+}
+
+///
+
+void IOWriteCustomLevelInstructions() {
+  char fileContent[1024] = {0};
+  const int32_t sz = snprintf(fileContent, 1024,
+    "Create custom levels on https://timboe.itch.io/cascada\n"
+    "Use level numbers which are not being used by the base game.\n"
+    "Place levels in this folder, they should be named: level_XX_hole_YY.json\n"
+    "where XX is between 1-99 and YY is between 1-9."
+  );
+  SDFile* file = pd->file->open("custom_level_instructions.txt", kFileWrite);
+  const int wrote = pd->file->write(file, fileContent, sz);
+  pd->file->close(file);
 }
 
 ///
