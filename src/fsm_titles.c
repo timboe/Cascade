@@ -58,6 +58,7 @@ void FSMDisplayTitlesWFadeIn(const bool newState) {
     IOSetLevelHole(0, 0);
     IOSetPlayer(0);
     gameSetYOffset(0, true);
+    gameDoPopulateMenuTitles();
     progress = FADE_LEVELS - 1;
   }
   if (gameGetFrameCount() % TICK_FREQUENCY / 2 == 0) { --progress; }

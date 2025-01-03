@@ -37,7 +37,7 @@ void soundResetPling() {
 void soundSetDoMusic(const bool doit) {
   if (!m_hasMusic) return;
   m_doMusic = doit;
-  if (!m_doMusic) {
+  if (m_doMusic == false) {
     for (int32_t i = 0; i < N_WF_TRACKS; ++i) {
       pd->sound->fileplayer->stop(m_waterfalls[i]);
     }
@@ -56,7 +56,7 @@ void soundSetDoSfx(const bool doit) {
 }
 
 void soundWaterfallDoInit() {
-  if (!m_hasMusic) return;
+  if (!m_hasMusic || !m_doMusic) return;
   pd->sound->fileplayer->play(m_waterfalls[0], 0);
   m_wfPlaying = 0;
 }
@@ -65,7 +65,7 @@ void soundDoWaterfall(const uint8_t id) {
   #ifdef DEV
   pd->system->logToConsole("soundDoWaterfall called for %i", (int)id);
   #endif
-  if (!m_hasMusic || (id % N_WF_TRACKS) == m_wfPlaying) return;
+  if (!m_hasMusic || !m_doMusic || (id % N_WF_TRACKS) == m_wfPlaying) return;
   for (int32_t i = 0; i < N_WF_TRACKS; ++i) {
     pd->sound->fileplayer->stop(m_waterfalls[i]);
   }
@@ -74,7 +74,7 @@ void soundDoWaterfall(const uint8_t id) {
 }
 
 void soundDoMusic() {
-  if (!m_hasMusic) return;
+  if (!m_hasMusic || !m_doMusic) return;
   int8_t track = -1;
   while (track == -1 || track == m_trackPlaying) {
     track = rand() % N_MUSIC_TRACKS;
@@ -87,16 +87,15 @@ void soundDoMusic() {
 }
 
 void musicStopped(SoundSource* _unused, void* _unused2) {
-  if (!m_hasMusic) return;
   if (IOIsCredits()) { soundDoMusic(); }
 }
 
 void soundPlayMusic(const uint8_t id) {
+  if (!m_hasMusic || !m_doMusic) return;
   pd->sound->fileplayer->play(m_music[id % N_MUSIC_TRACKS], 1);
 }
 
 void soundDoInit() {
-
   m_audioSample[kPlingSfx1] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__1");
   m_audioSample[kPlingSfx2] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__2");
   m_audioSample[kPlingSfx3] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__3");

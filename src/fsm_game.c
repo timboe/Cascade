@@ -302,9 +302,11 @@ void FSMAimModeScrollToTop(const bool newState) {
 void FSMPlayCredits(const bool newState) {
   static float progress = 0.0f;
   static float pause = 0.0f;
+  static uint16_t initialWait = 0;
   if (newState) {
     progress = gameGetYOffset();
     pause = 0.0f;
+    initialWait = 0;
     renderDoResetMarbleTrace();
     gameDoResetFrameCount();
     renderDoResetTriggerSplash();
@@ -329,7 +331,7 @@ void FSMPlayCredits(const bool newState) {
   const bool gutterd = (ballPos.y > IOGetCurrentHoleHeight() + BALL_RADIUS);
   if (gutterd) { physicsDoSecondTryBall(); }
 
-  progress += 0.25f;
+  if (++initialWait > TICK_FREQUENCY * 1) { progress += 0.25f; }
   progress += inputGetCrankChanged() * CRANK_SCROLL_MODIFIER;
   if (progress < gameGetMinimumY()) { progress = gameGetMinimumY(); }
   gameSetYOffset(progress, false);
