@@ -28,6 +28,9 @@ int16_t m_physicsGetMotionTrailY[2][MOTION_TRAIL_LEN];
 int16_t m_predictionTrailX[PREDICTION_TRACE_LEN];
 int16_t m_predictionTrailY[PREDICTION_TRACE_LEN];
 
+struct cpShapeFilter FILTER_BALL;
+struct cpShapeFilter FILTER_PEG;
+struct cpShapeFilter FILTER_WALL;
 
 /// ///
 
@@ -50,6 +53,18 @@ void physicsDoLaunchBall(const float strength) {
 }
 
 void physicsDoInit(void) {
+  FILTER_BALL.group = GROUP_BALL;
+  FILTER_BALL.categories |= FLAG_BALL;
+  FILTER_BALL.mask |= FLAG_BALL | FLAG_WALL | FLAG_PEG;
+
+  FILTER_PEG.group = GROUP_FURNATURE;
+  FILTER_PEG.categories |= FLAG_PEG;
+  FILTER_PEG.mask |= FLAG_BALL;
+
+  FILTER_WALL.group = GROUP_FURNATURE;
+  FILTER_WALL.categories |= FLAG_WALL;
+  FILTER_WALL.mask |= FLAG_BALL;
+
   m_space = cpSpaceNew();
   cpSpaceSetIterations(m_space, 10);
   cpSpaceSetGravity(m_space, G);
@@ -65,6 +80,7 @@ void physicsDoInit(void) {
     cpShapeSetFriction(m_ballShape[i], 0.0f);
     cpShapeSetElasticity(m_ballShape[i], ELASTICITY);
     cpShapeSetCollisionType(m_ballShape[i], FLAG_BALL);
+    cpShapeSetFilter(m_ballShape[i], FILTER_BALL);
   }
   cpSpaceAddShape(m_space, m_ballShape[0]);
   cpSpaceAddBody(m_space, m_ball[0]);
@@ -74,15 +90,15 @@ void physicsDoInit(void) {
   cpShape* top   = cpSegmentShapeNew(walls, cpv(0,            0), cpv(DEVICE_PIX_X, 0),  3.0f);
   cpShape* left  = cpSegmentShapeNew(walls, cpv(0,            0), cpv(0,            PHYSWALL_PIX_Y), 3.0f);
   cpShape* right = cpSegmentShapeNew(walls, cpv(DEVICE_PIX_X, 0), cpv(DEVICE_PIX_X, PHYSWALL_PIX_Y), 3.0f);
-  cpShapeSetCollisionType(top, FLAG_WALL);
-  cpShapeSetCollisionType(left, FLAG_WALL);
-  cpShapeSetCollisionType(right, FLAG_WALL);
   cpShapeSetFriction(top, 0.0f);
   cpShapeSetElasticity(top, ELASTICITY);
   cpShapeSetFriction(left, 0.0f);
   cpShapeSetElasticity(left, ELASTICITY);
   cpShapeSetFriction(right, 0.0f);
   cpShapeSetElasticity(right, ELASTICITY);
+  cpShapeSetFilter(top, FILTER_WALL);
+  cpShapeSetFilter(left, FILTER_WALL);
+  cpShapeSetFilter(right, FILTER_WALL);
   cpSpaceAddShape(m_space, top);
   cpSpaceAddShape(m_space, left);
   cpSpaceAddShape(m_space, right);

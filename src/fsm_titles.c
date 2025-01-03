@@ -19,10 +19,10 @@ float FSMCommonCrankNumeral(float* progress) {
   *progress -= cc * CRANK_NUMBERSCROLL_MODIFIER;
   //
   if (inputGetPressed(kButtonUp)) {
-    *progress += 10 * CRANK_NUMBERSCROLL_MODIFIER;
+    *progress += 10 * DPAD_NUMBERSCROLL_MODIFIER;
     crankNotMoved = 0;
   } else if (inputGetPressed(kButtonDown)) {
-    *progress -=  10 * CRANK_NUMBERSCROLL_MODIFIER;
+    *progress -=  10 * DPAD_NUMBERSCROLL_MODIFIER;
     crankNotMoved = 0;
   }
   //
@@ -185,11 +185,11 @@ void FSMChooseHoleWFadeIn(const bool newState) {
     gameSetYOffset(DEVICE_PIX_Y*3, /*force = */true);
     renderSetNumeralOffset(0.0f);
     bitmapDoUpdateHoleStatsBitmap();
-    progress = FADE_LEVELS - 1;
+    progress = FADE_LEVELS + 4; // Start a bit higher to let the background transition before we fade in
     soundDoSfx(kWhooshSfx1);
   }
-  if (gameGetFrameCount() % (TICK_FREQUENCY / FADE_LEVELS) == 0) { --progress; }
-  renderSetFadeLevel(progress);
+  if (gameGetFrameCount() % ( (TICK_FREQUENCY/2) / FADE_LEVELS) == 0) { --progress; }
+  renderSetFadeLevel(progress < FADE_LEVELS ? progress : FADE_LEVELS - 1);
   if (progress == -1) { return FSMDo(kTitlesFSM_ChooseHole); }
 }
 

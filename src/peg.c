@@ -32,6 +32,7 @@ void pegDoAddedShape(struct Peg_t* p) {
   p->bitmap = bitmapGetPeg(p); // Call after setting shape, iAngle, size and tyoe
   pegSetBitmapCoordinates(p);
   cpShapeSetCollisionType(p->cpShape, FLAG_PEG);
+  cpShapeSetFilter(p->cpShape, FILTER_PEG);
   cpShapeSetFriction(p->cpShape, FRICTION);
   cpShapeSetElasticity(p->cpShape, ELASTICITY);
   cpSpaceAddShape(physicsGetSpace(), p->cpShape);
@@ -107,8 +108,10 @@ void pegDoInit(struct Peg_t* p, const enum PegShape_t s, const float x, const fl
 }
 
 void pegDoClear(struct Peg_t* p) {
+  const uint16_t id = p->id; // Remember this
   pegDoRemove(p);
   memset(p, 0, sizeof(struct Peg_t));
+  p->id = id;
 }
 
 void pegDoRemove(struct Peg_t* p) {
@@ -160,13 +163,21 @@ void pegSetBitmapCoordinates(struct Peg_t* p) {
   p->yBitmap = p->y - p->radius;
 }
 
+float bound(const float f) {
+  if (f >= M_2PIf) { return f - M_2PIf; }
+  else if (f < 0) { return f + M_2PIf; }
+  return f;
+}
+
 void pegDoUpdateAngle(struct Peg_t* p, const float angle) {
   // Note we do NOT update the original p->angle, this is a constant for the peg
   if (p->shape == kPegShapeBall) {
     return; // Time saving, the angle is irrelevent for circles
   }
-  p->iAngle = radToByte(angle);
-  cpBodySetAngle(p->cpBody, angle);
+  const float bAngle = bound(angle);
+  // pd->system->logToConsole("PDUA p=%i, A=%f, bA=%f", p->id, angle, bAngle);
+  p->iAngle = radToByte(bAngle);
+  cpBodySetAngle(p->cpBody, bAngle);
   p->bitmap = bitmapGetPeg(p);
 }
 
@@ -180,9 +191,7 @@ void pegDoUpdate(struct Peg_t* p) {
   }
 
   const float tsm = physicsGetTimestepMultiplier();
-  p->time += (TIMESTEP * tsm * p->speed);
-  if (p->time >= M_2PIf) { p->time -= M_2PIf; } // Keep this one bounded
-  else if (p->time < 0) { p->time += M_2PIf; } // Speed might be -ve
+  p->time = bound(p->time + (TIMESTEP * tsm * p->speed));
 
   if (p->motion == kPegMotionStatic) {
 

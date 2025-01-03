@@ -215,9 +215,10 @@
 #define FLAG_PEG 2
 #define FLAG_WALL 4
 
+#define GROUP_BALL 1
+#define GROUP_FURNATURE 2
+
 // SCREEN EASING
-// Larger value to make moving quicker
-#define SCREEN_ACC 0.9f
 // Smaller value to limit max velocity
 #define SCREEN_FRIC 0.9f
 // Larger number for stronger bounce-back
@@ -226,6 +227,10 @@
 #define CRANK_SCROLL_MODIFIER 0.1f
 // Reduction factor to make the crank scrolling of numbers not be too fast
 #define CRANK_NUMBERSCROLL_MODIFIER 0.005f
+// For the DPad
+#define DPAD_NUMBERSCROLL_MODIFIER 0.01f
+#define DPAD_ANGLESCROLL_MODIFIER 1.0f
+#define DPAD_SCREENSCROLL_MODIFIER 0.9f
 // Per frame updates towards set-position
 #define SCREEN_EASING 0.25f
 // Time multiplier for a slow, full all-screen wipe 

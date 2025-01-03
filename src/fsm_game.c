@@ -77,8 +77,8 @@ bool FSMCommonFocusOnLowestBallInPlay(const enum PegSpecial_t special) {
 void FSMCommonTurretScrollAndBounceBack(const bool allowScroll) {
   // Button based
   float diffY = 0;
-  if      (inputGetPressed(kButtonUp)) diffY = -SCREEN_ACC;
-  else if (inputGetPressed(kButtonDown)) diffY =  SCREEN_ACC;
+  if      (inputGetPressed(kButtonUp)) diffY = -DPAD_SCREENSCROLL_MODIFIER;
+  else if (inputGetPressed(kButtonDown)) diffY =  DPAD_SCREENSCROLL_MODIFIER;
   gameModYVelocity(diffY);
   // Crank based
   static float angle = 180.0f;
@@ -86,8 +86,16 @@ void FSMCommonTurretScrollAndBounceBack(const bool allowScroll) {
   static float revDetection = 180.0f;
   // Backup: non-crank
   if (pd->system->isCrankDocked()) {
-    if      (inputGetPressed(kButtonLeft)) angle += 1.0f;
-    else if (inputGetPressed(kButtonRight)) angle -= 1.0f;
+    static float acc = 0.0f;
+    if (inputGetPressed(kButtonLeft)) {
+      acc += DPAD_ANGLESCROLL_MODIFIER / (float)TICK_FREQUENCY;
+      angle += (DPAD_ANGLESCROLL_MODIFIER + acc);
+    } else if (inputGetPressed(kButtonRight)) {
+      acc += DPAD_ANGLESCROLL_MODIFIER / (float)TICK_FREQUENCY;
+      angle -= (DPAD_ANGLESCROLL_MODIFIER + acc);
+    } else {
+      acc = 0;
+    }
   } else {
     angle = inputGetCrankAngle();
   }
@@ -173,11 +181,11 @@ void FSMDisplayLevelTitleWFadeIn(const bool newState) {
   static int8_t progress = FADE_LEVELS - 1;
   if (newState) {
     gameSetYOffset(-DEVICE_PIX_Y - TURRET_RADIUS, /*force = */true);
-    progress = FADE_LEVELS - 1;
+    progress = FADE_LEVELS + 2;
     soundDoSfx(kWhooshSfx1);
   }
-  if (gameGetFrameCount() % (TICK_FREQUENCY / FADE_LEVELS) == 0) { --progress; }
-  renderSetFadeLevel(progress);
+  if (gameGetFrameCount() % ( (TICK_FREQUENCY/2) / FADE_LEVELS) == 0) { --progress; }
+  renderSetFadeLevel(progress < FADE_LEVELS ? progress : FADE_LEVELS-1);
   if (progress == -1) { return FSMDo(kGameFSM_DisplayLevelTitle); }
 }
 
@@ -248,7 +256,7 @@ void FSMTutorialGetRequired(const bool newState) {
 void FSMGameFadeOutQuit(const bool newState) {
   static int8_t progress = 0;
   if (newState) { progress = 0; }
-  if (gameGetFrameCount() % (TICK_FREQUENCY / FADE_LEVELS) == 0) { ++progress; }
+  if (gameGetFrameCount() % ( (TICK_FREQUENCY/2) / FADE_LEVELS) == 0) { ++progress; }
   if (progress == FADE_LEVELS) { return FSMDo(kTitlesFSM_ChooseHoleWFadeIn); }
   renderSetFadeLevel(progress);
 }
@@ -256,7 +264,7 @@ void FSMGameFadeOutQuit(const bool newState) {
 void FSMGameFadeOutReset(const bool newState) {
   static int8_t progress = 0;
   if (newState) { progress = 0; }
-  if (gameGetFrameCount() % (TICK_FREQUENCY / FADE_LEVELS) == 0) { ++progress; }
+  if (gameGetFrameCount() % ( (TICK_FREQUENCY/2) / FADE_LEVELS) == 0) { ++progress; }
   if (progress == FADE_LEVELS) { return FSMDo(kGameFSM_DisplayLevelTitleWFadeIn); }
   renderSetFadeLevel(progress);
 }

@@ -29,3 +29,6 @@ void physicsDoResetBall(uint8_t n);
 
 void physicsDoSecondTryBall(void);
 
+extern struct cpShapeFilter FILTER_BALL;
+extern struct cpShapeFilter FILTER_PEG;
+extern struct cpShapeFilter FILTER_WALL;
