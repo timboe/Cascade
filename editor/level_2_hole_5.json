@@ -158,7 +158,7 @@
       "y": 200,
       "angle": -57,
       "size": 1,
-      "type": 0
+      "type": 1
     },
     "StaticControl19": {
       "shape": 1,
@@ -296,7 +296,7 @@
       "PegContainer2": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 1
+        "type": 0
       },
       "PegContainer3": {
         "shape_override": 0,
@@ -326,7 +326,7 @@
       "PegContainer8": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 1
+        "type": 0
       },
       "LineContainer1": {
         "lc_x": 140,
