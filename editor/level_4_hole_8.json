@@ -59,8 +59,8 @@
     "StaticControl6": {
       "shape": 0,
       "x": 211,
-      "y": 414,
-      "angle": -181,
+      "y": 408,
+      "angle": -182,
       "size": 0,
       "type": 0
     },
@@ -202,9 +202,9 @@
     },
     "StaticControl24": {
       "shape": 0,
-      "x": 199,
-      "y": 432,
-      "angle": -181,
+      "x": 212,
+      "y": 426,
+      "angle": -178,
       "size": 0,
       "type": 1
     },
