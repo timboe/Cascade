@@ -412,6 +412,7 @@ LCDBitmap* bitmapGetChevron(const uint8_t id) {
 
 // Can't currently use bitmapDoDrawRotatedPoly here as the points are not evenly spaced around the unit circle
 void bitmapDoDrawRotatedRect(const float x, const float y, const float w2, const float h2, const int16_t iAngle, const enum RenderColor_t rc) {
+    pd->graphics->setLineCapStyle(kLineCapStyleRound);
     const float angleRad = (M_PIf / 128.0f) * iAngle;
     const float ca = cosf(angleRad);
     const float sa = sinf(angleRad);
@@ -441,6 +442,7 @@ void bitmapDoDrawRotatedRect(const float x, const float y, const float w2, const
 }
 
 void bitmapDoDrawRotatedPoly(const uint8_t corners, const float x, const float y, const float w2, const float h2, const int16_t iAngle, const enum RenderColor_t rc) {
+    pd->graphics->setLineCapStyle(kLineCapStyleRound);
     const float angleOff = (M_PIf / 128.0f) * iAngle;
     int points[128] = {0};
     const float angleAdvance = M_2PIf / (float)corners;
@@ -468,6 +470,7 @@ void bitmapDoDrawRotatedPoly(const uint8_t corners, const float x, const float y
   }
 
 void bitmapDoUpdateScoreHistogram(void) {
+  pd->graphics->setLineCapStyle(kLineCapStyleRound);
   pd->graphics->clearBitmap(m_scoreHistogram, kColorBlack);
   pd->graphics->pushContext(m_scoreHistogram);
   const int16_t maxHistoBalls = 12;
@@ -527,6 +530,7 @@ void bitmapDoUpdateScoreHistogram(void) {
 #define N_MAX 7
 // This bit doesn't change
 void bitmapDoScoreCardBackground(void) {
+  pd->graphics->setLineCapStyle(kLineCapStyleRound);
   pd->graphics->pushContext(m_scoreCardBitmapBackground);
 
   int points[12] = {
@@ -1058,36 +1062,33 @@ void bitmapDoPreloadL(void) {
   }
 }
 
-#define N_POND_LINES 3
+#define POND_LINE_Y_START 2
+#define POND_LINE_Y_SKIP 4
 void bitmapDoPreloadM(const uint8_t n) {
-  const uint16_t offset = POND_WATER_HEIGHT * n;
-  int16_t x[POND_WATER_HEIGHT][N_POND_LINES];
-  uint8_t w[POND_WATER_HEIGHT][N_POND_LINES];
-  for (int line = 0; line < POND_WATER_HEIGHT; line += 2) {
-    uint8_t nLines = (rand() % (N_POND_LINES - 1)) + 1;
-    for (int n = 0; n < N_POND_LINES; ++n) { x[line][n] = -1; }
-    for (int n = 0; n < nLines; ++n) { 
-      x[line][n] = rand() % DEVICE_PIX_X;
-      w[line][n] = (rand() % (POND_WATER_HEIGHT * POND_WATER_TILES) > (line + offset) ? 1 : 2);
-    }
+  pd->graphics->setLineCapStyle(kLineCapStyleRound);
+  const int32_t girth = n + 1;
+  const int32_t offset = POND_WATER_HEIGHT * n;
+  int32_t x[POND_WATER_HEIGHT];
+  for (int32_t line = POND_LINE_Y_START; line < POND_WATER_HEIGHT; line += POND_LINE_Y_SKIP) {
+    x[line] = rand() % DEVICE_PIX_X/4;
   }
-  for (int t = 0; t < POND_WATER_FRAMES; ++t) {
+  for (int32_t t = 0; t < POND_WATER_FRAMES; ++t) {
     pd->graphics->pushContext(m_wfPond[n][t]);
     pd->graphics->setDrawMode(kDrawModeCopy);
-    for (int line = 0; line < POND_WATER_HEIGHT; line += 2) {
-      const float speed = (line + offset)/256.0f + 0.1f;
-      const int width = MAX((line + offset)/6, 4);
-      for (int n2 = 0; n2 < N_POND_LINES; ++n2) {
-        if (x[line][n2] == -1) { continue; }
-        const int x1 = x[line][n2] + (t * speed);
-        const int x2 = x1 + width;
-        for (int xOff = -20; xOff < 18; ++xOff) {
-          int x3 = x1 + (POND_WATER_FRAMES * speed * xOff);
-          int x4 = x3 + width;
-          if (x3 < 0) { x3 = 0; }
-          if (x4 > DEVICE_PIX_X) { x4 = DEVICE_PIX_X; }
-          pd->graphics->drawLine(x3, line, x4, line, w[line][n2], kColorWhite);
-        }
+    for (int32_t line = POND_LINE_Y_START; line < POND_WATER_HEIGHT; line += POND_LINE_Y_SKIP) {
+      const float speed = (line + offset)/(float)(POND_WATER_HEIGHT*POND_WATER_TILES) + 0.1f; ; // speed from 0.1 to 1.1f 
+      const int32_t width = MAX(4, ((line + offset)/6) ); // line width from 4 - 39 
+      // if (t == 0) {
+      //   pd->system->logToConsole("at (offset %i line %i) -> global line %i width is %i, speed is %f / girth is %i", offset, line, (line + offset), width, speed, girth); 
+      // }
+      const int32_t xStart = x[line] + (t * speed);
+      for (int32_t xOff = -16; xOff < 32; ++xOff) {
+        int32_t xCopy1 = xStart + (POND_WATER_FRAMES * speed * xOff);
+        if (xCopy1 < -width || xCopy1 > DEVICE_PIX_X) { continue; } // off screen
+        int32_t xCopy2 = xCopy1 + width;
+        if (xCopy1 < 0) { xCopy1 = 0; } // Clip
+        if (xCopy2 > DEVICE_PIX_X) { xCopy2 = DEVICE_PIX_X; } // Clip
+        pd->graphics->drawLine(xCopy1, line, xCopy2, line, girth, kColorWhite);
       }
     }
     pd->graphics->popContext();

@@ -69,7 +69,7 @@ bool FSMCommonFocusOnLowestBallInPlay(const enum PegSpecial_t special) {
   if (gutterd) {
     uint8_t whichBall = 0;
     if (y == ballPos[1].y) { whichBall = 1; }
-    if (special != kPegSpecialSecondTry) renderDoTriggerSplash(whichBall, ballPos[whichBall].x);
+    if (special != kPegSpecialSecondTry) { renderDoTriggerSplash(whichBall, ballPos[whichBall].x); }
   }
   return gutterd;
 }
@@ -353,7 +353,7 @@ void FSMBallInPlay(const bool newState) {
   }
 
   const float tsm = physicsGetTimestepMultiplier();
-  if (tsm < 1.0f) { physicsSetTimestepMultiplier(tsm + 0.05f); }
+  if (tsm < 1.0f - TSM_DELTA) { physicsSetTimestepMultiplier(tsm + TSM_FAST); }
 
   // Focus on ball, check gutter
   const bool guttered = FSMCommonFocusOnLowestBallInPlay(special);
@@ -393,7 +393,7 @@ void FSMBallInPlay(const bool newState) {
 
 void FSMBallStuck(const bool newState) {
   const float tsm = physicsGetTimestepMultiplier();
-  if (tsm < 1.0f) { physicsSetTimestepMultiplier(tsm + 0.05f); }
+  if (tsm < 1.0f - TSM_DELTA) { physicsSetTimestepMultiplier(tsm + TSM_FAST); }
   //
   FSMCommonTurretScrollAndBounceBack(true);
   //
@@ -422,9 +422,9 @@ void FSMCloseUp(const bool newState) {
   }
 
   const float tsm = physicsGetTimestepMultiplier();
-  if (tsm > 0.2f) { physicsSetTimestepMultiplier(tsm - 0.05f); } // 1.0 to 0.2 in 16 frames, 0.32 seconds
+  if (tsm > TSM_TARGET_SLOWMO + TSM_DELTA) { physicsSetTimestepMultiplier(tsm - TSM_FAST); } // 1.0 to 0.2 in 8 frames, 0.16 seconds
   // Note: Applying TSM changes over multiple frames so as to not overly mess up physics engine assumptions
-  // Big effect from going straight from a 1.0 multiplier to 0.2 
+  // Big effect from going straight from a 1.0 multiplier to 0.2  xxx
 
   cpVect ballPos[2];
   ballPos[0] = cpBodyGetPosition(physicsGetBall(0));
@@ -477,7 +477,7 @@ void FSMWinningToast(const bool newState) {
   }
 
   const float tsm = physicsGetTimestepMultiplier();
-  if (tsm < 0.75f) { physicsSetTimestepMultiplier(tsm + 0.005f); } // 0.25 per sec, 0.2 -> 0.75 in 2.2 seconds 
+  if (tsm < TSM_TARGET_TOAST - TSM_DELTA) { physicsSetTimestepMultiplier(tsm + TSM_SLOW); } // 0.25 per sec, 0.2 -> 0.8 in 2.4 seconds 
 
   const cpVect last = renderGetLastEndBlast();
   const cpVect ballPos = cpBodyGetPosition(physicsGetBall(0));

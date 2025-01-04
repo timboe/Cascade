@@ -166,7 +166,12 @@ void renderGame(const int32_t fc, const enum FSM_t fsm) {
   // DRAW PEGS
   renderGameBoard(fc);
 
-  if (fsm == kGameFSM_BallStuck || fsm == kGameFSM_GutterToTurret || fsm == kGameFSM_WinningToast) {
+  if (fsm == kGameFSM_BallStuck 
+    || fsm == kGameFSM_GutterToTurret 
+    || fsm == kGameFSM_WinningToast
+    || fsm == kGameFSM_TurretLower
+    || fsm == kGameFSM_AimMode)
+  {
     renderGamePops(fc);
   }
 
@@ -187,6 +192,7 @@ void renderGame(const int32_t fc, const enum FSM_t fsm) {
 
 #ifdef DEV
   // Debug gutter line
+  pd->graphics->setLineCapStyle(kLineCapStyleRound);
   pd->graphics->drawLine(0, IOGetCurrentHoleHeight(), DEVICE_PIX_X, IOGetCurrentHoleHeight(), 4, kColorBlack);
   pd->graphics->drawLine(0, IOGetCurrentHoleHeight(), DEVICE_PIX_X, IOGetCurrentHoleHeight(), 2, kColorWhite);
 
@@ -238,11 +244,17 @@ void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm) {
 
   // pd->system->logToConsole("startID %i, yOff is %i, paralax is %i, startOffset is %i", startID, yOffset, parallax, startOffset);
 
-  pd->graphics->setLineCapStyle(kLineCapStyleRound);
-  for (int i = 0; i < N_BACKLINES; ++i) {
-    if (m_backLines[i].y - BACKLINE_HEIGHT < maxY && !(fsm == kGameFSM_ScoresToTryAgain || fsm == kGameFSM_ToGameCreditsTitle)) { continue; }
-    if (m_backLines[i].y + BACKLINE_HEIGHT < yOffset) { continue; }
-    pd->graphics->drawLine(m_backLines[i].x, m_backLines[i].y, m_backLines[i].x, m_backLines[i].y + BACKLINE_HEIGHT, BACKLINE_WIDTH, kColorWhite);
+  if (fsm == kGameFSM_ScoresToTryAgain 
+    || fsm == kGameFSM_ToGameCreditsTitle
+    || fsm == kGameFSM_BallGutter
+    || fsm == kGameFSM_GutterToScores)
+  {
+    pd->graphics->setLineCapStyle(kLineCapStyleRound);
+    for (int i = 0; i < N_BACKLINES; ++i) {
+      if (m_backLines[i].y - BACKLINE_HEIGHT < maxY) { continue; }
+      if (m_backLines[i].y + BACKLINE_HEIGHT < yOffset) { continue; }
+      pd->graphics->drawLine(m_backLines[i].x, m_backLines[i].y, m_backLines[i].x, m_backLines[i].y + BACKLINE_HEIGHT, BACKLINE_WIDTH, kColorWhite);
+    }
   }
 
   if (fsm == kGameFSM_ScoresToTryAgain || fsm == kGameFSM_ToGameCreditsTitle) { return; }

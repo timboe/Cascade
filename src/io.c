@@ -432,16 +432,15 @@ void IODoScanLevels() {
     m_level = l;
     for (int32_t h = 0; h < MAX_HOLES; ++h) {
       m_hole = h;
-      if (l == MAX_LEVELS && h) { continue; } // Only one "credits" hole
       snprintf(filePath, 128, "holes/level_%i_hole_%i.json", (int)l+1, (int)h+1);
       SDFile* file = pd->file->open(filePath, kFileRead);
       if (!file) {
         // Look for user-supplied levels instead
         snprintf(filePath, 128, "level_%i_hole_%i.json", (int)l+1, (int)h+1);
-        SDFile* file = pd->file->open(filePath, kFileReadData);
+        file = pd->file->open(filePath, kFileReadData);
       }
       if (!file) {
-        continue;
+        break; // Holes must be sequentially numbered, 1, 2, 3, etc.
       }
       static json_decoder jd = {
         .decodeError = IODecodeError,
@@ -449,7 +448,7 @@ void IODoScanLevels() {
         .shouldDecodeTableValueForKey = IOShouldDecodeScan
       };
       #ifdef DEV
-      pd->system->logToConsole("decoding header for level %i hole %i", m_level, m_hole);
+      pd->system->logToConsole("decoding header for %s", filePath);
       #endif
       pd->json->decode(&jd, (json_reader){ .read = IODoRead, .userdata = file }, NULL);
       int32_t status = pd->file->close(file);
@@ -488,10 +487,14 @@ void IOReadVolumePreferences() {
     file = NULL;
   }
   if (result == 1) {
+    #ifdef DEV
     pd->system->logToConsole("Read volume preference %i", payload);
+    #endif
     soundSetSetting(payload);
   } else {
+    #ifdef DEV
     pd->system->logToConsole("No volume preference file");
+    #endif
     soundSetSetting(0); // music:true, sfx:true
   }
 }
@@ -734,7 +737,7 @@ void IODoLoadCurrentHole() {
   if (!file) {
     // Otherwise, look for user-supplied levels instead
     snprintf(filePath, 128, "level_%i_hole_%i.json", (int)m_level+1, (int)m_hole+1);
-    SDFile* file = pd->file->open(filePath, kFileReadData);
+    file = pd->file->open(filePath, kFileReadData);
   }
   if (!file) {
     #ifdef DEV
@@ -762,6 +765,7 @@ void IODoLoadCurrentHole() {
 
   pd->json->decode(&jd, (json_reader){ .read = IODoRead, .userdata = file }, NULL);
   int status = pd->file->close(file);
+  file = NULL;
 
   // Check playable (does not apply to the credits, however)
   if (m_level != MAX_LEVELS && (boardGetRequiredPegsInPlay() == 0 || boardGetNPegs() == 0)) {
@@ -782,7 +786,8 @@ void IOWriteCustomLevelInstructions() {
     "Create custom levels on https://timboe.itch.io/cascada\n"
     "Use level numbers which are not being used by the base game.\n"
     "Place levels in this folder, they should be named: level_XX_hole_YY.json\n"
-    "where XX is between 1-99 and YY is between 1-9."
+    "where XX is between 1-99 and YY is between 1-9.\n"
+    "Each level should have sequentially numbered holes, starting from hole 1.\n"
   );
   SDFile* file = pd->file->open(CUSTOM_LEVEL_INSTRUCTIONS_NAME, kFileWrite);
   const int32_t wrote = pd->file->write(file, fileContent, sz);

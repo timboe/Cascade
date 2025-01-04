@@ -351,7 +351,7 @@ void renderGameTutorial(const int32_t fc, const enum FSM_t fsm) {
     if (pd->system->isCrankDocked()) {
       pd->graphics->drawBitmap(bitmapGetTutorialDPad((fc / slow) % 2), 20, 40 + yOff, kBitmapFlippedY);
     } else {
-      pd->graphics->drawBitmap(bitmapGetTutorialCrankRotate(fc / fast), 20, 20 + yOff, kBitmapUnflipped);
+      pd->graphics->drawBitmap(bitmapGetTutorialCrankRotate(fc / fast), 0, yOff + 20, kBitmapUnflipped);
     }
 
   } else if (fsm == kGameFSM_TutorialScrollUp) {
@@ -359,7 +359,7 @@ void renderGameTutorial(const int32_t fc, const enum FSM_t fsm) {
     if (pd->system->isCrankDocked()) {
       pd->graphics->drawBitmap(bitmapGetTutorialDPad((fc / slow) % 2), 20, 40 + yOff, kBitmapUnflipped);
     } else {
-      pd->graphics->drawBitmap(bitmapGetTutorialCrankRotate(fc / fast), 20, 20 + yOff, kBitmapFlippedX);
+      pd->graphics->drawBitmap(bitmapGetTutorialCrankRotate(fc / fast), 0, yOff, kBitmapFlippedX);
     }
     pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 2 ? 0 : 2) , HALF_DEVICE_PIX_X + 20, 60 + yOff, kBitmapUnflipped);
 
@@ -372,9 +372,9 @@ void renderGameTutorial(const int32_t fc, const enum FSM_t fsm) {
     } else {
       uint8_t f = (fc / fast) % 8;
       if (f > 4) f = 4 - (f - 4);
-      pd->graphics->drawBitmap(bitmapGetTutorialCrankAngle(f), 20, 65 + yOff, kBitmapUnflipped);
+      pd->graphics->drawBitmap(bitmapGetTutorialCrankAngle(f), 0, 45 + yOff, kBitmapUnflipped);
     }
-    pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 2 ? 1 : 3) , HALF_DEVICE_PIX_X + 20, 60 + yOff, kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 4 == 0 ? 1 : 3) , HALF_DEVICE_PIX_X + 20, 60 + yOff, kBitmapUnflipped);
 
   } else if (fsm == kGameFSM_TutorialGetSpecial) {
 
@@ -383,8 +383,8 @@ void renderGameTutorial(const int32_t fc, const enum FSM_t fsm) {
       if (f < 2) pd->graphics->drawBitmap(bitmapGetTutorialDPad((fc / slow) % 2 ? 2 : 0), HALF_DEVICE_PIX_X + 20, 40 + yOff, kBitmapUnflipped);
       else       pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 2 ? 3 : 1) , HALF_DEVICE_PIX_X + 20, 60 + yOff, kBitmapUnflipped);
     } else {
-      pd->graphics->drawBitmap(bitmapGetTutorialCrankAngle(0), HALF_DEVICE_PIX_X + 20, 5 + yOff, kBitmapUnflipped);
-      pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 2 ? 1 : 3) , HALF_DEVICE_PIX_X + 20, 5 + 110 + yOff, kBitmapUnflipped);
+      pd->graphics->drawBitmap(bitmapGetTutorialCrankAngle(0), HALF_DEVICE_PIX_X + 20, yOff, kBitmapUnflipped);
+      pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 4 == 0 ? 1 : 3) , HALF_DEVICE_PIX_X + 20 - 50, 5 + 110 + yOff, kBitmapUnflipped);
     }
     if ((fc / slow) % 2) { pd->graphics->drawBitmap(bitmapGetTutorialArrows(0), 0, yOff, kBitmapUnflipped); }
 
@@ -395,8 +395,8 @@ void renderGameTutorial(const int32_t fc, const enum FSM_t fsm) {
       if (f < 2) pd->graphics->drawBitmap(bitmapGetTutorialDPad((fc / slow) % 2 ? 2 : 0), 20, 40 + yOff, kBitmapFlippedX);
       else       pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 2 ? 3 : 1), 20, 60 + yOff, kBitmapUnflipped);
     } else {
-      pd->graphics->drawBitmap(bitmapGetTutorialCrankAngle(4), 20, 5 + yOff, kBitmapUnflipped);
-      pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 2 ? 1 : 3), 20, 5 + 110 + yOff, kBitmapUnflipped);
+      pd->graphics->drawBitmap(bitmapGetTutorialCrankAngle(4), 0, yOff, kBitmapUnflipped);
+      pd->graphics->drawBitmap(bitmapGetTutorialButton((fc / slow) % 4 == 0 ? 1 : 3), 20 + 50, 5 + 110 + yOff, kBitmapUnflipped);
     }
     if ((fc / slow) % 2) { pd->graphics->drawBitmap(bitmapGetTutorialArrows(1), HALF_DEVICE_PIX_X, yOff, kBitmapUnflipped); }
 
@@ -405,7 +405,7 @@ void renderGameTutorial(const int32_t fc, const enum FSM_t fsm) {
     if (pd->system->isCrankDocked()) {
       pd->graphics->drawBitmap(bitmapGetTutorialDPad((fc / slow) % 2), 40, 40 + yOff, kBitmapFlippedY);
     } else {
-      pd->graphics->drawBitmap(bitmapGetTutorialCrankRotate(fc / fast), 40, 20 + yOff, kBitmapUnflipped);
+      pd->graphics->drawBitmap(bitmapGetTutorialCrankRotate(fc / fast), 20, yOff, kBitmapUnflipped);
     }
 
   }

@@ -63,7 +63,7 @@
 #define SPECIAL_BLAST_RADIUS 128
 #define SPECIAL_BLAST_FRAMES 9
 
-#define FINAL_PEG_SLOWMO_RADIUS 64
+#define FINAL_PEG_SLOWMO_RADIUS (64+16)
 
 #define POND_SPLASH_WIDTH 128
 #define POND_SPLASH_HEIGHT 82
@@ -203,6 +203,13 @@
 #define POOT_STRENGTH 300.0f
 
 #define WF_VELOCITY 0.6f
+
+#define TSM_FAST 0.2f
+#define TSM_SLOW 0.005f
+#define TSM_TARGET_SLOWMO 0.2f
+#define TSM_TARGET_TOAST 0.8f
+// Delta is used due to finite floating point precision
+#define TSM_DELTA 0.01f
 
 // Velocity squared under which the ball is considered stuck
 #define BALL_IS_STUCK 1000.0f
