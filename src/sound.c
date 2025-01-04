@@ -15,6 +15,8 @@ int8_t m_wfPlaying = -1;
 uint8_t m_plingID = 0;
 int32_t m_plingTimer = 0;
 
+const float WF_VOLUMES[] = {0.25f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f};
+
 FilePlayer* m_music[N_MUSIC_TRACKS];
 FilePlayer* m_waterfalls[N_WF_TRACKS];
 
@@ -35,7 +37,7 @@ void soundResetPling() {
 }
 
 void soundSetDoMusic(const bool doit) {
-  if (!m_hasMusic) return;
+  if (!m_hasMusic) { return; }
   m_doMusic = doit;
   if (m_doMusic == false) {
     for (int32_t i = 0; i < N_WF_TRACKS; ++i) {
@@ -55,8 +57,27 @@ void soundSetDoSfx(const bool doit) {
   m_doSfx = doit;
 }
 
+void soundDoWaterfallVolume(const enum FSM_t fsm, const enum GameMode_t gm) {
+  if (!m_doMusic || m_wfPlaying == -1) { return; }
+  const float yOff = gameGetYOffset();
+  const float maxY = (gm == kGameWindow ? IOGetCurrentHoleHeight() : PHYSWALL_PIX_Y);
+  float v = 1.0f;
+  if (IOGetCurrentHoleWaterfallBackground(gm) == -1 || fsm == kGameFSM_ScoresToTryAgain) {
+    // This lets us know we don't want the animated background, so no sfx either
+    v = 0.0f;
+  } else if (yOff < 0.0f) { // Fade out above
+    v += yOff / (float) DEVICE_PIX_Y; // Note that yOff is -ve
+    if (v < 0.0f) { v = 0.0f; }
+  } else if (yOff > maxY) { // Fade out below
+    v -= (yOff - maxY) / (float) DEVICE_PIX_Y;
+    if (v < 0.0f) { v = 0.0f; }
+  }
+  v *= WF_VOLUMES[m_wfPlaying];
+  pd->sound->fileplayer->setVolume(m_waterfalls[m_wfPlaying], v, v);
+}
+
 void soundWaterfallDoInit() {
-  if (!m_hasMusic || !m_doMusic) return;
+  if (!m_hasMusic || !m_doMusic) { return; }
   pd->sound->fileplayer->play(m_waterfalls[0], 0);
   m_wfPlaying = 0;
 }
@@ -65,7 +86,7 @@ void soundDoWaterfall(const uint8_t id) {
   #ifdef DEV
   pd->system->logToConsole("soundDoWaterfall called for %i", (int)id);
   #endif
-  if (!m_hasMusic || !m_doMusic || (id % N_WF_TRACKS) == m_wfPlaying) return;
+  if (!m_hasMusic || !m_doMusic || (id % N_WF_TRACKS) == m_wfPlaying) { return; }
   for (int32_t i = 0; i < N_WF_TRACKS; ++i) {
     pd->sound->fileplayer->stop(m_waterfalls[i]);
   }
@@ -74,7 +95,7 @@ void soundDoWaterfall(const uint8_t id) {
 }
 
 void soundDoMusic() {
-  if (!m_hasMusic || !m_doMusic) return;
+  if (!m_hasMusic || !m_doMusic) { return; }
   int8_t track = -1;
   while (track == -1 || track == m_trackPlaying) {
     track = rand() % N_MUSIC_TRACKS;
@@ -91,44 +112,44 @@ void musicStopped(SoundSource* _unused, void* _unused2) {
 }
 
 void soundPlayMusic(const uint8_t id) {
-  if (!m_hasMusic || !m_doMusic) return;
+  if (!m_hasMusic || !m_doMusic) { return; }
   pd->sound->fileplayer->play(m_music[id % N_MUSIC_TRACKS], 1);
 }
 
 void soundDoInit() {
-  m_audioSample[kPlingSfx1] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__1");
-  m_audioSample[kPlingSfx2] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__2");
-  m_audioSample[kPlingSfx3] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__3");
-  m_audioSample[kPlingSfx4] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__4");
-  m_audioSample[kPlingSfx5] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__5");
-  m_audioSample[kPlingSfx6] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__6");
-  m_audioSample[kPlingSfx7] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__7");
-  m_audioSample[kPlingSfx8] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__8");
-  m_audioSample[kPlingSfx9] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__9");
-  m_audioSample[kPlingSfx10] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__10");
-  m_audioSample[kPlingSfx11] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__11");
-  m_audioSample[kPlingSfx12] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__12");
-  m_audioSample[kPlingSfx13] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__13");
-  m_audioSample[kPlingSfx14] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__14");
-  m_audioSample[kPlingSfx15] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__15");
-  m_audioSample[kPlingSfx16] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__16");
+  m_audioSample[kPlingSfx1] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__1"); // -10%
+  m_audioSample[kPlingSfx2] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__2"); // -5%
+  m_audioSample[kPlingSfx3] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__3"); // Original
+  m_audioSample[kPlingSfx4] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__4"); // +5%
+  m_audioSample[kPlingSfx5] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__5"); // +10%
+  m_audioSample[kPlingSfx6] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__6"); // +15%
+  m_audioSample[kPlingSfx7] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__7"); // +20%
+  m_audioSample[kPlingSfx8] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__8"); // +25%
+  m_audioSample[kPlingSfx9] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__9"); // +30%
+  m_audioSample[kPlingSfx10] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__10"); // +40%
+  m_audioSample[kPlingSfx11] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__11"); // +50%
+  m_audioSample[kPlingSfx12] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__12"); // +60%
+  m_audioSample[kPlingSfx13] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__13"); // +70%
+  m_audioSample[kPlingSfx14] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__14"); // +80%
+  m_audioSample[kPlingSfx15] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__15"); // +90%
+  m_audioSample[kPlingSfx16] = pd->sound->sample->load("fx/760664__gutertonwav__guterton-cup-ding__16"); // +100%
 
-  m_audioSample[kDingSfx1] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__1");
-  m_audioSample[kDingSfx2] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__2");
-  m_audioSample[kDingSfx3] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__3");
-  m_audioSample[kDingSfx4] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__4");
-  m_audioSample[kDingSfx5] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__5");
-  m_audioSample[kDingSfx6] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__6");
-  m_audioSample[kDingSfx7] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__7");
-  m_audioSample[kDingSfx8] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__8");
-  m_audioSample[kDingSfx9] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__9");
-  m_audioSample[kDingSfx10] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__10");
-  m_audioSample[kDingSfx11] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__11");
-  m_audioSample[kDingSfx12] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__12");
-  m_audioSample[kDingSfx13] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__13");
-  m_audioSample[kDingSfx14] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__14");
-  m_audioSample[kDingSfx15] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__15");
-  m_audioSample[kDingSfx16] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__16");
+  m_audioSample[kDingSfx1] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__n1"); // -20%
+  m_audioSample[kDingSfx2] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__0"); // -15%
+  m_audioSample[kDingSfx3] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__1"); // ...
+  m_audioSample[kDingSfx4] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__2");
+  m_audioSample[kDingSfx5] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__3");
+  m_audioSample[kDingSfx6] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__4");
+  m_audioSample[kDingSfx7] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__5");
+  m_audioSample[kDingSfx8] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__6");
+  m_audioSample[kDingSfx9] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__7");
+  m_audioSample[kDingSfx10] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__8");
+  m_audioSample[kDingSfx11] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__9");
+  m_audioSample[kDingSfx12] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__10");
+  m_audioSample[kDingSfx13] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__11");
+  m_audioSample[kDingSfx14] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__12");
+  m_audioSample[kDingSfx15] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__13");
+  m_audioSample[kDingSfx16] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__14"); // +80%
 
   m_audioSample[kSplashSfx1] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__1");
   m_audioSample[kSplashSfx2] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__2");
@@ -136,10 +157,10 @@ void soundDoInit() {
   m_audioSample[kSplashSfx4] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__4");
   m_audioSample[kSplashSfx5] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__5");
 
-  m_audioSample[kWhooshSfx1] = pd->sound->sample->load("fx/682473__simosc__whoosh");
-  m_audioSample[kWhooshSfx2] = pd->sound->sample->load("fx/682473__simosc__whoosh");
-  m_audioSample[kWhooshSfx3] = pd->sound->sample->load("fx/682473__simosc__whoosh");
-  m_audioSample[kWhooshSfx4] = pd->sound->sample->load("fx/682473__simosc__whoosh");
+  m_audioSample[kWhooshSfx1] = pd->sound->sample->load("fx/153235__jzazvurek__swishes-svihy__1");
+  m_audioSample[kWhooshSfx2] = pd->sound->sample->load("fx/153235__jzazvurek__swishes-svihy__2");
+  m_audioSample[kWhooshSfx3] = pd->sound->sample->load("fx/153235__jzazvurek__swishes-svihy__3");
+  m_audioSample[kWhooshSfx4] = pd->sound->sample->load("fx/153235__jzazvurek__swishes-svihy__4");
 
   m_audioSample[kPopSfx1] = pd->sound->sample->load("fx/613608__pellepyb__pop-sound__1");
   m_audioSample[kPopSfx2] = pd->sound->sample->load("fx/613608__pellepyb__pop-sound__2");
@@ -185,7 +206,6 @@ void soundDoInit() {
     pd->sound->fileplayer->setBufferLength(m_music[i], 1.0f); 
   }
 
-  const float WF_VOLUMES[] = {0.25f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f};
   for (int32_t i = 0; i < N_WF_TRACKS; ++i) {
     m_waterfalls[i] = pd->sound->fileplayer->newPlayer();
     switch (i) {
@@ -203,29 +223,23 @@ void soundDoInit() {
 }
 
 void soundDoSfx(enum SfxSample sample) {
-  if (!m_doSfx || IOGetIsPreloading()) return;
+  if (!m_doSfx || IOGetIsPreloading()) { return; }
 
   if (sample == kPlingSfx1 || sample == kDingSfx1) {
-    if (m_doingExplosion) {
-      return; // Disable plings during the explosion
-    }
+    
+    if (m_doingExplosion) { return; } // Disable plings during the explosion
     if (m_plingTimer == 0 || (gameGetFrameCount() - m_plingTimer) > TICK_FREQUENCY*2) {
       m_plingID = 0;
     }
-
-    //TODO try and match the pitches better
-    if (sample == kDingSfx1 && m_plingID >= 2) { sample -= 2; }
-    else if (sample == kDingSfx1 && m_plingID >= 1) { sample -= 1; }
 
     sample += m_plingID;
 
     if (m_plingID < N_PLINGS_SFX-1) m_plingID++;
     m_plingTimer = gameGetFrameCount();
     if (boardGetCurrentSpecial() == kPegSpecialBounce) { sample = rand() % 2 ? kBoingSfx1 : kBoingSfx2; }
-  } else  if (sample == kWhooshSfx1) { // Round robin
-    static uint8_t offset = 0;
-    offset = (offset + 1) % 4;
-    sample += offset;
+
+  } else  if (sample == kWhooshSfx1) {
+    sample += rand() % N_WHOOSHES_SFX;
   } else if (sample == kSplashSfx1) {
     sample += rand() % N_SPLASHES_SFX;
   } else if (sample == kPopSfx1) {
@@ -238,6 +252,29 @@ void soundDoSfx(enum SfxSample sample) {
 void soundStopSfx(enum SfxSample sample) {
   if (!m_doSfx) return;
   pd->sound->sampleplayer->stop(m_samplePlayer[sample]);
+}
+
+int32_t soundGetSetting() {
+  if      (m_doMusic  && m_doSfx)  { return 0; }
+  else if (m_doMusic  && !m_doSfx) { return 1; }
+  else if (!m_doMusic && m_doSfx)  { return 2; }
+  return 3;
+}
+
+void soundSetSetting(const int32_t setting) {
+  if (setting == 0) {
+    soundSetDoMusic(true);
+    soundSetDoSfx(true);
+  } else if (setting == 1) {
+    soundSetDoMusic(true);
+    soundSetDoSfx(false);
+  } else if (setting == 2) {
+    soundSetDoMusic(false);
+    soundSetDoSfx(true);
+  } else {
+    soundSetDoMusic(false);
+    soundSetDoSfx(false);
+  }
 }
 
 ///////////////

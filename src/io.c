@@ -76,6 +76,8 @@ void IODoScanLevels(void);
 
 void IOWriteCustomLevelInstructions(void);
 
+void IOReadVolumePreferences(void);
+
 ///
 
 int IOShouldDecodeScan(json_decoder* jd, const char* key);
@@ -101,7 +103,7 @@ float IOGetPreloadingProgress(void) {
 }
 
 void IODonePreloading(void) {
-  soundWaterfallDoInit();
+  // soundWaterfallDoInit(); - now handled by IOReadVolumePreferences
   gameDoPopulateMenuTitles();
 }
 
@@ -141,6 +143,7 @@ void IODoUpdatePreloading(void) {
     case 28: bitmapDoPreloadM(1); break;
     case 29: bitmapDoPreloadM(2); break;
     case 30: bitmapDoPreloadM(3); break; // POND_WATER_SIZE
+    case 31: IOReadVolumePreferences(); IOWriteCustomLevelInstructions(); break;
   }
   const uint32_t after = pd->system->getCurrentTimeMilliseconds();
   #ifdef DEV
@@ -449,7 +452,8 @@ void IODoScanLevels() {
       pd->system->logToConsole("decoding header for level %i hole %i", m_level, m_hole);
       #endif
       pd->json->decode(&jd, (json_reader){ .read = IODoRead, .userdata = file }, NULL);
-      int status = pd->file->close(file);
+      int32_t status = pd->file->close(file);
+      file = NULL;
     }
   }
   m_level = 0;
@@ -463,14 +467,33 @@ void IODoScanLevels() {
     #ifdef DEV
     pd->system->logToConsole("Reading %i bytes of save data, result %i", SAVE_SIZE_V1, result);
     #endif
+    pd->file->close(file);
+    file = NULL;
   } else {
     #ifdef DEV
     pd->system->logToConsole("No save-game data at %s", SAVE_FORMAT_1_NAME);
     #endif
   }
+}
 
-  IOWriteCustomLevelInstructions();
-
+void IOReadVolumePreferences() {
+  char filePath[128];
+  snprintf(filePath, 128, SOUND_PREFERENCE_NAME);
+  SDFile* file = pd->file->open(filePath, kFileReadData);
+  int32_t result = 0;
+  uint8_t payload = 0;
+  if (file) {
+    result = pd->file->read(file, &payload, 1);
+    pd->file->close(file);
+    file = NULL;
+  }
+  if (result == 1) {
+    pd->system->logToConsole("Read volume preference %i", payload);
+    soundSetSetting(payload);
+  } else {
+    pd->system->logToConsole("No volume preference file");
+    soundSetSetting(0); // music:true, sfx:true
+  }
 }
 
 ////
@@ -761,9 +784,10 @@ void IOWriteCustomLevelInstructions() {
     "Place levels in this folder, they should be named: level_XX_hole_YY.json\n"
     "where XX is between 1-99 and YY is between 1-9."
   );
-  SDFile* file = pd->file->open("custom_level_instructions.txt", kFileWrite);
-  const int wrote = pd->file->write(file, fileContent, sz);
+  SDFile* file = pd->file->open(CUSTOM_LEVEL_INSTRUCTIONS_NAME, kFileWrite);
+  const int32_t wrote = pd->file->write(file, fileContent, sz);
   pd->file->close(file);
+  file = NULL;
 }
 
 ///
@@ -772,11 +796,20 @@ void IODoSave() {
   char filePath[128];
   snprintf(filePath, 128, SAVE_FORMAT_1_NAME);
   SDFile* file = pd->file->open(filePath, kFileWrite);
-  const int wrote = pd->file->write(file, m_persistent_data, SAVE_SIZE_V1);
+  const int32_t wrote1 = pd->file->write(file, m_persistent_data, SAVE_SIZE_V1);
   #ifdef DEV
-  pd->system->logToConsole("SAVE wrote %i bytes, expected to write %i bytes", wrote, SAVE_SIZE_V1);
+  pd->system->logToConsole("SAVE wrote %i bytes, expected to write %i bytes", wrote1, SAVE_SIZE_V1);
   #endif
   pd->file->close(file);
+  file = NULL;
+
+  // Write volume preference
+  snprintf(filePath, 128, SOUND_PREFERENCE_NAME);
+  file = pd->file->open(filePath, kFileWrite);
+  const uint8_t soundSetting = soundGetSetting();
+  const int32_t wrote2 = pd->file->write(file, &soundSetting, 1);
+  pd->file->close(file);
+  file = NULL;
 }
 
 ///

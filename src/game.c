@@ -89,11 +89,12 @@ int gameLoop(void* _data) {
   inputDoHandle(fsm, gm);
 
   if (!renderGetSubFreeze()) {
-    if (gm == kGameWindow) { // TODO eliminate me
+    if (gm == kGameWindow) {
       boardDoUpdate();
       physicsDoUpdate(m_frameCount);
     }
     renderDo(m_frameCount, fsm, gm);
+    soundDoWaterfallVolume(fsm, gm);
     ++m_frameCount;
   }
 
@@ -141,23 +142,11 @@ void menuOptionsCallbackCredits(void* _unused) {
 }
 
 void menuOptionsCallbackAudio(void* userData) {
-  int value = pd->system->getMenuItemValue((PDMenuItem*)userData);
+  int32_t value = pd->system->getMenuItemValue((PDMenuItem*)userData);
   #ifdef DEV
   pd->system->logToConsole("menuOptionsCallbackAudio %i", value);
   #endif
-  if (value == 0) {
-    soundSetDoMusic(true);
-    soundSetDoSfx(true);
-  } else if (value == 1) {
-    soundSetDoMusic(true);
-    soundSetDoSfx(false);
-  } else if (value == 2) {
-    soundSetDoMusic(false);
-    soundSetDoSfx(true);
-  } else {
-    soundSetDoMusic(false);
-    soundSetDoSfx(false);
-  }
+  soundSetSetting(value);
 }
 
 void gameDoPopulateMenuTitlesPlayer(void) {
@@ -172,6 +161,7 @@ void gameDoPopulateMenuTitles(void) {
   static const char* options[] = {"music+sfx", "music", "sfx", "none"};
   PDMenuItem* menu = pd->system->addOptionsMenuItem("audio", options, 4, menuOptionsCallbackAudio, NULL);
   pd->system->setMenuItemUserdata(menu, (void*) menu); // User data is a pointer to the menu itself
+  pd->system->setMenuItemValue(menu, soundGetSetting());
   pd->system->addMenuItem("credits", menuOptionsCallbackCredits, NULL);
 }
 
@@ -180,6 +170,7 @@ void gameDoPopulateMenuGame() {
   static const char* options[] = {"music+sfx", "music", "sfx", "none"};
   PDMenuItem* menu = pd->system->addOptionsMenuItem("audio", options, 4, menuOptionsCallbackAudio, NULL);
   pd->system->setMenuItemUserdata(menu, (void*) menu); // User data is a pointer to the menu itself
+  pd->system->setMenuItemValue(menu, soundGetSetting());
   pd->system->addMenuItem("quit hole", menuOptionsCallbackQuitHole, NULL);
   pd->system->addMenuItem("reset hole", menuOptionsCallbackResetHole, NULL);
 }

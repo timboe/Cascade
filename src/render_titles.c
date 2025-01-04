@@ -9,7 +9,7 @@ float m_numeralOffset = 0.0;
 void renderSetNumeralOffset(float no) { m_numeralOffset = no; }
 
 void renderTitlesHeader(const int32_t fc) {
-  const uint16_t yOff = gameGetYOffset();
+  const int16_t yOff = gameGetYOffset();
   if (yOff <= 14) { // NOTE: Very picky about rendering off-screen. Fine-tuned to avoid 'inverted rect in LCD_addUpdateRect()!'
     const int16_t vX = DEVICE_PIX_X-32, vY = 4, nameX = 8, nameY = 4;
     bitmapSetRoobert10();

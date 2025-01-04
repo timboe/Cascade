@@ -400,6 +400,14 @@ void renderGameTutorial(const int32_t fc, const enum FSM_t fsm) {
     }
     if ((fc / slow) % 2) { pd->graphics->drawBitmap(bitmapGetTutorialArrows(1), HALF_DEVICE_PIX_X, yOff, kBitmapUnflipped); }
 
+  } else if (fsm == kGameFSM_DisplayScores) {
+
+    if (pd->system->isCrankDocked()) {
+      pd->graphics->drawBitmap(bitmapGetTutorialDPad((fc / slow) % 2), 40, 40 + yOff, kBitmapFlippedY);
+    } else {
+      pd->graphics->drawBitmap(bitmapGetTutorialCrankRotate(fc / fast), 40, 20 + yOff, kBitmapUnflipped);
+    }
+
   }
 
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "game.h"
+#include "fsm.h"
 
 enum SfxSample {
   kPlingSfx1,
@@ -75,6 +76,8 @@ void soundPlayMusic(const uint8_t id);
 
 void soundDoWaterfall(const uint8_t id);
 
+void soundDoWaterfallVolume(const enum FSM_t fsm, const enum GameMode_t gm);
+
 void soundDoSfx(enum SfxSample sample);
 
 void soundStopSfx(enum SfxSample sample);
@@ -84,3 +87,7 @@ void soundSetDoMusic(const bool doit);
 void soundSetDoSfx(const bool doit);
 
 void soundSetDoingExplosion(const bool expOn);
+
+int32_t soundGetSetting(void);
+
+void soundSetSetting(const int32_t setting);

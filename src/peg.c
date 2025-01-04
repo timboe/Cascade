@@ -346,6 +346,7 @@ void pegDoHit(struct Peg_t* p) {
       boardDoSpecialBlast();
       renderAddTrauma(TRAUMA_BLAST_HIT);
       renderDoAddSpecialBlast(p->cpBody);
+      soundDoSfx(kPlingSfx1);
       soundDoSfx(kExplosionSfx);
     }
     //
@@ -359,7 +360,10 @@ void pegDoHit(struct Peg_t* p) {
       renderAddFreeze(FREEZE_SPECIAL_HIT);
       const enum PegSpecial_t special = boardDoAddSpecial(/*activate = */false);
       renderDoAddSpecial(p->cpBody, special);
-      if (!winToast) { soundDoSfx(kDingSfx1); } // TODO Make unique?
+      if (!winToast) { 
+        soundDoSfx(kDingSfx1);
+        soundDoSfx(kDingSfx1);
+      } 
     } else {
       renderAddTrauma(TRAUMA_PEG_HIT);
       renderAddFreeze(FREEZE_PEG_HIT);

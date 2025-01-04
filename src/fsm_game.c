@@ -125,7 +125,7 @@ uint8_t FSMCommonMarbleFire(uint16_t* timer) {
   static bool once = false;
   const bool buttonPressed = (inputGetPressed(kButtonB) || inputGetPressed(kButtonA));
   if ((*timer) >= TIME_FIRE_MARBLE || (progress > MIN_TURRET_CHARGE_TO_FIRE && !buttonPressed)) { // Fire
-    // physicsSetTimestepMultiplier(0.2f); // testing
+    physicsSetTimestepMultiplier(1.0f); // Redundency
     physicsDoResetBall(0);
     physicsDoLaunchBall(progress);
     ++m_ballCount;
@@ -145,7 +145,7 @@ uint8_t FSMCommonMarbleFire(uint16_t* timer) {
     once = false;
     soundStopSfx(kChargeSfx);
     // If we were holding A then we want to scroll to the top, different return value
-    if (inputGetReleased(kButtonA)) { return 2; }
+    if (inputGetReleased(kButtonA) && gameGetYOffset() > 0) { return 2; }
   }
   renderSetMarblePootCircle((uint16_t)(progress * TURRET_RADIUS));
   return 0;
@@ -165,7 +165,7 @@ void FSMDisplayLevelTitle(const bool newState) {
     if (!IOIsCredits()) { gameDoPopulateMenuGame(); }
     boardDoClear();
     IODoLoadCurrentHole();
-    physicsSetTimestepMultiplier(1.0f);
+    physicsSetTimestepMultiplier(1.0f); // Redundency
     gameDoResetPreviousWaterfall();
     renderDoUpdateBacklines();
     physicsDoResetBall(0);
@@ -294,8 +294,13 @@ void FSMAimModeScrollToTop(const bool newState) {
   gameSetYOffset(gameGetMinimumY() + ((gameGetYOffset() - gameGetMinimumY())*progress), true);
   FSMCommonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
   if (timer++ == TIME_AIM_SCROLL_TO_TOP) { 
-    if (IOGetIsTutorial() && m_ballCount == 0) { return FSMDo(kGameFSM_TutorialFireMarble); }
-    else return FSMDo(kGameFSM_AimMode);
+    if (IOGetIsTutorial()) {
+      if (m_ballCount == 0) { return FSMDo(kGameFSM_TutorialFireMarble); }
+      else if (boardGetSpecialPegsInPlay()) { return FSMDo(kGameFSM_TutorialGetSpecial); }
+      else { return FSMDo(kGameFSM_TutorialGetRequired); }
+    } else {
+      return FSMDo(kGameFSM_AimMode);
+    }
   }
 }
 
@@ -346,6 +351,10 @@ void FSMBallInPlay(const bool newState) {
     m_finalRequiredPos.y = 0;
     m_finalPegID = -1;
   }
+
+  const float tsm = physicsGetTimestepMultiplier();
+  if (tsm < 1.0f) { physicsSetTimestepMultiplier(tsm + 0.05f); }
+
   // Focus on ball, check gutter
   const bool guttered = FSMCommonFocusOnLowestBallInPlay(special);
   if (guttered) { return FSMDo(kGameFSM_BallGutter); }
@@ -383,6 +392,9 @@ void FSMBallInPlay(const bool newState) {
 }
 
 void FSMBallStuck(const bool newState) {
+  const float tsm = physicsGetTimestepMultiplier();
+  if (tsm < 1.0f) { physicsSetTimestepMultiplier(tsm + 0.05f); }
+  //
   FSMCommonTurretScrollAndBounceBack(true);
   //
   bool popped = true;
@@ -405,10 +417,14 @@ void FSMCloseUp(const bool newState) {
   static float timer = 0.0f;
   if (newState) {
     renderSetScale(2);
-    physicsSetTimestepMultiplier(0.2f);
     soundDoSfx(kDrumRollSfx1);
     timer = 0.0f;
   }
+
+  const float tsm = physicsGetTimestepMultiplier();
+  if (tsm > 0.2f) { physicsSetTimestepMultiplier(tsm - 0.05f); } // 1.0 to 0.2 in 16 frames, 0.32 seconds
+  // Note: Applying TSM changes over multiple frames so as to not overly mess up physics engine assumptions
+  // Big effect from going straight from a 1.0 multiplier to 0.2 
 
   cpVect ballPos[2];
   ballPos[0] = cpBodyGetPosition(physicsGetBall(0));
@@ -429,19 +445,17 @@ void FSMCloseUp(const bool newState) {
   }
 
   if (timer >= 10.0f) { m_vetoCloseUp = true; }
-  const bool stuck = FSMCommonGetIsBallStuck(special) || m_vetoCloseUp;
+  const bool stuck = FSMCommonGetIsBallStuck(special);
 
-  if (stuck || whichBall == -1 || !boardGetRequiredPegsInPlay()) {
+  if (stuck || m_vetoCloseUp || whichBall == -1 || !boardGetRequiredPegsInPlay()) {
     renderSetScale(1);
     gameSetXOffset(0);
     soundStopSfx(kDrumRollSfx1);
     m_fizzleTimer = FIZZLE_TIME; // Irrelevent if going to wining toast
     if (stuck) {
-      physicsSetTimestepMultiplier(1.0f);
       soundDoSfx(kFizzleSfx);
       return FSMDo(kGameFSM_BallStuck);
-    } else if (whichBall == -1) {
-      physicsSetTimestepMultiplier(1.0f);
+    } else if (whichBall == -1 || m_vetoCloseUp) {
       soundDoSfx(kFizzleSfx);
       return FSMDo(kGameFSM_BallInPlay);
     } else {
@@ -463,7 +477,7 @@ void FSMWinningToast(const bool newState) {
   }
 
   const float tsm = physicsGetTimestepMultiplier();
-  if (tsm < 0.75f) { physicsSetTimestepMultiplier(tsm + 0.005f);  }
+  if (tsm < 0.75f) { physicsSetTimestepMultiplier(tsm + 0.005f); } // 0.25 per sec, 0.2 -> 0.75 in 2.2 seconds 
 
   const cpVect last = renderGetLastEndBlast();
   const cpVect ballPos = cpBodyGetPosition(physicsGetBall(0));

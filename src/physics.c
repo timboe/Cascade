@@ -53,7 +53,6 @@ void physicsDoLaunchBall(const float strength) {
 }
 
 void physicsDoInit(void) {
-  FILTER_BALL.group = GROUP_BALL;
   FILTER_BALL.categories |= FLAG_BALL;
   FILTER_BALL.mask |= FLAG_BALL | FLAG_WALL | FLAG_PEG;
 

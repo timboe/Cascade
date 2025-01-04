@@ -154,13 +154,12 @@
 #define POP_ANIM_FRAMES 16
 #define POP_ANIM_HWIDTH 32
 
-
-
 //
 
 #define N_PLINGS_SFX 16
 #define N_SPLASHES_SFX 5
 #define N_POPS_SFX 3
+#define N_WHOOSHES_SFX 4
 
 #define N_MUSIC_TRACKS 12
 
@@ -215,8 +214,7 @@
 #define FLAG_PEG 2
 #define FLAG_WALL 4
 
-#define GROUP_BALL 1
-#define GROUP_FURNATURE 2
+#define GROUP_FURNATURE 1
 
 // SCREEN EASING
 // Smaller value to limit max velocity
@@ -253,6 +251,10 @@
 #define SAVE_FORMAT_1_MAX_HOLES 16
 #define SAVE_FORMAT_1_NAME "cascade_savegame_v1.dat"
 
+#define SOUND_PREFERENCE_NAME "cascada_sound_preference.dat"
+
+#define CUSTOM_LEVEL_INSTRUCTIONS_NAME "custom_level_instructions.txt"
+
 // Must be less than their SAVE_FORMAT counterparts
 #define MAX_PLAYERS 3
 #define MAX_LEVELS 99
@@ -260,4 +262,4 @@
 
 #define VERSION "v0.1"
 
-#define PRELOADING_STEPS 31
+#define PRELOADING_STEPS 32
