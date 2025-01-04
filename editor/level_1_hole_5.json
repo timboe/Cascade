@@ -28,7 +28,7 @@
       "shape": 0,
       "x": 150,
       "y": 144,
-      "angle": 0,
+      "angle": -6,
       "size": 0,
       "type": 0
     },
@@ -74,8 +74,8 @@
     },
     "StaticControl8": {
       "shape": 0,
-      "x": 34,
-      "y": 40,
+      "x": 32,
+      "y": 52,
       "angle": 130,
       "size": 0,
       "type": 1
