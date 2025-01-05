@@ -162,23 +162,23 @@
     },
     "StaticControl19": {
       "shape": 0,
-      "x": 152,
-      "y": 136,
+      "x": 156,
+      "y": 132,
       "angle": -245,
       "size": 0,
       "type": 0
     },
     "StaticControl20": {
       "shape": 0,
-      "x": 128,
-      "y": 172,
+      "x": 144,
+      "y": 168,
       "angle": -266,
       "size": 0,
       "type": 0
     },
     "StaticControl21": {
       "shape": 0,
-      "x": 96,
+      "x": 100,
       "y": 192,
       "angle": -323,
       "size": 0,

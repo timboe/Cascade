@@ -19,7 +19,7 @@
     "StaticControl1": {
       "shape": 1,
       "x": 300,
-      "y": 264,
+      "y": 248,
       "angle": 0,
       "size": 2,
       "type": 1
@@ -91,7 +91,7 @@
     "EllipticControl1": {
       "shape": 0,
       "x": 300,
-      "y": 264,
+      "y": 248,
       "angle": 90,
       "size": 0,
       "arc": 360,
@@ -165,7 +165,7 @@
     "EllipticControl2": {
       "shape": 0,
       "x": 300,
-      "y": 264,
+      "y": 248,
       "angle": 90,
       "size": 0,
       "arc": 360,
@@ -239,7 +239,7 @@
     "EllipticControl3": {
       "shape": 0,
       "x": 300,
-      "y": 264,
+      "y": 248,
       "angle": 90,
       "size": 0,
       "arc": 360,
@@ -318,7 +318,7 @@
     "EllipticControl4": {
       "shape": 0,
       "x": 300,
-      "y": 264,
+      "y": 248,
       "angle": 90,
       "size": 0,
       "arc": 360,
