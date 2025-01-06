@@ -196,10 +196,14 @@ void IODoNextPlayer(void) {
 }
 
 void IOResetPlayerSave(const uint16_t player) {
+  const uint8_t currentPlayer = m_player;
   for (int l = 0; l < MAX_LEVELS; ++l) {
     for (int h = 0; h < MAX_HOLES; ++h) {
       m_persistent_data[player][l][h] = 0; 
     }
+  }
+  if (player == currentPlayer) { // Resetting current player
+    IODoGoToNextUnplayedLevel();
   }
 }
 

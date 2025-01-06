@@ -244,10 +244,10 @@ void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm) {
 
   // pd->system->logToConsole("startID %i, yOff is %i, paralax is %i, startOffset is %i", startID, yOffset, parallax, startOffset);
 
-  if (fsm == kGameFSM_ScoresToTryAgain 
-    || fsm == kGameFSM_ToGameCreditsTitle
-    || fsm == kGameFSM_BallGutter
-    || fsm == kGameFSM_GutterToScores)
+  if (fsm == kGameFSM_ScoresToTryAgain // Going up
+    || fsm == kGameFSM_ToGameCreditsTitle // Going up
+    // || fsm == kGameFSM_BallGutter // Trying without this one... But it might look strange if gutter overshooting on WinningToast
+    || fsm == kGameFSM_GutterToScores) // Going down
   {
     pd->graphics->setLineCapStyle(kLineCapStyleRound);
     for (int i = 0; i < N_BACKLINES; ++i) {

@@ -91,7 +91,7 @@ int gameLoop(void* _data) {
   if (!renderGetSubFreeze()) {
     if (gm == kGameWindow) {
       boardDoUpdate();
-      physicsDoUpdate(m_frameCount);
+      physicsDoUpdate(m_frameCount, fsm);
     }
     renderDo(m_frameCount, fsm, gm);
     soundDoWaterfallVolume(fsm, gm);

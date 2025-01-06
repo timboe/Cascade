@@ -33,8 +33,8 @@ enum PegSpecial_t m_specialType;
 
 /// ///
 
-void renderDoAddEndBlast(cpBody* body) {
-  m_endBlast[m_endBlasts] = cpBodyGetPosition(body);
+void renderDoAddEndBlast(const cpVect location) {
+  m_endBlast[m_endBlasts] = location;
   m_endBlastID[m_endBlasts] = rand() % N_END_BLASTS;
   m_endBlastFrame[m_endBlasts] = 0;
   if (++m_endBlasts == MAX_END_BLASTS) { m_endBlasts = 0; }
@@ -127,8 +127,7 @@ void renderGameMarble(const int32_t fc) {
   } else {
     for (int i = 0; i < MAX_BALLS; ++i) {
       if (i == 1 && !physicsGetSecondBallInPlay()) { continue; }
-      const cpBody* ball = physicsGetBall(i);
-      const cpVect pos = cpBodyGetPosition(ball);
+      const cpVect pos = physicsGetBallPosition(i);
       if (pos.y > gutterY) { continue; }
       int16_t* trailX = physicsGetMotionTrailX(i);
       int16_t* trailY = physicsGetMotionTrailY(i);
