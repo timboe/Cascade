@@ -1,0 +1,181 @@
+digraph finite_state_machine {
+	rankdir=TB;
+	node [shape = ellipse, fontname = "helvetica"];
+
+    { 
+        node [shape=box, colorscheme=blues9, fillcolor=3, style=filled]
+        TitlesToChoosePlayer
+        ChoosePlayerToChooseLevel
+        ChooseLevelToChooseHole
+        ChooseLevelToChoosePlayer
+        ChooseHoleToChooseLevel
+        ChooseHoleToHoleTitle
+        DisplayHoleTitleWFadeIn
+        DisplayHoleTitle
+        ChooseHoleWFadeIn
+        DisplayTitleWFadeIn
+    }
+
+    
+    { 
+        node [shape=box, colorscheme=greens9, fillcolor=3, style=filled]
+        HoleTitleToHoleStart
+        TitlesToChoosePlayer
+        ScrollTop
+
+        GutterToAim
+        GutterToScores
+        LowerTurret
+        ScoresAnimation
+        DisplayScoresToNextHole
+        DisplayScoresToRetryHole
+        DisplayScoresToCreditsTitle
+        
+    }
+
+    { 
+        node [shape=hexagon, colorscheme=purples9, fillcolor=5, style=filled]
+        QuitWFadeOut
+        RestartWFadeOut
+        TitleScreensToCredits
+        LaunchGame
+    }
+
+    { 
+        node [shape=ellipse, colorscheme=blues9, fillcolor=4, style=filled]
+        PlayCredits
+        DisplayTitle
+        ChoosePlayer
+        ChooseLevel
+        ChooseHole
+    }
+
+    { 
+        node [shape=ellipse, colorscheme=greens9, fillcolor=5, style=filled]
+        AimMode
+        BallInPlay
+        CloseUp
+        WinningToast
+        BallStuck
+        BallGutter
+        DisplayScores
+    }
+
+    { 
+        node [colorscheme=purples9, fillcolor=3, style=filled]
+        TutorialGetRequired
+        TutorialScrollDown
+        TutorialGetSpecial
+        TutorialFireMarble
+        TutorialScrollUp
+    }
+
+    subgraph cluster_title {
+        penwidth = 0
+        DisplayTitle
+        TitlesToChoosePlayer
+        ChoosePlayer
+        ChoosePlayerToChooseLevel
+        ChooseLevel
+        ChooseLevelToChoosePlayer
+        ChooseLevelToChooseHole
+        ChooseHole
+        ChooseHoleToChooseLevel
+        ChooseHoleToHoleTitle
+        PlayCredits
+        DisplayTitleWFadeIn
+    }
+
+    subgraph cluster_tut {
+        penwidth = 0
+        TutorialScrollDown
+        TutorialScrollUp
+        TutorialFireMarble
+        TutorialGetRequired
+        TutorialGetSpecial
+    }
+
+    subgraph cluster_game {
+        penwidth = 0
+        DisplayHoleTitle
+        AimMode
+        ScrollTop
+        BallInPlay
+        BallStuck
+        WinningToast
+        BallGutter
+        GutterToScores
+        GutterToAim
+        LowerTurret
+        ScoresAnimation
+        DisplayScores
+        DisplayScoresToNextHole
+        DisplayScoresToRetryHole
+        HoleTitleToHoleStart
+        CloseUp
+        DisplayScoresToCreditsTitle
+        DisplayHoleTitleWFadeIn
+    }
+
+    LaunchGame -> DisplayTitle
+    DisplayTitleWFadeIn -> DisplayTitle;
+    DisplayTitle -> TitlesToChoosePlayer;
+    TitlesToChoosePlayer -> ChoosePlayer;
+    ChoosePlayer -> ChoosePlayerToChooseLevel;
+    ChoosePlayerToChooseLevel -> ChooseLevel;
+    ChooseLevel -> ChooseLevelToChooseHole;
+    ChooseLevel -> ChooseLevelToChoosePlayer;
+    ChooseLevelToChoosePlayer -> ChoosePlayer;
+    ChooseLevelToChooseHole -> ChooseHole;
+    QuitWFadeOut -> ChooseHoleWFadeIn
+    ChooseHoleWFadeIn -> ChooseHole;
+    ChooseHole -> ChooseHoleToChooseLevel;
+    ChooseHole -> ChooseHoleToHoleTitle;
+    ChooseHoleToChooseLevel -> ChooseLevel;
+    ChooseHoleToHoleTitle -> DisplayHoleTitle;
+    TitleScreensToCredits -> DisplayHoleTitle
+
+    RestartWFadeOut -> DisplayHoleTitleWFadeIn
+    DisplayHoleTitleWFadeIn -> DisplayHoleTitle;
+    DisplayHoleTitle -> HoleTitleToHoleStart
+    HoleTitleToHoleStart -> TutorialScrollDown
+    HoleTitleToHoleStart -> AimMode
+    HoleTitleToHoleStart -> PlayCredits
+    PlayCredits -> DisplayTitleWFadeIn
+    TutorialScrollDown -> TutorialScrollUp
+    TutorialScrollUp -> TutorialFireMarble
+    TutorialScrollUp -> ScrollTop
+    TutorialFireMarble -> BallInPlay
+    TutorialGetSpecial -> BallInPlay
+    TutorialGetRequired -> BallInPlay
+    AimMode -> ScrollTop
+    AimMode -> BallInPlay
+    ScrollTop -> TutorialFireMarble
+    ScrollTop -> AimMode
+    BallInPlay -> BallStuck
+    BallInPlay -> CloseUp
+    BallInPlay -> WinningToast
+    BallInPlay -> BallGutter
+    BallStuck -> BallInPlay
+    CloseUp -> BallStuck
+    CloseUp -> BallInPlay
+    CloseUp -> WinningToast
+    WinningToast -> BallGutter
+    BallGutter -> BallInPlay
+    BallGutter -> GutterToAim
+    BallGutter -> GutterToScores
+    GutterToAim -> LowerTurret
+    LowerTurret -> AimMode
+    LowerTurret -> TutorialGetSpecial
+    LowerTurret -> TutorialGetRequired
+    GutterToScores -> ScoresAnimation
+    ScoresAnimation -> DisplayScores
+    DisplayScores -> DisplayScoresToRetryHole
+    DisplayScores -> DisplayScoresToNextHole
+    DisplayScoresToRetryHole -> DisplayHoleTitle
+    DisplayScoresToNextHole -> DisplayHoleTitle
+    DisplayScoresToNextHole -> DisplayScoresToCreditsTitle
+    DisplayScoresToCreditsTitle -> DisplayHoleTitle
+
+
+}
