@@ -27,7 +27,7 @@ void renderDoAddSpecialBlast(cpBody* body);
 
 void renderSetFadeLevel(const int8_t fadeLevel);
 
-void renderDoAddEndBlast(cpBody* body);
+void renderDoAddEndBlast(const cpVect location);
 void renderDoResetEndBlast(void);
 cpVect renderGetLastEndBlast(void);
 

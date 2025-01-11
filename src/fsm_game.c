@@ -51,8 +51,8 @@ bool FSMCommonFocusOnLowestBallInPlay(const enum PegSpecial_t special) {
   FSMCommonTurretScrollAndBounceBack(true);
   // But with strong focus on ball
   cpVect ballPos[2];
-  ballPos[0] = cpBodyGetPosition(physicsGetBall(0));
-  ballPos[1] = cpBodyGetPosition(physicsGetBall(1));
+  ballPos[0] = physicsGetBallPosition(0);
+  ballPos[1] = physicsGetBallPosition(1);
   const float y1 = ballPos[0].y;
   const float y2 = (special == kPegSpecialMultiball ? ballPos[1].y : 0);
   float y = MAX(y1, y2);
@@ -332,7 +332,7 @@ void FSMPlayCredits(const bool newState) {
     return;
   }
 
-  cpVect ballPos = cpBodyGetPosition(physicsGetBall(0));
+  cpVect ballPos = physicsGetBallPosition(0);
   const bool gutterd = (ballPos.y > IOGetCurrentHoleHeight() + BALL_RADIUS);
   if (gutterd) { physicsDoSecondTryBall(); }
 
@@ -344,12 +344,14 @@ void FSMPlayCredits(const bool newState) {
 
 void FSMBallInPlay(const bool newState) {
   const enum PegSpecial_t special = boardGetCurrentSpecial();
+  static float distanceToFinalPeg = 0.0f;
   if (newState) {
     FSMDoResetBallStuckCounter();
     renderSetMarblePootCircle(0);
     m_finalRequiredPos.x = 0;
     m_finalRequiredPos.y = 0;
     m_finalPegID = -1;
+    distanceToFinalPeg = 0.0f;
   }
 
   const float tsm = physicsGetTimestepMultiplier();
@@ -382,8 +384,14 @@ void FSMBallInPlay(const bool newState) {
     if (!m_vetoCloseUp && !m_fizzleTimer) {
       for (int i = 0; i < MAX_BALLS; ++i) {
         if (i == 1 && special != kPegSpecialMultiball) { break; }
-        cpVect ballPos = cpBodyGetPosition(physicsGetBall(i));
-        if (cpvdist(m_finalRequiredPos, ballPos) < FINAL_PEG_SLOWMO_RADIUS)  { return FSMDo(kGameFSM_CloseUp); }
+        cpVect ballPos = physicsGetBallPosition(i);
+        const float dist = cpvdist(m_finalRequiredPos, ballPos);
+        // The ball must be travelling towards the final peg to get slowmo.
+        // I.e. the distance in this frame must be smaller than the distance in the previous frame
+        if (dist < FINAL_PEG_SLOWMO_RADIUS && dist < distanceToFinalPeg) {
+          return FSMDo(kGameFSM_CloseUp);
+        }
+        distanceToFinalPeg = dist;
       }
     }
   } else if (bgrpip == 0) { // Or straight to toast if zero left
@@ -427,8 +435,8 @@ void FSMCloseUp(const bool newState) {
   // Big effect from going straight from a 1.0 multiplier to 0.2  xxx
 
   cpVect ballPos[2];
-  ballPos[0] = cpBodyGetPosition(physicsGetBall(0));
-  ballPos[1] = cpBodyGetPosition(physicsGetBall(1));
+  ballPos[0] = physicsGetBallPosition(0);
+  ballPos[1] = physicsGetBallPosition(1);
   timer += 1.0f / TICK_FREQUENCY;
 
   const struct Peg_t* p = boardGetPeg(m_finalPegID);
@@ -459,7 +467,6 @@ void FSMCloseUp(const bool newState) {
       soundDoSfx(kFizzleSfx);
       return FSMDo(kGameFSM_BallInPlay);
     } else {
-      soundDoSfx(kDrumRollSfx2);
       return FSMDo(kGameFSM_WinningToast);
     }
   }
@@ -472,21 +479,22 @@ void FSMWinningToast(const bool newState) {
   const enum PegSpecial_t special = boardGetCurrentSpecial();
   if (newState) {
     renderDoResetEndBlast();
-    renderDoAddEndBlast(physicsGetBall(0));
+    renderDoAddEndBlast(physicsGetBallPosition(0));
     soundDoMusic();
+    soundDoSfx(kDrumRollSfx2);
   }
 
   const float tsm = physicsGetTimestepMultiplier();
   if (tsm < TSM_TARGET_TOAST - TSM_DELTA) { physicsSetTimestepMultiplier(tsm + TSM_SLOW); } // 0.25 per sec, 0.2 -> 0.8 in 2.4 seconds 
 
   const cpVect last = renderGetLastEndBlast();
-  const cpVect ballPos = cpBodyGetPosition(physicsGetBall(0));
+  const cpVect ballPos = physicsGetBallPosition(0);
   if (cpvlengthsq( cpvsub(last, ballPos) ) > (16*16)) {
-    renderDoAddEndBlast(physicsGetBall(0));
+    renderDoAddEndBlast(physicsGetBallPosition(0));
   }
 
   int fc = gameGetFrameCount();
-  if (physicsGetSecondBallInPlay() && fc % (TICK_FREQUENCY/5) == 0) { renderDoAddEndBlast(physicsGetBall(1)); }
+  if (physicsGetSecondBallInPlay() && fc % (TICK_FREQUENCY/5) == 0) { renderDoAddEndBlast(physicsGetBallPosition(1)); }
 
   const bool guttered = FSMCommonFocusOnLowestBallInPlay(special);
   if (guttered) { 

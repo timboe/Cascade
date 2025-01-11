@@ -63,7 +63,7 @@ struct Peg_t* boardGetPeg(const uint16_t i) { return &m_pegs[i]; }
 uint16_t boardGetNPegs(void) { return m_nPegs; }
 
 void boardDoSpecialBlast(void) {
-  const cpVect pos = cpBodyGetPosition(physicsGetBall(0));
+  const cpVect pos = physicsGetBallPosition(0);
   for (int i = 0; i < m_nPegs; ++i) {
     struct Peg_t* p = boardGetPeg(i);
     if (p->state == kPegStateActive) {

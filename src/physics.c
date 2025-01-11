@@ -13,6 +13,7 @@ cpSpace* m_space;
 
 cpBody* m_ball[2];
 cpShape* m_ballShape[2];
+cpVect m_ballPosition[2];
 
 bool m_secondBallInPlay = false;
 
@@ -32,15 +33,21 @@ struct cpShapeFilter FILTER_BALL;
 struct cpShapeFilter FILTER_PEG;
 struct cpShapeFilter FILTER_WALL;
 
+void physicsSetBallPosition(const uint8_t ball, const cpVect position);
+
 /// ///
 
-void physicsSetTimestepMultiplier(const float tsm) { m_timestep = TIMESTEP * tsm; }
+void physicsSetTimestepMultiplier(const float tsm) { 
+  // m_timestep = TIMESTEP * tsm;
+}
 float physicsGetTimestepMultiplier(void) { return m_timestep / TIMESTEP; }
 
 int16_t* physicsGetMotionTrailX(const uint8_t n) { return m_physicsGetMotionTrailX[n]; }
 int16_t* physicsGetMotionTrailY(const uint8_t n) { return m_physicsGetMotionTrailY[n]; }
 
 cpBody* physicsGetBall(const uint8_t n) { return m_ball[n]; }
+
+cpVect physicsGetBallPosition(const uint8_t n) { return m_ballPosition[n]; }
 
 cpSpace* physicsGetSpace(void) { return m_space; }
 
@@ -74,7 +81,7 @@ void physicsDoInit(void) {
   const float moment = cpMomentForCircle(BALL_MASS, 0.0f, BALL_RADIUS, cpvzero);
   for (int i = 0; i < MAX_BALLS; ++i) {
     m_ball[i] = cpBodyNew(BALL_MASS, moment);
-    cpBodySetPosition(m_ball[i], cpv(0, DEVICE_PIX_Y*10));
+    physicsSetBallPosition(i, cpv(0, DEVICE_PIX_Y*10));
     m_ballShape[i] = cpCircleShapeNew(m_ball[i], BALL_RADIUS, cpvzero);
     cpShapeSetFriction(m_ballShape[i], 0.0f);
     cpShapeSetElasticity(m_ballShape[i], ELASTICITY);
@@ -123,7 +130,7 @@ void physicsSetSecondBallInPlay(void) {
   m_secondBallInPlay = true;
   const cpVect pos = cpBodyGetPosition(m_ball[0]);
   const cpVect vel = cpBodyGetVelocity(m_ball[0]);
-  cpBodySetPosition(m_ball[1], pos);
+  physicsSetBallPosition(1, pos);
   cpBodySetVelocity(m_ball[1], cpv(vel.y, vel.x));
 }
 
@@ -146,30 +153,62 @@ uint8_t cpCollisionBeginFunc_ballPeg(cpArbiter* arb, struct cpSpace* space, cpDa
 void physicsDoSecondTryBall(void) {
   const cpVect pos = cpBodyGetPosition(m_ball[0]);
   const cpVect vel = cpBodyGetVelocity(m_ball[0]);
-  cpBodySetPosition(m_ball[0], cpv(pos.x, gameGetMinimumY() + BALL_RADIUS));
+  physicsSetBallPosition(0, cpv(pos.x, gameGetMinimumY() + BALL_RADIUS));
   cpBodySetVelocity(m_ball[0], cpv(vel.x, vel.y / 2.0f));
 }
 
 void physicsDoResetBall(uint8_t n) {
   int16_t yMod = (n == 1 ? 1024 : 0);
-  cpBodySetPosition(m_ball[n], cpv(HALF_DEVICE_PIX_X, gameGetMinimumY() + TURRET_RADIUS - yMod));
+  physicsSetBallPosition(n, cpv(HALF_DEVICE_PIX_X, gameGetMinimumY() + TURRET_RADIUS - yMod));
   cpBodySetVelocity(m_ball[n], cpvzero);
   cpBodySetAngle(m_ball[n], 0);
   cpBodySetAngularVelocity(m_ball[n], 0);
   cpShapeSetElasticity(m_ballShape[n], ELASTICITY);
 }
 
-void physicsDoUpdate(const int32_t fc) {
+void physicsSetBallPosition(const uint8_t ball, const cpVect position) {
+  cpBodySetPosition(m_ball[ball], position);
+  m_ballPosition[ball] = position;
+}
+
+void physicsDoUpdate(const int32_t fc, const enum FSM_t fsm) {
   // TODO https://chipmunk-physics.net/forum/viewtopic.php?t=3032
-  cpSpaceStep(m_space, m_timestep);
+
+
+  static uint32_t frame = 0;
+  if (fsm == kGameFSM_CloseUp || fsm == kGameFSM_WinningToast) { // 25% if in closeup, 50% if in toast
+    static cpVect ballPrev[2];
+    static cpVect ballCur[2];
+    const uint8_t nSteps = (fsm == kGameFSM_CloseUp ? 4 : 2);
+    const uint8_t step = (frame++ % nSteps);
+    if (!step) {
+      ballPrev[0] = cpBodyGetPosition(m_ball[0]);
+      ballPrev[1] = cpBodyGetPosition(m_ball[1]);
+      cpSpaceStep(m_space, m_timestep);
+      ballCur[0] = cpBodyGetPosition(m_ball[0]);
+      ballCur[1] = cpBodyGetPosition(m_ball[1]);
+    }
+    const float multiple = step / (float)nSteps;
+    m_ballPosition[0].x = ballPrev[0].x + (ballCur[0].x - ballPrev[0].x) * multiple;
+    m_ballPosition[0].y = ballPrev[0].y + (ballCur[0].y - ballPrev[0].y) * multiple;
+    m_ballPosition[1].x = ballPrev[1].x + (ballCur[1].x - ballPrev[1].x) * multiple;
+    m_ballPosition[1].y = ballPrev[1].y + (ballCur[1].y - ballPrev[1].y) * multiple;
+  } else {
+    cpSpaceStep(m_space, m_timestep);
+    m_ballPosition[0] = cpBodyGetPosition(m_ball[0]);
+    m_ballPosition[1] = cpBodyGetPosition(m_ball[1]);
+    frame = 0;
+  }
+
+
   const bool twoBalls = (boardGetCurrentSpecial() == kPegSpecialMultiball);
   
   cpVect pos[2];
   for (uint8_t b = 0; b < 2; ++b) {
     if (b == 1 && !twoBalls) { continue; }
     pos[b] = cpBodyGetPosition(m_ball[b]);
-    if (pos[b].x < 4) { cpBodySetPosition(m_ball[b], cpv(4, pos[b].y)); }
-    else if (pos[b].x > DEVICE_PIX_X - 4) { cpBodySetPosition(m_ball[b], cpv(DEVICE_PIX_X - 4, pos[b].y)); }
+    if (pos[b].x < 4) { physicsSetBallPosition(b, cpv(4, pos[b].y)); }
+    else if (pos[b].x > DEVICE_PIX_X - 4) { physicsSetBallPosition(b, cpv(DEVICE_PIX_X - 4, pos[b].y)); }
   }
 
   if (FSMGetIsAimMode()) {
@@ -181,12 +220,12 @@ void physicsDoUpdate(const int32_t fc) {
     renderSetMarbleTrace(i, pos[0].x, pos[0].y);
   }
 
-  m_physicsGetMotionTrailX[0][fc % MOTION_TRAIL_LEN] = pos[0].x;
-  m_physicsGetMotionTrailY[0][fc % MOTION_TRAIL_LEN] = pos[0].y;
+  m_physicsGetMotionTrailX[0][fc % MOTION_TRAIL_LEN] = m_ballPosition[0].x;
+  m_physicsGetMotionTrailY[0][fc % MOTION_TRAIL_LEN] = m_ballPosition[0].y;
 
   if (twoBalls) {
-    m_physicsGetMotionTrailX[1][fc % MOTION_TRAIL_LEN] = pos[1].x;
-    m_physicsGetMotionTrailY[1][fc % MOTION_TRAIL_LEN] = pos[1].y;
+    m_physicsGetMotionTrailX[1][fc % MOTION_TRAIL_LEN] = m_ballPosition[1].x;
+    m_physicsGetMotionTrailY[1][fc % MOTION_TRAIL_LEN] = m_ballPosition[1].y;
     if (!m_secondBallInPlay) { physicsDoResetBall(1); }
   }
 

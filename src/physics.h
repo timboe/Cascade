@@ -5,12 +5,14 @@
 
 void physicsDoInit(void);
 
-void physicsDoUpdate(const int32_t fc);
+void physicsDoUpdate(const int32_t fc, const enum FSM_t fsm);
 
 void physicsSetTimestepMultiplier(const float tsm);
 float physicsGetTimestepMultiplier(void);
 
 cpBody* physicsGetBall(const uint8_t n);
+
+cpVect physicsGetBallPosition(const uint8_t n);
 
 cpSpace* physicsGetSpace(void);
 
