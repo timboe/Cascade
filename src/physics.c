@@ -131,7 +131,7 @@ void physicsSetSecondBallInPlay(void) {
   const cpVect pos = cpBodyGetPosition(m_ball[0]);
   const cpVect vel = cpBodyGetVelocity(m_ball[0]);
   physicsSetBallPosition(1, pos);
-  cpBodySetVelocity(m_ball[1], cpv(vel.y, vel.x));
+  cpBodySetVelocity(m_ball[1], cpv(-vel.x, -vel.y));
 }
 
 bool physicsGetSecondBallInPlay(void) {
@@ -217,7 +217,7 @@ void physicsDoUpdate(const int32_t fc, const enum FSM_t fsm) {
       physicsDoResetBall(0);
       physicsDoLaunchBall(1.0f);
     }
-    renderSetMarbleTrace(i, pos[0].x, pos[0].y);
+    renderSetMarbleTrace(pos[0], i);
   }
 
   m_physicsGetMotionTrailX[0][fc % MOTION_TRAIL_LEN] = m_ballPosition[0].x;

@@ -42,11 +42,9 @@
 #define CUSTOM_WFSHEET_SIZE_Y 16
 
 #define FIRST_CUSTOM_WF_ID 10
-#define CUSTOM_WF_ID_GREATWAVE 11
 
 // Comment line to disable
 //#define WF_FIXED_BG 1
-
 
 #define NUMERAL_PIX_X 128
 #define NUMERAL_PIX_Y 160

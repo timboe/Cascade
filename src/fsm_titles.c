@@ -53,17 +53,19 @@ void FSMDisplayTitles(const bool newState) {
 }
 
 void FSMDisplayTitlesWFadeIn(const bool newState) {
-  static int8_t progress = FADE_LEVELS - 1;
+  static int8_t progress;
   if (newState) {
     IOSetLevelHole(0, 0);
     IOSetPlayer(0);
     gameSetYOffset(0, true);
-    gameDoPopulateMenuTitles();
-    progress = FADE_LEVELS - 1;
+    progress = FADE_LEVELS + 2; // +2 to give extra pause before fade out
   }
   if (gameGetFrameCount() % TICK_FREQUENCY / 2 == 0) { --progress; }
-  renderSetFadeLevel(progress);
-  if (progress == -1) { return FSMDo(kTitlesFSM_DisplayTitles); }
+  renderSetFadeLevel(progress < FADE_LEVELS ? progress : FADE_LEVELS-1);
+  if (progress == -1) {
+    gameDoPopulateMenuTitles();
+    return FSMDo(kTitlesFSM_DisplayTitles);
+  }
 }
 
 void FSMTitlesToChoosePlayer(const bool newState) {

@@ -159,11 +159,6 @@ uint16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole) {
 }
 #else
 uint16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole) { 
-  // // TODO - bake this in to the levels?
-  // if (IOGetWaterfallForeground(level,hole) < FIRST_CUSTOM_WF_ID || IOGetWaterfallForeground(level,hole) == CUSTOM_WF_ID_GREATWAVE) { 
-  //   return m_hole_background[level][hole];
-  // }
-  // return -1;
   return m_hole_background[level][hole];
 }
 #endif

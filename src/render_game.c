@@ -78,9 +78,8 @@ void renderSetMarbleFallN(const uint16_t n) { m_ballFallN = n; }
 void renderSetMarbleFallX(const uint16_t x) { m_ballFallX = x; }
 void renderSetMarbleFallY(const uint16_t ball, const float y) { m_ballFallY[ball] = y; }
 
-void renderSetMarbleTrace(const uint16_t i, const uint16_t x, const uint16_t y) {
-  m_ballTrace[i].x = x;
-  m_ballTrace[i].y = y;
+void renderSetMarbleTrace(const cpVect v, const uint16_t i) {
+  m_ballTrace[i] = v;
   m_ballTraces = i;
 }
 
@@ -186,9 +185,12 @@ void renderGameTrajectory(void) {
   if (!FSMGetIsAimMode()) {
     return;
   }
+  pd->graphics->setLineCapStyle(kLineCapStyleSquare);
   for (int i = 2; i < m_ballTraces; ++i) {
-    pd->graphics->drawLine(m_ballTrace[i].x, m_ballTrace[i].y, m_ballTrace[i-1].x, m_ballTrace[i-1].y, 4, kColorWhite);
-    pd->graphics->drawLine(m_ballTrace[i].x, m_ballTrace[i].y, m_ballTrace[i-1].x, m_ballTrace[i-1].y, 2, kColorBlack);
+    pd->graphics->drawLine(round(m_ballTrace[i].x), round(m_ballTrace[i].y), round(m_ballTrace[i-1].x), round(m_ballTrace[i-1].y), 8, kColorWhite);
+  }
+  for (int i = 2; i < m_ballTraces; ++i) {
+    pd->graphics->drawLine(round(m_ballTrace[i].x), round(m_ballTrace[i].y), round(m_ballTrace[i-1].x), round(m_ballTrace[i-1].y), 3, kColorBlack);
   }
 }
 
