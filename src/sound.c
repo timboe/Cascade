@@ -209,12 +209,12 @@ void soundDoInit() {
   for (int32_t i = 0; i < N_WF_TRACKS; ++i) {
     m_waterfalls[i] = pd->sound->fileplayer->newPlayer();
     switch (i) {
-      case 0: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690211__nox_sound__ambiance_stream_big_seljalandsfoss_loop_stereo_02"); break;
-      case 1: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690213__nox_sound__ambiance_stream_light_skaftafell_loop_stereo_02"); break;
-      case 2: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690214__nox_sound__ambiance_stream_moderate_seljalandsfoss_loop_stereo"); break;
-      case 3: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690218__nox_sound__ambiance_stream_moderate_skogafoss_close_loop_stereo_02"); break;
-      case 4: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690221__nox_sound__ambiance_waterfall_big_seljalandsfoss_loop_stereo"); break;
-      case 5: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690224__nox_sound__ambiance_waterfall_big_skogafoss_loop_stereo"); break;
+      case 0: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690221__nox_sound__ambiance_waterfall_big_seljalandsfoss_loop_stereo"); break;
+      case 1: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690214__nox_sound__ambiance_stream_moderate_seljalandsfoss_loop_stereo"); break;
+      case 2: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690213__nox_sound__ambiance_stream_light_skaftafell_loop_stereo_02"); break;
+      case 3: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690211__nox_sound__ambiance_stream_big_seljalandsfoss_loop_stereo_02"); break;
+      case 4: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690224__nox_sound__ambiance_waterfall_big_skogafoss_loop_stereo"); break;
+      case 5: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690218__nox_sound__ambiance_stream_moderate_skogafoss_close_loop_stereo_02"); break;
     }
     pd->sound->fileplayer->setVolume(m_waterfalls[i], WF_VOLUMES[i], WF_VOLUMES[i]);
     pd->sound->fileplayer->setBufferLength(m_waterfalls[i], 1.0f); 
