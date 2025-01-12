@@ -7,7 +7,7 @@
     "hole": 1,
     "par": 3,
     "foreground": 3,
-    "background": 0,
+    "background": 1,
     "special": 6,
     "height": 480,
     "snap": 4,
