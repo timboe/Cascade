@@ -873,16 +873,16 @@ void bitmapDoPreloadC(void) {
 void bitmapDoPreloadD(void) {
   char text[128];
   for (int32_t i = 2; i <= N_WF_FG; ++i) { // Did 1 already as a critical load
-    snprintf(text, 128, "images/falls_fg/falls%i_fg", (int)i);
+    snprintf(text, 128, "images/falls_fg_y_crush/falls%i_fg", (int)i);
     m_sheetWfFg[i] = bitmapDoLoadImageTableAtPath(text);
   }
   // Special
   for (int32_t i = WF_SPECIAL_START; i < WF_SPECIAL_END; ++i) { 
-    snprintf(text, 128, "images/falls_fg/falls%i_fg", (int)i);
+    snprintf(text, 128, "images/falls_fg_y_crush/falls%i_fg", (int)i);
     m_sheetWfFg[i] = bitmapDoLoadImageTableAtPath(text);
   }
   // Credits
-  snprintf(text, 128, "images/falls_fg/falls100_fg");
+  snprintf(text, 128, "images/falls_fg_y_crush/falls100_fg");
   m_sheetWfFg[100] = bitmapDoLoadImageTableAtPath(text);
 #ifndef WF_FIXED_BG
   for (int32_t i = 2; i <= N_WF_BG; ++i) { // Did 1 already as a critical load
@@ -1110,6 +1110,6 @@ void bitmapDoInit(void) {
   m_fontRoobert10 = bitmapDoLoadFontAtPath("fonts/Roobert-10-Bold");
   m_headerImage = bitmapDoLoadImageAtPath("images/splash");
   m_wfBg[1] = bitmapDoLoadImageAtPath("images/falls_bg/falls1_bg");
-  m_sheetWfFg[1] = bitmapDoLoadImageTableAtPath("images/falls_fg/falls1_fg");
+  m_sheetWfFg[1] = bitmapDoLoadImageTableAtPath("images/falls_fg_y_crush/falls1_fg");
   m_previewBitmap = NULL;
 }

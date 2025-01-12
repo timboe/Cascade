@@ -16,7 +16,7 @@ bool renderGetSubFreeze(void);
 
 void renderSetScale(const uint8_t scale);
 
-void renderSetMarbleTrace(const uint16_t i, const uint16_t x, const uint16_t y);
+void renderSetMarbleTrace(const cpVect v, const uint16_t i);
 
 void renderSetMarblePootCircle(const uint16_t radius);
 

@@ -133,6 +133,9 @@ uint8_t FSMCommonMarbleFire(uint16_t* timer) {
     once = false;
     soundStopSfx(kChargeSfx);
     soundDoSfx(kPootSfx);
+    const float trauma = ((*timer) >= TIME_FIRE_MARBLE ? TRAUMA_SPECIAL_HIT : TRAUMA_PEG_HIT);
+    renderAddTrauma(trauma);
+    renderAddFreeze(trauma);
     return 1;
   } else if (buttonPressed) { // Arm
     (*timer)++;
@@ -145,7 +148,7 @@ uint8_t FSMCommonMarbleFire(uint16_t* timer) {
     once = false;
     soundStopSfx(kChargeSfx);
     // If we were holding A then we want to scroll to the top, different return value
-    if (inputGetReleased(kButtonA) && gameGetYOffset() > 0) { return 2; }
+    if (inputGetReleased(kButtonA) && gameGetYOffset() > gameGetMinimumY()) { return 2; }
   }
   renderSetMarblePootCircle((uint16_t)(progress * TURRET_RADIUS));
   return 0;
@@ -178,7 +181,7 @@ void FSMDisplayLevelTitle(const bool newState) {
 }
 
 void FSMDisplayLevelTitleWFadeIn(const bool newState) {
-  static int8_t progress = FADE_LEVELS - 1;
+  static int8_t progress;
   if (newState) {
     gameSetYOffset(-DEVICE_PIX_Y - TURRET_RADIUS, /*force = */true);
     progress = FADE_LEVELS + 2;
@@ -240,9 +243,8 @@ void FSMTutorialFireMarble(const bool newState) {
   //
   FSMCommonTurretScrollAndBounceBack(false); // allow control = FALSE is tutorial only
   //
-  const uint8_t fired = FSMCommonMarbleFire(&timer); 
+  const uint8_t fired = FSMCommonMarbleFire(&timer); // Cannot scroll down, so don't need to deal with return code 2
   if      (fired == 1) { FSMDo(kGameFSM_BallInPlay); }
-  else if (fired == 2) { FSMDo(kGameFSM_AimModeScrollToTop); }
 }
 
 void FSMTutorialGetSpecial(const bool newState) {
@@ -293,14 +295,9 @@ void FSMAimModeScrollToTop(const bool newState) {
   const float progress = getEasing(EASE_AIM_SCROLL_TO_TOP, 1.0f - (float)timer/TIME_AIM_SCROLL_TO_TOP);
   gameSetYOffset(gameGetMinimumY() + ((gameGetYOffset() - gameGetMinimumY())*progress), true);
   FSMCommonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
-  if (timer++ == TIME_AIM_SCROLL_TO_TOP) { 
-    if (IOGetIsTutorial()) {
-      if (m_ballCount == 0) { return FSMDo(kGameFSM_TutorialFireMarble); }
-      else if (boardGetSpecialPegsInPlay()) { return FSMDo(kGameFSM_TutorialGetSpecial); }
-      else { return FSMDo(kGameFSM_TutorialGetRequired); }
-    } else {
-      return FSMDo(kGameFSM_AimMode);
-    }
+  if (timer++ == TIME_AIM_SCROLL_TO_TOP) {
+    gameSetYOffset(gameGetMinimumY(), true); 
+    return FSMDo(kGameFSM_AimMode);
   }
 }
 
@@ -320,7 +317,7 @@ void FSMPlayCredits(const bool newState) {
     physicsDoLaunchBall(1.0f);
   }
 
-  if (progress >= gameGetMinimumY() + IOGetCurrentHoleHeight() - DEVICE_PIX_Y/3) {
+  if (progress >= gameGetMinimumY() + IOGetCurrentHoleHeight() - DEVICE_PIX_Y/3 + 4) {
     pause += 1.0f / TICK_FREQUENCY;
     physicsDoResetBall(0);
     if (pause >= 5.0f) {
@@ -473,7 +470,7 @@ void FSMWinningToast(const bool newState) {
     soundDoSfx(kDrumRollSfx2);
     physicsSetTimestepMultiplier(TSM_TARGET_TOAST);
   }
-  
+
   const cpVect last = renderGetLastEndBlast();
   const cpVect ballPos = physicsGetBallPosition(0);
   if (cpvlengthsq( cpvsub(last, ballPos) ) > (16*16)) {

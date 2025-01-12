@@ -15,7 +15,7 @@ int8_t m_wfPlaying = -1;
 uint8_t m_plingID = 0;
 int32_t m_plingTimer = 0;
 
-const float WF_VOLUMES[] = {0.25f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f};
+const float WF_VOLUMES[] = {0.6f, 0.8f, 1.0f, 0.5f, 1.0f, 0.8f};
 
 FilePlayer* m_music[N_MUSIC_TRACKS];
 FilePlayer* m_waterfalls[N_WF_TRACKS];
@@ -62,7 +62,7 @@ void soundDoWaterfallVolume(const enum FSM_t fsm, const enum GameMode_t gm) {
   const float yOff = gameGetYOffset();
   const float maxY = (gm == kGameWindow ? IOGetCurrentHoleHeight() : PHYSWALL_PIX_Y);
   float v = 1.0f;
-  if (IOGetCurrentHoleWaterfallBackground(gm) == -1 || fsm == kGameFSM_ScoresToTryAgain) {
+  if (IOGetCurrentHoleWaterfallBackground(gm) == 0 || fsm == kGameFSM_ScoresToTryAgain) {
     // This lets us know we don't want the animated background, so no sfx either
     v = 0.0f;
   } else if (yOff < 0.0f) { // Fade out above
@@ -113,7 +113,11 @@ void musicStopped(SoundSource* _unused, void* _unused2) {
 
 void soundPlayMusic(const uint8_t id) {
   if (!m_hasMusic || !m_doMusic) { return; }
-  pd->sound->fileplayer->play(m_music[id % N_MUSIC_TRACKS], 1);
+  for (int32_t i = 0; i < N_MUSIC_TRACKS; ++i) {
+    pd->sound->fileplayer->stop(m_music[i]);
+  }
+  m_trackPlaying = id % N_MUSIC_TRACKS;
+  pd->sound->fileplayer->play(m_music[m_trackPlaying], 1);
 }
 
 void soundDoInit() {
@@ -149,7 +153,7 @@ void soundDoInit() {
   m_audioSample[kDingSfx13] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__11");
   m_audioSample[kDingSfx14] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__12");
   m_audioSample[kDingSfx15] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__13");
-  m_audioSample[kDingSfx16] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__14"); // +80%
+  m_audioSample[kDingSfx16] = pd->sound->sample->load("fx/760661__gutertonwav__guterton-bowl-ding__14"); // +80% (see git history for 15-18)
 
   m_audioSample[kSplashSfx1] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__1");
   m_audioSample[kSplashSfx2] = pd->sound->sample->load("fx/737644__kraftaggregat__rocks-thrown-in-water__2");
