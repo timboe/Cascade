@@ -154,21 +154,22 @@ void IODoUpdatePreloading(void) {
 }
 
 #ifdef WF_FIXED_BG
-int16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole) { 
-  return 0;
+uint16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole) { 
+  return 1;
 }
 #else
-int16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole) { 
-  // TODO - bake this in to the levels?
-  if (IOGetWaterfallForeground(level,hole) < FIRST_CUSTOM_WF_ID || IOGetWaterfallForeground(level,hole) == CUSTOM_WF_ID_GREATWAVE) { 
-    return m_hole_background[level][hole];
-  }
-  return -1;
+uint16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole) { 
+  // // TODO - bake this in to the levels?
+  // if (IOGetWaterfallForeground(level,hole) < FIRST_CUSTOM_WF_ID || IOGetWaterfallForeground(level,hole) == CUSTOM_WF_ID_GREATWAVE) { 
+  //   return m_hole_background[level][hole];
+  // }
+  // return -1;
+  return m_hole_background[level][hole];
 }
 #endif
 uint16_t IOGetWaterfallForeground(const uint16_t level, const uint16_t hole) { return m_hole_foreground[level][hole]; }
 
-int16_t IOGetCurrentHoleWaterfallBackground(const enum GameMode_t gm) { 
+uint16_t IOGetCurrentHoleWaterfallBackground(const enum GameMode_t gm) { 
   return IOGetWaterfallBackground(m_level, (gm == kTitles ? 0 : m_hole));
 }
 
@@ -182,7 +183,7 @@ void IODoPreviousPlayer(void) {
   if (!m_player) { m_player = MAX_PLAYERS - 1; }
   else --m_player;
   #ifdef DEV
-  pd->system->logToConsole("Now player %i - got to unplayed hole", (int)m_player+1);
+  pd->system->logToConsole("Now player %i - got to un-played hole", (int)m_player+1);
   #endif
   IODoGoToNextUnplayedLevel();
 }
@@ -190,7 +191,7 @@ void IODoPreviousPlayer(void) {
 void IODoNextPlayer(void) {
   m_player = (m_player + 1) % MAX_PLAYERS;
   #ifdef DEV
-  pd->system->logToConsole("Now player %i - got to unplayed hole", (int)m_player+1);
+  pd->system->logToConsole("Now player %i - got to un-played hole", (int)m_player+1);
   #endif
   IODoGoToNextUnplayedLevel();
 }

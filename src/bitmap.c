@@ -80,8 +80,8 @@ LCDBitmap* m_hexBitmap[MAX_PEG_SIZE][128];
 LCDBitmap* m_specialTextBitmap[(uint8_t)kNPegSpecial];
 
 LCDBitmap* m_wfPond[POND_WATER_TILES][POND_WATER_FRAMES];
-LCDBitmap* m_wfBg[N_WF_BG];
-LCDBitmapTable* m_sheetWfFg[128]; // N_WF + room for specials
+LCDBitmap* m_wfBg[N_WF_BG+1] = {NULL}; // Don't use 0th entry
+LCDBitmapTable* m_sheetWfFg[128] = {NULL}; // N_WF + room for specials
 LCDBitmapTable* m_waterSplashTable[N_SPLASHES];
 LCDBitmapTable* m_fountainTable[N_FOUNTAINS];
 LCDBitmapTable* m_chevronTable;
@@ -239,7 +239,13 @@ LCDBitmap* bitmapGetTitleHeaderImage(void) { return m_headerImage; }
 
 LCDBitmap* bitmapGetWfPond(const uint8_t n, const int32_t fc) { return m_wfPond[n % POND_WATER_TILES][fc/2 % POND_WATER_FRAMES]; }
 
-LCDBitmap* bitmapGetWfBg(const uint8_t wf) { return m_wfBg[wf]; }
+LCDBitmap* bitmapGetWfBg(const uint8_t wf) { 
+  if (!m_wfBg[wf]) {
+    pd->system->logToConsole("bitmapGetWfBg requested non-existant %i", wf);
+    return m_wfBg[1];
+  }
+  return m_wfBg[wf];
+}
 
 LCDBitmap* bitmapGetWaterSplash(const uint8_t id) { 
   return pd->graphics->getTableBitmap(m_waterSplashTable[0], id);
@@ -250,6 +256,10 @@ LCDBitmap* bitmapGetFountain(const uint8_t f, const int id) {
 }
 
 LCDBitmap* bitmapGetWfFg(const uint8_t wf, const uint8_t id) {
+  if (!m_sheetWfFg[wf]) {
+    pd->system->logToConsole("bitmapGetWfFg requested non-existant %i", wf);
+    return pd->graphics->getTableBitmap(m_sheetWfFg[1], id);
+  }
   return pd->graphics->getTableBitmap(m_sheetWfFg[wf], id);
 }
 
@@ -862,7 +872,7 @@ void bitmapDoPreloadC(void) {
 
 void bitmapDoPreloadD(void) {
   char text[128];
-  for (int32_t i = 1; i < N_WF_FG; ++i) { // Did 0 already as a critical load
+  for (int32_t i = 2; i <= N_WF_FG; ++i) { // Did 1 already as a critical load
     snprintf(text, 128, "images/falls_fg/falls%i_fg", (int)i);
     m_sheetWfFg[i] = bitmapDoLoadImageTableAtPath(text);
   }
@@ -875,7 +885,7 @@ void bitmapDoPreloadD(void) {
   snprintf(text, 128, "images/falls_fg/falls100_fg");
   m_sheetWfFg[100] = bitmapDoLoadImageTableAtPath(text);
 #ifndef WF_FIXED_BG
-  for (int32_t i = 1; i < N_WF_BG; ++i) { // Did 0 already as a critical load
+  for (int32_t i = 2; i <= N_WF_BG; ++i) { // Did 1 already as a critical load
     snprintf(text, 128, "images/falls_bg/falls%i_bg", (int)i);
     m_wfBg[i] = bitmapDoLoadImageAtPath(text);
   }
@@ -1099,7 +1109,7 @@ void bitmapDoInit(void) {
   // Load critical bitmaps
   m_fontRoobert10 = bitmapDoLoadFontAtPath("fonts/Roobert-10-Bold");
   m_headerImage = bitmapDoLoadImageAtPath("images/splash");
-  m_wfBg[0] = bitmapDoLoadImageAtPath("images/falls_bg/falls0_bg");
-  m_sheetWfFg[0] = bitmapDoLoadImageTableAtPath("images/falls_fg/falls0_fg");
+  m_wfBg[1] = bitmapDoLoadImageAtPath("images/falls_bg/falls1_bg");
+  m_sheetWfFg[1] = bitmapDoLoadImageTableAtPath("images/falls_fg/falls1_fg");
   m_previewBitmap = NULL;
 }

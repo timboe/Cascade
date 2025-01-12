@@ -27,7 +27,7 @@ void renderFade(void);
 
 void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm);
 
-void renderBackgroundDo(const int16_t bg, const int16_t fg, const uint16_t startID, const int16_t wfBgOff, const int16_t parallax, const uint16_t wfSheetSizeY, const uint16_t maxY);
+void renderBackgroundDo(const uint16_t bg, const uint16_t fg, const uint16_t startID, const int16_t wfBgOff, const int16_t parallax, const uint16_t wfSheetSizeY, const uint16_t maxY);
 
 /// ///
 
@@ -83,7 +83,7 @@ void renderDo(const int32_t fc, const enum FSM_t fsm, const enum GameMode_t gm) 
   }
 
   const float offX = -gameGetXOffset();
-  const float offY = -snap(gameGetYOffset());
+  const float offY = -gameGetYOffset();
 
   pd->graphics->setDrawMode(kDrawModeCopy);
   pd->graphics->setDrawOffset(offX, offY);
@@ -203,11 +203,8 @@ void renderGame(const int32_t fc, const enum FSM_t fsm) {
 #endif
 }
 
-void renderBackgroundDo(const int16_t bg, const int16_t fg, const uint16_t startID, const int16_t wfBgOff, const int16_t parallax, const uint16_t wfSheetSizeY, const uint16_t maxY) {
-  // pd->system->logToConsole("renderBackgroundDo for bg:%i fg:%i startID:%i wfBgOff:%i parallax:%i wfSheetSizeY:%i maxY:%i",
-  //   bg, fg, startID, wfBgOff, parallax, wfSheetSizeY, maxY);
-
-  if (bg != -1) {
+void renderBackgroundDo(const uint16_t bg, const uint16_t fg, const uint16_t startID, const int16_t wfBgOff, const int16_t parallax, const uint16_t wfSheetSizeY, const uint16_t maxY) {
+  if (bg) {
     for (int i = startID; i < (startID+6); ++i) {  // Background
       const int16_t y = (WF_DIVISION_PIX_Y * i) - wfBgOff + parallax;
       if (i >= wfSheetSizeY + 1 || y > maxY) break;
@@ -215,7 +212,7 @@ void renderBackgroundDo(const int16_t bg, const int16_t fg, const uint16_t start
     }
   }
   for (int i = startID; i < (startID+5); ++i) { // Foreground
-    const int16_t y = (WF_DIVISION_PIX_Y * i) + parallax;
+    const int16_t y = (WF_DIVISION_PIX_Y * i) + parallax; // - (y % 8); // Tested to combat shimmering
     if (i >= wfSheetSizeY || y > maxY) break;
     pd->graphics->drawBitmap(bitmapGetWfFg(fg, i), 0, y, kBitmapUnflipped);
   }
@@ -227,11 +224,13 @@ void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm) {
   if (screenShotGetInProgress()) { return; }
 #endif
 
-  const int8_t prevWfBg = gameGetPreviousWaterfallBg();
-  const uint8_t prevWfFg = gameGetPreviousWaterfallFg();
+  const uint16_t prevWfBg = gameGetPreviousWaterfallBg();
+  const uint16_t prevWfFg = gameGetPreviousWaterfallFg();
 
-  const int8_t currentWfBg = IOGetCurrentHoleWaterfallBackground(gm); 
-  const uint8_t currentWfFg = IOGetCurrentHoleWaterfallForeground(gm);
+  const uint16_t currentWfBg = IOGetCurrentHoleWaterfallBackground(gm); 
+  const uint16_t currentWfFg = IOGetCurrentHoleWaterfallForeground(gm);
+
+  // pd->system->logToConsole("RCB FG cur:%i prev:%i, BG cur:%i prev%i", currentWfFg, prevWfFg, currentWfBg, prevWfBg);
 
   const int32_t yOffset = gameGetYOffset();
   const uint16_t chh = IOGetCurrentHoleHeight();

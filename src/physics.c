@@ -38,7 +38,7 @@ void physicsSetBallPosition(const uint8_t ball, const cpVect position);
 /// ///
 
 void physicsSetTimestepMultiplier(const float tsm) { 
-  // m_timestep = TIMESTEP * tsm;
+  m_timestep = TIMESTEP * tsm;
 }
 float physicsGetTimestepMultiplier(void) { return m_timestep / TIMESTEP; }
 
@@ -176,10 +176,10 @@ void physicsDoUpdate(const int32_t fc, const enum FSM_t fsm) {
 
 
   static uint32_t frame = 0;
-  if (fsm == kGameFSM_CloseUp || fsm == kGameFSM_WinningToast) { // 25% if in closeup, 50% if in toast
+  if (fsm == kGameFSM_CloseUp) { // 25% if in closeup - but keep a consistent timestep for phys
     static cpVect ballPrev[2];
     static cpVect ballCur[2];
-    const uint8_t nSteps = (fsm == kGameFSM_CloseUp ? 4 : 2);
+    const uint8_t nSteps = (fsm == kGameFSM_CloseUp ? 4 : 2); // (used to also do 50% here)
     const uint8_t step = (frame++ % nSteps);
     if (!step) {
       ballPrev[0] = cpBodyGetPosition(m_ball[0]);

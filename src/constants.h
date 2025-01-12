@@ -10,7 +10,7 @@
 
 /// ///
 
-#define N_WF_FG 10
+#define N_WF_FG 9
 #define N_WF_BG 4
 
 #define WF_SPECIAL_START 10
@@ -204,12 +204,8 @@
 
 #define WF_VELOCITY 0.6f
 
-#define TSM_FAST 0.2f
-#define TSM_SLOW 0.005f
-#define TSM_TARGET_SLOWMO 0.2f
+#define TSM_TARGET_SLOWMO 0.25f
 #define TSM_TARGET_TOAST 0.8f
-// Delta is used due to finite floating point precision
-#define TSM_DELTA 0.01f
 
 // Velocity squared under which the ball is considered stuck
 #define BALL_IS_STUCK 1000.0f

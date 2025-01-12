@@ -354,9 +354,6 @@ void FSMBallInPlay(const bool newState) {
     distanceToFinalPeg = 0.0f;
   }
 
-  const float tsm = physicsGetTimestepMultiplier();
-  if (tsm < 1.0f - TSM_DELTA) { physicsSetTimestepMultiplier(tsm + TSM_FAST); }
-
   // Focus on ball, check gutter
   const bool guttered = FSMCommonFocusOnLowestBallInPlay(special);
   if (guttered) { return FSMDo(kGameFSM_BallGutter); }
@@ -400,9 +397,6 @@ void FSMBallInPlay(const bool newState) {
 }
 
 void FSMBallStuck(const bool newState) {
-  const float tsm = physicsGetTimestepMultiplier();
-  if (tsm < 1.0f - TSM_DELTA) { physicsSetTimestepMultiplier(tsm + TSM_FAST); }
-  //
   FSMCommonTurretScrollAndBounceBack(true);
   //
   bool popped = true;
@@ -428,11 +422,6 @@ void FSMCloseUp(const bool newState) {
     soundDoSfx(kDrumRollSfx1);
     timer = 0.0f;
   }
-
-  const float tsm = physicsGetTimestepMultiplier();
-  if (tsm > TSM_TARGET_SLOWMO + TSM_DELTA) { physicsSetTimestepMultiplier(tsm - TSM_FAST); } // 1.0 to 0.2 in 8 frames, 0.16 seconds
-  // Note: Applying TSM changes over multiple frames so as to not overly mess up physics engine assumptions
-  // Big effect from going straight from a 1.0 multiplier to 0.2  xxx
 
   cpVect ballPos[2];
   ballPos[0] = physicsGetBallPosition(0);
@@ -482,11 +471,9 @@ void FSMWinningToast(const bool newState) {
     renderDoAddEndBlast(physicsGetBallPosition(0));
     soundDoMusic();
     soundDoSfx(kDrumRollSfx2);
+    physicsSetTimestepMultiplier(TSM_TARGET_TOAST);
   }
-
-  const float tsm = physicsGetTimestepMultiplier();
-  if (tsm < TSM_TARGET_TOAST - TSM_DELTA) { physicsSetTimestepMultiplier(tsm + TSM_SLOW); } // 0.25 per sec, 0.2 -> 0.8 in 2.4 seconds 
-
+  
   const cpVect last = renderGetLastEndBlast();
   const cpVect ballPos = physicsGetBallPosition(0);
   if (cpvlengthsq( cpvsub(last, ballPos) ) > (16*16)) {
