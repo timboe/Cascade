@@ -125,8 +125,8 @@ func restore_save(save_game : Dictionary) -> void:
 		%Foreground.selected = 10
 		print("Set selected to 4")
 	else:
-		%Foreground.selected = %ForegroundIDSlider.value
-	%Background.selected = save_game["header"]["background"]
+		%Foreground.selected = %ForegroundIDSlider.value-1
+	%Background.selected = save_game["header"]["background"] - 1
 	%SpecialButton.selected = save_game["header"]["special"]
 	%HeightSlider.value = save_game["header"]["height"]
 	%EditorSnap.value = save_game["header"]["snap"]

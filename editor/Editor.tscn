@@ -87,12 +87,12 @@ func _on_item_selected(index):
 	if id == 10: # custom
 		$FileDialog.visible = true
 		return
-	var res = load(\"res://foregrounds/falls\" + str(id) +  \"_fg-table-400-60.png\")
+	var res = load(\"res://foregrounds/falls\" + str(id+1) +  \"_fg-table-400-60.png\")
 	if res:
 		%ForegroundTexRect.texture = res
 
 func _on_background_item_selected(index):
-	var res = load(\"res://backgrounds/falls\" + str(index) + \"_bg.png\")
+	var res = load(\"res://backgrounds/falls\" + str(index+1) + \"_bg.png\")
 	if res:
 		%BackgroundTexRect.texture = res
 
