@@ -120,7 +120,7 @@ func pack_save() -> Dictionary:
 	header["hole"] = %HoleSlider.value
 	header["par"] = %ParSlider.value
 	header["foreground"] = %ForegroundIDSlider.value
-	header["background"] = %Background.get_item_id(%Background.selected)
+	header["background"] = %Background.get_item_id(%Background.selected) + 1
 	header["special"] = %SpecialButton.selected
 	header["height"] = %HeightSlider.value
 	header["snap"] = %EditorSnap.value
