@@ -88,7 +88,7 @@ void pegDoClear(struct Peg_t* p);
 
 void pegDoRemove(struct Peg_t* p);
 
-void pegDoUpdate(struct Peg_t* p);
+void pegDoUpdate(struct Peg_t* p, const float timeStep);
 
 void pegSetType(struct Peg_t* p, const enum PegType_t type);
 
