@@ -94,12 +94,20 @@ int gameLoop(void* _data) {
       physicsDoUpdate(m_frameCount, fsm);
     }
     renderDo(m_frameCount, fsm, gm);
-    soundDoWaterfallVolume(fsm, gm);
+    soundDoVolumes(fsm, gm);
+    if (rand() % BIRDCALL_SFX_CHANCE == 0) { soundDoSfx(kBirdSfx1); }
     ++m_frameCount;
   }
 
   // if (FSMGet() == kGameFSM_GutterToTurret) pd->system->logToConsole("<<< gameLoop FC (loop end) %i", gameGetFrameCount());
   return 1;
+}
+
+void gameMenuStateSafetyReset(void) {
+  physicsSetTimestepMultiplier(1.0f);
+  renderSetScale(1);
+  gameSetXOffset(0);
+  soundStopSfx(kDrumRollSfx1);
 }
 
 void menuOptionsCallbackResetSave(void* toReset) {
@@ -113,10 +121,7 @@ void menuOptionsCallbackQuitHole(void* _unused) {
   #ifdef DEV
   pd->system->logToConsole("menuOptionsCallbackQuitHole");
   #endif
-  physicsSetTimestepMultiplier(1.0f);
-  renderSetScale(1);
-  gameSetXOffset(0);
-  soundStopSfx(kDrumRollSfx1);
+  gameMenuStateSafetyReset();
   pd->system->removeAllMenuItems();
   FSMDo(kGameFSM_GameFadeOutQuit);
 }
@@ -125,10 +130,7 @@ void menuOptionsCallbackResetHole(void* _unused) {
   #ifdef DEV
   pd->system->logToConsole("menuOptionsCallbackResetHole");
   #endif
-  physicsSetTimestepMultiplier(1.0f);
-  renderSetScale(1);
-  gameSetXOffset(0);
-  soundStopSfx(kDrumRollSfx1);
+  gameMenuStateSafetyReset();
   pd->system->removeAllMenuItems();
   FSMDo(kGameFSM_GameFadeOutReset);
 }
@@ -137,6 +139,7 @@ void menuOptionsCallbackCredits(void* _unused) {
   #ifdef DEV
   pd->system->logToConsole("menuOptionsCallbackCredits");
   #endif
+  gameMenuStateSafetyReset();
   pd->system->removeAllMenuItems();
   FSMDo(kTitlesFSM_ToTitleCreditsTitle);
 }

@@ -38,3 +38,4 @@ float gameGetParalaxFactorNearForY(const bool hard, const float y);
 void gameDoPopulateMenuGame(void);
 void gameDoPopulateMenuTitlesPlayer(void);
 void gameDoPopulateMenuTitles(void);
+void gameMenuStateSafetyReset(void);

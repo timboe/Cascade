@@ -259,7 +259,10 @@ void FSMGameFadeOutQuit(const bool newState) {
   static int8_t progress = 0;
   if (newState) { progress = 0; }
   if (gameGetFrameCount() % ( (TICK_FREQUENCY/2) / FADE_LEVELS) == 0) { ++progress; }
-  if (progress == FADE_LEVELS) { return FSMDo(kTitlesFSM_ChooseHoleWFadeIn); }
+  if (progress == FADE_LEVELS) { 
+    soundStopSfx(kFountainSfx);
+    return FSMDo(kTitlesFSM_ChooseHoleWFadeIn);
+  }
   renderSetFadeLevel(progress);
 }
 
@@ -267,7 +270,10 @@ void FSMGameFadeOutReset(const bool newState) {
   static int8_t progress = 0;
   if (newState) { progress = 0; }
   if (gameGetFrameCount() % ( (TICK_FREQUENCY/2) / FADE_LEVELS) == 0) { ++progress; }
-  if (progress == FADE_LEVELS) { return FSMDo(kGameFSM_DisplayLevelTitleWFadeIn); }
+  if (progress == FADE_LEVELS) { 
+    soundStopSfx(kFountainSfx);
+    return FSMDo(kGameFSM_DisplayLevelTitleWFadeIn);
+  }
   renderSetFadeLevel(progress);
 }
 
@@ -468,6 +474,7 @@ void FSMWinningToast(const bool newState) {
     renderDoAddEndBlast(physicsGetBallPosition(0));
     soundDoMusic();
     soundDoSfx(kDrumRollSfx2);
+    soundDoSfx(kFountainSfx);
     physicsSetTimestepMultiplier(TSM_TARGET_TOAST);
   }
 
@@ -650,6 +657,7 @@ void FSMScoresAnimation(const bool newState) {
       renderSetMarbleFallY(i, py[i]);
     }
     IOSetCurrentHoleScore(m_ballCount);
+    soundStopSfx(kFountainSfx);
   }
   //
   bool moving = false;

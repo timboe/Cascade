@@ -9,6 +9,8 @@ bool m_hasMusic = true;
 
 bool m_doingExplosion = false;
 
+float m_wf_v = 1.0f;
+
 int8_t m_trackPlaying = -1;
 int8_t m_wfPlaying = -1;
 
@@ -57,23 +59,33 @@ void soundSetDoSfx(const bool doit) {
   m_doSfx = doit;
 }
 
-void soundDoWaterfallVolume(const enum FSM_t fsm, const enum GameMode_t gm) {
-  if (!m_doMusic || m_wfPlaying == -1) { return; }
+void soundDoVolumes(const enum FSM_t fsm, const enum GameMode_t gm) {
   const float yOff = gameGetYOffset();
   const float maxY = (gm == kGameWindow ? IOGetCurrentHoleHeight() : PHYSWALL_PIX_Y);
-  float v = 1.0f;
-  if (IOGetCurrentHoleWaterfallBackground(gm) == 0 || fsm == kGameFSM_ScoresToTryAgain) {
-    // This lets us know we don't want the animated background, so no sfx either
-    v = 0.0f;
-  } else if (yOff < 0.0f) { // Fade out above
-    v += yOff / (float) DEVICE_PIX_Y; // Note that yOff is -ve
-    if (v < 0.0f) { v = 0.0f; }
-  } else if (yOff > maxY) { // Fade out below
-    v -= (yOff - maxY) / (float) DEVICE_PIX_Y;
-    if (v < 0.0f) { v = 0.0f; }
+
+  // Fountain volume
+  if (m_doSfx) {
+    float absDistNorm = fabsf((yOff + (DEVICE_PIX_Y/2) ) - maxY) / (DEVICE_PIX_Y * 2.0f);
+    const float f_v = (absDistNorm > 1.0f ? 0.0f : 1.0f - absDistNorm);
+    pd->sound->sampleplayer->setVolume(m_samplePlayer[kFountainSfx], f_v, f_v);
+  } 
+
+  // Waterfall volume
+  if (m_doMusic && m_wfPlaying != -1) {
+    m_wf_v = 1.0f;
+    if (IOGetCurrentHoleWaterfallBackground(gm) == 0 || fsm == kGameFSM_ScoresToTryAgain) {
+      // This lets us know we don't want the animated background, so no sfx either
+      m_wf_v = 0.0f;
+    } else if (yOff < 0.0f) { // Fade out above
+      m_wf_v += yOff / (float) DEVICE_PIX_Y; // Note that yOff is -ve
+      if (m_wf_v < 0.0f) { m_wf_v = 0.0f; }
+    } else if (yOff > maxY) { // Fade out below
+      m_wf_v -= (yOff - maxY) / (float) DEVICE_PIX_Y;
+      if (m_wf_v < 0.0f) { m_wf_v = 0.0f; }
+    }
+    const float v = m_wf_v * WF_VOLUMES[m_wfPlaying];
+    pd->sound->fileplayer->setVolume(m_waterfalls[m_wfPlaying], v, v);
   }
-  v *= WF_VOLUMES[m_wfPlaying];
-  pd->sound->fileplayer->setVolume(m_waterfalls[m_wfPlaying], v, v);
 }
 
 void soundWaterfallDoInit() {
@@ -166,6 +178,21 @@ void soundDoInit() {
   m_audioSample[kWhooshSfx3] = pd->sound->sample->load("fx/153235__jzazvurek__swishes-svihy__3");
   m_audioSample[kWhooshSfx4] = pd->sound->sample->load("fx/153235__jzazvurek__swishes-svihy__4");
 
+  m_audioSample[kBirdSfx1]  = pd->sound->sample->load("fx/181132__keweldog__bird-chirps__1");
+  m_audioSample[kBirdSfx2]  = pd->sound->sample->load("fx/181132__keweldog__bird-chirps__2");
+  m_audioSample[kBirdSfx3]  = pd->sound->sample->load("fx/181132__keweldog__bird-chirps__3");
+  m_audioSample[kBirdSfx4]  = pd->sound->sample->load("fx/182529__keweldog__bird-chirps2__1");
+  m_audioSample[kBirdSfx5]  = pd->sound->sample->load("fx/182529__keweldog__bird-chirps2__2");
+  m_audioSample[kBirdSfx6]  = pd->sound->sample->load("fx/182796__keweldog__bird-chirps3__1");
+  m_audioSample[kBirdSfx7]  = pd->sound->sample->load("fx/182796__keweldog__bird-chirps3__2");
+  m_audioSample[kBirdSfx8]  = pd->sound->sample->load("fx/182796__keweldog__bird-chirps3__3");
+  m_audioSample[kBirdSfx9] = pd->sound->sample->load("fx/182795__keweldog__bird-chirps4__1");
+  m_audioSample[kBirdSfx10] = pd->sound->sample->load("fx/182795__keweldog__bird-chirps4__2");
+  m_audioSample[kBirdSfx11] = pd->sound->sample->load("fx/182795__keweldog__bird-chirps4__3");
+  m_audioSample[kBirdSfx12] = pd->sound->sample->load("fx/184870__keweldog__bird-chirps5__1");
+  m_audioSample[kBirdSfx13] = pd->sound->sample->load("fx/184870__keweldog__bird-chirps5__2");
+  m_audioSample[kBirdSfx14] = pd->sound->sample->load("fx/184870__keweldog__bird-chirps5__3");
+
   m_audioSample[kPopSfx1] = pd->sound->sample->load("fx/613608__pellepyb__pop-sound__1");
   m_audioSample[kPopSfx2] = pd->sound->sample->load("fx/613608__pellepyb__pop-sound__2");
   m_audioSample[kPopSfx3] = pd->sound->sample->load("fx/613608__pellepyb__pop-sound__3");
@@ -183,6 +210,7 @@ void soundDoInit() {
   m_audioSample[kFizzleSfx] =  pd->sound->sample->load("fx/133448__chaosportal__cigarette-sizzle-01");
   m_audioSample[kBoingSfx1] =  pd->sound->sample->load("fx/201260__empraetorius__water-bottle-boing__1");
   m_audioSample[kBoingSfx2] =  pd->sound->sample->load("fx/201260__empraetorius__water-bottle-boing__2");
+  m_audioSample[kFountainSfx] =  pd->sound->sample->load("fx/63756__dobroide__20081118fountainarchivodeindias");
 
   for (int32_t i = 0; i < kNSFX; ++i) {
     m_samplePlayer[i] = pd->sound->sampleplayer->newPlayer();
@@ -248,8 +276,11 @@ void soundDoSfx(enum SfxSample sample) {
     sample += rand() % N_SPLASHES_SFX;
   } else if (sample == kPopSfx1) {
     sample += rand() % N_POPS_SFX;
+  } else if (sample == kBirdSfx1) {
+    sample += rand() % N_BIRD_SFX;
+    // Special: Only play if at high waterfall volume
+    if (m_wf_v < 0.8f) { return; }
   }
-
   pd->sound->sampleplayer->play(m_samplePlayer[sample], 1, 1.0f);
 }
 

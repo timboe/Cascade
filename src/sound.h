@@ -58,6 +58,21 @@ enum SfxSample {
   kWhooshSfx2,
   kWhooshSfx3,
   kWhooshSfx4,
+  kBirdSfx1,
+  kBirdSfx2,
+  kBirdSfx3,
+  kBirdSfx4,
+  kBirdSfx5,
+  kBirdSfx6,
+  kBirdSfx7,
+  kBirdSfx8,
+  kBirdSfx9,
+  kBirdSfx10,
+  kBirdSfx11,
+  kBirdSfx12,
+  kBirdSfx13,
+  kBirdSfx14,
+  kFountainSfx,
   kRelocateTurretSfx,
   kTumblerClickSfx,
   kCrankClickSfx,
@@ -76,7 +91,7 @@ void soundPlayMusic(const uint8_t id);
 
 void soundDoWaterfall(const uint8_t id);
 
-void soundDoWaterfallVolume(const enum FSM_t fsm, const enum GameMode_t gm);
+void soundDoVolumes(const enum FSM_t fsm, const enum GameMode_t gm);
 
 void soundDoSfx(enum SfxSample sample);
 

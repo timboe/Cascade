@@ -158,12 +158,15 @@
 #define N_SPLASHES_SFX 5
 #define N_POPS_SFX 3
 #define N_WHOOSHES_SFX 4
+#define N_BIRD_SFX 14
 
 #define N_MUSIC_TRACKS 12
 
 #define N_WF_TRACKS 6
 
 #define CRANK_NOISE_ANGLE 30.0f
+
+#define BIRDCALL_SFX_CHANCE 2048
 
 // PHYSICS 
 
