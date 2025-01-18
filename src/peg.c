@@ -181,7 +181,7 @@ void pegDoUpdateAngle(struct Peg_t* p, const float angle) {
   p->bitmap = bitmapGetPeg(p);
 }
 
-void pegDoUpdate(struct Peg_t* p) {
+void pegDoUpdate(struct Peg_t* p, const float timeStep) {
   if (p->queueRemove) {
     p->state = kPegStateRemoved;
     pegDoRemove(p);
@@ -190,8 +190,7 @@ void pegDoUpdate(struct Peg_t* p) {
     return;
   }
 
-  const float tsm = physicsGetTimestepMultiplier();
-  p->time = bound(p->time + (TIMESTEP * tsm * p->speed));
+  p->time = bound(p->time + (timeStep * p->speed)); // Remember speed can be -ve
 
   if (p->motion == kPegMotionStatic) {
 

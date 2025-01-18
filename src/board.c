@@ -222,8 +222,10 @@ void boardDoTestLevel(void) {
 }
 
 void boardDoUpdate(void) {
+  const float closeUpMod = (FSMGet() == kGameFSM_CloseUp ? 0.25f : 1.0f);;
+  const float ts = physicsGetTimestepMultiplier() * TIMESTEP * closeUpMod;
   for (int i = 0; i < m_nPegs; ++i) {
-    pegDoUpdate(&m_pegs[i]);
+    pegDoUpdate(&m_pegs[i], ts);
   }
 }
 
