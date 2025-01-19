@@ -6,9 +6,9 @@
     "level": 5,
     "hole": 7,
     "par": 3,
-    "foreground": 1,
-    "background": 0,
-    "special": 0,
+    "foreground": 5,
+    "background": 2,
+    "special": 2,
     "height": 620,
     "snap": 4,
     "n_static": 29,
@@ -22,7 +22,7 @@
       "y": 124,
       "angle": 0,
       "size": 0,
-      "type": 1
+      "type": 2
     },
     "StaticControl2": {
       "shape": 2,

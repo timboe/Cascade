@@ -5,13 +5,13 @@
     "author": "",
     "level": 5,
     "hole": 6,
-    "par": 3,
+    "par": 2,
     "foreground": 18,
     "background": 0,
-    "special": 0,
+    "special": 6,
     "height": 530,
     "snap": 4,
-    "n_static": 33,
+    "n_static": 34,
     "n_elliptic": 0,
     "n_linear": 0
   },
@@ -98,8 +98,8 @@
     },
     "StaticControl11": {
       "shape": 1,
-      "x": 216,
-      "y": 224,
+      "x": 200,
+      "y": 316,
       "angle": -21,
       "size": 0,
       "type": 2
@@ -211,7 +211,7 @@
     "StaticControl25": {
       "shape": 0,
       "x": 200,
-      "y": 348,
+      "y": 352,
       "angle": -5,
       "size": 0,
       "type": 0
@@ -254,7 +254,7 @@
       "y": 284,
       "angle": 0,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl31": {
       "shape": 1,
@@ -267,7 +267,7 @@
     "StaticControl32": {
       "shape": 1,
       "x": 196,
-      "y": 272,
+      "y": 260,
       "angle": 0,
       "size": 2,
       "type": 1
@@ -279,6 +279,14 @@
       "angle": 0,
       "size": 2,
       "type": 1
+    },
+    "StaticControl34": {
+      "shape": 2,
+      "x": 220,
+      "y": 216,
+      "angle": 11,
+      "size": 0,
+      "type": 0
     }
   }
 }

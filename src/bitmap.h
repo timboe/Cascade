@@ -16,7 +16,7 @@ LCDFont* bitmapGetRoobert10(void);
 LCDFont* bitmapGetGreatVibes24(void);
 LCDFont* bitmapGetGreatVibes109(void);
 
-LCDBitmap* bitmapGetWfFg(const uint8_t wf, const uint8_t id);
+LCDBitmap* bitmapGetWfFg(const uint8_t wf, const uint8_t id, const bool yCrush);
 LCDBitmap* bitmapGetWfBg(const uint8_t wf);
 LCDBitmap* bitmapGetWfPond(const uint8_t n, const int32_t fc);
 LCDBitmap* bitmapGetWaterSplash(const uint8_t id);

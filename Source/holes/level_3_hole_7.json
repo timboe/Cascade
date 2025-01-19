@@ -8,10 +8,10 @@
     "par": 3,
     "foreground": 13,
     "background": 0,
-    "special": 0,
+    "special": 5,
     "height": 890,
     "snap": 4,
-    "n_static": 25,
+    "n_static": 28,
     "n_elliptic": 0,
     "n_linear": 1
   },
@@ -215,6 +215,30 @@
       "angle": 0,
       "size": 0,
       "type": 1
+    },
+    "StaticControl26": {
+      "shape": 1,
+      "x": 124,
+      "y": 384,
+      "angle": 0,
+      "size": 0,
+      "type": 2
+    },
+    "StaticControl27": {
+      "shape": 1,
+      "x": 260,
+      "y": 704,
+      "angle": 0,
+      "size": 0,
+      "type": 2
+    },
+    "StaticControl28": {
+      "shape": 1,
+      "x": 136,
+      "y": 752,
+      "angle": 0,
+      "size": 0,
+      "type": 2
     },
     "LinearControl1": {
       "shape": 1,

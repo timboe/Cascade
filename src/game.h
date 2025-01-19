@@ -26,6 +26,8 @@ float gameGetYOffset(void);
 void gameSetYOffset(float set, const bool force);
 void gameModYVelocity(const float mod);
 float gameDoApplyYEasing(void);
+bool gameGetYClamped(void);
+void gameSetYNotClamped(void);
 
 void gameSetXOffset(const float set);
 float gameGetXOffset(void);

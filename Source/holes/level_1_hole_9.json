@@ -6,11 +6,11 @@
     "level": 1,
     "hole": 9,
     "par": 3,
-    "foreground": 0,
-    "background": 0,
-    "special": 0,
-    "height": 360,
-    "snap": 4,
+    "foreground": 1,
+    "background": 1,
+    "special": 3,
+    "height": 380,
+    "snap": 2,
     "n_static": 0,
     "n_elliptic": 4,
     "n_linear": 2
@@ -19,7 +19,7 @@
     "EllipticControl1": {
       "shape": 0,
       "x": 112,
-      "y": 124,
+      "y": 126,
       "angle": 0,
       "size": 0,
       "arc": 360,
@@ -32,7 +32,7 @@
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 1
+        "type": 0
       },
       "PegContainer2": {
         "shape_override": 0,
@@ -47,7 +47,7 @@
       "PegContainer4": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       },
       "PegContainer5": {
         "shape_override": 0,
@@ -63,7 +63,7 @@
     "EllipticControl2": {
       "shape": 0,
       "x": 272,
-      "y": 256,
+      "y": 258,
       "angle": 90,
       "size": 0,
       "arc": 360,
@@ -106,8 +106,8 @@
     },
     "EllipticControl3": {
       "shape": 2,
-      "x": 288,
-      "y": 128,
+      "x": 285,
+      "y": 126,
       "angle": 90,
       "size": 0,
       "arc": 360,
@@ -150,8 +150,8 @@
     },
     "EllipticControl4": {
       "shape": 2,
-      "x": 124,
-      "y": 256,
+      "x": 122,
+      "y": 258,
       "angle": 30,
       "size": 0,
       "arc": 360,
@@ -164,7 +164,7 @@
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 1
+        "type": 0
       },
       "PegContainer2": {
         "shape_override": 0,
@@ -179,7 +179,7 @@
       "PegContainer4": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       },
       "PegContainer5": {
         "shape_override": 0,
@@ -221,7 +221,7 @@
       },
       "PegContainer4": {
         "shape_override": 0,
-        "size_override": 2,
+        "size_override": 0,
         "type": 2
       },
       "PegContainer5": {
@@ -292,7 +292,7 @@
       },
       "PegContainer4": {
         "shape_override": 0,
-        "size_override": 2,
+        "size_override": 0,
         "type": 2
       },
       "PegContainer5": {

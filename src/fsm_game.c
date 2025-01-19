@@ -63,7 +63,7 @@ bool FSMCommonFocusOnLowestBallInPlay(const enum PegSpecial_t special) {
     //    
     y = MIN(y1,y2);
   }
-  gameSetYOffset(y - HALF_DEVICE_PIX_Y, false);
+  gameSetYOffset(y - HALF_DEVICE_PIX_Y, /*force = */ false); // Not forcec, applies y-crush
   // Return true if no balls in play
   const bool gutterd = (y > IOGetCurrentHoleHeight() + BALL_RADIUS);
   if (gutterd) {
@@ -125,7 +125,7 @@ uint8_t FSMCommonMarbleFire(uint16_t* timer) {
   static bool once = false;
   const bool buttonPressed = (inputGetPressed(kButtonB) || inputGetPressed(kButtonA));
   if ((*timer) >= TIME_FIRE_MARBLE || (progress > MIN_TURRET_CHARGE_TO_FIRE && !buttonPressed)) { // Fire
-    physicsSetTimestepMultiplier(1.0f); // Redundency
+    gameMenuStateSafetyReset(); // Redundency
     physicsDoResetBall(0);
     physicsDoLaunchBall(progress);
     ++m_ballCount;
@@ -163,12 +163,12 @@ void FSMDisplayLevelTitle(const bool newState) {
     const uint32_t before = pd->system->getCurrentTimeMilliseconds(); 
     timer = 0;
     timeToWait = IOIsCredits() ? TIME_DISPLAY_SPLASH*5 : TIME_DISPLAY_SPLASH;
-    gameSetYOffset(-DEVICE_PIX_Y - TURRET_RADIUS, true);
+    gameSetYOffset(-DEVICE_PIX_Y - TURRET_RADIUS, /*force = */true);
     bitmapDoUpdateScoreHistogram();
     if (!IOIsCredits()) { gameDoPopulateMenuGame(); }
     boardDoClear();
     IODoLoadCurrentHole();
-    physicsSetTimestepMultiplier(1.0f); // Redundency
+    gameMenuStateSafetyReset(); // Redundency
     gameDoResetPreviousWaterfall();
     renderDoUpdateBacklines();
     physicsDoResetBall(0);
@@ -200,8 +200,7 @@ void FSMLevelTitleToStart(const bool newState) {
     gameSetMinimumY(0);
     // soundDoSfx(kWhooshSfx1); // Doesn't fit here
   }
-  float progress = getEasing(EASE_SPLASH_TO_GAME, 1.0f - (float)timer/TIME_SPLASH_TO_GAME);
-  gameSetYOffset((-DEVICE_PIX_Y - TURRET_RADIUS) * progress, true);
+  FSMDoCommonScrollTo(-DEVICE_PIX_Y - TURRET_RADIUS, 0, (float)timer/TIME_SPLASH_TO_GAME, EASE_SPLASH_TO_GAME);
   if (timer++ == TIME_SPLASH_TO_GAME) { 
     if (IOGetIsTutorial()) { return FSMDo(kGameFSM_TutorialScrollDown); }
     else if (IOIsCredits()) { return FSMDo(kGameFSM_PlayCredits); }
@@ -234,7 +233,7 @@ void FSMTutorialFireMarble(const bool newState) {
   static uint16_t timer = 0;
   if (newState) {
     gameSetMinimumY(0); // Tutorial only
-    gameSetYOffset(0, true);  // Tutorial only
+    gameSetYOffset(0, /*force = */true);  // Tutorial only
     renderDoResetMarbleTrace();
     gameDoResetFrameCount();
     renderDoResetTriggerSplash();
@@ -297,12 +296,14 @@ void FSMAimMode(const bool newState) {
 
 void FSMAimModeScrollToTop(const bool newState) {
   static uint16_t timer = 0;
-  if (newState) { timer = 0; }
-  const float progress = getEasing(EASE_AIM_SCROLL_TO_TOP, 1.0f - (float)timer/TIME_AIM_SCROLL_TO_TOP);
-  gameSetYOffset(gameGetMinimumY() + ((gameGetYOffset() - gameGetMinimumY())*progress), true);
+  if (newState) { 
+    timer = 0;
+    soundDoSfx(kWhooshSfx1);
+  }
+  FSMDoCommonScrollTo(gameGetMinimumY(), gameGetYOffset(), 1.0f - (float)timer/TIME_AIM_SCROLL_TO_TOP, EASE_AIM_SCROLL_TO_TOP);
   FSMCommonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
   if (timer++ == TIME_AIM_SCROLL_TO_TOP) {
-    gameSetYOffset(gameGetMinimumY(), true); 
+    gameSetYOffset(gameGetMinimumY(), /*force = */true); 
     return FSMDo(kGameFSM_AimMode);
   }
 }
@@ -342,7 +343,7 @@ void FSMPlayCredits(const bool newState) {
   if (++initialWait > TICK_FREQUENCY * 1) { progress += 0.25f; }
   progress += inputGetCrankChanged() * CRANK_SCROLL_MODIFIER;
   if (progress < gameGetMinimumY()) { progress = gameGetMinimumY(); }
-  gameSetYOffset(progress, false);
+  gameSetYOffset(progress, /*force = */false); // Y crush will be set by force=false, but not used here
 }
 
 void FSMBallInPlay(const bool newState) {
@@ -465,6 +466,7 @@ void FSMCloseUp(const bool newState) {
 
   gameSetXOffset( roundf(ballPos[whichBall].x) - (HALF_DEVICE_PIX_X/2) );
   gameSetYOffset( roundf(ballPos[whichBall].y) - (HALF_DEVICE_PIX_Y/2), true );
+  gameSetYNotClamped(); // Explicit apply y-crush
 }
 
 void FSMWinningToast(const bool newState) {
@@ -487,8 +489,9 @@ void FSMWinningToast(const bool newState) {
   int fc = gameGetFrameCount();
   if (physicsGetSecondBallInPlay() && fc % (TICK_FREQUENCY/5) == 0) { renderDoAddEndBlast(physicsGetBallPosition(1)); }
 
+  const bool stuck = FSMCommonGetIsBallStuck(special);
   const bool guttered = FSMCommonFocusOnLowestBallInPlay(special);
-  if (guttered) { 
+  if (guttered || stuck) { 
     physicsSetTimestepMultiplier(1.0f);
     return FSMDo(kGameFSM_BallGutter);
   }
@@ -506,7 +509,7 @@ void FSMBallGutter(const bool newState) {
     } else if (special == kPegSpecialSecondTry && boardGetRequiredPegsInPlay()) {
       physicsDoSecondTryBall();
       boardDoClearSpecial();
-      gameSetYOffset(gameGetMinimumY(), true);
+      gameSetYOffset(gameGetMinimumY(), /*force = */true);
       soundDoSfx(kTeleportSfx);
       return FSMDo(kGameFSM_BallInPlay);
     }
@@ -516,6 +519,7 @@ void FSMBallGutter(const bool newState) {
   }
   if (vY > 0.01f) {
     gameSetYOffset(gameGetYOffset() + (vY * TIMESTEP), true);
+    gameSetYNotClamped(); // Explit apply y-crush
     vY *= 0.5f;
   } else if (pause) {
     --pause;
@@ -548,18 +552,13 @@ void FSMGutterToTurret(const bool newState) {
   FSMCommonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
   //
   progress += (TIMESTEP * END_SWEEP_SCALE * distance_mod * height_mod);
-  float easedProgress = getEasing(EASE_GUTTER_TO_TOP, progress);
-  easedProgress = (1.0f - easedProgress);
-  const float tarIOGetPartial = endY + ((startY - endY) * easedProgress);
-  gameSetYOffset(tarIOGetPartial, true);
-  //
-  // const float popLevel = (startY + DEVICE_PIX_Y) * easedProgress;
-  const float popLevel = tarIOGetPartial + (DEVICE_PIX_Y * easedProgress);
+  const float y = FSMDoCommonScrollTo(startY, endY, progress, EASE_GUTTER_TO_TOP);
+  const float popLevel = y + (DEVICE_PIX_Y * (1.0f - getEasing(EASE_GUTTER_TO_TOP, progress)));
   // pd->system->logToConsole("FSMGutterToTurret FC %i: boardDoBurstPegs pop level %f", gameGetFrameCount(), popLevel);
   boardDoBurstPegs(popLevel);
   //
   if (progress >= 1) {
-    gameSetYOffset(endY, true);
+    gameSetYOffset(endY, /*force = */true);
     boardDoBurstPegs(0);
     FSMDo(kGameFSM_TurretLower);
   }
@@ -610,13 +609,11 @@ void FSMTurretLower(const bool newState) {
   FSMCommonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
   //
   progress += (TIMESTEP * speed);
-  const float easedProgress = getEasing(EASE_GUTTER_TO_TOP, progress);
-  const float progressY = startY + ((endY - startY) * easedProgress);
-  gameSetYOffset(progressY, true);
+  const float progressY = FSMDoCommonScrollTo(startY, endY, progress, EASE_GUTTER_TO_TOP);
   gameSetMinimumY(progressY);
   //
   if (progress >= 1) {
-    gameSetYOffset(endY, true);
+    gameSetYOffset(endY, /*force = */true);
     gameSetMinimumY(endY);
     if (IOGetIsTutorial() && boardGetSpecialPegsInPlay()) { return FSMDo(kGameFSM_TutorialGetSpecial); }
     else if (IOGetIsTutorial()) { return FSMDo(kGameFSM_TutorialGetRequired); }
@@ -646,7 +643,8 @@ void FSMScoresAnimation(const bool newState) {
   static const uint16_t maxBallsToShow = 12;
   if (newState) {
     timer = 0;
-    ballsToShow = m_ballCount;
+    IOSetCurrentHoleScore(m_ballCount);
+    ballsToShow = IOGetCurrentHoleScore(); // Will display the best score
     if (ballsToShow > maxBallsToShow) { ballsToShow = maxBallsToShow; }
     renderSetMarbleFallN(ballsToShow);
     renderSetMarbleFallX(IOGetCurrentHole());
@@ -656,7 +654,6 @@ void FSMScoresAnimation(const bool newState) {
       vy[i] = 0;
       renderSetMarbleFallY(i, py[i]);
     }
-    IOSetCurrentHoleScore(m_ballCount);
     soundStopSfx(kFountainSfx);
   }
   //
@@ -689,7 +686,7 @@ void FSMDisplayScores(const bool newState) {
   else if (inputGetPressed(kButtonDown)) change += 2.5f;
   offset += change;
   offset *= 0.9f;
-  gameSetYOffset(DEVICE_PIX_Y*5 + offset, true);
+  gameSetYOffset(DEVICE_PIX_Y*5 + offset, true); // Y crush is not relevent here - no background
 
   if      (offset >  16.0f) return FSMDo(kGameFSM_ScoresToSplash);
   else if (offset < -16.0f) return FSMDo(kGameFSM_ScoresToTryAgain);

@@ -5,10 +5,10 @@
     "author": "",
     "level": 4,
     "hole": 9,
-    "par": 3,
+    "par": 4,
     "foreground": 16,
     "background": 0,
-    "special": 0,
+    "special": 4,
     "height": 320,
     "snap": 4,
     "n_static": 30,
@@ -30,7 +30,7 @@
       "y": 288,
       "angle": 0,
       "size": 0,
-      "type": 1
+      "type": 2
     },
     "StaticControl3": {
       "shape": 1,

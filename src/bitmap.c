@@ -81,7 +81,14 @@ LCDBitmap* m_specialTextBitmap[(uint8_t)kNPegSpecial];
 
 LCDBitmap* m_wfPond[POND_WATER_TILES][POND_WATER_FRAMES];
 LCDBitmap* m_wfBg[N_WF_BG+1] = {NULL}; // Don't use 0th entry
-LCDBitmapTable* m_sheetWfFg[128] = {NULL}; // N_WF + room for specials
+
+LCDBitmapTable* m_sheetWfFg[N_WF_FG+1] = {NULL};
+LCDBitmapTable* m_sheetWfFgYCrush[N_WF_FG+1] = {NULL};
+
+LCDBitmapTable* m_sheetWfFgSpecial = NULL;
+LCDBitmapTable* m_sheetWfFgSpecialYCrush = NULL;
+uint8_t m_loadedWfFgSpecial = 0;
+
 LCDBitmapTable* m_waterSplashTable[N_SPLASHES];
 LCDBitmapTable* m_fountainTable[N_FOUNTAINS];
 LCDBitmapTable* m_chevronTable;
@@ -116,7 +123,28 @@ void bitmapDoDrawRotatedPoly(const uint8_t corners, const float x, const float y
 
 void bitmapDoScoreCardBackground(void);
 
+void bitmapDoLoadWfFgSpecial(const uint8_t id);
+
 /// ///
+
+void bitmapDoLoadWfFgSpecial(const uint8_t id) {
+  if (id == m_loadedWfFgSpecial) {
+    return;
+  }
+  if (m_sheetWfFgSpecial) {
+    pd->graphics->freeBitmapTable(m_sheetWfFgSpecial);
+    pd->graphics->freeBitmapTable(m_sheetWfFgSpecialYCrush);
+    m_sheetWfFgSpecial = NULL;
+    m_sheetWfFgSpecialYCrush = NULL;
+  }
+  char text[128];
+  snprintf(text, 128, "images/falls_fg/falls%i_fg", (int)id);
+  m_sheetWfFgSpecial = bitmapDoLoadImageTableAtPath(text);
+  snprintf(text, 128, "images/falls_fg_y_crush/falls%i_fg", (int)id);
+  m_sheetWfFgSpecialYCrush = bitmapDoLoadImageTableAtPath(text);
+  m_loadedWfFgSpecial = id;
+  pd->system->logToConsole("bitmapDoLoadWfFgSpecial loaded id %i", id);
+} 
 
 LCDBitmap* bitmapDoLoadImageAtPath(const char* path) {
   const char* outErr = NULL;
@@ -255,12 +283,19 @@ LCDBitmap* bitmapGetFountain(const uint8_t f, const int id) {
   return pd->graphics->getTableBitmap(m_fountainTable[f % N_FOUNTAINS], id % FOUNTAIN_FRAMES);
 }
 
-LCDBitmap* bitmapGetWfFg(const uint8_t wf, const uint8_t id) {
-  if (!m_sheetWfFg[wf]) {
-    pd->system->logToConsole("bitmapGetWfFg requested non-existant %i", wf);
-    return pd->graphics->getTableBitmap(m_sheetWfFg[1], id);
+LCDBitmap* bitmapGetWfFg(const uint8_t wf, const uint8_t id, const bool yCrush) {
+  LCDBitmap* bit = NULL;
+  LCDBitmapTable* tab = NULL;
+  if (wf > N_WF_FG) {
+    bitmapDoLoadWfFgSpecial(wf);
+    tab = (yCrush ? m_sheetWfFgSpecialYCrush : m_sheetWfFgSpecial);
+  } else {
+    tab = (yCrush ? m_sheetWfFgYCrush[wf] : m_sheetWfFg[wf]);
   }
-  return pd->graphics->getTableBitmap(m_sheetWfFg[wf], id);
+  if (tab) { bit = pd->graphics->getTableBitmap(tab, id);  }
+  if (bit) { return bit; }
+  pd->system->logToConsole("bitmapGetWfFg rerror for wf:%i id:%i yCrush %i", wf, id, (int)yCrush);
+  return pd->graphics->getTableBitmap(m_sheetWfFg[1], 0);
 }
 
 LCDBitmap* bitmapGetSpecialBlast(const uint8_t id) {
@@ -609,6 +644,8 @@ void bitmapDoUpdateScoreCard(void) {
   uint16_t scores[MAX_LEVELS] = {0};
   uint16_t totPar = 0;
   uint16_t totScore = 0;
+  uint16_t totHolesPlayed = 0;
+  uint16_t totHoles = 0;
   uint16_t d = 0;
   for (int l = 0; l < MAX_LEVELS; ++l) {
     uint16_t par = 0;
@@ -620,8 +657,12 @@ void bitmapDoUpdateScoreCard(void) {
       const uint16_t s = IOGetScore(l, h);
       par += p;
       score += s;
-      if (p) { total++; }
-      if (p && s) { 
+      if (p) { // If there is a par, then there is a level
+        totHoles++;
+        total++; 
+      } 
+      if (p && s) {  // If there is a par and a score, then the player has tried the level at least once
+        totHolesPlayed++;
         played++;
         totPar += p;
         totScore += s;
@@ -680,7 +721,7 @@ void bitmapDoUpdateScoreCard(void) {
     if (scores[l] == 0) { // Not played all holes
       snprintf(text, 128, "~");
     } else {
-      int16_t diff = pars[l] - scores[l];
+      int16_t diff = scores[l] - pars[l]; // 1 stroke at par 3 would be -2 (under par), so "score - par"
       if (diff > 0) { snprintf(text, 128, "+%i", diff); }
       else { snprintf(text, 128, "%i", diff); }
     }
@@ -694,8 +735,8 @@ void bitmapDoUpdateScoreCard(void) {
 
   {
     char text[128];
-    int16_t tot = totPar - totScore;
-    if (!totScore) { snprintf(text, 128, "0 HOLES PLAYED"); }
+    int16_t tot = totScore - totPar;
+    if (totHolesPlayed != totHoles) { snprintf(text, 128, "%i/%i HOLES PLAYED", totHolesPlayed, totHoles); }
     else if (tot > 0) { snprintf(text, 128, "%i OVER PAR", tot); }
     else if (tot < 0) { snprintf(text, 128, "%i UNDER PAR", tot*-1); }
     else { snprintf(text, 128, "EQUAL TO PAR"); }
@@ -724,7 +765,7 @@ void bitmapDoUpdateLevelStatsBitmap(void) {
     if (holes == 1) { snprintf(text, 128, "%i OF 1 HOLE", (int)played); }
     else { snprintf(text, 128, "%i OF %i HOLES", (int)played, (int)holes); }
   } else {
-    const int16_t displayScore = par - score;
+    const int16_t displayScore = score - par;
     if (displayScore < 0) {
       snprintf(text, 128, "%i UNDER PAR", (int)displayScore*-1);
     } else if (displayScore > 0) {
@@ -758,7 +799,7 @@ void bitmapDoUpdateHoleStatsBitmap(void) {
 
   pd->graphics->clearBitmap(m_holeStatsBitmap[1], kColorClear);
   if (score) {
-    int16_t displayScore = par - score;
+    int16_t displayScore = score - par;
     if (displayScore < 0) {
       snprintf(text, 128, "%i UNDER", (int)displayScore*-1);
     } else if (displayScore > 0) {
@@ -874,16 +915,11 @@ void bitmapDoPreloadD(void) {
   char text[128];
   for (int32_t i = 2; i <= N_WF_FG; ++i) { // Did 1 already as a critical load
     snprintf(text, 128, "images/falls_fg_y_crush/falls%i_fg", (int)i);
+    m_sheetWfFgYCrush[i] = bitmapDoLoadImageTableAtPath(text);
+    snprintf(text, 128, "images/falls_fg/falls%i_fg", (int)i);
     m_sheetWfFg[i] = bitmapDoLoadImageTableAtPath(text);
   }
-  // Special
-  for (int32_t i = WF_SPECIAL_START; i < WF_SPECIAL_END; ++i) { 
-    snprintf(text, 128, "images/falls_fg_y_crush/falls%i_fg", (int)i);
-    m_sheetWfFg[i] = bitmapDoLoadImageTableAtPath(text);
-  }
-  // Credits
-  snprintf(text, 128, "images/falls_fg_y_crush/falls100_fg");
-  m_sheetWfFg[100] = bitmapDoLoadImageTableAtPath(text);
+
 #ifndef WF_FIXED_BG
   for (int32_t i = 2; i <= N_WF_BG; ++i) { // Did 1 already as a critical load
     snprintf(text, 128, "images/falls_bg/falls%i_bg", (int)i);
@@ -1110,6 +1146,7 @@ void bitmapDoInit(void) {
   m_fontRoobert10 = bitmapDoLoadFontAtPath("fonts/Roobert-10-Bold");
   m_headerImage = bitmapDoLoadImageAtPath("images/splash");
   m_wfBg[1] = bitmapDoLoadImageAtPath("images/falls_bg/falls1_bg");
-  m_sheetWfFg[1] = bitmapDoLoadImageTableAtPath("images/falls_fg_y_crush/falls1_fg");
+  m_sheetWfFg[1] = bitmapDoLoadImageTableAtPath("images/falls_fg/falls1_fg");
+  m_sheetWfFgYCrush[1] = bitmapDoLoadImageTableAtPath("images/falls_fg_y_crush/falls1_fg");
   m_previewBitmap = NULL;
 }

@@ -1,0 +1,58 @@
+{
+  "header": {
+    "save_format": 1,
+    "name": "TSTCRSH",
+    "author": "",
+    "level": 11,
+    "hole": 2,
+    "par": 3,
+    "foreground": 6,
+    "background": 0,
+    "special": 0,
+    "height": 960,
+    "snap": 4,
+    "n_static": 0,
+    "n_elliptic": 2,
+    "n_linear": 0
+  },
+  "body": {
+    "EllipticControl1": {
+      "shape": 1,
+      "x": 48,
+      "y": 32,
+      "angle": 0,
+      "size": 0,
+      "arc": 360,
+      "use_arc": true,
+      "speed": 1,
+      "easing": 0,
+      "a": 32,
+      "b": 32,
+      "n_pegs": 1,
+      "PegContainer1": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 1
+      }
+    },
+    "EllipticControl2": {
+      "shape": 1,
+      "x": 296,
+      "y": 148,
+      "angle": 0,
+      "size": 0,
+      "arc": 360,
+      "use_arc": true,
+      "speed": 1,
+      "easing": 0,
+      "a": 32,
+      "b": 32,
+      "n_pegs": 1,
+      "PegContainer1": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      }
+    }
+  }
+}

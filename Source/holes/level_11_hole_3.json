@@ -1,0 +1,76 @@
+{
+  "header": {
+    "save_format": 1,
+    "name": "TEST",
+    "author": "",
+    "level": 11,
+    "hole": 3,
+    "par": 3,
+    "foreground": 3,
+    "background": 0,
+    "special": 1,
+    "height": 300,
+    "snap": 4,
+    "n_static": 7,
+    "n_elliptic": 0,
+    "n_linear": 0
+  },
+  "body": {
+    "StaticControl1": {
+      "shape": 1,
+      "x": 160,
+      "y": 172,
+      "angle": 0,
+      "size": 0,
+      "type": 1
+    },
+    "StaticControl2": {
+      "shape": 1,
+      "x": 240,
+      "y": 172,
+      "angle": 0,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl3": {
+      "shape": 0,
+      "x": 128,
+      "y": 140,
+      "angle": 0,
+      "size": 0,
+      "type": 1
+    },
+    "StaticControl4": {
+      "shape": 0,
+      "x": 268,
+      "y": 140,
+      "angle": 0,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl5": {
+      "shape": 1,
+      "x": 196,
+      "y": 248,
+      "angle": 0,
+      "size": 0,
+      "type": 2
+    },
+    "StaticControl6": {
+      "shape": 1,
+      "x": 196,
+      "y": 248,
+      "angle": 0,
+      "size": 0,
+      "type": 2
+    },
+    "StaticControl7": {
+      "shape": 1,
+      "x": 196,
+      "y": 248,
+      "angle": 0,
+      "size": 0,
+      "type": 2
+    }
+  }
+}

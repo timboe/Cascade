@@ -57,8 +57,8 @@ void FSMDisplayTitlesWFadeIn(const bool newState) {
   if (newState) {
     IOSetLevelHole(0, 0);
     IOSetPlayer(0);
-    gameSetYOffset(0, true);
-    progress = FADE_LEVELS + 2; // +2 to give extra pause before fade out
+    gameSetYOffset(0, /*force = */true);
+    progress = FADE_LEVELS + 2; // +2 to give extra pause 
   }
   if (gameGetFrameCount() % TICK_FREQUENCY / 2 == 0) { --progress; }
   renderSetFadeLevel(progress < FADE_LEVELS ? progress : FADE_LEVELS-1);

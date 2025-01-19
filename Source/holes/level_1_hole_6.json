@@ -6,8 +6,8 @@
     "level": 1,
     "hole": 6,
     "par": 2,
-    "foreground": 0,
-    "background": 0,
+    "foreground": 1,
+    "background": 1,
     "special": 3,
     "height": 430,
     "snap": 4,
@@ -139,7 +139,7 @@
     "StaticControl16": {
       "shape": 1,
       "x": 200,
-      "y": 84,
+      "y": 100,
       "angle": 30,
       "size": 0,
       "type": 2
@@ -215,7 +215,7 @@
       "PegContainer12": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 3
+        "type": 0
       },
       "PegContainer13": {
         "shape_override": 0,
@@ -225,7 +225,7 @@
       "PegContainer14": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 3
+        "type": 0
       },
       "PegContainer15": {
         "shape_override": 0,
@@ -244,9 +244,9 @@
       "y": 220,
       "angle": 90,
       "size": 0,
-      "arc": 340,
+      "arc": 300,
       "use_arc": true,
-      "speed": 0.5,
+      "speed": -0.5,
       "easing": 0,
       "a": 115,
       "b": 115,
@@ -383,12 +383,12 @@
       "PegContainer8": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 3
+        "type": 0
       },
       "PegContainer9": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 3
+        "type": 0
       },
       "PegContainer10": {
         "shape_override": 0,

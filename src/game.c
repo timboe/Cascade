@@ -18,9 +18,11 @@ uint16_t m_previousWaterfallBg = 1;
 
 int16_t m_minimumY = 0;
 
-float m_xOffset = 0;
-float m_yOffset = 0;
+float m_xOffset = 0.0f;
+float m_yOffset = 0.0f;
 float m_vY = 0;
+
+bool m_yClamped = true;
 
 /// ///
 
@@ -83,6 +85,7 @@ int gameLoop(void* _data) {
 
   IODoUpdatePreloading();
 
+  m_yClamped = true; // Default assumption, may be invalidated by FSM (prior to render)
   const enum FSM_t fsm = FSMUpdate();
   const enum GameMode_t gm = FSMGetGameMode();
 
@@ -201,6 +204,9 @@ float gameDoApplyYEasing(void) {
     else              { m_yOffset += toAdd; }
   }
 
+  if (fabsf(m_vY) < 1e-3f) { m_vY = 0.0f; }
+  if (m_vY) { m_yClamped = false; }
+
   return m_vY;
 }
 
@@ -215,7 +221,11 @@ void gameSetYOffset(float set, const bool force) {
   if (set < m_minimumY) set = m_minimumY;
   float diff = set - m_yOffset;
   m_yOffset += diff * SCREEN_EASING;
+  m_yClamped = false;
 }
+
+bool gameGetYClamped(void) { return m_yClamped; }
+void gameSetYNotClamped(void) { m_yClamped = false; };
 
 void gameSetXOffset(const float set) { m_xOffset = set; }
 float gameGetXOffset(void) { return m_xOffset; }

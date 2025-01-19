@@ -27,7 +27,7 @@ void renderFade(void);
 
 void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm);
 
-void renderBackgroundDo(const uint16_t bg, const uint16_t fg, const uint16_t startID, const int16_t wfBgOff, const int16_t parallax, const uint16_t wfSheetSizeY, const uint16_t maxY);
+void renderBackgroundDo(const uint16_t bg, const uint16_t fg, const uint16_t startID, const int16_t wfBgOff, const int16_t parallax, const uint16_t wfSheetSizeY, const uint16_t maxY, const bool yCrush);
 
 /// ///
 
@@ -47,6 +47,9 @@ void renderSetScale(const uint8_t scale) { m_renderScale = scale; }
 void renderSetFadeLevel(const int8_t fadeLevel) { m_fadeLevel = fadeLevel; }
 
 void renderAddFreeze(const uint16_t amount) { 
+#ifdef DISABLE_FREEEZE
+  return;
+#endif
   m_freeze += amount;
   if (m_freeze > TICK_FREQUENCY/5) { m_freeze = TICK_FREQUENCY/5; }
 }
@@ -64,6 +67,9 @@ int16_t snap(int16_t s) {
 }
 
 void renderAddTrauma(const float amount) {
+#ifdef DISABLE_TRAUMA
+  return;
+#endif
   m_trauma += amount;
   m_trauma *= -1;
   m_decay = amount;
@@ -203,7 +209,7 @@ void renderGame(const int32_t fc, const enum FSM_t fsm) {
 #endif
 }
 
-void renderBackgroundDo(const uint16_t bg, const uint16_t fg, const uint16_t startID, const int16_t wfBgOff, const int16_t parallax, const uint16_t wfSheetSizeY, const uint16_t maxY) {
+void renderBackgroundDo(const uint16_t bg, const uint16_t fg, const uint16_t startID, const int16_t wfBgOff, const int16_t parallax, const uint16_t wfSheetSizeY, const uint16_t maxY, const bool yCrush) {
   if (bg) {
     for (int i = startID; i < (startID+6); ++i) {  // Background
       const int16_t y = (WF_DIVISION_PIX_Y * i) - wfBgOff + parallax;
@@ -214,7 +220,7 @@ void renderBackgroundDo(const uint16_t bg, const uint16_t fg, const uint16_t sta
   for (int i = startID; i < (startID+5); ++i) { // Foreground
     const int16_t y = (WF_DIVISION_PIX_Y * i) + parallax; // - (y % 8); // Tested to combat shimmering
     if (i >= wfSheetSizeY || y > maxY) break;
-    pd->graphics->drawBitmap(bitmapGetWfFg(fg, i), 0, y, kBitmapUnflipped);
+    pd->graphics->drawBitmap(bitmapGetWfFg(fg, i, yCrush), 0, y, kBitmapUnflipped);
   }
 }
 
@@ -233,6 +239,7 @@ void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm) {
   // pd->system->logToConsole("RCB FG cur:%i prev:%i, BG cur:%i prev%i", currentWfFg, prevWfFg, currentWfBg, prevWfBg);
 
   const int32_t yOffset = gameGetYOffset();
+  const bool yCrush = !gameGetYClamped();
   const uint16_t chh = IOGetCurrentHoleHeight();
   const uint16_t maxY = (FSMGetGameMode() == kTitles ? (WF_MAX_HEIGHT * DEVICE_PIX_Y) : chh);
   const uint16_t wfSheetSize = currentWfFg < FIRST_CUSTOM_WF_ID ? WFSHEET_SIZE_Y : CUSTOM_WFSHEET_SIZE_Y;
@@ -265,7 +272,7 @@ void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm) {
   const int16_t wfBgOff = WF_DIVISION_PIX_Y - ((int)wfBgOffC % WF_DIVISION_PIX_Y); 
 
   // Draw "previous" waterfall (will become current once gameDoResetPreviousWaterfall is called)
-  renderBackgroundDo(prevWfBg, prevWfFg, startID, wfBgOff, parallax, wfSheetSize, maxY);
+  renderBackgroundDo(prevWfBg, prevWfFg, startID, wfBgOff, parallax, wfSheetSize, maxY, yCrush);
 
   // Animate in new waterfall
   if (currentWfFg != prevWfFg || currentWfBg != prevWfBg) {
@@ -274,14 +281,14 @@ void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm) {
     if (locked) {
       static uint16_t timer = 0;
       pd->graphics->setStencilImage(bitmapGetStencilWipe(timer), 0);
-      renderBackgroundDo(currentWfBg, currentWfFg, startID, wfBgOff, parallax, wfSheetSize, maxY);
+      renderBackgroundDo(currentWfBg, currentWfFg, startID, wfBgOff, parallax, wfSheetSize, maxY, yCrush);
       pd->graphics->setStencilImage(NULL, 0);
       if (++timer == STENCIL_WIPE_N) {
         gameDoResetPreviousWaterfall();
         timer = 0;
       }
     } else {
-      renderBackgroundDo(currentWfBg, currentWfFg, startID, wfBgOff, parallax, wfSheetSize, maxY);
+      renderBackgroundDo(currentWfBg, currentWfFg, startID, wfBgOff, parallax, wfSheetSize, maxY, yCrush);
     }
   }
 

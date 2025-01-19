@@ -80,6 +80,9 @@ bool FSMGetIsAimMode(void) {
   return (m_FSM == kGameFSM_AimMode || m_FSM == kGameFSM_TutorialFireMarble || m_FSM == kGameFSM_TutorialGetSpecial || m_FSM == kGameFSM_TutorialGetRequired);
 }
 
-void FSMDoCommonScrollTo(const int16_t origin, const int16_t destination, const float progress, const enum EasingFunction_t e) {
-  gameSetYOffset(origin + (destination - origin)*getEasing(e, progress), true);
+float FSMDoCommonScrollTo(const int16_t origin, const int16_t destination, const float progress, const enum EasingFunction_t e) {
+  const float y = origin + (destination - origin)*getEasing(e, progress);
+  gameSetYOffset(y, true);
+  gameSetYNotClamped();
+  return y;
 }

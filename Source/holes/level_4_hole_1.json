@@ -6,9 +6,9 @@
     "level": 4,
     "hole": 1,
     "par": 3,
-    "foreground": 3,
-    "background": 0,
-    "special": 0,
+    "foreground": 4,
+    "background": 3,
+    "special": 6,
     "height": 480,
     "snap": 4,
     "n_static": 46,
@@ -154,15 +154,15 @@
     },
     "StaticControl18": {
       "shape": 0,
-      "x": 140,
-      "y": 300,
+      "x": 132,
+      "y": 296,
       "angle": 45,
       "size": 1,
       "type": 1
     },
     "StaticControl19": {
       "shape": 2,
-      "x": 140,
+      "x": 132,
       "y": 244,
       "angle": 90,
       "size": 2,
@@ -171,7 +171,7 @@
     "StaticControl20": {
       "shape": 0,
       "x": 200,
-      "y": 236,
+      "y": 240,
       "angle": 0,
       "size": 2,
       "type": 1
@@ -179,7 +179,7 @@
     "StaticControl21": {
       "shape": 0,
       "x": 200,
-      "y": 316,
+      "y": 312,
       "angle": 0,
       "size": 2,
       "type": 1
@@ -194,7 +194,7 @@
     },
     "StaticControl23": {
       "shape": 0,
-      "x": 256,
+      "x": 264,
       "y": 248,
       "angle": 90,
       "size": 2,
@@ -202,7 +202,7 @@
     },
     "StaticControl24": {
       "shape": 0,
-      "x": 256,
+      "x": 264,
       "y": 304,
       "angle": 90,
       "size": 2,
@@ -338,15 +338,15 @@
     },
     "StaticControl41": {
       "shape": 0,
-      "x": 320,
-      "y": 436,
+      "x": 328,
+      "y": 444,
       "angle": 52,
       "size": 0,
       "type": 0
     },
     "StaticControl42": {
       "shape": 0,
-      "x": 376,
+      "x": 392,
       "y": 440,
       "angle": 115,
       "size": 0,
@@ -370,7 +370,7 @@
     },
     "StaticControl45": {
       "shape": 0,
-      "x": 24,
+      "x": 8,
       "y": 440,
       "angle": -122,
       "size": 0,
@@ -378,24 +378,24 @@
     },
     "StaticControl46": {
       "shape": 0,
-      "x": 68,
-      "y": 460,
+      "x": 56,
+      "y": 456,
       "angle": -81,
       "size": 0,
       "type": 0
     },
     "EllipticControl1": {
-      "shape": 1,
+      "shape": 2,
       "x": 72,
-      "y": 68,
-      "angle": 90,
-      "size": 0,
-      "arc": 360,
-      "use_arc": true,
+      "y": 72,
+      "angle": 69,
+      "size": 1,
+      "arc": 342,
+      "use_arc": false,
       "speed": 0,
       "easing": 0,
-      "a": 32,
-      "b": 32,
+      "a": 40,
+      "b": 40,
       "n_pegs": 9,
       "PegContainer1": {
         "shape_override": 0,

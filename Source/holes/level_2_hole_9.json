@@ -1,14 +1,14 @@
 {
   "header": {
     "save_format": 1,
-    "name": "TSUNAMI",
+    "name": "WAVE",
     "author": "",
     "level": 2,
     "hole": 9,
-    "par": 6,
+    "par": 3,
     "foreground": 11,
     "background": 3,
-    "special": 5,
+    "special": 1,
     "height": 600,
     "snap": 3,
     "n_static": 54,
