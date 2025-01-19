@@ -920,12 +920,10 @@ void bitmapDoPreloadD(void) {
     m_sheetWfFg[i] = bitmapDoLoadImageTableAtPath(text);
   }
 
-#ifndef WF_FIXED_BG
   for (int32_t i = 2; i <= N_WF_BG; ++i) { // Did 1 already as a critical load
     snprintf(text, 128, "images/falls_bg/falls%i_bg", (int)i);
     m_wfBg[i] = bitmapDoLoadImageAtPath(text);
   }
-#endif
 }
 
 void bitmapDoPreloadE(void) {
@@ -1128,7 +1126,7 @@ void bitmapDoPreloadM(const uint8_t n) {
       //   pd->system->logToConsole("at (offset %i line %i) -> global line %i width is %i, speed is %f / girth is %i", offset, line, (line + offset), width, speed, girth); 
       // }
       const int32_t xStart = x[line] + (t * speed);
-      for (int32_t xOff = -16; xOff < 32; ++xOff) {
+      for (int32_t xOff = -16; xOff < 64; ++xOff) {
         int32_t xCopy1 = xStart + (POND_WATER_FRAMES * speed * xOff);
         if (xCopy1 < -width || xCopy1 > DEVICE_PIX_X) { continue; } // off screen
         int32_t xCopy2 = xCopy1 + width;

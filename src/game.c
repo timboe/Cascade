@@ -37,11 +37,8 @@ void gameSetTurretBarrelAngle(const float angle) { m_turretBarrelAngle = angle; 
 float gameGetTurretBarrelAngle(void) { return m_turretBarrelAngle; }
 
 uint16_t gameGetPreviousWaterfallFg(void) { return m_previousWaterfallFg; }
-#ifdef WF_FIXED_BG
-uint16_t gameGetPreviousWaterfallBg(void) { return 1; }
-#else
 uint16_t gameGetPreviousWaterfallBg(void) { return m_previousWaterfallBg; }
-#endif
+
 void gameDoResetPreviousWaterfall(void) { 
   m_previousWaterfallFg = IOGetCurrentHoleWaterfallForeground(FSMGetGameMode());
   m_previousWaterfallBg = IOGetCurrentHoleWaterfallBackground(FSMGetGameMode());
@@ -204,7 +201,7 @@ float gameDoApplyYEasing(void) {
     else              { m_yOffset += toAdd; }
   }
 
-  if (fabsf(m_vY) < 1e-3f) { m_vY = 0.0f; }
+  if (fabsf(m_vY) < 0.1f) { m_vY = 0.0f; }
   if (m_vY) { m_yClamped = false; }
 
   return m_vY;

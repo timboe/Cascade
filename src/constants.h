@@ -13,7 +13,7 @@
 
 /// ///
 
-#define N_WF_FG 9
+#define N_WF_FG 6
 #define N_WF_BG 4
 
 #define WF_SPECIAL_START 10
@@ -46,9 +46,6 @@
 
 #define FIRST_CUSTOM_WF_ID 10
 
-// Comment line to disable
-//#define WF_FIXED_BG 1
-
 #define NUMERAL_PIX_X 128
 #define NUMERAL_PIX_Y 160
 #define NUMERAL_BUF 40
@@ -70,7 +67,7 @@
 #define POND_SPLASH_HEIGHT 82
 #define POND_SPLASH_ANIM_FRAMES 16
 
-#define POND_WATER_FRAMES 128
+#define POND_WATER_FRAMES 64
 #define POND_WATER_HEIGHT 60
 #define POND_WATER_TILES 4
 

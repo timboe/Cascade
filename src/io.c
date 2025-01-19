@@ -153,15 +153,7 @@ void IODoUpdatePreloading(void) {
   if (!IOGetIsPreloading()) { IODonePreloading(); }
 }
 
-#ifdef WF_FIXED_BG
-uint16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole) { 
-  return 1;
-}
-#else
-uint16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole) { 
-  return m_hole_background[level][hole];
-}
-#endif
+uint16_t IOGetWaterfallBackground(const uint16_t level, const uint16_t hole) { return m_hole_background[level][hole]; }
 uint16_t IOGetWaterfallForeground(const uint16_t level, const uint16_t hole) { return m_hole_foreground[level][hole]; }
 
 uint16_t IOGetCurrentHoleWaterfallBackground(const enum GameMode_t gm) { 
