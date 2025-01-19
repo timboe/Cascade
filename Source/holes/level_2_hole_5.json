@@ -9,7 +9,7 @@
     "foreground": 2,
     "background": 3,
     "special": 1,
-    "height": 490,
+    "height": 530,
     "snap": 4,
     "n_static": 20,
     "n_elliptic": 0,

@@ -9,7 +9,7 @@
     "foreground": 2,
     "background": 3,
     "special": 2,
-    "height": 570,
+    "height": 580,
     "snap": 2,
     "n_static": 5,
     "n_elliptic": 0,
@@ -720,11 +720,11 @@
       },
       "LineContainer2": {
         "lc_x": 430,
-        "lc_y": 698
+        "lc_y": 678
       },
       "LineContainer3": {
         "lc_x": -30,
-        "lc_y": 698
+        "lc_y": 678
       }
     },
     "LinearControl30": {
@@ -775,11 +775,11 @@
       },
       "LineContainer2": {
         "lc_x": 430,
-        "lc_y": 698
+        "lc_y": 678
       },
       "LineContainer3": {
         "lc_x": -30,
-        "lc_y": 698
+        "lc_y": 678
       }
     }
   }

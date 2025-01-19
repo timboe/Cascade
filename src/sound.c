@@ -210,7 +210,7 @@ void soundDoInit() {
   m_audioSample[kFizzleSfx] =  pd->sound->sample->load("fx/133448__chaosportal__cigarette-sizzle-01");
   m_audioSample[kBoingSfx1] =  pd->sound->sample->load("fx/201260__empraetorius__water-bottle-boing__1");
   m_audioSample[kBoingSfx2] =  pd->sound->sample->load("fx/201260__empraetorius__water-bottle-boing__2");
-  m_audioSample[kFountainSfx] =  pd->sound->sample->load("fx/63756__dobroide__20081118fountainarchivodeindias");
+  m_audioSample[kFountainSfx] =  pd->sound->sample->load("fx/724231__agusivan__water-falling-fountain");
 
   for (int32_t i = 0; i < kNSFX; ++i) {
     m_samplePlayer[i] = pd->sound->sampleplayer->newPlayer();
@@ -256,6 +256,7 @@ void soundDoInit() {
 
 void soundDoSfx(enum SfxSample sample) {
   if (!m_doSfx || IOGetIsPreloading()) { return; }
+  uint8_t playNTimes = 1;
 
   if (sample == kPlingSfx1 || sample == kDingSfx1) {
     
@@ -280,8 +281,10 @@ void soundDoSfx(enum SfxSample sample) {
     sample += rand() % N_BIRD_SFX;
     // Special: Only play if at high waterfall volume
     if (m_wf_v < 0.8f) { return; }
+  } else if (sample == kFountainSfx) {
+    playNTimes = 5;
   }
-  pd->sound->sampleplayer->play(m_samplePlayer[sample], 1, 1.0f);
+  pd->sound->sampleplayer->play(m_samplePlayer[sample], playNTimes, 1.0f);
 }
 
 void soundStopSfx(enum SfxSample sample) {
