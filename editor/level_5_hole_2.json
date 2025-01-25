@@ -19,7 +19,7 @@
     "StaticControl1": {
       "shape": 0,
       "x": 152,
-      "y": 720,
+      "y": 724,
       "angle": 6,
       "size": 1,
       "type": 1
@@ -91,7 +91,7 @@
       "speed": 0,
       "easing": 0,
       "n_pegs": 3,
-      "n_lines": 1,
+      "n_lines": 2,
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
@@ -109,7 +109,11 @@
       },
       "LineContainer1": {
         "lc_x": 72,
-        "lc_y": 808
+        "lc_y": 832
+      },
+      "LineContainer2": {
+        "lc_x": 60,
+        "lc_y": 972
       }
     },
     "LinearControl2": {
@@ -122,7 +126,7 @@
       "use_arc": false,
       "speed": 0,
       "easing": 0,
-      "n_pegs": 3,
+      "n_pegs": 2,
       "n_lines": 1,
       "PegContainer1": {
         "shape_override": 0,
@@ -134,14 +138,9 @@
         "size_override": 0,
         "type": 0
       },
-      "PegContainer3": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
       "LineContainer1": {
         "lc_x": 352,
-        "lc_y": 844
+        "lc_y": 884
       }
     },
     "LinearControl3": {
@@ -154,7 +153,7 @@
       "use_arc": false,
       "speed": 0,
       "easing": 0,
-      "n_pegs": 5,
+      "n_pegs": 4,
       "n_lines": 1,
       "PegContainer1": {
         "shape_override": 0,
@@ -176,14 +175,9 @@
         "size_override": 0,
         "type": 0
       },
-      "PegContainer5": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
       "LineContainer1": {
-        "lc_x": 308,
-        "lc_y": 644
+        "lc_x": 312,
+        "lc_y": 680
       }
     },
     "LinearControl4": {
@@ -220,12 +214,12 @@
       },
       "LineContainer1": {
         "lc_x": 268,
-        "lc_y": 456
+        "lc_y": 488
       }
     },
     "LinearControl5": {
       "shape": 0,
-      "x": 248,
+      "x": 252,
       "y": 472,
       "angle": 86,
       "size": 0,
@@ -257,13 +251,13 @@
       },
       "LineContainer1": {
         "lc_x": 236,
-        "lc_y": 300
+        "lc_y": 296
       }
     },
     "LinearControl6": {
       "shape": 0,
-      "x": 220,
-      "y": 312,
+      "x": 228,
+      "y": 292,
       "angle": 83,
       "size": 0,
       "arc": 180,
@@ -298,8 +292,8 @@
         "type": 1
       },
       "LineContainer1": {
-        "lc_x": 196,
-        "lc_y": 88
+        "lc_x": 204,
+        "lc_y": 96
       }
     },
     "LinearControl7": {
@@ -307,48 +301,6 @@
       "x": 156,
       "y": 424,
       "angle": 95,
-      "size": 0,
-      "arc": 180,
-      "use_arc": false,
-      "speed": 0,
-      "easing": 0,
-      "n_pegs": 5,
-      "n_lines": 1,
-      "PegContainer1": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer2": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer3": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer4": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer5": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "LineContainer1": {
-        "lc_x": 180,
-        "lc_y": 200
-      }
-    },
-    "LinearControl8": {
-      "shape": 0,
-      "x": 140,
-      "y": 584,
-      "angle": 93,
       "size": 0,
       "arc": 180,
       "use_arc": false,
@@ -377,8 +329,40 @@
         "type": 0
       },
       "LineContainer1": {
+        "lc_x": 176,
+        "lc_y": 256
+      }
+    },
+    "LinearControl8": {
+      "shape": 0,
+      "x": 140,
+      "y": 584,
+      "angle": 93,
+      "size": 0,
+      "arc": 180,
+      "use_arc": false,
+      "speed": 0,
+      "easing": 0,
+      "n_pegs": 3,
+      "n_lines": 1,
+      "PegContainer1": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer2": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer3": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "LineContainer1": {
         "lc_x": 148,
-        "lc_y": 412
+        "lc_y": 452
       }
     },
     "LinearControl9": {
@@ -420,7 +404,7 @@
       },
       "LineContainer1": {
         "lc_x": 120,
-        "lc_y": 576
+        "lc_y": 612
       }
     },
     "LinearControl10": {

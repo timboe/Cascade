@@ -434,7 +434,7 @@
       "use_arc": false,
       "speed": 0.9,
       "easing": 4,
-      "n_pegs": 10,
+      "n_pegs": 6,
       "n_lines": 4,
       "PegContainer1": {
         "shape_override": 0,
@@ -462,26 +462,6 @@
         "type": 0
       },
       "PegContainer6": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer7": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer8": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer9": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer10": {
         "shape_override": 0,
         "size_override": 0,
         "type": 0
@@ -513,7 +493,7 @@
       "use_arc": false,
       "speed": 0.9,
       "easing": 4,
-      "n_pegs": 10,
+      "n_pegs": 6,
       "n_lines": 4,
       "PegContainer1": {
         "shape_override": 0,
@@ -541,26 +521,6 @@
         "type": 0
       },
       "PegContainer6": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer7": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer8": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer9": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer10": {
         "shape_override": 0,
         "size_override": 0,
         "type": 0
@@ -592,7 +552,7 @@
       "use_arc": false,
       "speed": 0.9,
       "easing": 4,
-      "n_pegs": 10,
+      "n_pegs": 6,
       "n_lines": 4,
       "PegContainer1": {
         "shape_override": 0,
@@ -620,26 +580,6 @@
         "type": 0
       },
       "PegContainer6": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer7": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer8": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer9": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer10": {
         "shape_override": 0,
         "size_override": 0,
         "type": 0
