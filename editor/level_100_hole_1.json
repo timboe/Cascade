@@ -107,7 +107,7 @@
     "StaticControl12": {
       "shape": 2,
       "x": 56,
-      "y": 532,
+      "y": 524,
       "angle": -246,
       "size": 0,
       "type": 0
@@ -139,7 +139,7 @@
     "StaticControl16": {
       "shape": 2,
       "x": 36,
-      "y": 704,
+      "y": 696,
       "angle": 0,
       "size": 0,
       "type": 0
@@ -147,7 +147,7 @@
     "StaticControl17": {
       "shape": 2,
       "x": 80,
-      "y": 704,
+      "y": 696,
       "angle": 0,
       "size": 0,
       "type": 0
@@ -155,7 +155,7 @@
     "StaticControl18": {
       "shape": 2,
       "x": 124,
-      "y": 704,
+      "y": 696,
       "angle": 0,
       "size": 0,
       "type": 0
@@ -163,7 +163,7 @@
     "StaticControl19": {
       "shape": 2,
       "x": 168,
-      "y": 704,
+      "y": 696,
       "angle": 0,
       "size": 0,
       "type": 0
@@ -171,7 +171,7 @@
     "StaticControl20": {
       "shape": 2,
       "x": 232,
-      "y": 704,
+      "y": 696,
       "angle": 0,
       "size": 0,
       "type": 0
@@ -179,7 +179,7 @@
     "StaticControl21": {
       "shape": 2,
       "x": 276,
-      "y": 704,
+      "y": 696,
       "angle": 0,
       "size": 0,
       "type": 0
@@ -187,7 +187,7 @@
     "StaticControl22": {
       "shape": 2,
       "x": 320,
-      "y": 704,
+      "y": 696,
       "angle": 0,
       "size": 0,
       "type": 0
@@ -195,7 +195,7 @@
     "StaticControl23": {
       "shape": 2,
       "x": 364,
-      "y": 704,
+      "y": 696,
       "angle": 0,
       "size": 0,
       "type": 0
@@ -203,7 +203,7 @@
     "StaticControl24": {
       "shape": 2,
       "x": 48,
-      "y": 780,
+      "y": 772,
       "angle": 42,
       "size": 0,
       "type": 0
@@ -211,7 +211,7 @@
     "StaticControl25": {
       "shape": 2,
       "x": 80,
-      "y": 844,
+      "y": 840,
       "angle": -115,
       "size": 0,
       "type": 0
@@ -219,15 +219,15 @@
     "StaticControl26": {
       "shape": 2,
       "x": 40,
-      "y": 868,
+      "y": 860,
       "angle": -25,
       "size": 0,
       "type": 0
     },
     "StaticControl27": {
       "shape": 2,
-      "x": 304,
-      "y": 868,
+      "x": 308,
+      "y": 860,
       "angle": -53,
       "size": 0,
       "type": 0
@@ -235,7 +235,7 @@
     "StaticControl28": {
       "shape": 2,
       "x": 348,
-      "y": 780,
+      "y": 772,
       "angle": -23,
       "size": 0,
       "type": 0
@@ -243,7 +243,7 @@
     "StaticControl29": {
       "shape": 2,
       "x": 368,
-      "y": 844,
+      "y": 836,
       "angle": -99,
       "size": 0,
       "type": 0
@@ -251,7 +251,7 @@
     "StaticControl30": {
       "shape": 2,
       "x": 20,
-      "y": 492,
+      "y": 496,
       "angle": -22,
       "size": 0,
       "type": 0

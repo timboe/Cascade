@@ -11,25 +11,25 @@
     "special": 5,
     "height": 960,
     "snap": 4,
-    "n_static": 56,
+    "n_static": 70,
     "n_elliptic": 0,
     "n_linear": 6
   },
   "body": {
     "StaticControl1": {
       "shape": 1,
-      "x": 308,
-      "y": 136,
+      "x": 304,
+      "y": 144,
       "angle": 0,
-      "size": 1,
-      "type": 1
+      "size": 0,
+      "type": 2
     },
     "StaticControl2": {
       "shape": 0,
       "x": 288,
       "y": 92,
       "angle": 62,
-      "size": 0,
+      "size": 1,
       "type": 0
     },
     "StaticControl3": {
@@ -37,7 +37,7 @@
       "x": 324,
       "y": 100,
       "angle": 62,
-      "size": 0,
+      "size": 1,
       "type": 0
     },
     "StaticControl4": {
@@ -463,6 +463,118 @@
       "angle": 20,
       "size": 0,
       "type": 1
+    },
+    "StaticControl57": {
+      "shape": 0,
+      "x": 4,
+      "y": 72,
+      "angle": 223,
+      "size": 1,
+      "type": 0
+    },
+    "StaticControl58": {
+      "shape": 0,
+      "x": 32,
+      "y": 100,
+      "angle": 233,
+      "size": 1,
+      "type": 0
+    },
+    "StaticControl59": {
+      "shape": 0,
+      "x": 60,
+      "y": 120,
+      "angle": 202,
+      "size": 1,
+      "type": 0
+    },
+    "StaticControl60": {
+      "shape": 0,
+      "x": 48,
+      "y": 136,
+      "angle": 255,
+      "size": 1,
+      "type": 0
+    },
+    "StaticControl61": {
+      "shape": 0,
+      "x": 92,
+      "y": 124,
+      "angle": 360,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl62": {
+      "shape": 0,
+      "x": 88,
+      "y": 144,
+      "angle": 212,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl63": {
+      "shape": 0,
+      "x": 40,
+      "y": 168,
+      "angle": 276,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl64": {
+      "shape": 0,
+      "x": 68,
+      "y": 164,
+      "angle": 246,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl65": {
+      "shape": 0,
+      "x": 76,
+      "y": 188,
+      "angle": 269,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl66": {
+      "shape": 0,
+      "x": 108,
+      "y": 160,
+      "angle": 234,
+      "size": 0,
+      "type": 0
+    },
+    "StaticControl67": {
+      "shape": 2,
+      "x": 124,
+      "y": 176,
+      "angle": 250,
+      "size": 0,
+      "type": 1
+    },
+    "StaticControl68": {
+      "shape": 2,
+      "x": 112,
+      "y": 128,
+      "angle": 227,
+      "size": 0,
+      "type": 1
+    },
+    "StaticControl69": {
+      "shape": 2,
+      "x": 80,
+      "y": 208,
+      "angle": 171,
+      "size": 0,
+      "type": 1
+    },
+    "StaticControl70": {
+      "shape": 2,
+      "x": 36,
+      "y": 188,
+      "angle": 204,
+      "size": 0,
+      "type": 0
     },
     "LinearControl1": {
       "shape": 0,
