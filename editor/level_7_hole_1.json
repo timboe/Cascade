@@ -1,10 +1,10 @@
 {
   "header": {
     "save_format": 1,
-    "name": "NEEDLE",
+    "name": "BLANK",
     "author": "",
-    "level": 5,
-    "hole": 4,
+    "level": 7,
+    "hole": 1,
     "par": 3,
     "foreground": 4,
     "background": 1,
