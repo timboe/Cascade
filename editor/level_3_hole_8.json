@@ -464,7 +464,7 @@
       "use_arc": true,
       "speed": 1,
       "easing": 2,
-      "n_pegs": 9,
+      "n_pegs": 7,
       "n_lines": 1,
       "PegContainer1": {
         "shape_override": 0,
@@ -497,16 +497,6 @@
         "type": 0
       },
       "PegContainer7": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer8": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer9": {
         "shape_override": 0,
         "size_override": 0,
         "type": 0
@@ -526,7 +516,7 @@
       "use_arc": true,
       "speed": 1,
       "easing": 2,
-      "n_pegs": 9,
+      "n_pegs": 7,
       "n_lines": 1,
       "PegContainer1": {
         "shape_override": 0,
@@ -559,16 +549,6 @@
         "type": 0
       },
       "PegContainer7": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer8": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer9": {
         "shape_override": 0,
         "size_override": 0,
         "type": 0
@@ -588,7 +568,7 @@
       "use_arc": true,
       "speed": 1,
       "easing": 2,
-      "n_pegs": 9,
+      "n_pegs": 7,
       "n_lines": 1,
       "PegContainer1": {
         "shape_override": 0,
@@ -621,16 +601,6 @@
         "type": 0
       },
       "PegContainer7": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer8": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer9": {
         "shape_override": 0,
         "size_override": 0,
         "type": 0
