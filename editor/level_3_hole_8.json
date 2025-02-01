@@ -6,12 +6,12 @@
     "level": 3,
     "hole": 8,
     "par": 3,
-    "foreground": 2,
-    "background": 1,
+    "foreground": 3,
+    "background": 2,
     "special": 4,
     "height": 880,
     "snap": 4,
-    "n_static": 48,
+    "n_static": 49,
     "n_elliptic": 1,
     "n_linear": 3
   },
@@ -400,6 +400,14 @@
       "size": 0,
       "type": 0
     },
+    "StaticControl49": {
+      "shape": 2,
+      "x": 220,
+      "y": 124,
+      "angle": 0,
+      "size": 0,
+      "type": 1
+    },
     "EllipticControl1": {
       "shape": 0,
       "x": 220,
@@ -463,13 +471,13 @@
       "arc": 360,
       "use_arc": true,
       "speed": 1,
-      "easing": 2,
+      "easing": 1,
       "n_pegs": 7,
       "n_lines": 1,
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       },
       "PegContainer2": {
         "shape_override": 0,
@@ -515,13 +523,13 @@
       "arc": 360,
       "use_arc": true,
       "speed": 1,
-      "easing": 2,
+      "easing": 1,
       "n_pegs": 7,
       "n_lines": 1,
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       },
       "PegContainer2": {
         "shape_override": 0,
@@ -567,13 +575,13 @@
       "arc": 360,
       "use_arc": true,
       "speed": 1,
-      "easing": 2,
+      "easing": 1,
       "n_pegs": 7,
       "n_lines": 1,
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       },
       "PegContainer2": {
         "shape_override": 0,
