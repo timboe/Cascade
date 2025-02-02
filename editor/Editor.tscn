@@ -83,7 +83,7 @@ script/source = "extends OptionButton
 func _on_item_selected(index):
 	print(\"_on_item_selected foreground\")
 	var id = get_item_id(index)
-	%ForegroundIDSlider.value = id
+	%ForegroundIDSlider.value = id + 1
 	if id == 10: # custom
 		$FileDialog.visible = true
 		return

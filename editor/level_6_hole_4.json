@@ -11,8 +11,8 @@
     "special": 3,
     "height": 930,
     "snap": 4,
-    "n_static": 70,
-    "n_elliptic": 1,
+    "n_static": 58,
+    "n_elliptic": 4,
     "n_linear": 0
   },
   "body": {
@@ -187,7 +187,7 @@
     "StaticControl22": {
       "shape": 0,
       "x": 360,
-      "y": 600,
+      "y": 612,
       "angle": -97,
       "size": 1,
       "type": 0
@@ -195,7 +195,7 @@
     "StaticControl23": {
       "shape": 0,
       "x": 360,
-      "y": 540,
+      "y": 552,
       "angle": -92,
       "size": 1,
       "type": 0
@@ -203,7 +203,7 @@
     "StaticControl24": {
       "shape": 0,
       "x": 360,
-      "y": 480,
+      "y": 488,
       "angle": -84,
       "size": 1,
       "type": 0
@@ -227,7 +227,7 @@
     "StaticControl27": {
       "shape": 0,
       "x": 364,
-      "y": 428,
+      "y": 440,
       "angle": -95,
       "size": 1,
       "type": 0
@@ -265,94 +265,6 @@
       "type": 0
     },
     "StaticControl32": {
-      "shape": 0,
-      "x": 236,
-      "y": 668,
-      "angle": 0,
-      "size": 0,
-      "type": 0
-    },
-    "StaticControl33": {
-      "shape": 0,
-      "x": 316,
-      "y": 656,
-      "angle": 0,
-      "size": 0,
-      "type": 0
-    },
-    "StaticControl34": {
-      "shape": 0,
-      "x": 40,
-      "y": 660,
-      "angle": 0,
-      "size": 0,
-      "type": 0
-    },
-    "StaticControl35": {
-      "shape": 0,
-      "x": 36,
-      "y": 760,
-      "angle": 0,
-      "size": 0,
-      "type": 0
-    },
-    "StaticControl36": {
-      "shape": 0,
-      "x": 108,
-      "y": 792,
-      "angle": 0,
-      "size": 0,
-      "type": 0
-    },
-    "StaticControl37": {
-      "shape": 0,
-      "x": 68,
-      "y": 708,
-      "angle": 0,
-      "size": 0,
-      "type": 0
-    },
-    "StaticControl38": {
-      "shape": 0,
-      "x": 40,
-      "y": 836,
-      "angle": 0,
-      "size": 0,
-      "type": 0
-    },
-    "StaticControl39": {
-      "shape": 0,
-      "x": 184,
-      "y": 772,
-      "angle": 0,
-      "size": 0,
-      "type": 0
-    },
-    "StaticControl40": {
-      "shape": 0,
-      "x": 108,
-      "y": 872,
-      "angle": 0,
-      "size": 0,
-      "type": 0
-    },
-    "StaticControl41": {
-      "shape": 0,
-      "x": 196,
-      "y": 900,
-      "angle": 0,
-      "size": 0,
-      "type": 0
-    },
-    "StaticControl42": {
-      "shape": 0,
-      "x": 160,
-      "y": 828,
-      "angle": 0,
-      "size": 0,
-      "type": 0
-    },
-    "StaticControl43": {
       "shape": 2,
       "x": 188,
       "y": 676,
@@ -360,7 +272,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl44": {
+    "StaticControl33": {
       "shape": 2,
       "x": 160,
       "y": 464,
@@ -368,7 +280,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl45": {
+    "StaticControl34": {
       "shape": 2,
       "x": 180,
       "y": 168,
@@ -376,7 +288,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl46": {
+    "StaticControl35": {
       "shape": 2,
       "x": 176,
       "y": 260,
@@ -384,7 +296,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl47": {
+    "StaticControl36": {
       "shape": 2,
       "x": 272,
       "y": 260,
@@ -392,7 +304,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl48": {
+    "StaticControl37": {
       "shape": 2,
       "x": 252,
       "y": 368,
@@ -400,7 +312,7 @@
       "size": 0,
       "type": 2
     },
-    "StaticControl49": {
+    "StaticControl38": {
       "shape": 2,
       "x": 172,
       "y": 568,
@@ -408,7 +320,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl50": {
+    "StaticControl39": {
       "shape": 2,
       "x": 120,
       "y": 648,
@@ -416,7 +328,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl51": {
+    "StaticControl40": {
       "shape": 2,
       "x": 120,
       "y": 732,
@@ -424,7 +336,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl52": {
+    "StaticControl41": {
       "shape": 2,
       "x": 36,
       "y": 368,
@@ -432,7 +344,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl53": {
+    "StaticControl42": {
       "shape": 2,
       "x": 40,
       "y": 480,
@@ -440,7 +352,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl54": {
+    "StaticControl43": {
       "shape": 2,
       "x": 72,
       "y": 376,
@@ -448,7 +360,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl55": {
+    "StaticControl44": {
       "shape": 2,
       "x": 56,
       "y": 276,
@@ -456,7 +368,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl56": {
+    "StaticControl45": {
       "shape": 2,
       "x": 124,
       "y": 360,
@@ -464,7 +376,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl57": {
+    "StaticControl46": {
       "shape": 2,
       "x": 116,
       "y": 488,
@@ -472,7 +384,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl58": {
+    "StaticControl47": {
       "shape": 2,
       "x": 180,
       "y": 376,
@@ -480,7 +392,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl59": {
+    "StaticControl48": {
       "shape": 2,
       "x": 108,
       "y": 224,
@@ -488,7 +400,7 @@
       "size": 0,
       "type": 2
     },
-    "StaticControl60": {
+    "StaticControl49": {
       "shape": 2,
       "x": 116,
       "y": 124,
@@ -496,7 +408,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl61": {
+    "StaticControl50": {
       "shape": 2,
       "x": 156,
       "y": 72,
@@ -504,7 +416,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl62": {
+    "StaticControl51": {
       "shape": 2,
       "x": 240,
       "y": 180,
@@ -512,7 +424,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl63": {
+    "StaticControl52": {
       "shape": 2,
       "x": 208,
       "y": 216,
@@ -520,7 +432,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl64": {
+    "StaticControl53": {
       "shape": 2,
       "x": 244,
       "y": 428,
@@ -528,7 +440,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl65": {
+    "StaticControl54": {
       "shape": 2,
       "x": 240,
       "y": 504,
@@ -536,7 +448,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl66": {
+    "StaticControl55": {
       "shape": 2,
       "x": 260,
       "y": 576,
@@ -544,7 +456,7 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl67": {
+    "StaticControl56": {
       "shape": 2,
       "x": 208,
       "y": 536,
@@ -552,27 +464,19 @@
       "size": 0,
       "type": 0
     },
-    "StaticControl68": {
+    "StaticControl57": {
       "shape": 2,
       "x": 360,
-      "y": 392,
+      "y": 404,
       "angle": 244,
       "size": 0,
       "type": 0
     },
-    "StaticControl69": {
+    "StaticControl58": {
       "shape": 2,
       "x": 304,
       "y": 460,
       "angle": 236,
-      "size": 0,
-      "type": 0
-    },
-    "StaticControl70": {
-      "shape": 0,
-      "x": 52,
-      "y": 904,
-      "angle": 0,
       "size": 0,
       "type": 0
     },
@@ -635,6 +539,138 @@
         "type": 0
       },
       "PegContainer10": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      }
+    },
+    "EllipticControl2": {
+      "shape": 0,
+      "x": 132,
+      "y": 852,
+      "angle": 135,
+      "size": 1,
+      "arc": 360,
+      "use_arc": false,
+      "speed": 1.1,
+      "easing": 0,
+      "a": 25,
+      "b": 25,
+      "n_pegs": 6,
+      "PegContainer1": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer2": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer3": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer4": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer5": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer6": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      }
+    },
+    "EllipticControl3": {
+      "shape": 0,
+      "x": 52,
+      "y": 696,
+      "angle": 135,
+      "size": 0,
+      "arc": 360,
+      "use_arc": false,
+      "speed": 0.9,
+      "easing": 0,
+      "a": 20,
+      "b": 20,
+      "n_pegs": 6,
+      "PegContainer1": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer2": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer3": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer4": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer5": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer6": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      }
+    },
+    "EllipticControl4": {
+      "shape": 0,
+      "x": 252,
+      "y": 656,
+      "angle": 135,
+      "size": 0,
+      "arc": 360,
+      "use_arc": false,
+      "speed": 0.9,
+      "easing": 0,
+      "a": 20,
+      "b": 20,
+      "n_pegs": 6,
+      "PegContainer1": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer2": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer3": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer4": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer5": {
+        "shape_override": 0,
+        "size_override": 0,
+        "type": 0
+      },
+      "PegContainer6": {
         "shape_override": 0,
         "size_override": 0,
         "type": 0

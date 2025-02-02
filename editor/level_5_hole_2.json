@@ -6,8 +6,8 @@
     "level": 5,
     "hole": 2,
     "par": 4,
-    "foreground": 4,
-    "background": 1,
+    "foreground": 5,
+    "background": 4,
     "special": 5,
     "height": 960,
     "snap": 4,
@@ -274,22 +274,22 @@
       "PegContainer2": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 1
+        "type": 0
       },
       "PegContainer3": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 1
+        "type": 0
       },
       "PegContainer4": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 1
+        "type": 0
       },
       "PegContainer5": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 1
+        "type": 0
       },
       "LineContainer1": {
         "lc_x": 204,
@@ -501,7 +501,7 @@
     },
     "LinearControl11": {
       "shape": 0,
-      "x": 132,
+      "x": 144,
       "y": 948,
       "angle": 95,
       "size": 0,
@@ -527,7 +527,7 @@
         "type": 0
       },
       "LineContainer1": {
-        "lc_x": 140,
+        "lc_x": 152,
         "lc_y": 796
       }
     },
@@ -597,7 +597,7 @@
     },
     "LinearControl14": {
       "shape": 0,
-      "x": 260,
+      "x": 252,
       "y": 956,
       "angle": 86,
       "size": 0,
@@ -623,7 +623,7 @@
         "type": 0
       },
       "LineContainer1": {
-        "lc_x": 248,
+        "lc_x": 240,
         "lc_y": 780
       }
     },

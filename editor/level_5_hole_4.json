@@ -6,8 +6,8 @@
     "level": 5,
     "hole": 4,
     "par": 3,
-    "foreground": 4,
-    "background": 1,
+    "foreground": 5,
+    "background": 4,
     "special": 3,
     "height": 960,
     "snap": 4,
@@ -163,7 +163,7 @@
     "EllipticControl1": {
       "shape": 0,
       "x": 196,
-      "y": 200,
+      "y": 216,
       "angle": 0,
       "size": 0,
       "arc": 360,
@@ -172,7 +172,7 @@
       "easing": 0,
       "a": 150,
       "b": 10,
-      "n_pegs": 13,
+      "n_pegs": 12,
       "PegContainer1": {
         "shape_override": 0,
         "size_override": 0,
@@ -229,11 +229,6 @@
         "type": 0
       },
       "PegContainer12": {
-        "shape_override": 0,
-        "size_override": 0,
-        "type": 0
-      },
-      "PegContainer13": {
         "shape_override": 0,
         "size_override": 0,
         "type": 0
@@ -352,7 +347,7 @@
     },
     "LinearControl2": {
       "shape": 2,
-      "x": 76,
+      "x": 68,
       "y": 112,
       "angle": 120,
       "size": 0,
@@ -375,7 +370,7 @@
       "PegContainer3": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 0
+        "type": 1
       },
       "PegContainer4": {
         "shape_override": 0,
@@ -383,7 +378,7 @@
         "type": 0
       },
       "LineContainer1": {
-        "lc_x": 276,
+        "lc_x": 268,
         "lc_y": 112
       }
     },
