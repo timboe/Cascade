@@ -172,15 +172,15 @@ void physicsSetBallPosition(const uint8_t ball, const cpVect position) {
 }
 
 void physicsDoUpdate(const int32_t fc, const enum FSM_t fsm) {
-  // TODO https://chipmunk-physics.net/forum/viewtopic.php?t=3032
 
-
+  // Slow motion block
   static uint32_t frame = 0;
-  if (fsm == kGameFSM_CloseUp) { // 25% if in closeup - but keep a consistent timestep for phys
+  if (fsm == kGameFSM_CloseUp || fsm == kGameFSM_WinningToast) { // 25% if in closeup - but keep a consistent timestep for phys
     static cpVect ballPrev[2];
     static cpVect ballCur[2];
-    const uint8_t nSteps = (fsm == kGameFSM_CloseUp ? 4 : 2); // (used to also do 50% here)
+    const uint8_t nSteps = (fsm == kGameFSM_CloseUp ? 4 : 2);
     const uint8_t step = (frame++ % nSteps);
+    // Run physics update only on 1/step frames
     if (!step) {
       ballPrev[0] = cpBodyGetPosition(m_ball[0]);
       ballPrev[1] = cpBodyGetPosition(m_ball[1]);
@@ -188,12 +188,14 @@ void physicsDoUpdate(const int32_t fc, const enum FSM_t fsm) {
       ballCur[0] = cpBodyGetPosition(m_ball[0]);
       ballCur[1] = cpBodyGetPosition(m_ball[1]);
     }
+    // Apply linear interpolation on the other frames
     const float multiple = step / (float)nSteps;
     m_ballPosition[0].x = ballPrev[0].x + (ballCur[0].x - ballPrev[0].x) * multiple;
     m_ballPosition[0].y = ballPrev[0].y + (ballCur[0].y - ballPrev[0].y) * multiple;
     m_ballPosition[1].x = ballPrev[1].x + (ballCur[1].x - ballPrev[1].x) * multiple;
     m_ballPosition[1].y = ballPrev[1].y + (ballCur[1].y - ballPrev[1].y) * multiple;
   } else {
+    // Regular - one physics update per frame
     cpSpaceStep(m_space, m_timestep);
     m_ballPosition[0] = cpBodyGetPosition(m_ball[0]);
     m_ballPosition[1] = cpBodyGetPosition(m_ball[1]);

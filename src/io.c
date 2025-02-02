@@ -424,11 +424,11 @@ void IODoScanLevels() {
     m_level = l;
     for (int32_t h = 0; h < MAX_HOLES; ++h) {
       m_hole = h;
-      snprintf(filePath, 128, "holes/level_%i_hole_%i.json", (int)l+1, (int)h+1);
+      snprintf(filePath, 128, "holes/round_%i_hole_%i.json", (int)l+1, (int)h+1);
       SDFile* file = pd->file->open(filePath, kFileRead);
       if (!file) {
         // Look for user-supplied levels instead
-        snprintf(filePath, 128, "level_%i_hole_%i.json", (int)l+1, (int)h+1);
+        snprintf(filePath, 128, "round_%i_hole_%i.json", (int)l+1, (int)h+1);
         file = pd->file->open(filePath, kFileReadData);
       }
       if (!file) {
@@ -723,12 +723,12 @@ void* IOFinishDecodeLevel(json_decoder* jd, const char* key, json_value_type typ
 
 void IODoLoadCurrentHole() {
   char filePath[128];
-  snprintf(filePath, 128, "holes/level_%i_hole_%i.json", (int)m_level+1, (int)m_hole+1);
+  snprintf(filePath, 128, "holes/round_%i_hole_%i.json", (int)m_level+1, (int)m_hole+1);
   // Always give preference to the built in levels first
   SDFile* file = pd->file->open(filePath, kFileRead);
   if (!file) {
     // Otherwise, look for user-supplied levels instead
-    snprintf(filePath, 128, "level_%i_hole_%i.json", (int)m_level+1, (int)m_hole+1);
+    snprintf(filePath, 128, "round_%i_hole_%i.json", (int)m_level+1, (int)m_hole+1);
     file = pd->file->open(filePath, kFileReadData);
   }
   if (!file) {
@@ -777,9 +777,9 @@ void IOWriteCustomLevelInstructions() {
   const int32_t sz = snprintf(fileContent, 1024,
     "Create custom levels on https://timboe.itch.io/cascada\n"
     "Use level numbers which are not being used by the base game.\n"
-    "Place levels in this folder, they should be named: level_XX_hole_YY.json\n"
+    "Place levels in this folder, they should be named: round_XX_hole_Y.json\n"
     "where XX is between 1-99 and YY is between 1-9.\n"
-    "Each level should have sequentially numbered holes, starting from hole 1.\n"
+    "Each round should have sequentially numbered holes, starting from hole 1.\n"
   );
   SDFile* file = pd->file->open(CUSTOM_LEVEL_INSTRUCTIONS_NAME, kFileWrite);
   const int32_t wrote = pd->file->write(file, fileContent, sz);

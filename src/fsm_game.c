@@ -477,7 +477,7 @@ void FSMWinningToast(const bool newState) {
     soundDoMusic();
     soundDoSfx(kDrumRollSfx2);
     soundDoSfx(kFountainSfx);
-    physicsSetTimestepMultiplier(TSM_TARGET_TOAST);
+    //physicsSetTimestepMultiplier(TSM_TARGET_TOAST);
   }
 
   const cpVect last = renderGetLastEndBlast();

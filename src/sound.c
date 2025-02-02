@@ -210,7 +210,7 @@ void soundDoInit() {
   m_audioSample[kFizzleSfx] =  pd->sound->sample->load("fx/133448__chaosportal__cigarette-sizzle-01");
   m_audioSample[kBoingSfx1] =  pd->sound->sample->load("fx/201260__empraetorius__water-bottle-boing__1");
   m_audioSample[kBoingSfx2] =  pd->sound->sample->load("fx/201260__empraetorius__water-bottle-boing__2");
-  m_audioSample[kFountainSfx] =  pd->sound->sample->load("fx/724231__agusivan__water-falling-fountain");
+  m_audioSample[kFountainSfx] =  pd->sound->sample->load("fx/676283__fauxtogramme__water-from-a-fountain");
 
   for (int32_t i = 0; i < kNSFX; ++i) {
     m_samplePlayer[i] = pd->sound->sampleplayer->newPlayer();

@@ -60,7 +60,7 @@ void screenShotDo() {
 
 void screenShotInit(void) {
   char filePath[128];
-  snprintf(filePath, 128, "level_%i_hole_%i.bmp", IOGetCurrentLevel()+1, IOGetCurrentHole()+1);
+  snprintf(filePath, 128, "round_%i_hole_%i.bmp", IOGetCurrentLevel()+1, IOGetCurrentHole()+1);
   m_imageFile = pd->file->open(filePath, kFileWrite);
  
   m_imageBitmap = pd->graphics->newBitmap(DEVICE_PIX_X, IOGetCurrentHoleHeight(), kColorWhite);
