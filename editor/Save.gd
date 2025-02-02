@@ -3,7 +3,7 @@ extends Button
 func _on_Save_pressed():
 	var level : int = $"../LevelSlider".value
 	var hole : int = $"../HoleSlider".value
-	var save_name := String("level_" + str(level) + "_hole_" + str(hole) + ".json")
+	var save_name := String("round_" + str(level) + "_hole_" + str(hole) + ".json")
 	$FileDialog.current_file = save_name
 	$FileDialog.visible = true
 	
