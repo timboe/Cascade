@@ -304,7 +304,8 @@ void FSMAimModeScrollToTop(const bool newState) {
   FSMCommonTurretScrollAndBounceBack(false); // Just move turret, don't influence the scroll
   if (timer++ == TIME_AIM_SCROLL_TO_TOP) {
     gameSetYOffset(gameGetMinimumY(), /*force = */true); 
-    return FSMDo(kGameFSM_AimMode);
+    if (IOGetIsTutorial()) return FSMDo(kGameFSM_TutorialFireMarble);
+    else return FSMDo(kGameFSM_AimMode);
   }
 }
 
@@ -396,7 +397,7 @@ void FSMBallInPlay(const bool newState) {
       }
     }
   } else if (bgrpip == 0) { // Or straight to toast if zero left
-    return FSMDo(kGameFSM_WinningToast);
+    return FSMDo(kGameFSM_WinningToastA);
   }
 }
 
@@ -460,7 +461,7 @@ void FSMCloseUp(const bool newState) {
       soundDoSfx(kFizzleSfx);
       return FSMDo(kGameFSM_BallInPlay);
     } else {
-      return FSMDo(kGameFSM_WinningToast);
+      return FSMDo(kGameFSM_WinningToastA);
     }
   }
 
@@ -469,15 +470,49 @@ void FSMCloseUp(const bool newState) {
   gameSetYNotClamped(); // Explicit apply y-crush
 }
 
-void FSMWinningToast(const bool newState) {
+// Initial toast, runs proper physics at 50% for 3 seconds
+void FSMWinningToastA(const bool newState) {
   const enum PegSpecial_t special = boardGetCurrentSpecial();
+  static uint16_t timer = 0;
   if (newState) {
     renderDoResetEndBlast();
     renderDoAddEndBlast(physicsGetBallPosition(0));
     soundDoMusic();
     soundDoSfx(kDrumRollSfx2);
     soundDoSfx(kFountainSfx);
-    //physicsSetTimestepMultiplier(TSM_TARGET_TOAST);
+    timer = 0;
+  }
+
+  const cpVect last = renderGetLastEndBlast();
+  const cpVect ballPos = physicsGetBallPosition(0);
+  if (cpvlengthsq( cpvsub(last, ballPos) ) > (16*16)) {
+    renderDoAddEndBlast(physicsGetBallPosition(0));
+  }
+
+  int fc = gameGetFrameCount();
+  if (physicsGetSecondBallInPlay() && fc % (TICK_FREQUENCY/5) == 0) { renderDoAddEndBlast(physicsGetBallPosition(1)); }
+
+  const bool stuck = FSMCommonGetIsBallStuck(special);
+  const bool guttered = FSMCommonFocusOnLowestBallInPlay(special);
+  if (guttered || stuck) { 
+    return FSMDo(kGameFSM_BallGutter);
+  }
+
+  if (++timer == TIME_FROM_TOAST_A_TO_TOAST_B) {
+    return FSMDo(kGameFSM_WinningToastB);
+  }
+}
+
+// Continued toast, increases physics from 50% to 80% via modified timestep. Distorts simulation. But we don't care by this point
+void FSMWinningToastB(const bool newState) {
+  const enum PegSpecial_t special = boardGetCurrentSpecial();
+  if (newState) {
+    physicsSetTimestepMultiplier(TSM_INITIAL_TOAST);
+  }
+
+  const float tsm = physicsGetTimestepMultiplier();
+  if (tsm < TSM_TARGET_TOAST) {
+    physicsSetTimestepMultiplier(tsm + TSM_STEP);
   }
 
   const cpVect last = renderGetLastEndBlast();

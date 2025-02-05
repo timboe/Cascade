@@ -175,7 +175,7 @@ void physicsDoUpdate(const int32_t fc, const enum FSM_t fsm) {
 
   // Slow motion block
   static uint32_t frame = 0;
-  if (fsm == kGameFSM_CloseUp || fsm == kGameFSM_WinningToast) { // 25% if in closeup - but keep a consistent timestep for phys
+  if (fsm == kGameFSM_CloseUp || fsm == kGameFSM_WinningToastA) { // 25% if in closeup - keep a consistent timestep for phys. 50% for ToastA
     static cpVect ballPrev[2];
     static cpVect ballCur[2];
     const uint8_t nSteps = (fsm == kGameFSM_CloseUp ? 4 : 2);

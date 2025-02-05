@@ -42,11 +42,11 @@ void soundSetDoMusic(const bool doit) {
   if (!m_hasMusic) { return; }
   m_doMusic = doit;
   if (m_doMusic == false) {
-    for (int32_t i = 0; i < N_WF_TRACKS; ++i) {
-      pd->sound->fileplayer->stop(m_waterfalls[i]);
+    if (m_wfPlaying != -1) {
+      pd->sound->fileplayer->stop(m_waterfalls[m_wfPlaying]);
     }
-    for (int32_t i = 0; i < N_MUSIC_TRACKS; ++i) {
-      pd->sound->fileplayer->stop(m_music[i]);
+    if (m_trackPlaying != -1) {
+      pd->sound->fileplayer->stop(m_music[m_trackPlaying]);
     }
     m_wfPlaying = -1;
     m_trackPlaying = -1;
@@ -108,14 +108,14 @@ void soundDoWaterfall(const uint8_t id) {
 
 void soundDoMusic() {
   if (!m_hasMusic || !m_doMusic) { return; }
+  if (m_trackPlaying != -1) {
+    pd->sound->fileplayer->stop(m_music[m_trackPlaying]);
+  }
   int8_t track = -1;
   while (track == -1 || track == m_trackPlaying) {
     track = rand() % N_MUSIC_TRACKS;
   }
   m_trackPlaying = track;
-  for (int32_t i = 0; i < N_MUSIC_TRACKS; ++i) {
-    pd->sound->fileplayer->stop(m_music[i]);
-  }
   pd->sound->fileplayer->play(m_music[m_trackPlaying], 1); 
 }
 
@@ -125,8 +125,8 @@ void musicStopped(SoundSource* _unused, void* _unused2) {
 
 void soundPlayMusic(const uint8_t id) {
   if (!m_hasMusic || !m_doMusic) { return; }
-  for (int32_t i = 0; i < N_MUSIC_TRACKS; ++i) {
-    pd->sound->fileplayer->stop(m_music[i]);
+  if (m_trackPlaying != -1) {
+    pd->sound->fileplayer->stop(m_music[m_trackPlaying]);
   }
   m_trackPlaying = id % N_MUSIC_TRACKS;
   pd->sound->fileplayer->play(m_music[m_trackPlaying], 1);

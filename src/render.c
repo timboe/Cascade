@@ -174,14 +174,16 @@ void renderGame(const int32_t fc, const enum FSM_t fsm) {
 
   if (fsm == kGameFSM_BallStuck 
     || fsm == kGameFSM_GutterToTurret 
-    || fsm == kGameFSM_WinningToast
+    || fsm == kGameFSM_WinningToastA
+    || fsm == kGameFSM_WinningToastB
     || fsm == kGameFSM_TurretLower
     || fsm == kGameFSM_AimMode)
   {
     renderGamePops(fc);
   }
 
-  if (  fsm == kGameFSM_WinningToast 
+  if (  fsm == kGameFSM_WinningToastA
+    ||  fsm == kGameFSM_WinningToastB
     || (fsm == kGameFSM_BallGutter && boardGetRequiredPegsInPlay() == 0)
     ||  fsm == kGameFSM_GutterToScores)
   {

@@ -99,7 +99,7 @@ void renderGameMarble(const int32_t fc) {
   const enum FSM_t fsm = FSMGet();
 
   // Draw end blasts
-  if (fsm >= kGameFSM_WinningToast && fsm <= kGameFSM_GutterToScores) {
+  if (fsm >= kGameFSM_WinningToastA && fsm <= kGameFSM_GutterToScores) {
     for (int s = 0; s < MAX_END_BLASTS; ++s) {
       if (m_endBlastID[s] == -1) { continue; }
       pd->graphics->setDrawMode(kDrawModeXOR);

@@ -19,10 +19,10 @@ float FSMCommonCrankNumeral(float* progress) {
   *progress -= cc * CRANK_NUMBERSCROLL_MODIFIER;
   //
   if (inputGetPressed(kButtonUp)) {
-    *progress += 10 * DPAD_NUMBERSCROLL_MODIFIER;
+    *progress += 5 * DPAD_NUMBERSCROLL_MODIFIER;
     crankNotMoved = 0;
   } else if (inputGetPressed(kButtonDown)) {
-    *progress -=  10 * DPAD_NUMBERSCROLL_MODIFIER;
+    *progress -=  5 * DPAD_NUMBERSCROLL_MODIFIER;
     crankNotMoved = 0;
   }
   //

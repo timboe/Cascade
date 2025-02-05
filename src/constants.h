@@ -1,7 +1,7 @@
 
 //#define DEV 1
 
-//#define TAKE_SCREENSHOTS 1
+#define TAKE_SCREENSHOTS 1
 
 #define SHOW_FPS 1
 
@@ -13,7 +13,7 @@
 
 /// ///
 
-#define N_WF_FG 6
+#define N_WF_FG 7
 #define N_WF_BG 4
 
 #define WF_SPECIAL_START 10
@@ -102,6 +102,7 @@
 #define TIME_BALL_DROP_DELAY (BASE_TIME/3)
 #define TIME_SCORE_TO_TRY_AGAIN (BASE_TIME*5)
 #define TIME_SCORE_TO_LEVELTITLE (BASE_TIME)
+#define TIME_FROM_TOAST_A_TO_TOAST_B (BASE_TIME*3)
 
 #define FIZZLE_TIME (BASE_TIME*4)
 
@@ -205,8 +206,9 @@
 
 #define WF_VELOCITY 0.6f
 
-#define TSM_TARGET_SLOWMO 0.25f
+#define TSM_INITIAL_TOAST 0.5f
 #define TSM_TARGET_TOAST 0.8f
+#define TSM_STEP (0.1f/TICK_FREQUENCY)
 
 // Velocity squared under which the ball is considered stuck
 #define BALL_IS_STUCK 1000.0f

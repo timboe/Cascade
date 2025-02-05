@@ -54,7 +54,8 @@ void FSMDo(const enum FSM_t transitionTo) {
     case kGameFSM_PlayCredits: return FSMPlayCredits(newState);
     case kGameFSM_BallStuck: return FSMBallStuck(newState);
     case kGameFSM_CloseUp: return FSMCloseUp(newState);
-    case kGameFSM_WinningToast: return FSMWinningToast(newState);
+    case kGameFSM_WinningToastA: return FSMWinningToastA(newState);
+    case kGameFSM_WinningToastB: return FSMWinningToastB(newState);
     case kGameFSM_BallGutter: return FSMBallGutter(newState);
     case kGameFSM_GutterToTurret: return FSMGutterToTurret(newState);
     case kGameFSM_TurretLower: return FSMTurretLower(newState);

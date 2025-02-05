@@ -40,7 +40,8 @@ enum FSM_t {
   kGameFSM_PlayCredits, // Place after BallInPlay 
   kGameFSM_BallStuck,
   kGameFSM_CloseUp,
-  kGameFSM_WinningToast,
+  kGameFSM_WinningToastA,
+  kGameFSM_WinningToastB,
   kGameFSM_BallGutter, // END OF BALL-IN-PLAY
   kGameFSM_GutterToTurret,
   kGameFSM_TurretLower,
@@ -99,7 +100,8 @@ void FSMPlayCredits(const bool newState);
 void FSMBallInPlay(const bool newState);
 void FSMBallStuck(const bool newState);
 void FSMCloseUp(const bool newState);
-void FSMWinningToast(const bool newState);
+void FSMWinningToastA(const bool newState);
+void FSMWinningToastB(const bool newState);
 void FSMBallGutter(const bool newState);
 void FSMGutterToTurret(const bool newState);
 void FSMTurretLower(const bool newState);

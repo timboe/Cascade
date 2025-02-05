@@ -326,7 +326,7 @@ void pegDoMotionPathFinalise(struct Peg_t* p) {
 }
 
 void pegDoHit(struct Peg_t* p) {
-  const bool winToast = (FSMGet() == kGameFSM_WinningToast);
+  const bool winToast = (FSMGet() == kGameFSM_WinningToastA || FSMGet() == kGameFSM_WinningToastB);
   if (p->state == kPegStateActive 
     && FSMGetBallInPlay()
     && p->y < IOGetCurrentHoleHeight()
