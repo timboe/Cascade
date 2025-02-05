@@ -95,7 +95,9 @@ int gameLoop(void* _data) {
     }
     renderDo(m_frameCount, fsm, gm);
     soundDoVolumes(fsm, gm);
-    if (rand() % BIRDCALL_SFX_CHANCE == 0) { soundDoSfx(kBirdSfx1); }
+    if (rand() % BIRDCALL_SFX_CHANCE == 0 && IOGetCurrentHoleWaterfallBackground(gm) > 0) { 
+      soundDoSfx(kBirdSfx1);
+    }
     ++m_frameCount;
   }
 
@@ -161,7 +163,7 @@ void gameDoPopulateMenuTitlesPlayer(void) {
 
 void gameDoPopulateMenuTitles(void) {
   pd->system->removeAllMenuItems();
-  static const char* options[] = {"music+sfx", "music", "sfx", "none"};
+  static const char* options[] = {"water+sfx", "water", "sfx", "none"};
   PDMenuItem* menu = pd->system->addOptionsMenuItem("audio", options, 4, menuOptionsCallbackAudio, NULL);
   pd->system->setMenuItemUserdata(menu, (void*) menu); // User data is a pointer to the menu itself
   pd->system->setMenuItemValue(menu, soundGetSetting());
@@ -170,7 +172,7 @@ void gameDoPopulateMenuTitles(void) {
 
 void gameDoPopulateMenuGame() {
   pd->system->removeAllMenuItems();
-  static const char* options[] = {"music+sfx", "music", "sfx", "none"};
+  static const char* options[] = {"water+sfx", "water", "sfx", "none"};
   PDMenuItem* menu = pd->system->addOptionsMenuItem("audio", options, 4, menuOptionsCallbackAudio, NULL);
   pd->system->setMenuItemUserdata(menu, (void*) menu); // User data is a pointer to the menu itself
   pd->system->setMenuItemValue(menu, soundGetSetting());

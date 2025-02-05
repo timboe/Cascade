@@ -9,6 +9,8 @@ bool m_hasMusic = true;
 
 bool m_doingExplosion = false;
 
+bool m_stopGuard = false;
+
 float m_wf_v = 1.0f;
 
 int8_t m_trackPlaying = -1;
@@ -42,12 +44,14 @@ void soundSetDoMusic(const bool doit) {
   if (!m_hasMusic) { return; }
   m_doMusic = doit;
   if (m_doMusic == false) {
+    m_stopGuard = true;
     if (m_wfPlaying != -1) {
       pd->sound->fileplayer->stop(m_waterfalls[m_wfPlaying]);
     }
     if (m_trackPlaying != -1) {
       pd->sound->fileplayer->stop(m_music[m_trackPlaying]);
     }
+    m_stopGuard = false;
     m_wfPlaying = -1;
     m_trackPlaying = -1;
   } else {
@@ -99,8 +103,10 @@ void soundDoWaterfall(const uint8_t id) {
   pd->system->logToConsole("soundDoWaterfall called for %i", (int)id);
   #endif
   if (!m_hasMusic || !m_doMusic || (id % N_WF_TRACKS) == m_wfPlaying) { return; }
-  for (int32_t i = 0; i < N_WF_TRACKS; ++i) {
-    pd->sound->fileplayer->stop(m_waterfalls[i]);
+  if (m_wfPlaying != -1) {
+    m_stopGuard = true;
+    pd->sound->fileplayer->stop(m_waterfalls[m_wfPlaying]);
+    m_stopGuard = false;
   }
   m_wfPlaying = id % N_WF_TRACKS;
   pd->sound->fileplayer->play(m_waterfalls[m_wfPlaying], 0);
@@ -109,7 +115,9 @@ void soundDoWaterfall(const uint8_t id) {
 void soundDoMusic() {
   if (!m_hasMusic || !m_doMusic) { return; }
   if (m_trackPlaying != -1) {
+    m_stopGuard = true;
     pd->sound->fileplayer->stop(m_music[m_trackPlaying]);
+    m_stopGuard = false;
   }
   int8_t track = -1;
   while (track == -1 || track == m_trackPlaying) {
@@ -120,13 +128,16 @@ void soundDoMusic() {
 }
 
 void musicStopped(SoundSource* _unused, void* _unused2) {
+  if (m_stopGuard) { return; }
   if (IOIsCredits()) { soundDoMusic(); }
 }
 
 void soundPlayMusic(const uint8_t id) {
   if (!m_hasMusic || !m_doMusic) { return; }
   if (m_trackPlaying != -1) {
+    m_stopGuard = true;
     pd->sound->fileplayer->stop(m_music[m_trackPlaying]);
+    m_stopGuard = false;
   }
   m_trackPlaying = id % N_MUSIC_TRACKS;
   pd->sound->fileplayer->play(m_music[m_trackPlaying], 1);

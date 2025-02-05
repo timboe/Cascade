@@ -368,7 +368,7 @@ LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int1
       m_previewBitmap = NULL;
     }
     char text[128];
-    snprintf(text, 128, "images/holes/level_%i_hole_%i", level+1, hole+1);
+    snprintf(text, 128, "images/holes/round_%i_hole_%i", level+1, hole+1); 
     m_previewBitmap = pd->graphics->loadBitmap(text, NULL);
   }
 

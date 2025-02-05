@@ -269,7 +269,7 @@ void renderCommonBackground(const enum FSM_t fsm, const enum GameMode_t gm) {
 
   static float wfBgOffC = 0;
   if (!IOGetIsPreloading()) {
-    wfBgOffC += WF_VELOCITY * physicsGetTimestepMultiplier();
+    wfBgOffC += WF_VELOCITY * (FSMGet() == kGameFSM_CloseUp ? 0.25f : 1.0f);
   }
   const int16_t wfBgOff = WF_DIVISION_PIX_Y - ((int)wfBgOffC % WF_DIVISION_PIX_Y); 
 
