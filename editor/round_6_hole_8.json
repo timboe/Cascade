@@ -193,7 +193,7 @@
       "type": 2
     },
     "LinearControl1": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 136,
       "angle": 0,
@@ -215,7 +215,7 @@
       }
     },
     "LinearControl2": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 158,
       "angle": 0,
@@ -237,7 +237,7 @@
       }
     },
     "LinearControl3": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 180,
       "angle": 0,
@@ -259,7 +259,7 @@
       }
     },
     "LinearControl4": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 202,
       "angle": 0,
@@ -281,7 +281,7 @@
       }
     },
     "LinearControl5": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 226,
       "angle": 0,
@@ -303,7 +303,7 @@
       }
     },
     "LinearControl6": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 250,
       "angle": 0,
@@ -325,7 +325,7 @@
       }
     },
     "LinearControl7": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 274,
       "angle": 0,
@@ -347,7 +347,7 @@
       }
     },
     "LinearControl8": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 298,
       "angle": 0,
@@ -545,7 +545,7 @@
       }
     },
     "LinearControl17": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 322,
       "angle": 0,
@@ -567,7 +567,7 @@
       }
     },
     "LinearControl18": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 346,
       "angle": 0,
@@ -589,7 +589,7 @@
       }
     },
     "LinearControl19": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 370,
       "angle": 0,
@@ -611,7 +611,7 @@
       }
     },
     "LinearControl20": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 394,
       "angle": 0,
@@ -633,7 +633,7 @@
       }
     },
     "LinearControl21": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 418,
       "angle": 0,
@@ -655,7 +655,7 @@
       }
     },
     "LinearControl22": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 444,
       "angle": 0,
@@ -677,7 +677,7 @@
       }
     },
     "LinearControl23": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 468,
       "angle": 0,
@@ -699,7 +699,7 @@
       }
     },
     "LinearControl24": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 492,
       "angle": 0,
@@ -721,7 +721,7 @@
       }
     },
     "LinearControl25": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 516,
       "angle": 0,
@@ -743,7 +743,7 @@
       }
     },
     "LinearControl26": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 540,
       "angle": 0,
@@ -765,7 +765,7 @@
       }
     },
     "LinearControl27": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 564,
       "angle": 0,
@@ -787,7 +787,7 @@
       }
     },
     "LinearControl28": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 588,
       "angle": 0,
@@ -809,7 +809,7 @@
       }
     },
     "LinearControl29": {
-      "shape": 2,
+      "shape": 1,
       "x": 100,
       "y": 612,
       "angle": 0,
