@@ -158,6 +158,12 @@ void renderGame(const int32_t fc, const enum FSM_t fsm) {
     return;
   }
 
+  // DRAW GUTTER
+  renderGameGutter(fc);
+
+  // DRAW PEGS
+  renderGameBoard(fc);
+
   if (!IOIsCredits()) {
     // DRAW TURRET & TOP DECORATION
     renderGameTurret();
@@ -165,12 +171,6 @@ void renderGame(const int32_t fc, const enum FSM_t fsm) {
     // DRAW TRAJECTORY
     renderGameTrajectory();
   }
-
-  // DRAW GUTTER
-  renderGameGutter(fc);
-
-  // DRAW PEGS
-  renderGameBoard(fc);
 
   if (fsm == kGameFSM_BallStuck 
     || fsm == kGameFSM_GutterToTurret 

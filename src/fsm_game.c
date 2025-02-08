@@ -172,6 +172,7 @@ void FSMDisplayLevelTitle(const bool newState) {
     gameDoResetPreviousWaterfall();
     renderDoUpdateBacklines();
     physicsDoResetBall(0);
+    bitmapUpdateSideMenuLevel(IOGetCurrentLevel(), IOGetCurrentHole());
     #ifdef DEV
     const uint32_t after = pd->system->getCurrentTimeMilliseconds();
     pd->system->logToConsole("Hole loading took %i ms", (int)(after - before));
@@ -282,6 +283,7 @@ void FSMAimMode(const bool newState) {
     renderDoResetMarbleTrace();
     gameDoResetFrameCount();
     renderDoResetTriggerSplash();
+    pd->system->setMenuImage(bitmapGetSideMenu(m_ballCount + 1), 0);
     timer = 0;
     m_vetoCloseUp = false;
     m_fizzleTimer = 0;
@@ -323,6 +325,7 @@ void FSMPlayCredits(const bool newState) {
     physicsDoResetBall(0);
     gameSetTurretBarrelAngle(90.0f + 45.0f);
     physicsDoLaunchBall(1.0f);
+    pd->system->setMenuImage(NULL, 0);
   }
 
   if (progress >= gameGetMinimumY() + IOGetCurrentHoleHeight() - DEVICE_PIX_Y/3 + 4) {
@@ -567,6 +570,7 @@ void FSMBallGutter(const bool newState) {
       return FSMDo(kGameFSM_GutterToTurret);
     } else { 
       boardResetPegsHit();
+      pd->system->setMenuImage(NULL, 0);
       return FSMDo(kGameFSM_GutterToScores);
     }
   }

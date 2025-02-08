@@ -112,11 +112,13 @@ void gameMenuStateSafetyReset(void) {
   soundStopSfx(kDrumRollSfx1);
 }
 
-void menuOptionsCallbackResetSave(void* toReset) {
+void menuOptionsCallbackResetSave(void* _unused) {
   #ifdef DEV
   pd->system->logToConsole("menuOptionsCallbackResetSave %i", (uintptr_t)toReset);
   #endif
-  IOResetPlayerSave((uintptr_t)toReset);
+  IOResetPlayerSave(0);
+  IOResetPlayerSave(1);
+  IOResetPlayerSave(2);
 }
 
 void menuOptionsCallbackQuitHole(void* _unused) {
@@ -124,6 +126,7 @@ void menuOptionsCallbackQuitHole(void* _unused) {
   pd->system->logToConsole("menuOptionsCallbackQuitHole");
   #endif
   gameMenuStateSafetyReset();
+  pd->system->setMenuImage(NULL, 0);
   pd->system->removeAllMenuItems();
   FSMDo(kGameFSM_GameFadeOutQuit);
 }
@@ -133,6 +136,7 @@ void menuOptionsCallbackResetHole(void* _unused) {
   pd->system->logToConsole("menuOptionsCallbackResetHole");
   #endif
   gameMenuStateSafetyReset();
+  pd->system->setMenuImage(NULL, 0);
   pd->system->removeAllMenuItems();
   FSMDo(kGameFSM_GameFadeOutReset);
 }
@@ -156,9 +160,12 @@ void menuOptionsCallbackAudio(void* userData) {
 
 void gameDoPopulateMenuTitlesPlayer(void) {
   pd->system->removeAllMenuItems();
-  pd->system->addMenuItem("reset slot 1", menuOptionsCallbackResetSave, (void*)0);
-  pd->system->addMenuItem("reset slot 2", menuOptionsCallbackResetSave, (void*)1);
-  pd->system->addMenuItem("reset slot 3", menuOptionsCallbackResetSave, (void*)2);
+  pd->system->addMenuItem("reset data", menuOptionsCallbackResetSave, NULL);
+  static const char* options[] = {"water+sfx", "water", "sfx", "none"};
+  PDMenuItem* menu = pd->system->addOptionsMenuItem("audio", options, 4, menuOptionsCallbackAudio, NULL);
+  pd->system->setMenuItemUserdata(menu, (void*) menu); // User data is a pointer to the menu itself
+  pd->system->setMenuItemValue(menu, soundGetSetting());
+  pd->system->addMenuItem("credits", menuOptionsCallbackCredits, NULL);
 }
 
 void gameDoPopulateMenuTitles(void) {

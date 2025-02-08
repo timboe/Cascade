@@ -199,9 +199,9 @@ void renderGameBoard(const int32_t fc) {
   if (screenShotGetInProgress()) {
     for (int i = 0; i < boardGetNPegs(); ++i) {
       const struct Peg_t* p = boardGetPeg(i);
-      if (p->motion == kPegMotionEllipse) {
+      if (p->motion == kPegMotionEllipse && p->speed) {
         pd->graphics->drawEllipse(p->pathX[0] - p->a, p->pathY[0] - p->b, p->a*2, p->b*2, 4, 0.0f, 360.0f, kColorBlack);
-      } else if (p->motion == kPegMotionPath) {
+      } else if (p->motion == kPegMotionPath && p->speed) {
         for (int j = 1; j < p->pathSteps; ++j) {
           pd->graphics->drawLine(p->pathX[j], p->pathY[j], p->pathX[j-1], p->pathY[j-1], 4, kColorBlack);
         }

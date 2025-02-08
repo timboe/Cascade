@@ -64,6 +64,9 @@ LCDBitmap* bitmapGetSpecialBlast(const uint8_t id);
 
 LCDBitmap* bitmapGetSpecial(const enum PegSpecial_t special);
 
+LCDBitmap* bitmapGetSideMenu(const uint16_t ballCount);
+void bitmapUpdateSideMenuLevel(const uint16_t level, const uint16_t hole);
+
 void bitmapDoUpdateGameInfoTopper(void);
 void bitmapDoUpdateLevelTitle(void);
 void bitmapDoUpdateLevelStatsBitmap(void);

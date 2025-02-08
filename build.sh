@@ -9,7 +9,6 @@ rm *bmp
 cd -
 rm Source/images/holes/*png
 cp ${PLAYDATE_SDK_PATH}/Disk/Data/uk.co.tim-martin.cascada/*png Source/images/holes
-rm ${PLAYDATE_SDK_PATH}/Disk/Data/uk.co.tim-martin.cascada/*bmp
 
 make clean
 make

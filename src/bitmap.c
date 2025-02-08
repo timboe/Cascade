@@ -3,34 +3,13 @@
 #include "util.h"
 #include "io.h"
 #include "peg.h"
+#include "patterns.h"
 
 enum RenderColor_t {
   kRenderColorWhite,
   kRenderColorGrey,
   kRenderColorHatched
 };
-
-const static LCDPattern kGreyPattern = {
-  0,0,0,0,0,0,0,0,
-  0b11001100,
-  0b11001100,
-  0b11001100,
-  0b11001100,
-  0b11001100,
-  0b11001100,
-  0b11001100,
-  0b11001100};
-
-const static LCDPattern kHatchedPattern = {
-  0,0,0,0,0,0,0,0,
-  0b11110000,
-  0b11110000,
-  0b11110000,
-  0b11110000,
-  0b00001111,
-  0b00001111,
-  0b00001111,
-  0b00001111};
 
 // Titiles
 LCDBitmap* m_headerImage;
@@ -68,6 +47,13 @@ LCDBitmap* m_numeralBitmap[10];
 LCDBitmap* m_cardBitmap;
 
 LCDBitmap* m_scoreHistogram = NULL;
+
+LCDBitmap* m_sideMenuBitmap;
+LCDBitmap* m_sideMenuLevelBitmap;
+
+int16_t m_cachedLevel = -1;
+int16_t m_cachedHole = -1;
+
 
 LCDBitmap* m_pootAnimation[TURRET_RADIUS];
 
@@ -115,7 +101,7 @@ LCDBitmapTable* bitmapDoLoadImageTableAtPath(const char* path);
 
 LCDFont* bitmapDoLoadFontAtPath(const char* path);
 
-void bitmapDoDrawOutlineText(const char text[], const uint16_t textSize, int16_t x, int16_t y, const uint16_t outlineSize);
+void bitmapDoDrawOutlineText(const char text[], const uint16_t textSize, int16_t x, int16_t y, const uint16_t outlineSize, const bool invert);
 
 void bitmapDoDrawRotatedRect(const float x, const float y, const float w2, const float h2, const int16_t iAngle, const enum RenderColor_t rc);
 
@@ -125,7 +111,58 @@ void bitmapDoScoreCardBackground(void);
 
 void bitmapDoLoadWfFgSpecial(const uint8_t id);
 
+void bitmapUpdateCachedPreviewBitmap(const uint16_t level, const uint16_t hole);
+
 /// ///
+
+LCDBitmap* bitmapGetSideMenu(const uint16_t ballCount) {  // xxx
+  pd->graphics->clearBitmap(m_sideMenuBitmap, kColorClear);
+  pd->graphics->pushContext(m_sideMenuBitmap);
+  pd->graphics->fillRect(0, 0, HALF_DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
+  pd->graphics->drawBitmap(m_sideMenuLevelBitmap, 0, 0, kBitmapUnflipped);
+
+  #define SM_Y_START 45
+  #define SM_Y_INC 60
+
+  bitmapSetRoobert24();
+  char text[128];
+  snprintf(text, 128, "%s", IOGetCurrentHoleName());
+  const int32_t w0 = pd->graphics->getTextWidth(bitmapGetRoobert24(), text, 128, kUTF8Encoding, 0);
+  bitmapDoDrawOutlineText(text, 128, HALF_DEVICE_PIX_X/2 - w0/2, SM_Y_START, 2, true);
+
+  snprintf(text, 128, "PAR : %i", IOGetCurrentHolePar());
+  const int32_t w1 = pd->graphics->getTextWidth(bitmapGetRoobert24(), text, 128, kUTF8Encoding, 0);
+  bitmapDoDrawOutlineText(text, 128, HALF_DEVICE_PIX_X/2 - w1/2, SM_Y_START + SM_Y_INC, 2, true);
+
+  snprintf(text, 128, "BALL : %i", ballCount);
+  const int32_t w2 = pd->graphics->getTextWidth(bitmapGetRoobert24(), text, 128, kUTF8Encoding, 0);
+  bitmapDoDrawOutlineText(text, 128, HALF_DEVICE_PIX_X/2 - w2/2, SM_Y_START + 2*SM_Y_INC, 2, true);
+
+  pd->graphics->popContext();
+  return m_sideMenuBitmap;
+}
+
+void bitmapUpdateSideMenuLevel(const uint16_t level, const uint16_t hole) {
+  bitmapUpdateCachedPreviewBitmap(level, hole);
+  pd->graphics->clearBitmap(m_sideMenuLevelBitmap, kColorClear);
+  if (m_previewBitmap) {
+    int height;
+    pd->graphics->getBitmapData(m_previewBitmap, NULL, &height, NULL, NULL, NULL);
+    float yScale = 1.0f;
+    uint16_t yOff = 0;
+    uint16_t xOff = 0;
+    if (height > DEVICE_PIX_Y) {
+      yScale = DEVICE_PIX_Y / (float)height;
+      xOff = (HALF_DEVICE_PIX_X - (yScale * HALF_DEVICE_PIX_X)) / 2;
+    } else if (height < DEVICE_PIX_Y) {
+      yOff = (DEVICE_PIX_Y - height) / 2;
+    }
+    pd->graphics->pushContext(m_sideMenuLevelBitmap);
+    pd->graphics->drawScaledBitmap(m_previewBitmap, xOff, yOff, yScale, yScale);
+    pd->graphics->popContext();
+  }
+}
+
 
 void bitmapDoLoadWfFgSpecial(const uint8_t id) {
   if (id == m_loadedWfFgSpecial) {
@@ -173,8 +210,8 @@ LCDFont* bitmapDoLoadFontAtPath(const char* path) {
   return f;
 }
 
-void bitmapDoDrawOutlineText(const char text[], const uint16_t textSize, int16_t x, int16_t y, const uint16_t outlineSize) {
-  pd->graphics->setDrawMode(kDrawModeFillWhite);
+void bitmapDoDrawOutlineText(const char text[], const uint16_t textSize, int16_t x, int16_t y, const uint16_t outlineSize, const bool invert) {
+  pd->graphics->setDrawMode(invert ? kDrawModeFillBlack : kDrawModeFillWhite);
   for (int i = 0; i < 8; ++i) {
     switch (i) {
       case 0: y += outlineSize; break;
@@ -186,12 +223,12 @@ void bitmapDoDrawOutlineText(const char text[], const uint16_t textSize, int16_t
       case 6: y += outlineSize; break;
       case 7: y += outlineSize; break;
     }
-    pd->graphics->drawText(text, 128, kUTF8Encoding, x, y);
+    pd->graphics->drawText(text, textSize, kUTF8Encoding, x, y);
   }
-  pd->graphics->setDrawMode(kDrawModeFillBlack);
+  pd->graphics->setDrawMode(invert ? kDrawModeFillWhite : kDrawModeFillBlack);
   y -= outlineSize;
   x -= outlineSize;
-  pd->graphics->drawText(text, 128, kUTF8Encoding, x, y);
+  pd->graphics->drawText(text, textSize, kUTF8Encoding, x, y);
 }
 
 void bitmapDoUpdateLevelTitle(void) {
@@ -230,8 +267,7 @@ void bitmapDoUpdateLevelTitle(void) {
   snprintf(text, 128, "%i~%i", (int)IOGetCurrentLevel() + 1, (int)IOGetCurrentHole() + 1);
   const int32_t w1 = pd->graphics->getTextWidth(bitmapGetGreatVibes109(), text, 128, kUTF8Encoding, 0);
   bitmapSetGreatVibes109();
-  pd->graphics->setDrawMode(kDrawModeFillBlack);
-  bitmapDoDrawOutlineText(text, 128, DEVICE_PIX_X/2 - w1/2, yB, 4);
+  bitmapDoDrawOutlineText(text, 128, DEVICE_PIX_X/2 - w1/2, yB, 4, false);
   //
   snprintf(text, 128, "PAR %i", (int)IOGetCurrentHolePar());
   const int32_t w2 = pd->graphics->getTextWidth(bitmapGetRoobert24(), text, 128, kUTF8Encoding, 0);
@@ -354,15 +390,10 @@ LCDBitmap* bitmapGetTitleHoleTutorial(void) { return m_holeTutorialBitmap; }
 
 LCDBitmap* bitmapGetTitleScoreCard(void) { return m_scoreCardBitmap; }
 
-LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int16_t offset) {
-  pd->graphics->clearBitmap(m_previewBitmapWindow, kColorClear);
-
-  if (!IOGetPar(level, hole)) { return m_previewBitmapWindow; } // No level
-
-  static int16_t cachedLevel = -1, cachedHole = -1;
-  if (cachedLevel != level || cachedHole != hole) {
-    cachedLevel = level;
-    cachedHole = hole;
+void bitmapUpdateCachedPreviewBitmap(const uint16_t level, const uint16_t hole) {
+  if (m_cachedLevel != level || m_cachedHole != hole) {
+    m_cachedLevel = level;
+    m_cachedHole = hole;
     if (m_previewBitmap) {
       pd->graphics->freeBitmap(m_previewBitmap);
       m_previewBitmap = NULL;
@@ -371,6 +402,14 @@ LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int1
     snprintf(text, 128, "images/holes/round_%i_hole_%i", level+1, hole+1); 
     m_previewBitmap = pd->graphics->loadBitmap(text, NULL);
   }
+}
+
+LCDBitmap* bitmapGetLevelPreview(const uint16_t level, const uint16_t hole, int16_t offset) {
+  pd->graphics->clearBitmap(m_previewBitmapWindow, kColorClear);
+
+  if (!IOGetPar(level, hole)) { return m_previewBitmapWindow; } // No level
+
+  bitmapUpdateCachedPreviewBitmap(level, hole);
 
   if (!m_previewBitmap) { return m_previewBitmapWindow; } // No image
 
@@ -777,8 +816,7 @@ void bitmapDoUpdateLevelStatsBitmap(void) {
   const int32_t w = pd->graphics->getTextWidth(bitmapGetRoobert24(), text, 128, kUTF8Encoding, 0);
   pd->graphics->clearBitmap(m_levelStatsBitmap, kColorClear);
   pd->graphics->pushContext(m_levelStatsBitmap);
-  pd->graphics->setDrawMode(kDrawModeFillBlack);
-  bitmapDoDrawOutlineText(text, 129, NUMERAL_PIX_X - w/2, 0, 2);
+  bitmapDoDrawOutlineText(text, 129, NUMERAL_PIX_X - w/2, 0, 2, false);
   pd->graphics->popContext();
 }
 
@@ -793,8 +831,7 @@ void bitmapDoUpdateHoleStatsBitmap(void) {
   const int32_t w1 = pd->graphics->getTextWidth(bitmapGetRoobert24(), text, 128, kUTF8Encoding, 0);
   pd->graphics->clearBitmap(m_holeStatsBitmap[0], kColorClear);
   pd->graphics->pushContext(m_holeStatsBitmap[0]);
-  pd->graphics->setDrawMode(kDrawModeFillBlack);
-  bitmapDoDrawOutlineText(text, 129, NUMERAL_PIX_X/2 - w1/2, 0, 2);
+  bitmapDoDrawOutlineText(text, 129, NUMERAL_PIX_X/2 - w1/2, 0, 2, false);
   pd->graphics->popContext();
 
   pd->graphics->clearBitmap(m_holeStatsBitmap[1], kColorClear);
@@ -809,8 +846,7 @@ void bitmapDoUpdateHoleStatsBitmap(void) {
     }
     const int32_t w2 = pd->graphics->getTextWidth(bitmapGetRoobert24(), text, 128, kUTF8Encoding, 0);
     pd->graphics->pushContext(m_holeStatsBitmap[1]);
-    pd->graphics->setDrawMode(kDrawModeFillBlack);
-    bitmapDoDrawOutlineText(text, 129, (NUMERAL_PIX_X+(NUMERAL_BUF*2))/2 - w2/2, 0, 2);
+    bitmapDoDrawOutlineText(text, 129, (NUMERAL_PIX_X+(NUMERAL_BUF*2))/2 - w2/2, 0, 2, false);
     pd->graphics->popContext();
   }
 
@@ -821,8 +857,7 @@ void bitmapDoUpdateHoleStatsBitmap(void) {
     bitmapSetRoobert24();
     snprintf(text, 128, "BY %s", author);
     const int32_t w3 = pd->graphics->getTextWidth(bitmapGetRoobert24(), text, 128, kUTF8Encoding, 0);
-    pd->graphics->setDrawMode(kDrawModeFillBlack);
-    bitmapDoDrawOutlineText(text, 128, HALF_DEVICE_PIX_X/2 - w3/2, 0, 2);
+    bitmapDoDrawOutlineText(text, 128, HALF_DEVICE_PIX_X/2 - w3/2, 0, 2, false);
     pd->graphics->popContext();
   }
 
@@ -833,8 +868,7 @@ void bitmapDoUpdateHoleStatsBitmap(void) {
     bitmapSetRoobert24();
     snprintf(text, 128, "%s", name);
     const int32_t w4 = pd->graphics->getTextWidth(bitmapGetRoobert24(), text, 128, kUTF8Encoding, 0);
-    pd->graphics->setDrawMode(kDrawModeFillBlack);
-    bitmapDoDrawOutlineText(text, 128, HALF_DEVICE_PIX_X/2 - w4/2, 0, 2);
+    bitmapDoDrawOutlineText(text, 128, HALF_DEVICE_PIX_X/2 - w4/2, 0, 2, false);
     pd->graphics->popContext();
   }
 }
@@ -888,6 +922,9 @@ void bitmapDoPreloadA(void) {
   m_holeStatsBitmap[1] = pd->graphics->newBitmap(NUMERAL_PIX_X + (2*NUMERAL_BUF), TITLETEXT_HEIGHT, kColorClear);
   m_holeAuthorBitmap = pd->graphics->newBitmap(HALF_DEVICE_PIX_X, TITLETEXT_HEIGHT, kColorClear);
   m_holeNameBitmap = pd->graphics->newBitmap(HALF_DEVICE_PIX_X, TITLETEXT_HEIGHT, kColorClear);
+
+  m_sideMenuBitmap = pd->graphics->newBitmap(DEVICE_PIX_X, DEVICE_PIX_Y, kColorClear);
+  m_sideMenuLevelBitmap = pd->graphics->newBitmap(HALF_DEVICE_PIX_X, DEVICE_PIX_Y, kColorClear);
 }
 
 void bitmapDoPreloadB(const uint8_t anim) { // TURRET_LAUNCH_FRAMES
@@ -1018,8 +1055,7 @@ void bitmapDoPreloadI(void) {
     snprintf(text, 128, "%i", n);
     const int32_t w = pd->graphics->getTextWidth(bitmapGetGreatVibes109(), text, 128, kUTF8Encoding, 0);
     bitmapSetGreatVibes109();
-    pd->graphics->setDrawMode(kDrawModeFillBlack);
-    bitmapDoDrawOutlineText(text, 128, NUMERAL_PIX_X/2 - w/2 - pixelFineTuning[n], 0, 4);
+    bitmapDoDrawOutlineText(text, 128, NUMERAL_PIX_X/2 - w/2 - pixelFineTuning[n], 0, 4, false);
     pd->graphics->popContext();
   }
 }
@@ -1032,8 +1068,7 @@ void bitmapDoPreloadJ(void) {
     pd->graphics->pushContext(m_specialTextBitmap[s]);
     bitmapSetRoobert24();
     const int32_t w0 = pd->graphics->getTextWidth(bitmapGetRoobert24(), pegGetSpecialTxt(s), 128, kUTF8Encoding, 0);
-    pd->graphics->setDrawMode(kDrawModeFillBlack);
-    bitmapDoDrawOutlineText(pegGetSpecialTxt(s), 128, SPECIAL_TEXT_WIDTH/2 - w0/2, 0, 2);
+    bitmapDoDrawOutlineText(pegGetSpecialTxt(s), 128, SPECIAL_TEXT_WIDTH/2 - w0/2, 0, 2, false);
     pd->graphics->popContext();
   }
 
@@ -1043,8 +1078,7 @@ void bitmapDoPreloadJ(void) {
   pd->graphics->pushContext(m_levelBitmap);
   bitmapSetRoobert24();
   const int32_t w1 = pd->graphics->getTextWidth(bitmapGetRoobert24(), "ROUND", 128, kUTF8Encoding, 0);
-  pd->graphics->setDrawMode(kDrawModeFillBlack);
-  bitmapDoDrawOutlineText("ROUND", 128, NUMERAL_PIX_X - w1/2, 0, 2);
+  bitmapDoDrawOutlineText("ROUND", 128, NUMERAL_PIX_X - w1/2, 0, 2, false);
   pd->graphics->popContext();
 
   //
@@ -1054,8 +1088,7 @@ void bitmapDoPreloadJ(void) {
   pd->graphics->pushContext(tempBitmap);
   bitmapSetRoobert24();
   const int32_t w2 = pd->graphics->getTextWidth(bitmapGetRoobert24(), "HOLE", 128, kUTF8Encoding, 0);
-  pd->graphics->setDrawMode(kDrawModeFillBlack);
-  bitmapDoDrawOutlineText("HOLE", 128, NUMERAL_PIX_Y/2 - w2/2, 0, 2);
+  bitmapDoDrawOutlineText("HOLE", 128, NUMERAL_PIX_Y/2 - w2/2, 0, 2, false);
   pd->graphics->popContext();
 
   m_holeBitmap = pd->graphics->newBitmap(TITLETEXT_HEIGHT, NUMERAL_PIX_Y, kColorClear);
@@ -1069,8 +1102,7 @@ void bitmapDoPreloadJ(void) {
   pd->graphics->pushContext(tempBitmap);
   bitmapSetRoobert24();
   const int32_t w3 = pd->graphics->getTextWidth(bitmapGetRoobert24(), "PLAYER", 128, kUTF8Encoding, 0);
-  pd->graphics->setDrawMode(kDrawModeFillBlack);
-  bitmapDoDrawOutlineText("PLAYER", 128, NUMERAL_PIX_Y/2 - w3/2, 0, 2);
+  bitmapDoDrawOutlineText("PLAYER", 128, NUMERAL_PIX_Y/2 - w3/2, 0, 2, false);
   pd->graphics->popContext();
 
   m_playerBitmap = pd->graphics->newBitmap(TITLETEXT_HEIGHT, NUMERAL_PIX_Y, kColorClear);

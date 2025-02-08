@@ -2,6 +2,40 @@
 
 static const LCDPattern kColorChekerboard = {0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 
+const static LCDPattern kGreyPattern = {
+  0,0,0,0,0,0,0,0,
+  0b11001100,
+  0b11001100,
+  0b11001100,
+  0b11001100,
+  0b11001100,
+  0b11001100,
+  0b11001100,
+  0b11001100};
+
+const static LCDPattern kHatchedPattern = {
+  0,0,0,0,0,0,0,0,
+  0b11110000,
+  0b11110000,
+  0b11110000,
+  0b11110000,
+  0b00001111,
+  0b00001111,
+  0b00001111,
+  0b00001111};
+
+static const LCDPattern kStripePattern = 
+  {0,0,0,0,0,0,0,0,
+    0b11100011,
+    0b11110001,
+    0b11111000,
+    0b01111100,
+    0b00111110,
+    0b00011111,
+    0b10001111,
+    0b11000111,
+  };
+
 #define FADE_LEVELS 8
 
 static const LCDPattern kFadePattern[FADE_LEVELS] = {
