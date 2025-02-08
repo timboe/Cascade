@@ -78,6 +78,12 @@ void boardDoRequiredPegHit(void);
 
 void boardDoSpecialBlast(void);
 
+uint16_t boardGetPegsHit(void);
+
+void boardDoPegHit(void);
+
+void boardResetPegsHit(void);
+
 enum PegSpecial_t boardGetCurrentSpecial(void);
 void boardDoClearSpecial(void);
 enum PegSpecial_t boardDoAddSpecial(const bool activate);

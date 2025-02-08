@@ -559,8 +559,16 @@ void FSMBallGutter(const bool newState) {
   } else if (pause) {
     --pause;
   } else {
-    if (boardGetRequiredPegsInPlay()) { return FSMDo(kGameFSM_GutterToTurret); }
-    else                              { return FSMDo(kGameFSM_GutterToScores); }
+    if (boardGetRequiredPegsInPlay()) {
+      if (boardGetPegsHit() == 0) {
+        soundDoSfx(kWompSfx);
+      }
+      boardResetPegsHit();
+      return FSMDo(kGameFSM_GutterToTurret);
+    } else { 
+      boardResetPegsHit();
+      return FSMDo(kGameFSM_GutterToScores);
+    }
   }
 }
 

@@ -19,7 +19,7 @@ int8_t m_wfPlaying = -1;
 uint8_t m_plingID = 0;
 int32_t m_plingTimer = 0;
 
-const float WF_VOLUMES[] = {0.6f, 0.8f, 1.0f, 0.5f, 1.0f, 0.8f};
+const float WF_VOLUMES[] = {0.6f, 0.8f, 1.0f, 0.5f, 1.0f, 0.8f, 1.0f};
 
 FilePlayer* m_music[N_MUSIC_TRACKS];
 FilePlayer* m_waterfalls[N_WF_TRACKS];
@@ -222,6 +222,7 @@ void soundDoInit() {
   m_audioSample[kBoingSfx1] =  pd->sound->sample->load("fx/201260__empraetorius__water-bottle-boing__1");
   m_audioSample[kBoingSfx2] =  pd->sound->sample->load("fx/201260__empraetorius__water-bottle-boing__2");
   m_audioSample[kFountainSfx] =  pd->sound->sample->load("fx/676283__fauxtogramme__water-from-a-fountain");
+  m_audioSample[kWompSfx] =  pd->sound->sample->load("fx/434750__djfroyd__fail");
 
   for (int32_t i = 0; i < kNSFX; ++i) {
     m_samplePlayer[i] = pd->sound->sampleplayer->newPlayer();
@@ -258,6 +259,7 @@ void soundDoInit() {
       case 3: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690211__nox_sound__ambiance_stream_big_seljalandsfoss_loop_stereo_02"); break;
       case 4: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690224__nox_sound__ambiance_waterfall_big_skogafoss_loop_stereo"); break;
       case 5: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690218__nox_sound__ambiance_stream_moderate_skogafoss_close_loop_stereo_02"); break;
+      case 6: m_hasMusic &= pd->sound->fileplayer->loadIntoPlayer(m_waterfalls[i], "tracks/690204__nox_sound__ambiance_sea_strong_reynisdrangar_loop_stereo"); break;
     }
     pd->sound->fileplayer->setVolume(m_waterfalls[i], WF_VOLUMES[i], WF_VOLUMES[i]);
     pd->sound->fileplayer->setBufferLength(m_waterfalls[i], 1.0f); 
