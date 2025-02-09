@@ -163,7 +163,8 @@
 
 #define N_MUSIC_TRACKS 12
 
-#define N_WF_TRACKS 6
+// update WF_VOLUMES too
+#define N_WF_TRACKS 7
 
 #define CRANK_NOISE_ANGLE 30.0f
 
@@ -266,6 +267,6 @@
 #define MAX_LEVELS 99
 #define MAX_HOLES 9
 
-#define VERSION "v0.1"
+#define VERSION "vB1"
 
 #define PRELOADING_STEPS 32

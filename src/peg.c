@@ -333,6 +333,7 @@ void pegDoHit(struct Peg_t* p) {
     && p->y > 0
   ) {
     p->state = kPegStateHit;
+    boardDoPegHit();
     FSMDoResetBallStuckCounter();
     //
     const enum PegSpecial_t special = boardGetCurrentSpecial();

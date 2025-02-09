@@ -7,6 +7,8 @@ struct Peg_t m_pegs[MAX_PEGS];
 
 uint16_t m_nPegs = 0;
 
+uint16_t m_pegsHit;
+
 uint16_t m_requiredPegsInPlay = 0;
 
 float m_lastBurstLevel = 0.0f;
@@ -17,6 +19,12 @@ enum PegSpecial_t m_specialToActivate = kPegSpecialNotSpecial;
 uint8_t m_specialCounter = 0;
 
 /// ///
+
+uint16_t boardGetPegsHit(void) { return m_pegsHit;  }
+
+void boardResetPegsHit(void) { m_pegsHit = 0; }
+
+void boardDoPegHit(void) { ++m_pegsHit; }
 
 float boardGetLastBurstLevel(void) { return m_lastBurstLevel; }
 
