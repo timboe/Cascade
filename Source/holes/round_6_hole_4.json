@@ -546,7 +546,7 @@
     },
     "EllipticControl2": {
       "shape": 0,
-      "x": 132,
+      "x": 104,
       "y": 852,
       "angle": 135,
       "size": 1,
@@ -590,8 +590,8 @@
     },
     "EllipticControl3": {
       "shape": 0,
-      "x": 52,
-      "y": 696,
+      "x": 60,
+      "y": 704,
       "angle": 135,
       "size": 0,
       "arc": 360,

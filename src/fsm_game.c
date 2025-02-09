@@ -123,7 +123,8 @@ void FSMCommonTurretScrollAndBounceBack(const bool allowScroll) {
 uint8_t FSMCommonMarbleFire(uint16_t* timer) {
   float progress = getEasing(EASE_MARBLE_FIRE, (float)(*timer)/TIME_FIRE_MARBLE);
   static bool once = false;
-  const bool buttonPressed = (inputGetPressed(kButtonB) || inputGetPressed(kButtonA));
+  const bool crankOutAndLRPressed = !pd->system->isCrankDocked() && (inputGetPressed(kButtonLeft) || inputGetPressed(kButtonRight));
+  const bool buttonPressed = (inputGetPressed(kButtonB) || inputGetPressed(kButtonA) || crankOutAndLRPressed);
   if ((*timer) >= TIME_FIRE_MARBLE || (progress > MIN_TURRET_CHARGE_TO_FIRE && !buttonPressed)) { // Fire
     gameMenuStateSafetyReset(); // Redundency
     physicsDoResetBall(0);

@@ -3,7 +3,7 @@
 
 //#define TAKE_SCREENSHOTS 1
 
-#define SHOW_FPS 1
+//#define SHOW_FPS 1
 
 #define DISABLE_TRAUMA 1
 //#define DISABLE_FREEZE 1
