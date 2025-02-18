@@ -283,7 +283,7 @@
     "StaticControl34": {
       "shape": 2,
       "x": 360,
-      "y": 756,
+      "y": 768,
       "angle": 0,
       "size": 1,
       "type": 0
@@ -291,8 +291,8 @@
     "StaticControl35": {
       "shape": 2,
       "x": 360,
-      "y": 756,
-      "angle": 0,
+      "y": 768,
+      "angle": -60,
       "size": 0,
       "type": 0
     },
