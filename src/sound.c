@@ -223,6 +223,7 @@ void soundDoInit() {
   m_audioSample[kBoingSfx2] =  pd->sound->sample->load("fx/201260__empraetorius__water-bottle-boing__2");
   m_audioSample[kFountainSfx] =  pd->sound->sample->load("fx/676283__fauxtogramme__water-from-a-fountain");
   m_audioSample[kWompSfx] =  pd->sound->sample->load("fx/434750__djfroyd__fail");
+  m_audioSample[kSuccessSfx] =  pd->sound->sample->load("fx/404358__kagateni__success");
 
   for (int32_t i = 0; i < kNSFX; ++i) {
     m_samplePlayer[i] = pd->sound->sampleplayer->newPlayer();

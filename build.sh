@@ -13,8 +13,8 @@ cp ${PLAYDATE_SDK_PATH}/Disk/Data/uk.co.tim-martin.cascada/*png Source/images/ho
 make clean
 make
 
-rm Cascada_v0.1.pdx.zip
-zip -r -q Cascada_v0.1.pdx.zip Cascada.pdx
+rm Cascada_v0.2.pdx.zip
+zip -r -q Cascada_v0.2.pdx.zip Cascada.pdx
 
 
 

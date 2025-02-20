@@ -51,7 +51,10 @@ LCDBitmap* bitmapGetTurretBarrel(void);
 LCDBitmap* bitmapGetGameInfoTopper(void);
 LCDBitmap* bitmapGetLevelTitle(void);
 LCDBitmap* bitmapGetScoreHistogram(void);
+LCDBitmap* bitmapGetTick(void);
 LCDBitmap* bitmapGetChevron(const uint8_t id);
+LCDBitmap* bitmapGetPar(const int16_t id);
+LCDBitmap* bitmapGetParMask(const float prog);
 
 LCDBitmap* bitmapGetPeg(const struct Peg_t* p);
 LCDBitmap* bitmapGetPegPop(const struct Peg_t* p);

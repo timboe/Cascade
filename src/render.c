@@ -152,7 +152,7 @@ void renderGame(const int32_t fc, const enum FSM_t fsm) {
   renderGameTopper();
 
   // DRAW SCORES
-  renderGameScores(fc);
+  renderGameScores(fc, fsm);
 
   if (fsm == kGameFSM_ScoresToTryAgain || fsm == kGameFSM_ToGameCreditsTitle) {
     return;
@@ -171,6 +171,8 @@ void renderGame(const int32_t fc, const enum FSM_t fsm) {
     // DRAW TRAJECTORY
     renderGameTrajectory();
   }
+
+  renderGameSpecials(fc); // Got special text & explosions
 
   if (fsm == kGameFSM_BallStuck 
     || fsm == kGameFSM_GutterToTurret 
@@ -191,7 +193,7 @@ void renderGame(const int32_t fc, const enum FSM_t fsm) {
   }
 
   // DRAW BALL
-  renderGameMarble(fc);
+  renderGameMarble(fc, fsm);
 
   if (IOGetIsTutorial()) { renderGameTutorial(fc, fsm); }
 

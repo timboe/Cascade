@@ -77,6 +77,7 @@ enum SfxSample {
   kTumblerClickSfx,
   kCrankClickSfx,
   kWompSfx,
+  kSuccessSfx,
   kNSFX
 };
 

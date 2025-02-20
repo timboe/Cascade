@@ -31,6 +31,8 @@ cpVect m_specialPos = cpvzero;
 uint8_t m_specialOffset = 0;
 enum PegSpecial_t m_specialType;
 
+void renderEndBlasts(const int32_t fc);
+
 /// ///
 
 void renderDoAddEndBlast(const cpVect location) {
@@ -90,27 +92,30 @@ void renderDoResetMarbleTrace(void) {
   }
 }
 
-void renderGameMarble(const int32_t fc) {
+void renderEndBlasts(const int32_t fc) {
+  for (int s = 0; s < MAX_END_BLASTS; ++s) {
+    if (m_endBlastID[s] == -1) { continue; }
+    pd->graphics->setDrawMode(kDrawModeXOR);
+    pd->graphics->drawBitmap(bitmapGetEndBlast(m_endBlastID[s], m_endBlastFrame[s]), m_endBlast[s].x - END_BLAST_HWIDTH, m_endBlast[s].y - END_BLAST_HWIDTH, kBitmapUnflipped);
+    pd->graphics->setDrawMode(kDrawModeCopy);
+    if (fc % 2 == 0) {
+      if (++m_endBlastFrame[s] == END_BLAST_FRAMES) {
+        m_endBlastID[s] = -1;
+      }
+    }
+  }
+}
+
+void renderGameMarble(const int32_t fc, const enum FSM_t fsm) {
 #ifdef TAKE_SCREENSHOTS
   return;
 #endif
 
   // Start out by rendering any end of level effects
-  const enum FSM_t fsm = FSMGet();
 
   // Draw end blasts
   if (fsm >= kGameFSM_WinningToastA && fsm <= kGameFSM_GutterToScores) {
-    for (int s = 0; s < MAX_END_BLASTS; ++s) {
-      if (m_endBlastID[s] == -1) { continue; }
-      pd->graphics->setDrawMode(kDrawModeXOR);
-      pd->graphics->drawBitmap(bitmapGetEndBlast(m_endBlastID[s], m_endBlastFrame[s]), m_endBlast[s].x - END_BLAST_HWIDTH, m_endBlast[s].y - END_BLAST_HWIDTH, kBitmapUnflipped);
-      pd->graphics->setDrawMode(kDrawModeCopy);
-      if (fc % 2 == 0) {
-        if (++m_endBlastFrame[s] == END_BLAST_FRAMES) {
-          m_endBlastID[s] = -1;
-        }
-      }
-    }
+    renderEndBlasts(fc);
   }
 
   const int32_t gutterY = IOGetCurrentHoleHeight();
@@ -194,33 +199,7 @@ void renderGameTrajectory(void) {
   }
 }
 
-void renderGameBoard(const int32_t fc) {
-#ifdef TAKE_SCREENSHOTS
-  if (screenShotGetInProgress()) {
-    for (int i = 0; i < boardGetNPegs(); ++i) {
-      const struct Peg_t* p = boardGetPeg(i);
-      if (p->motion == kPegMotionEllipse && p->speed) {
-        pd->graphics->drawEllipse(p->pathX[0] - p->a, p->pathY[0] - p->b, p->a*2, p->b*2, 4, 0.0f, 360.0f, kColorBlack);
-      } else if (p->motion == kPegMotionPath && p->speed) {
-        for (int j = 1; j < p->pathSteps; ++j) {
-          pd->graphics->drawLine(p->pathX[j], p->pathY[j], p->pathX[j-1], p->pathY[j-1], 4, kColorBlack);
-        }
-      }
-    }
-  }
-#endif
-
-  for (int i = 0; i < boardGetNPegs(); ++i) {
-    const struct Peg_t* p = boardGetPeg(i);
-    if (p->state == kPegStateRemoved || p->y < 0 || p->y > IOGetCurrentHoleHeight()) {
-      continue;
-    } else if (p->state == kPegStateHit) {
-      pd->graphics->setDrawMode(kDrawModeInverted);
-    }
-    pd->graphics->drawBitmap(p->bitmap, p->xBitmap, p->yBitmap, kBitmapUnflipped);
-    pd->graphics->setDrawMode(kDrawModeCopy);
-  }
-
+void renderGameSpecials(const int32_t fc) {
   if (m_specialPos.x) { // Draw special obtained toast
     m_specialOffset++;
     if (m_specialOffset == TICK_FREQUENCY) {
@@ -252,6 +231,35 @@ void renderGameBoard(const int32_t fc) {
       pd->graphics->setDrawMode(kDrawModeCopy);
       pd->graphics->drawBitmap(bitmapGetSpecialBlast(animFrame), m_blastPos.x - SPECIAL_BLAST_RADIUS, m_blastPos.y - SPECIAL_BLAST_RADIUS, kBitmapUnflipped);
     }
+  }
+}
+
+
+void renderGameBoard(const int32_t fc) {
+#ifdef TAKE_SCREENSHOTS
+  if (screenShotGetInProgress()) {
+    for (int i = 0; i < boardGetNPegs(); ++i) {
+      const struct Peg_t* p = boardGetPeg(i);
+      if (p->motion == kPegMotionEllipse && p->speed) {
+        pd->graphics->drawEllipse(p->pathX[0] - p->a, p->pathY[0] - p->b, p->a*2, p->b*2, 4, 0.0f, 360.0f, kColorBlack);
+      } else if (p->motion == kPegMotionPath && p->speed) {
+        for (int j = 1; j < p->pathSteps; ++j) {
+          pd->graphics->drawLine(p->pathX[j], p->pathY[j], p->pathX[j-1], p->pathY[j-1], 4, kColorBlack);
+        }
+      }
+    }
+  }
+#endif
+
+  for (int i = 0; i < boardGetNPegs(); ++i) {
+    const struct Peg_t* p = boardGetPeg(i);
+    if (p->state == kPegStateRemoved || p->y < 0 || p->y > IOGetCurrentHoleHeight()) {
+      continue;
+    } else if (p->state == kPegStateHit) {
+      pd->graphics->setDrawMode(kDrawModeInverted);
+    }
+    pd->graphics->drawBitmap(p->bitmap, p->xBitmap, p->yBitmap, kBitmapUnflipped);
+    pd->graphics->setDrawMode(kDrawModeCopy);
   }
 
 }
@@ -312,7 +320,7 @@ void renderGameGutter(const int32_t fc) {
   // pd->graphics->drawRect(1, gutterY + 1, DEVICE_PIX_X-2, (POND_WATER_HEIGHT*POND_WATER_TILES)-2, kColorBlack);
 }
 
-void renderGameScores(const int32_t fc) {
+void renderGameScores(const int32_t fc, const enum FSM_t fsm) {
   const int32_t so = gameGetYOffset();
 
   //Note no parallax here
@@ -325,16 +333,45 @@ void renderGameScores(const int32_t fc) {
         kBitmapUnflipped);
     }
 
-    if (FSMGet() >= kGameFSM_DisplayScores) {
+    if (fsm >= kGameFSM_DisplayScores) {
       #define C_OFF (96 + 0)
       // add 16 if adding arrows too
       pd->graphics->drawBitmap(bitmapGetChevron((fc / (TICK_FREQUENCY/2)) % 3), DEVICE_PIX_X - 2*BUF - C_OFF, DEVICE_PIX_Y*5 + BUF, kBitmapFlippedY);
       pd->graphics->drawBitmap(bitmapGetChevron((fc / (TICK_FREQUENCY/2)) % 3), DEVICE_PIX_X - 2*BUF - C_OFF, DEVICE_PIX_Y*6 - C_OFF - BUF, kBitmapUnflipped);
-    
-      // if ((fc / TICK_FREQUENCY) % 2) {
-      //   pd->graphics->drawBitmap(bitmapGetFwBkwIcon(0), DEVICE_PIX_X - FW_BKW_WIDTH - 8, DEVICE_PIX_Y*5 + FW_BKW_BUF, kBitmapUnflipped);
-      //   pd->graphics->drawBitmap(bitmapGetFwBkwIcon(1), DEVICE_PIX_X - FW_BKW_WIDTH - 8, DEVICE_PIX_Y*6 - FW_BKW_BUF - FW_BKW_HEIGHT, kBitmapUnflipped);
-      // }
+    }
+
+    if (fsm == kGameFSM_DisplayScores) {
+      const uint16_t par = IOGetCurrentHolePar();
+      const uint16_t score = IOGetCurrentHoleScore();
+      if (score && score <= par) {
+        pd->graphics->drawBitmap(bitmapGetTick(), 
+          BUF + BALL_RADIUS/2 + m_ballFallX*3*BALL_RADIUS - 2,
+          BUF + BUF/2 + (12 - par - 2)*2*BALL_RADIUS + (DEVICE_PIX_Y * 5),
+          kBitmapUnflipped);
+      }
+    }
+
+    if (fsm == kGameFSM_ScoresAnimationB) {
+      const int16_t timer = FSMGetHoleScoreTimer();
+      const float progress = timer / (float)TIME_SCORE_ANIMATION_B;
+      LCDBitmap* par = bitmapGetPar( FSMGetHoleScoreID() );
+      LCDBitmap* mask = bitmapGetParMask( progress );
+
+      int16_t yOff = 0;
+      if (progress > 0.8f) {
+        const float endProg = (progress - 0.8f) * 5.0f;
+        const float endProgSmooth = getEasing(kEaseInBack, endProg);
+        yOff = DEVICE_PIX_Y * endProgSmooth;
+      }
+
+      pd->graphics->setDrawMode(kDrawModeCopy);
+      pd->graphics->drawBitmap(par, 0, (DEVICE_PIX_Y * 5) - yOff , kBitmapUnflipped);
+      pd->graphics->setBitmapMask(mask, par);
+      pd->graphics->drawBitmap(mask, 0, (DEVICE_PIX_Y * 5) - yOff, kBitmapUnflipped);
+      pd->graphics->setDrawMode(kDrawModeCopy);
+      pd->graphics->setBitmapMask(mask, NULL);
+
+      renderEndBlasts(fc);
     }
   }
 

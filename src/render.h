@@ -49,14 +49,15 @@ void renderTitlesWfPond(const int32_t fc);
 void renderTitlesTransitionLevelSplash(void);
 
 void renderGameTopper(void);
-void renderGameMarble(const int32_t fc);
+void renderGameMarble(const int32_t fc, const enum FSM_t fsm);
 void renderGamePoot(const enum FSM_t fsm);
 void renderGameTurret(void);
 void renderGameTrajectory(void);
 void renderGameBoard(const int32_t fc);
+void renderGameSpecials(const int32_t fc);
 void renderGamePops(const int32_t fc);
 void renderGameFountains(const int32_t fc);
 void renderGameBackground(void);
 void renderGameGutter(const int32_t fc);
-void renderGameScores(const int32_t fc);
+void renderGameScores(const int32_t fc, const enum FSM_t fsm);
 void renderGameTutorial(const int32_t fc, const enum FSM_t fsm);

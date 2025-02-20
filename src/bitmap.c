@@ -47,13 +47,13 @@ LCDBitmap* m_numeralBitmap[10];
 LCDBitmap* m_cardBitmap;
 
 LCDBitmap* m_scoreHistogram = NULL;
+LCDBitmap* m_tickBitmap;
 
 LCDBitmap* m_sideMenuBitmap;
 LCDBitmap* m_sideMenuLevelBitmap;
 
 int16_t m_cachedLevel = -1;
 int16_t m_cachedHole = -1;
-
 
 LCDBitmap* m_pootAnimation[TURRET_RADIUS];
 
@@ -78,7 +78,10 @@ uint8_t m_loadedWfFgSpecial = 0;
 LCDBitmapTable* m_waterSplashTable[N_SPLASHES];
 LCDBitmapTable* m_fountainTable[N_FOUNTAINS];
 LCDBitmapTable* m_chevronTable;
+LCDBitmapTable* m_parTable;
 LCDBitmapTable* m_pegPopTable[MAX_POPS];
+
+LCDBitmap* m_parMask;
 
 LCDBitmapTable* m_specialBlastTable;
 LCDBitmapTable* m_endBlastTable[N_END_BLASTS];
@@ -115,7 +118,7 @@ void bitmapUpdateCachedPreviewBitmap(const uint16_t level, const uint16_t hole);
 
 /// ///
 
-LCDBitmap* bitmapGetSideMenu(const uint16_t ballCount) {  // xxx
+LCDBitmap* bitmapGetSideMenu(const uint16_t ballCount) {
   pd->graphics->clearBitmap(m_sideMenuBitmap, kColorClear);
   pd->graphics->pushContext(m_sideMenuBitmap);
   pd->graphics->fillRect(0, 0, HALF_DEVICE_PIX_X, DEVICE_PIX_Y, kColorWhite);
@@ -494,6 +497,24 @@ LCDBitmap* bitmapGetChevron(const uint8_t id) {
   return pd->graphics->getTableBitmap(m_chevronTable, id % 3);
 }
 
+LCDBitmap* bitmapGetPar(const int16_t id) {
+  return pd->graphics->getTableBitmap(m_parTable, id % 4);
+}
+
+LCDBitmap* bitmapGetTick(void) { return m_tickBitmap; }
+
+LCDBitmap* bitmapGetParMask(const float prog) {
+  const float progSmooth = getEasing(kEaseInOutQuart, prog);
+  const int16_t x = (progSmooth * DEVICE_PIX_X * 2) - HALF_DEVICE_PIX_X;
+  pd->graphics->clearBitmap(m_parMask, kColorWhite);
+  pd->graphics->pushContext(m_parMask);
+  pd->graphics->drawLine(x,      DEVICE_PIX_Y, x - 64 , 0, 64, kColorBlack);
+  pd->graphics->drawLine(x + 64, DEVICE_PIX_Y, x,       0, 16, kColorBlack);
+  pd->graphics->popContext();
+  return m_parMask;
+}
+
+
 // Can't currently use bitmapDoDrawRotatedPoly here as the points are not evenly spaced around the unit circle
 void bitmapDoDrawRotatedRect(const float x, const float y, const float w2, const float h2, const int16_t iAngle, const enum RenderColor_t rc) {
     pd->graphics->setLineCapStyle(kLineCapStyleRound);
@@ -601,6 +622,13 @@ void bitmapDoUpdateScoreHistogram(void) {
   for (int i = 0; i < MAX_HOLES; ++i) {
     for (int j = 1; j <= balls[i]; j++) {
       pd->graphics->drawBitmap(m_marbleBitmap, BUF + BALL_RADIUS/2 + i*3*BALL_RADIUS, BUF + (maxHistoBalls - j)*2*BALL_RADIUS, kBitmapUnflipped);
+    }
+
+    if (balls[i] && balls[i] <= par[i]) {
+      pd->graphics->drawBitmap(m_tickBitmap, 
+        BUF + BALL_RADIUS/2 + i*3*BALL_RADIUS - 2,
+        BUF + BUF/2 + (maxHistoBalls - par[i] - 2)*2*BALL_RADIUS,
+        kBitmapUnflipped);
     }
   }
 
@@ -878,6 +906,7 @@ void bitmapDoPreloadA(void) {
   m_ditherBitmap = bitmapDoLoadImageAtPath("images/dither");
   m_holeTutorialBitmap = bitmapDoLoadImageAtPath("images/tut/tutorial");
   m_cardBitmap = bitmapDoLoadImageAtPath("images/card");
+  m_tickBitmap = bitmapDoLoadImageAtPath("images/tick");
 
   m_turretBarrelTabel = bitmapDoLoadImageTableAtPath("images/anim/turretBarrel");
   m_waterSplashTable[0] = bitmapDoLoadImageTableAtPath("images/anim/MarbleSplash0");
@@ -888,6 +917,7 @@ void bitmapDoPreloadA(void) {
   m_tutorialDPadTable = bitmapDoLoadImageTableAtPath("images/tut/dPad");
   m_tutorialArrowsTable = bitmapDoLoadImageTableAtPath("images/tut/tutorialPoint");
   m_chevronTable =  bitmapDoLoadImageTableAtPath("images/chevron");
+  m_parTable =  bitmapDoLoadImageTableAtPath("images/par");
   m_fwBkwIconTable = bitmapDoLoadImageTableAtPath("images/forwarbackward");
   m_turretBodyTable = bitmapDoLoadImageTableAtPath("images/turretBody");
   char text[128];
@@ -908,6 +938,8 @@ void bitmapDoPreloadA(void) {
   m_fontGreatvibes24 = bitmapDoLoadFontAtPath("fonts/GreatVibes-Regular-24");
   m_fontGreatvibes109 = bitmapDoLoadFontAtPath("fonts/GreatVibes-Regular-109");
   pd->graphics->setFont(m_fontGreatvibes24);
+
+  m_parMask = pd->graphics->newBitmap(DEVICE_PIX_X, DEVICE_PIX_Y, kColorClear);
 
   m_infoTopperBitmap = pd->graphics->newBitmap(DEVICE_PIX_X, TITLETEXT_HEIGHT, kColorClear);
   m_levelTitleBitmap = pd->graphics->newBitmap(DEVICE_PIX_X, DEVICE_PIX_Y, kColorClear);

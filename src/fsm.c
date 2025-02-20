@@ -60,7 +60,8 @@ void FSMDo(const enum FSM_t transitionTo) {
     case kGameFSM_GutterToTurret: return FSMGutterToTurret(newState);
     case kGameFSM_TurretLower: return FSMTurretLower(newState);
     case kGameFSM_GutterToScores: return FSMGutterToScores(newState);
-    case kGameFSM_ScoresAnimation: return FSMScoresAnimation(newState);
+    case kGameFSM_ScoresAnimationA: return FSMScoresAnimationA(newState);
+    case kGameFSM_ScoresAnimationB: return FSMScoresAnimationB(newState);
     case kGameFSM_DisplayScores: return FSMDisplayScores(newState);
     case kGameFSM_ScoresToTryAgain: return FSMScoresToTryAgain(newState);
     case kGameFSM_ScoresToSplash: return FSMScoresToSplash(newState);

@@ -46,7 +46,8 @@ enum FSM_t {
   kGameFSM_GutterToTurret,
   kGameFSM_TurretLower,
   kGameFSM_GutterToScores,
-  kGameFSM_ScoresAnimation,
+  kGameFSM_ScoresAnimationA,
+  kGameFSM_ScoresAnimationB,
   kGameFSM_DisplayScores,
   kGameFSM_ScoresToTryAgain,
   kGameFSM_ScoresToSplash,
@@ -63,6 +64,9 @@ enum FSM_t FSMGet(void);
 enum GameMode_t FSMGetGameMode(void);
 
 bool FSMGetBallInPlay(void);
+
+int16_t FSMGetHoleScoreID(void);
+int16_t FSMGetHoleScoreTimer(void);
 
 void FSMDoResetBallStuckCounter(void);
 
@@ -106,7 +110,8 @@ void FSMBallGutter(const bool newState);
 void FSMGutterToTurret(const bool newState);
 void FSMTurretLower(const bool newState);
 void FSMGutterToScores(const bool newState);
-void FSMScoresAnimation(const bool newState);
+void FSMScoresAnimationA(const bool newState);
+void FSMScoresAnimationB(const bool newState);
 void FSMDisplayScores(const bool newState);
 void FSMScoresToTryAgain(const bool newState);
 void FSMScoresToSplash(const bool newState);

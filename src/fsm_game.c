@@ -20,6 +20,9 @@ int16_t m_finalPegID = -1;
 bool m_vetoCloseUp = false; // If we break out of close up, then don't do it again on this ball
 uint16_t m_fizzleTimer = 0; // Prevent going straight back in to close up
 
+int16_t m_holeScoreID = -1; // Which special hole message to show  
+int16_t m_holeScoreTimer = -1; // And for how long
+
 void FSMCommonTurretScrollAndBounceBack(const bool allowScroll);
 
 bool FSMCommonFocusOnLowestBallInPlay(const enum PegSpecial_t special);
@@ -27,6 +30,10 @@ bool FSMCommonFocusOnLowestBallInPlay(const enum PegSpecial_t special);
 uint8_t FSMCommonMarbleFire(uint16_t* timer);
 
 /// ///
+
+int16_t FSMGetHoleScoreID(void) { return m_holeScoreID; }
+
+int16_t FSMGetHoleScoreTimer(void) { return m_holeScoreTimer; }
 
 void FSMDoResetBallStuckCounter(void) { 
   m_ballStuckCounter[0] = 0;
@@ -679,10 +686,10 @@ void FSMGutterToScores(const bool newState) {
     soundDoSfx(kWhooshSfx1);
   }
   FSMDoCommonScrollTo(origin, DEVICE_PIX_Y*5, (float)timer/TIME_GUTTER_TO_SCORE, EASE_GUTTER_TO_SCORE);
-  if (timer++ == TIME_GUTTER_TO_SCORE) { return FSMDo(kGameFSM_ScoresAnimation); }
+  if (timer++ == TIME_GUTTER_TO_SCORE) { return FSMDo(kGameFSM_ScoresAnimationA); }
 }
 
-void FSMScoresAnimation(const bool newState) {
+void FSMScoresAnimationA(const bool newState) {
   static float py[32] = {0};
   static float vy[32] = {0};
   static uint16_t timer = 0;
@@ -691,11 +698,22 @@ void FSMScoresAnimation(const bool newState) {
   static const uint16_t maxBallsToShow = 12;
   if (newState) {
     timer = 0;
+    const uint16_t previousScore = IOGetCurrentHoleScore();
+    if (m_ballCount > maxBallsToShow) {
+      m_ballCount = maxBallsToShow;
+    }
     IOSetCurrentHoleScore(m_ballCount);
     ballsToShow = IOGetCurrentHoleScore(); // Will display the best score
-    if (ballsToShow > maxBallsToShow) { ballsToShow = maxBallsToShow; }
     renderSetMarbleFallN(ballsToShow);
     renderSetMarbleFallX(IOGetCurrentHole());
+    const uint16_t par = IOGetCurrentHolePar();
+    m_holeScoreID = -1; 
+    if (m_ballCount <= par && (m_ballCount < previousScore || previousScore == 0)) {
+      if (m_ballCount == 1)            { m_holeScoreID = 3; } // Hole in 1
+      else if (m_ballCount == par)     { m_holeScoreID = 0; } // Par
+      else if (m_ballCount == par - 1) { m_holeScoreID = 1; } // Birdie
+      else                             { m_holeScoreID = 2; } // Eagle (/fallback)
+    }
     activeBalls = 1;
     for (int i = 0; i < ballsToShow; ++i) {
       py[i] = -2*BALL_RADIUS*(i + 1);
@@ -721,8 +739,36 @@ void FSMScoresAnimation(const bool newState) {
     renderSetMarbleFallY(i, py[i]);
   }
   if (++timer % TIME_BALL_DROP_DELAY == 0 && activeBalls < ballsToShow) { activeBalls++; }
-  if (!moving) return FSMDo(kGameFSM_DisplayScores);
+  if (!moving) {
+    if (m_holeScoreID == -1) { return FSMDo(kGameFSM_DisplayScores); }
+    else                     { return FSMDo(kGameFSM_ScoresAnimationB); }
+  }
 }
+
+void FSMScoresAnimationB(const bool newState) {
+  static uint16_t blastFrequency;
+  if (newState) {
+    m_holeScoreTimer = 0;
+    if      (m_holeScoreID == 3) { blastFrequency = 4; } // Hole in 1
+    else if (m_holeScoreID == 0) { blastFrequency = 10; } // Par
+    else if (m_holeScoreID == 1) { blastFrequency = 8; } // Birdie
+    else                         { blastFrequency = 6; } // Eagle (/fallback)
+    soundDoSfx(kSuccessSfx);
+    renderDoResetEndBlast();
+  }
+  //
+  if (m_holeScoreTimer >= TICK_FREQUENCY/2
+    && m_holeScoreTimer <= TIME_SCORE_ANIMATION_B - END_BLAST_FRAMES*2
+    && m_holeScoreTimer % blastFrequency == 0)
+  {
+    const uint16_t x = 32 + rand() % (DEVICE_PIX_X - 64);
+    const uint16_t y = 32 + rand() % (DEVICE_PIX_Y - 64) + (DEVICE_PIX_Y * 5);
+    renderDoAddEndBlast( cpv(x,y) );
+    soundDoSfx(kPopSfx1);
+  }
+  if (++m_holeScoreTimer == TIME_SCORE_ANIMATION_B) { return FSMDo(kGameFSM_DisplayScores); }
+}
+
 
 
 void FSMDisplayScores(const bool newState) {
