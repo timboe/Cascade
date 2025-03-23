@@ -1,0 +1,678 @@
+[gd_scene load_steps=23 format=3 uid="uid://ccn4dby23xe5u"]
+
+[ext_resource type="Theme" uid="uid://mvm1lqkscosr" path="res://editor/theme/aestro.tres" id="1_xnnph"]
+[ext_resource type="StyleBox" uid="uid://cgsvf1qt0q4uy" path="res://background_style_box_flat.tres" id="2_p5hqi"]
+[ext_resource type="Texture2D" uid="uid://c3p26s3h3glww" path="res://backgrounds/falls0_bg.png" id="3_sg4b8"]
+[ext_resource type="Texture2D" uid="uid://v76yewb52ss8" path="res://foregrounds/falls1_fg-table-400-60.png" id="4_8fcmy"]
+[ext_resource type="Texture2D" uid="uid://b645rphiris4n" path="res://turretBody.png" id="5_qe4vv"]
+[ext_resource type="Script" path="res://RenderScene.gd" id="6_wnurb"]
+[ext_resource type="Script" path="res://InputParser.gd" id="7_ghot4"]
+[ext_resource type="Script" path="res://Save.gd" id="8_17lq2"]
+[ext_resource type="Script" path="res://Load.gd" id="9_pbdva"]
+[ext_resource type="StyleBox" uid="uid://b0mcxi81am8bc" path="res://selected_style_box_flat.tres" id="10_obq6a"]
+
+[sub_resource type="GDScript" id="GDScript_pob6t"]
+script/source = "extends LineEdit
+
+func _on_text_changed(new_text):
+	var caret_pos = self.caret_column
+	self.text = new_text.to_upper()
+	self.caret_column = caret_pos
+"
+
+[sub_resource type="GDScript" id="GDScript_m17f8"]
+script/source = "extends LineEdit
+
+func _on_text_changed(new_text):
+	var caret_pos = self.caret_column
+	self.text = new_text.to_upper()
+	self.caret_column = caret_pos
+"
+
+[sub_resource type="GDScript" id="GDScript_vi753"]
+script/source = "extends HSlider
+
+func _on_value_changed(newValue):
+	$\"../LevelLabel\".text = \"Round: \" + str(newValue)
+"
+
+[sub_resource type="GDScript" id="GDScript_scs8v"]
+script/source = "extends HSlider
+
+func _on_value_changed(newValue):
+	$\"../HoleLabel\".text = \"Hole: \" + str(newValue)
+"
+
+[sub_resource type="GDScript" id="GDScript_lhfae"]
+script/source = "extends HSlider
+
+func _on_value_changed(newValue):
+	$\"../ParLabel\".text = \"Hole Par: \" + str(newValue)
+"
+
+[sub_resource type="GDScript" id="GDScript_stxm2"]
+script/source = "extends HSlider
+
+func _on_value_changed(newValue):
+	$\"../HeightLabel\".text = \"Waterfall Height: \" + str(newValue)
+	$%Render.queue_redraw()
+	#get_tree().call_group(\"y_sensitive\", \"new_max_y\", newValue + 50)
+"
+
+[sub_resource type="GDScript" id="GDScript_4ako0"]
+script/source = "extends HSlider
+
+func _on_value_changed(new_value):
+	$\"../SnapLabel\".text = \"Editor Snap: \" + str(new_value)
+	for t in get_tree().get_nodes_in_group(\"coordinate_text_group\"):
+		t.step = new_value
+"
+
+[sub_resource type="GDScript" id="GDScript_2y8hb"]
+script/source = "extends OptionButton
+
+func _on_item_selected(index):
+	print(\"_on_item_selected foreground\")
+	var id = get_item_id(index)
+	if (%ForegroundIDSlider):
+		%ForegroundIDSlider.value = id + 1
+	if id == 10: # custom
+		$FileDialog.visible = true
+		return
+	var res = load(\"res://foregrounds/falls\" + str(id+1) +  \"_fg-table-400-60.png\")
+	if res:
+		%ForegroundTexRect.texture = res
+
+func _on_background_item_selected(index):
+	var res = load(\"res://backgrounds/falls\" + str(index+1) + \"_bg.png\")
+	if res:
+		%BackgroundTexRect.texture = res
+
+
+func _on_file_dialog_file_selected(path):
+	var image = Image.load_from_file(path)
+	var tex = ImageTexture.create_from_image(image)
+	print(\"will load custom image at \",path,\" giving \", tex)
+	if tex:
+		%ForegroundTexRect.texture = tex
+		#%ForegroundTexRect.stretch_mode = TextureRect.StretchMode.STRETCH_KEEP_ASPECT
+"
+
+[sub_resource type="GDScript" id="GDScript_hf5xj"]
+script/source = "extends Button
+
+var fs = false
+
+func _on_pressed():
+	if !fs:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+		fs = true
+	else: 
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+		fs = false
+"
+
+[sub_resource type="GDScript" id="GDScript_2mwtp"]
+script/source = "extends Button
+
+@onready var staticScene = load(\"res://peg_control.tscn\")
+var static_count : int = 0
+
+var newPos := Vector2(32,32)
+
+func reset_count():
+	static_count = 0
+
+func _on_pressed():
+	var instance = staticScene.instantiate()
+	static_count += 1
+	instance.name = \"StaticControl\" + str(static_count)
+	instance.find_child(\"StaticPeg\").text = \"StaticPeg\" + str(static_count)
+	instance.find_child(\"XText\").value = newPos.x
+	instance.find_child(\"YText\").value = newPos.y
+	newPos.x += 16
+	if (newPos.x >= 400 - 16):
+		newPos.x = 16
+		newPos.y += 16
+	%RightVBox.add_child(instance)
+	%Render.queue_redraw()
+"
+
+[sub_resource type="GDScript" id="GDScript_qd471"]
+script/source = "extends Button
+
+@onready var staticScene = load(\"res://elliptic_control.tscn\")
+var elliptic_count : int = 0
+
+var newPos := Vector2(32,64)
+
+func reset_count():
+	elliptic_count = 0
+
+func _on_pressed():
+	var instance = staticScene.instantiate()
+	elliptic_count += 1
+	instance.name = \"EllipticControl\" + str(elliptic_count)
+	instance.find_child(\"EllipticPathText\").text = \"EllipticPegPath\" + str(elliptic_count)
+	instance.find_child(\"XText\").value = newPos.x
+	instance.find_child(\"YText\").value = newPos.y
+	newPos.x += 16
+	if (newPos.x >= 400 - 16):
+		newPos.x = 16
+		newPos.y += 16
+	$%RightVBox.add_child(instance)
+	$%Render.queue_redraw()
+"
+
+[sub_resource type="GDScript" id="GDScript_sm36e"]
+script/source = "extends Button
+
+@onready var staticScene = load(\"res://line_control.tscn\")
+var lineCount : int = 0
+
+var newPos := Vector2(32,64+32)
+
+func reset_count():
+	lineCount = 0
+
+func _on_pressed():
+	var instance = staticScene.instantiate()
+	lineCount += 1
+	instance.name = \"LinearControl\" + str(lineCount)
+	instance.find_child(\"LinePathText\").text = \"LinearPegPath\" + str(lineCount)
+	instance.find_child(\"XText\").value = newPos.x
+	instance.find_child(\"YText\").value = newPos.y
+	newPos.x += 16
+	if (newPos.x >= 400 - 16):
+		newPos.x = 16
+		newPos.y += 16
+	$%RightVBox.add_child(instance)
+	$%Render.queue_redraw()
+"
+
+[node name="RootControl" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource("1_xnnph")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("2_p5hqi")
+
+[node name="HBox" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LeftScroll" type="ScrollContainer" parent="HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+
+[node name="Control" type="Control" parent="HBox/LeftScroll"]
+custom_minimum_size = Vector2(400, 960)
+layout_mode = 2
+
+[node name="BackgroundTexRect" type="TextureRect" parent="HBox/LeftScroll/Control"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_right = 400.0
+offset_bottom = 1020.0
+texture = ExtResource("3_sg4b8")
+stretch_mode = 1
+
+[node name="ForegroundTexRect" type="TextureRect" parent="HBox/LeftScroll/Control"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_right = 400.0
+offset_bottom = 960.0
+texture = ExtResource("4_8fcmy")
+
+[node name="Turret" type="TextureRect" parent="HBox/LeftScroll/Control"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -32.0
+offset_right = 32.0
+offset_bottom = 64.0
+grow_horizontal = 2
+texture = ExtResource("5_qe4vv")
+
+[node name="Render" type="Node2D" parent="HBox/LeftScroll/Control"]
+unique_name_in_owner = true
+script = ExtResource("6_wnurb")
+
+[node name="InputParser" type="Node2D" parent="HBox/LeftScroll/Control"]
+unique_name_in_owner = true
+visible = false
+script = ExtResource("7_ghot4")
+
+[node name="RightScroll" type="ScrollContainer" parent="HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="HBox/RightScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="RightVBox" type="VBoxContainer" parent="HBox/RightScroll/Margin"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="LevelSettings" type="Label" parent="HBox/RightScroll/Margin/RightVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "HOLE SETTINGS"
+
+[node name="Grid" type="GridContainer" parent="HBox/RightScroll/Margin/RightVBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+columns = 2
+
+[node name="AuthorLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Hole Author:"
+horizontal_alignment = 2
+
+[node name="Author" type="LineEdit" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_length = 6
+script = SubResource("GDScript_pob6t")
+
+[node name="NameLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Hole Name:"
+horizontal_alignment = 2
+
+[node name="Name" type="LineEdit" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_length = 9
+script = SubResource("GDScript_m17f8")
+
+[node name="LevelLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Round: 10"
+horizontal_alignment = 2
+
+[node name="LevelSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 7.0
+max_value = 99.0
+value = 10.0
+rounded = true
+tick_count = 16
+script = SubResource("GDScript_vi753")
+
+[node name="HoleLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Hole: 1"
+horizontal_alignment = 2
+
+[node name="HoleSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 9.0
+value = 1.0
+rounded = true
+tick_count = 9
+script = SubResource("GDScript_scs8v")
+
+[node name="ParLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Hole Par: 3"
+horizontal_alignment = 2
+
+[node name="ParSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 10.0
+value = 3.0
+rounded = true
+tick_count = 8
+script = SubResource("GDScript_lhfae")
+
+[node name="SpecialLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Hole Special"
+horizontal_alignment = 2
+
+[node name="SpecialButton" type="OptionButton" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+item_count = 7
+selected = 0
+popup/item_0/text = "Random"
+popup/item_0/id = 0
+popup/item_1/text = "AIMSHOT"
+popup/item_1/id = 1
+popup/item_2/text = "SECONDSHOT"
+popup/item_2/id = 2
+popup/item_3/text = "BLASTBALL"
+popup/item_3/id = 3
+popup/item_4/text = "MULTIBALL"
+popup/item_4/id = 4
+popup/item_5/text = "ELASTIBALL"
+popup/item_5/id = 5
+popup/item_6/text = "GHOSTBALL"
+popup/item_6/id = 6
+
+[node name="HeightLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Hole Height: 960"
+horizontal_alignment = 2
+
+[node name="HeightSlider" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 240.0
+max_value = 960.0
+step = 10.0
+value = 960.0
+rounded = true
+tick_count = 12
+script = SubResource("GDScript_stxm2")
+
+[node name="SnapLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Editor Snap: 4"
+horizontal_alignment = 2
+
+[node name="EditorSnap" type="HSlider" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 30.0
+value = 4.0
+rounded = true
+tick_count = 15
+script = SubResource("GDScript_4ako0")
+
+[node name="StaticPegsLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Static obstacles:"
+horizontal_alignment = 2
+
+[node name="StaticPegs" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+
+[node name="MotionPegsLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Motion Obstacles:"
+horizontal_alignment = 2
+
+[node name="MotionPegs" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+
+[node name="Foreground" type="OptionButton" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+item_count = 8
+selected = 0
+popup/item_0/text = "Waterfall 1"
+popup/item_0/id = 0
+popup/item_1/text = "Waterfall 2"
+popup/item_1/id = 1
+popup/item_2/text = "Waterfall 3"
+popup/item_2/id = 2
+popup/item_3/text = "Waterfall 4"
+popup/item_3/id = 3
+popup/item_4/text = "Waterfall 5"
+popup/item_4/id = 4
+popup/item_5/text = "Waterfall 6"
+popup/item_5/id = 5
+popup/item_6/text = "Waterfall 7"
+popup/item_6/id = 6
+popup/item_7/text = "CUSTOM"
+popup/item_7/id = 10
+script = SubResource("GDScript_2y8hb")
+
+[node name="FileDialog" type="FileDialog" parent="HBox/RightScroll/Margin/RightVBox/Grid/Foreground"]
+title = "Open a File"
+ok_button_text = "Open"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.png, *.jpg, *.jpeg ; Images")
+use_native_dialog = true
+
+[node name="Background" type="OptionButton" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+item_count = 4
+selected = 0
+popup/item_0/text = "Background 1"
+popup/item_0/id = 0
+popup/item_1/text = "Background 2"
+popup/item_1/id = 1
+popup/item_2/text = "Background 3"
+popup/item_2/id = 2
+popup/item_3/text = "Background 4"
+popup/item_3/id = 3
+
+[node name="Export" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+text = "Export"
+script = ExtResource("8_17lq2")
+
+[node name="PopupPanel" type="PopupPanel" parent="HBox/RightScroll/Margin/RightVBox/Grid/Export"]
+initial_position = 1
+size = Vector2i(600, 400)
+theme_override_styles/panel = ExtResource("10_obq6a")
+
+[node name="MarginContainer" type="MarginContainer" parent="HBox/RightScroll/Margin/RightVBox/Grid/Export/PopupPanel"]
+offset_right = 600.0
+offset_bottom = 400.0
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBox/RightScroll/Margin/RightVBox/Grid/Export/PopupPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid/Export/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "EXPORTED HOLE DATA"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBox/RightScroll/Margin/RightVBox/Grid/Export/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid/Export/PopupPanel/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Save the following to a file named:"
+horizontal_alignment = 1
+
+[node name="FileNameLabel" type="RichTextLabel" parent="HBox/RightScroll/Margin/RightVBox/Grid/Export/PopupPanel/MarginContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(256, 0)
+layout_mode = 2
+focus_mode = 2
+text = "round_1_hole_1.json"
+scroll_active = false
+selection_enabled = true
+
+[node name="TextExport" type="TextEdit" parent="HBox/RightScroll/Margin/RightVBox/Grid/Export/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+editable = false
+
+[node name="CopyButton" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid/Export/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Copy Hole Data"
+
+[node name="Close" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid/Export/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Close"
+
+[node name="Import" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+text = "Import"
+script = ExtResource("9_pbdva")
+
+[node name="PopupPanel" type="PopupPanel" parent="HBox/RightScroll/Margin/RightVBox/Grid/Import"]
+initial_position = 1
+size = Vector2i(500, 400)
+theme_override_styles/panel = ExtResource("10_obq6a")
+
+[node name="MarginContainer" type="MarginContainer" parent="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel"]
+offset_right = 500.0
+offset_bottom = 400.0
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "IMPORT LEVEL DATA"
+horizontal_alignment = 1
+
+[node name="TextImport" type="TextEdit" parent="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Status" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Status: OK"
+horizontal_alignment = 1
+
+[node name="PasteButton" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Paste Level Data From Clipboard"
+
+[node name="Import" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Import"
+
+[node name="Close" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Close"
+
+[node name="FullScreen" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+text = "Fullscreen"
+script = SubResource("GDScript_hf5xj")
+
+[node name="Reset" type="Button" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
+layout_mode = 2
+text = "Reset"
+script = ExtResource("9_pbdva")
+
+[node name="HSeparator" type="HSeparator" parent="HBox/RightScroll/Margin/RightVBox"]
+layout_mode = 2
+
+[node name="AddPeg" type="Label" parent="HBox/RightScroll/Margin/RightVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "ADD OBSTACLES"
+
+[node name="AddStatic" type="Button" parent="HBox/RightScroll/Margin/RightVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "New Static Obstacle"
+script = SubResource("GDScript_2mwtp")
+
+[node name="AddElliptic" type="Button" parent="HBox/RightScroll/Margin/RightVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "New Elliptic Obstacle Path"
+script = SubResource("GDScript_qd471")
+
+[node name="AddLinear" type="Button" parent="HBox/RightScroll/Margin/RightVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "New Linear Obstacle Path"
+script = SubResource("GDScript_sm36e")
+
+[node name="HSeparator2" type="HSeparator" parent="HBox/RightScroll/Margin/RightVBox"]
+layout_mode = 2
+
+[node name="Pegs" type="Label" parent="HBox/RightScroll/Margin/RightVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "OBSTACLES"
+
+[connection signal="text_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/Author" to="HBox/RightScroll/Margin/RightVBox/Grid/Author" method="_on_text_changed"]
+[connection signal="text_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/Name" to="HBox/RightScroll/Margin/RightVBox/Grid/Name" method="_on_text_changed"]
+[connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/LevelSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/LevelSlider" method="_on_value_changed"]
+[connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/HoleSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/HoleSlider" method="_on_value_changed"]
+[connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/ParSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/ParSlider" method="_on_value_changed"]
+[connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/HeightSlider" to="HBox/RightScroll/Margin/RightVBox/Grid/HeightSlider" method="_on_value_changed"]
+[connection signal="value_changed" from="HBox/RightScroll/Margin/RightVBox/Grid/EditorSnap" to="HBox/RightScroll/Margin/RightVBox/Grid/EditorSnap" method="_on_value_changed"]
+[connection signal="item_selected" from="HBox/RightScroll/Margin/RightVBox/Grid/Foreground" to="HBox/RightScroll/Margin/RightVBox/Grid/Foreground" method="_on_item_selected"]
+[connection signal="file_selected" from="HBox/RightScroll/Margin/RightVBox/Grid/Foreground/FileDialog" to="HBox/RightScroll/Margin/RightVBox/Grid/Foreground" method="_on_file_dialog_file_selected"]
+[connection signal="item_selected" from="HBox/RightScroll/Margin/RightVBox/Grid/Background" to="HBox/RightScroll/Margin/RightVBox/Grid/Foreground" method="_on_background_item_selected"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Export" to="HBox/RightScroll/Margin/RightVBox/Grid/Export" method="_on_Export_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Export/PopupPanel/MarginContainer/VBoxContainer/CopyButton" to="HBox/RightScroll/Margin/RightVBox/Grid/Export" method="_on_copy_button_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Export/PopupPanel/MarginContainer/VBoxContainer/Close" to="HBox/RightScroll/Margin/RightVBox/Grid/Export" method="_on_close_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Import" to="HBox/RightScroll/Margin/RightVBox/Grid/Import" method="_on_Import_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel/MarginContainer/VBoxContainer/PasteButton" to="HBox/RightScroll/Margin/RightVBox/Grid/Import" method="_on_paste_button_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel/MarginContainer/VBoxContainer/Import" to="HBox/RightScroll/Margin/RightVBox/Grid/Import" method="_on_import_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Import/PopupPanel/MarginContainer/VBoxContainer/Close" to="HBox/RightScroll/Margin/RightVBox/Grid/Import" method="_on_close_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/FullScreen" to="HBox/RightScroll/Margin/RightVBox/Grid/FullScreen" method="_on_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/Grid/Reset" to="HBox/RightScroll/Margin/RightVBox/Grid/Reset" method="reset_level"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddStatic" to="HBox/RightScroll/Margin/RightVBox/AddStatic" method="_on_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddElliptic" to="HBox/RightScroll/Margin/RightVBox/AddElliptic" method="_on_pressed"]
+[connection signal="pressed" from="HBox/RightScroll/Margin/RightVBox/AddLinear" to="HBox/RightScroll/Margin/RightVBox/AddLinear" method="_on_pressed"]

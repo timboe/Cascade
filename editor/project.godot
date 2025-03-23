@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Cascada Level Editor"
-run/main_scene="res://Editor.tscn"
+run/main_scene="res://Editor_web.tscn"
 config/features=PackedStringArray("4.2", "Forward Plus")
 run/max_fps=30
 boot_splash/image="res://splash.png"

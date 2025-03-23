@@ -285,6 +285,8 @@ func _process(delta):
 
 func do_reset():
 	#print("reset")
+	if not get_tree():
+		return
 	var ellipticPaths = get_tree().get_nodes_in_group("elliptic_pegs")
 	var linePaths = get_tree().get_nodes_in_group("line_pegs")
 	for ellipticPath in ellipticPaths:

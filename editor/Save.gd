@@ -9,7 +9,10 @@ func _on_Save_pressed():
 	
 func _on_Export_pressed():
 	var save_game = pack_save()
+	var level : int = $"../LevelSlider".value
+	var hole : int = $"../HoleSlider".value
 	$PopupPanel/MarginContainer/VBoxContainer/TextExport.text = JSON.stringify(save_game, "  ", false)
+	$PopupPanel/MarginContainer/VBoxContainer/HBoxContainer/FileNameLabel.text = String("round_"+str(level)+"_hole_"+str(hole)+".json")
 	$PopupPanel.visible = true
 
 func _on_file_dialog_confirmed():
@@ -119,7 +122,10 @@ func pack_save() -> Dictionary:
 	header["level"] = %LevelSlider.value
 	header["hole"] = %HoleSlider.value
 	header["par"] = %ParSlider.value
-	header["foreground"] = %ForegroundIDSlider.value
+	if (%ForegroundIDSlider):
+		header["foreground"] = %ForegroundIDSlider.value
+	else:
+		header["foreground"] = %Foreground.get_item_id(%Foreground.selected) + 1
 	header["background"] = %Background.get_item_id(%Background.selected) + 1
 	header["special"] = %SpecialButton.selected
 	header["height"] = %HeightSlider.value

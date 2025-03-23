@@ -102,11 +102,13 @@ func reset_level() -> void:
 		i += 1
 	%Name.text = ""
 	%Author.text = ""
-	%LevelSlider.value = 1
+	%LevelSlider.value = 10
 	%HoleSlider.value = 1
 	%ParSlider.value = 3
 	%Foreground.selected = 0
+	%Foreground._on_item_selected(0)
 	%Background.selected = 0
+	%Foreground._on_background_item_selected(0)
 	%SpecialButton.selected = 0
 	%HeightSlider.value = 960
 	%EditorSnap.value = 4
@@ -120,12 +122,12 @@ func restore_save(save_game : Dictionary) -> void:
 	%LevelSlider.value = save_game["header"]["level"] 
 	%HoleSlider.value = save_game["header"]["hole"]
 	%ParSlider.value = save_game["header"]["par"]
-	%ForegroundIDSlider.value = save_game["header"]["foreground"]
-	if %ForegroundIDSlider.value >= 10:
-		%Foreground.selected = 10
-		print("Set selected to 4")
-	else:
-		%Foreground.selected = %ForegroundIDSlider.value-1
+	if (%ForegroundIDSlider):
+		%ForegroundIDSlider.value = save_game["header"]["foreground"]
+		if %ForegroundIDSlider.value >= 10:
+			%Foreground.selected = 10
+		else:
+			%Foreground.selected = %ForegroundIDSlider.value-1
 	%Background.selected = save_game["header"]["background"] - 1
 	%SpecialButton.selected = save_game["header"]["special"]
 	%HeightSlider.value = save_game["header"]["height"]
@@ -184,3 +186,4 @@ func _on_import_pressed():
 
 func _on_close_pressed():
 	$PopupPanel.visible = false
+
