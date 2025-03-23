@@ -6,7 +6,7 @@
 //#define SHOW_FPS 1
 
 #define DISABLE_TRAUMA 1
-//#define DISABLE_FREEZE 1
+#define DISABLE_FREEZE 1
 
 #define MAX(a,b) ((a) > (b) ? a : b)
 #define MIN(a,b) ((a) < (b) ? a : b)
@@ -268,6 +268,6 @@
 #define MAX_LEVELS 99
 #define MAX_HOLES 9
 
-#define VERSION "vB1"
+#define VERSION "vB2"
 
 #define PRELOADING_STEPS 32

@@ -340,14 +340,17 @@ void renderGameScores(const int32_t fc, const enum FSM_t fsm) {
       pd->graphics->drawBitmap(bitmapGetChevron((fc / (TICK_FREQUENCY/2)) % 3), DEVICE_PIX_X - 2*BUF - C_OFF, DEVICE_PIX_Y*6 - C_OFF - BUF, kBitmapUnflipped);
     }
 
-    if (fsm == kGameFSM_DisplayScores) {
-      const uint16_t par = IOGetCurrentHolePar();
-      const uint16_t score = IOGetCurrentHoleScore();
-      if (score && score <= par) {
-        pd->graphics->drawBitmap(bitmapGetTick(), 
-          BUF + BALL_RADIUS/2 + m_ballFallX*3*BALL_RADIUS - 2,
-          BUF + BUF/2 + (12 - par - 2)*2*BALL_RADIUS + (DEVICE_PIX_Y * 5),
-          kBitmapUnflipped);
+    if (fsm >= kGameFSM_DisplayScores) {
+      static uint16_t bufY, bufX, bufDisp = 0;
+      if (fsm == kGameFSM_DisplayScores) { // Invalidated once moved to next level, buffer here
+        const uint16_t par = IOGetCurrentHolePar();
+        const uint16_t score = IOGetCurrentHoleScore();
+        bufX = BUF + BALL_RADIUS/2 + m_ballFallX*3*BALL_RADIUS - 2;
+        bufY = BUF + BUF/2 + (12 - par - 2)*2*BALL_RADIUS + (DEVICE_PIX_Y * 5);
+        bufDisp = (score && score <= par);
+      }
+      if (bufDisp) {
+        pd->graphics->drawBitmap(bitmapGetTick(), bufX, bufY, kBitmapUnflipped);
       }
     }
 
