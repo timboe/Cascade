@@ -6,7 +6,7 @@
 //#define SHOW_FPS 1
 
 #define DISABLE_TRAUMA 1
-#define DISABLE_FREEZE 1
+//#define DISABLE_FREEZE 1
 
 #define MAX(a,b) ((a) > (b) ? a : b)
 #define MIN(a,b) ((a) < (b) ? a : b)

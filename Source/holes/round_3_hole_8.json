@@ -5,7 +5,7 @@
     "author": "",
     "level": 3,
     "hole": 8,
-    "par": 3,
+    "par": 4,
     "foreground": 3,
     "background": 2,
     "special": 4,
@@ -283,7 +283,7 @@
     "StaticControl34": {
       "shape": 2,
       "x": 360,
-      "y": 756,
+      "y": 768,
       "angle": 0,
       "size": 1,
       "type": 0
@@ -291,8 +291,8 @@
     "StaticControl35": {
       "shape": 2,
       "x": 360,
-      "y": 756,
-      "angle": 0,
+      "y": 768,
+      "angle": 60,
       "size": 0,
       "type": 0
     },
@@ -300,7 +300,7 @@
       "shape": 2,
       "x": 340,
       "y": 652,
-      "angle": -60,
+      "angle": 60,
       "size": 0,
       "type": 0
     },
