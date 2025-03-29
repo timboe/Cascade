@@ -6,7 +6,7 @@ extends HSlider
 @onready var parentControl : Control = get_parent().get_parent().get_parent().get_parent()
 
 func _on_value_changed(newValue):
-	$"../PathLabel".text = "Path Pegs: " + str(newValue)
+	$"../PathLabel".text = "Path Obstacles: " + str(newValue)
 	rend.call_deferred("do_update")
 	var pegVbox : VBoxContainer = parentControl.find_child("PegVBox")
 	var tot_pegs = newValue

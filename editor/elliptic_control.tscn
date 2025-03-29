@@ -95,7 +95,7 @@ theme_override_constants/separation = 6
 
 [node name="EllipticPathText" type="Label" parent="Margin/EllipticVBox"]
 layout_mode = 2
-text = "EllipticPegPath0"
+text = "EllipticObstaclePath0"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="Margin/EllipticVBox"]
 layout_mode = 2
@@ -103,7 +103,7 @@ layout_mode = 2
 [node name="PathLabel" type="Label" parent="Margin/EllipticVBox/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Path Pegs: 1"
+text = "Path Obstacles: 1"
 horizontal_alignment = 2
 
 [node name="PathSlider" type="HSlider" parent="Margin/EllipticVBox/HBoxContainer2"]
@@ -312,7 +312,7 @@ theme_override_constants/separation = 6
 [node name="PegLabel" type="Label" parent="Margin/EllipticVBox/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Peg"
+text = "Obstacle"
 horizontal_alignment = 1
 
 [node name="PegLabel2" type="Label" parent="Margin/EllipticVBox/HBoxContainer"]
