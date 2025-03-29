@@ -127,7 +127,7 @@ func _on_pressed():
 	var instance = staticScene.instantiate()
 	static_count += 1
 	instance.name = \"StaticControl\" + str(static_count)
-	instance.find_child(\"StaticPeg\").text = \"StaticPeg\" + str(static_count)
+	instance.find_child(\"StaticPeg\").text = \"StaticObstacle\" + str(static_count)
 	instance.find_child(\"XText\").value = newPos.x
 	instance.find_child(\"YText\").value = newPos.y
 	newPos.x += 16
@@ -153,7 +153,7 @@ func _on_pressed():
 	var instance = staticScene.instantiate()
 	elliptic_count += 1
 	instance.name = \"EllipticControl\" + str(elliptic_count)
-	instance.find_child(\"EllipticPathText\").text = \"EllipticPegPath\" + str(elliptic_count)
+	instance.find_child(\"EllipticPathText\").text = \"EllipticObstaclePath\" + str(elliptic_count)
 	instance.find_child(\"XText\").value = newPos.x
 	instance.find_child(\"YText\").value = newPos.y
 	newPos.x += 16
@@ -179,7 +179,7 @@ func _on_pressed():
 	var instance = staticScene.instantiate()
 	lineCount += 1
 	instance.name = \"LinearControl\" + str(lineCount)
-	instance.find_child(\"LinePathText\").text = \"LinearPegPath\" + str(lineCount)
+	instance.find_child(\"LinePathText\").text = \"LinearObstaclePath\" + str(lineCount)
 	instance.find_child(\"XText\").value = newPos.x
 	instance.find_child(\"YText\").value = newPos.y
 	newPos.x += 16

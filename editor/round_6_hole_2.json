@@ -8,7 +8,7 @@
     "par": 3,
     "foreground": 20,
     "background": 0,
-    "special": 0,
+    "special": 1,
     "height": 550,
     "snap": 4,
     "n_static": 61,

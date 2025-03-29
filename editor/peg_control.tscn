@@ -77,7 +77,7 @@ theme_override_constants/separation = 6
 
 [node name="StaticPeg" type="Label" parent="Margin/VBox"]
 layout_mode = 2
-text = "StaticPeg0"
+text = "StaticObstacle0"
 
 [node name="Grid1" type="GridContainer" parent="Margin/VBox"]
 layout_mode = 2
