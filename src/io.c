@@ -293,6 +293,7 @@ void IOSetCurrentHoleScore(const uint16_t score) {
   if (!score) { return; }
   if (!m_persistent_data[m_player][m_level][m_hole] || score < m_persistent_data[m_player][m_level][m_hole]) {
     m_persistent_data[m_player][m_level][m_hole] = score;
+    IODoSave();
   }
 }
 

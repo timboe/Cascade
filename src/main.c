@@ -41,7 +41,6 @@ int eventHandler(PlaydateAPI* pd, PDSystemEvent event, uint32_t arg) {
       break;
     case kEventPause:;
       pdxlog("EH: pause");
-      //pd->system->setMenuImage(getPauseImage(), 0); // TODO
       break;
     case kEventResume:;
       pdxlog("EH: resume");

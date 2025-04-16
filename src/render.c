@@ -55,6 +55,9 @@ void renderAddFreeze(const uint16_t amount) {
 }
 
 bool renderGetSubFreeze(void) {
+#ifdef DISABLE_FREEZE
+  return;
+#endif
   if (m_freeze) {
     return m_freeze--;
   }

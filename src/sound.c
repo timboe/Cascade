@@ -19,7 +19,14 @@ int8_t m_wfPlaying = -1;
 uint8_t m_plingID = 0;
 int32_t m_plingTimer = 0;
 
-const float WF_VOLUMES[] = {0.6f, 0.8f, 1.0f, 0.5f, 1.0f, 0.8f, 1.0f};
+const float WF_VOLUMES[] = {
+  0.6f,  //0 
+  0.8f,  //1
+  1.0f,  //2 
+  0.5f,  //3 
+  1.0f,  //4 
+  0.8f,  //5 
+  1.0f}; //6
 
 FilePlayer* m_music[N_MUSIC_TRACKS];
 FilePlayer* m_waterfalls[N_WF_TRACKS];
