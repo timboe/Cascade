@@ -46,7 +46,7 @@
       "y": 820,
       "angle": 90,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl5": {
       "shape": 0,
@@ -54,7 +54,7 @@
       "y": 756,
       "angle": 90,
       "size": 2,
-      "type": 0
+      "type": 1
     },
     "StaticControl6": {
       "shape": 0,
@@ -94,7 +94,7 @@
       "y": 820,
       "angle": 90,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl11": {
       "shape": 0,
@@ -102,7 +102,7 @@
       "y": 756,
       "angle": 90,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl12": {
       "shape": 0,
@@ -110,7 +110,7 @@
       "y": 692,
       "angle": 90,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl13": {
       "shape": 0,
@@ -118,7 +118,7 @@
       "y": 628,
       "angle": 90,
       "size": 2,
-      "type": 0
+      "type": 1
     },
     "StaticControl14": {
       "shape": 0,
@@ -308,7 +308,7 @@
       "PegContainer2": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 1
+        "type": 0
       },
       "PegContainer3": {
         "shape_override": 0,
@@ -333,7 +333,7 @@
       "PegContainer7": {
         "shape_override": 0,
         "size_override": 0,
-        "type": 1
+        "type": 0
       },
       "PegContainer8": {
         "shape_override": 0,
@@ -501,7 +501,7 @@
       "PegContainer4": {
         "shape_override": 0,
         "size_override": 2,
-        "type": 1
+        "type": 0
       },
       "PegContainer5": {
         "shape_override": 0,
