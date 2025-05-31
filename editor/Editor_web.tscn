@@ -437,7 +437,7 @@ script = SubResource("GDScript_4ako0")
 [node name="StaticPegsLabel" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Static obstacles:"
+text = "Static Obstacles:"
 horizontal_alignment = 2
 
 [node name="StaticPegs" type="Label" parent="HBox/RightScroll/Margin/RightVBox/Grid"]
