@@ -182,7 +182,7 @@
       "y": 312,
       "angle": 0,
       "size": 2,
-      "type": 0
+      "type": 1
     },
     "StaticControl22": {
       "shape": 0,
@@ -206,7 +206,7 @@
       "y": 304,
       "angle": 90,
       "size": 2,
-      "type": 0
+      "type": 1
     },
     "StaticControl25": {
       "shape": 2,
