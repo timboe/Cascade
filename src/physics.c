@@ -129,7 +129,11 @@ void physicsDoRemoveSecondBall(void) {
 void physicsSetSecondBallInPlay(void) {
   m_secondBallInPlay = true;
   const cpVect pos = cpBodyGetPosition(m_ball[0]);
-  const cpVect vel = cpBodyGetVelocity(m_ball[0]);
+  cpVect vel = cpBodyGetVelocity(m_ball[0]);
+  if (vel.x > 0.0f && vel.x <  10.0f) { vel.x =  10.0f; }
+  if (vel.x < 0.0f && vel.x > -10.0f) { vel.x = -10.0f; }
+  if (vel.y > 0.0f && vel.y <  10.0f) { vel.y =  10.0f; }
+  if (vel.y < 0.0f && vel.y > -10.0f) { vel.y = -10.0f; }
   physicsSetBallPosition(1, pos);
   cpBodySetVelocity(m_ball[1], cpv(-vel.x, -vel.y));
 }

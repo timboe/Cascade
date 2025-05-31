@@ -11,7 +11,7 @@
     "special": 5,
     "height": 960,
     "snap": 4,
-    "n_static": 87,
+    "n_static": 88,
     "n_elliptic": 0,
     "n_linear": 0
   },
@@ -142,7 +142,7 @@
       "y": 572,
       "angle": 155,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl17": {
       "shape": 2,
@@ -150,7 +150,7 @@
       "y": 576,
       "angle": 210,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl18": {
       "shape": 2,
@@ -158,7 +158,7 @@
       "y": 552,
       "angle": 132,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl19": {
       "shape": 2,
@@ -166,7 +166,7 @@
       "y": 736,
       "angle": -77,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl20": {
       "shape": 2,
@@ -174,7 +174,7 @@
       "y": 708,
       "angle": -38,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl21": {
       "shape": 2,
@@ -182,7 +182,7 @@
       "y": 764,
       "angle": -121,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl22": {
       "shape": 2,
@@ -214,7 +214,7 @@
       "y": 704,
       "angle": -192,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl26": {
       "shape": 2,
@@ -222,7 +222,7 @@
       "y": 680,
       "angle": -161,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl27": {
       "shape": 2,
@@ -230,7 +230,7 @@
       "y": 736,
       "angle": -205,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl28": {
       "shape": 2,
@@ -238,7 +238,7 @@
       "y": 428,
       "angle": -170,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl29": {
       "shape": 2,
@@ -246,7 +246,7 @@
       "y": 460,
       "angle": -201,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl30": {
       "shape": 2,
@@ -254,7 +254,7 @@
       "y": 416,
       "angle": -134,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl31": {
       "shape": 2,
@@ -262,7 +262,7 @@
       "y": 164,
       "angle": -234,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl32": {
       "shape": 2,
@@ -270,7 +270,7 @@
       "y": 132,
       "angle": -205,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl33": {
       "shape": 2,
@@ -278,7 +278,7 @@
       "y": 188,
       "angle": -281,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl34": {
       "shape": 2,
@@ -286,7 +286,7 @@
       "y": 852,
       "angle": -98,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl35": {
       "shape": 2,
@@ -294,7 +294,7 @@
       "y": 820,
       "angle": -69,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl36": {
       "shape": 2,
@@ -302,7 +302,7 @@
       "y": 880,
       "angle": -132,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl37": {
       "shape": 2,
@@ -310,7 +310,7 @@
       "y": 464,
       "angle": -128,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl38": {
       "shape": 2,
@@ -318,7 +318,7 @@
       "y": 428,
       "angle": -97,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl39": {
       "shape": 2,
@@ -326,7 +326,7 @@
       "y": 480,
       "angle": -150,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl40": {
       "shape": 2,
@@ -334,7 +334,7 @@
       "y": 216,
       "angle": -45,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl41": {
       "shape": 2,
@@ -342,7 +342,7 @@
       "y": 248,
       "angle": -75,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl42": {
       "shape": 2,
@@ -350,7 +350,7 @@
       "y": 196,
       "angle": -27,
       "size": 2,
-      "type": 1
+      "type": 0
     },
     "StaticControl43": {
       "shape": 0,
@@ -711,6 +711,14 @@
       "angle": -173,
       "size": 0,
       "type": 0
+    },
+    "StaticControl88": {
+      "shape": 0,
+      "x": 204,
+      "y": 936,
+      "angle": -353,
+      "size": 0,
+      "type": 2
     }
   }
 }

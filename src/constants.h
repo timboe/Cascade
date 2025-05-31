@@ -268,6 +268,6 @@
 #define MAX_LEVELS 99
 #define MAX_HOLES 9
 
-#define VERSION "vB2"
+#define VERSION "v1.0"
 
 #define PRELOADING_STEPS 32
