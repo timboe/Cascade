@@ -1,44 +1,73 @@
-# Cascade
-Prototype playdate physics game, working title
+# Cascada
 
+_Cascade marbles and watch them plink and plonk down serene waterfall scenes in this relaxing Pachinko game for Playdate._
 
-https://www.1001fonts.com/great-vibes-font.html
+* 54 levels across six themed rounds
+* Par-based scoring (like golf) with unlimited marbles
+* Six animated waterfall backgrounds plus 13 holes set against famous scenes from art, science and nature
+* Crank-controlled gameplay
+* Create your own levels with the web-based level editor
+* Minimal text
+* Smooth 50 FPS performance
 
-https://unsplash.com/photos/a-bird-in-the-water-8C3Z8jk7yMw
+## Build Info
 
-https://thenounproject.com/icon/tutorial-6717327/
+* This game can be Side Loaded onto the Playdate - [see how to do this here](https://help.play.date/games/sideloading/).
+* Available [in Panic's Catalog](https://play.date/games/398647).
+* Available [at itch.io](https://timboe.itch.io/cascada)
 
-https://www.freepik.com/free-vector/cartoon-water-element-animation-frames_13763531.htm#query=water%20splash%20animation&position=4&from_view=keyword&track=ais&uuid=fffafd39-c3c4-439c-88ab-1dc01d5dcdbe
+## Credits
 
-Outline: thickness 6, intensity 80. Font size 90 regular
+Full license files in the `licences` directory
 
-Kenny sonic explosion 
-
-https://thenounproject.com/icon/crank-108874/
-
-https://thenounproject.com/icon/clockwise-3256360/
-
-https://thenounproject.com/icon/button-488661/
-
-https://thenounproject.com/icon/d-pad-1273656/
-
-https://thenounproject.com/icon/army-chevron-4942716/
-
-https://thenounproject.com/icon/eye-7431853/
-
-
-https://unsplash.com/photos/waterfalls-surrounded-with-green-leafed-trees-during-daytime-NWrye3NRrKw
-https://ditherit.com/ Error + Stucki + Serpentine
-https://www.gingerbeardman.com/canvas-dither/ Disabled + Stucki
-paint.net FS plugin (BEST)
-
-https://unsplash.com/photos/photo-of-waterfalls-OE6qLhRHhhs
-pain.net FS dither + delete white areas
-
-https://unsplash.com/photos/a-waterfall-in-the-middle-of-a-forest-LI7fbyc9uJ8 
-
-https://en.wikipedia.org/wiki/The_Great_Wave_off_Kanagawa#/media/File:Tsunami_by_hokusai_19th_century.jpg
-https://unsplash.com/photos/a-waterfall-in-a-forest-ijdGVQwkfcA
-https://unsplash.com/photos/waterfalls-in-the-middle-of-green-trees-during-daytime-UxC3uEfPsvg
-https://unsplash.com/photos/a-large-waterfall-with-a-man-standing-in-front-of-it-xdRIxoySFck
-https://unsplash.com/photos/waterfalls-on-brown-rocky-mountain-during-daytime-oMaa0mR1V7c
+* Soundtrack: 
+  * Nox Sounds: Iceland Flows Pack [CC-0]
+  * Doctor Dreamchip: Lofi Keyboard Pack [CC-BY-4]
+* Fonts & Graphics:
+  * Robert Leuschke: Great Vibes [OFL-1.1]
+  * Martin Vacha: Roobert [CC-BY-4]
+  * Vincent van Gogh: The Starry Night [Public Domain]
+  * NASA: Venus Globe [Public Domain]
+  * NASA and ESA: Eagle Nebula Pillars [Public Domain]
+  * Edvard Munch: The Scream of Nature [Public Domain]
+  * Grant Wood: American Gothic [Public Domain]
+  * Katsushika Hokusai: The Great Wave off Kanagawa [Public Domain]
+  * Gustave Courbet: Le Désespéré [Public Domain]
+  * M. C. Escher: Tower of Babel [Public Domain]
+  * Claude Monet: San Giorgio Maggiore At Dusk [Public Domain]
+  * Darryl Brooks: Leaning Tower of Pisa [Usplash]
+  * Vincent van Gogh: Vase with Fifteen Sunflowers [Public Domain]
+  * Arches National Park: Delicate Arch [Public Domain]
+  * Matze Weiss: Skógafoss [Usplash]
+  * Blake Verdoorn: Bridge and waterfalls [Usplash]
+  * Anders Ipsen: Waterfalls with trees [Usplash]
+  * Jay Joshi: Yosemite Valley [Usplash]
+  * Alexander Milo: Glymur Falls [Usplash]
+  * Anna Saveleva: Glencoe valley [Usplash]
+  * Christian: Cascades [Usplash]
+  * Jordan Whitt: Badlands National Park [Usplash]
+  * Johannes S: Crank [CC-BY-3]
+  * Mark Claus: Button [CC-BY-3]
+  * Aurélien Dotpro: D Pad [CC-BY-3]
+  * SAM Designs: Army Chevron [CC-BY-3]
+  * Alzam: Tutorial [CC-BY-3]
+  * Kenny: Smoke Particles [CC-0]
+* Audio Effects:
+  * Chaosportal: Cigarette Sizzle 01 [CC-0]
+  * ztrees1: Whoosh [CC-BY-3]
+  * empraetorius: Water Bottle Boing [CC-BY-4]
+  * Pellepyb: Pop sound [CC-0]
+  * MATRIXXX_: Heavy Artillery Shot [CC-0]
+  * TheRandomSoundByte2637: Snare Drum Buzz and Cymbal [CC-BY-4]
+  * chungus43A: 8-bit laser charging [CC-0]
+  * Kraftaggregat: Rocks Thrown in Water [CC-0]
+  * guterton.wav: Cup Ding and Bowl Ding [CC-BY-4]
+  * keweldog: Bird Chrips [CC-0]
+  * Fauxtogramme: Water Fountain [CC-0]
+  * djfroyd: Fail [CC-BY-3]
+  * Kagateni: Success [CC0]
+  * ADPCM-XQ [MIT]
+  * sfx.me
+* Chipmunk2D Physics: Howling Moon Software [MIT].
+  * Thanks also to maximile for the initial Playdate integration.
+* Particle Sizzler: Tomás Franco.
