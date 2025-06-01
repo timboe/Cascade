@@ -16,7 +16,7 @@ _Cascade marbles and watch them plink and plonk down serene waterfall scenes in 
 * Available [in Panic's Catalog](https://play.date/games/398647).
 * Available [at itch.io](https://timboe.itch.io/cascada)
 
-## Credits
+## Cascada Credits
 
 Full license files in the `licences` directory
 
@@ -67,7 +67,13 @@ Full license files in the `licences` directory
   * djfroyd: Fail [CC-BY-3]
   * Kagateni: Success [CC0]
   * ADPCM-XQ [MIT]
-  * sfx.me
+  * sfxr.me
 * Chipmunk2D Physics: Howling Moon Software [MIT].
   * Thanks also to maximile for the initial Playdate integration.
 * Particle Sizzler: Tomás Franco.
+
+## Cascada Editor Credits
+
+* [Godot Engine](https://godotengine.org/license/) [MIT]
+* Aestro theme by hanprog [Apache-2.0]
+* Godot Clipboard Copy/Paste Workaround For Web by TinyTakinTeller [MIT] 

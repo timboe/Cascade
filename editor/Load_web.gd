@@ -140,12 +140,14 @@ func reset_level() -> void:
 func restore_save(save_game : Dictionary) -> void:
 	reset_level()
 	
+	var fg = save_game["header"]["foreground"]
+	
 	%Name.text = save_game["header"]["name"] 
 	%Author.text = save_game["header"]["author"] 
 	%LevelSlider.value = save_game["header"]["level"] 
 	%HoleSlider.value = save_game["header"]["hole"]
 	%ParSlider.value = save_game["header"]["par"]
-	%Foreground.selected = save_game["header"]["foreground"] - 1
+	%Foreground.selected = 0 if fg > 7 else fg-1 
 	%Background.selected = save_game["header"]["background"] - 1
 	%SpecialButton.selected = save_game["header"]["special"]
 	%HeightSlider.value = save_game["header"]["height"]
@@ -182,7 +184,7 @@ func restore_save(save_game : Dictionary) -> void:
 		
 	%Foreground._on_background_item_selected(%Background.selected)
 
-	var res = load("res://foregrounds/falls" + str(%Foreground.selected+1) +  "_fg-table-400-60.png")
+	var res = load("res://foregrounds/falls" + str(fg) +  "_fg-table-400-60.png")
 	print("trying to load: ", res)
 	if res:
 		%ForegroundTexRect.texture = res

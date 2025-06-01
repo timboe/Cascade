@@ -10,7 +10,7 @@ func _on_value_changed(newValue):
 	rend.call_deferred("do_update")
 	var pegVbox : VBoxContainer = parentControl.find_child("PegVBox")
 	var tot_pegs = newValue
-	var tot_lines_node = $"../../HBoxContainer3/LineSlider"
+	var tot_lines_node = get_node_or_null("../../HBoxContainer3/LineSlider")
 	if tot_lines_node:
 		var tot_lines = tot_lines_node.value
 		parentControl.custom_minimum_size.y = 370 + ((tot_lines+1) * (27+6)) + ((tot_pegs+1) * (27+6))
